@@ -3,7 +3,7 @@ var left_panel = (function() {
   var attrs = {
     GENDER: [ 
       {
-        NAME: "Female", 
+        NAME: "FEMALE", 
         VALUE: "female"
       }, 
       {
@@ -116,22 +116,22 @@ return {
               });
            }
     });
-    console.log(_result);
     //TODO
     //update view -- trigger event listener
   },
   set_status: function(_input) {
     var pseudo_input = {
       OS_STATUS: ["NA", "Deceased"],
-      RACE: ["Asian", "White", "Black or African American"]
+      RACE: ["Asian", "White", "Black or African American"],
+      GENDER: ["FEMALE"]
     };
     $('#left_panel input[type=checkbox]').attr('checked', false);
 
-    $.each(Object.keys(pseudo_input), function(_index, _selected_attr_name) {
-      var _obj = pseudo_input[_selected_attr_name];
+    $.each(Object.keys(pseudo_input), function(_index, _selected_attr_category) {
+      var _obj = pseudo_input[_selected_attr_category];
       $.each(_obj, function(_inner_index, _selected_attr_val) {
         
-        //find the value for the name
+        //find the value maps to the display name
         var _defined_selected_attr_val = "";
         $.each(Object.keys(attrs), function(_tmp_index, _tmp_key) {
           var _tmp_obj = attrs[_tmp_key];
@@ -142,10 +142,8 @@ return {
         });
 
         $('#left_panel input[type=checkbox]').each(function() {
-          var _this_attr_name = $(this)[0].name;
-          var _this_attr_val = $(this).val();
-          if (_this_attr_name === _selected_attr_name && 
-              _this_attr_val === _defined_selected_attr_val) {
+          var _this_checkbox_id = $(this).attr("id");
+          if (_this_checkbox_id === _selected_attr_category + "_" + _defined_selected_attr_val) {
             $(this).attr("checked", true);
           }
         });        
