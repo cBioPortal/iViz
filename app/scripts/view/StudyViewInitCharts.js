@@ -1292,11 +1292,15 @@ var StudyViewInitCharts = (function(){
         },
         filterChartFromLeftPanel: function (selections) {
           _.each(selections, function (selection, key) {
-            varChart[attrNameMapUID[key]].filter(selection);
+            if(attrNameMapUID.hasOwnProperty(key)) {
+              varChart[attrNameMapUID[key]].filter(selection);
+            }
           })
         },
         filterChart: function (attr_id, filterId) {
-          varChart[attrNameMapUID[attr_id]].filter(filterId);
+          if(attrNameMapUID.hasOwnProperty(attr_id)) {
+            varChart[attrNameMapUID[attr_id]].filter(filterId);
+          }
         }
     };
 })();
