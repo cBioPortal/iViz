@@ -122,8 +122,8 @@ return {
   },
   set_status: function(_input) {
     var pseudo_input = {
-      OS_STATUS: ["na", "deceased"],
-      RACE: ["asian", "white"]
+      OS_STATUS: ["na", "Deceased"],
+      RACE: ["Asian", "White", "Black or African American"]
     };
     $('#left_panel input[type=checkbox]').attr('checked', false);
 
@@ -132,7 +132,8 @@ return {
       $.each(_obj, function(_inner_index, _selected_attr_val) {
         $('#left_panel input[type=checkbox]').each(function() {
           var _this_attr_name = $(this)[0].name;
-          var _this_attr_val = $(this).val();
+          var _this_attr_val = $(this).text();
+          console.log($(this).text);
           if (_this_attr_name === _selected_attr_name && 
               _this_attr_val === _selected_attr_val) {
             $(this).attr("checked", true);
