@@ -306,7 +306,7 @@ var StudyViewInitCharts = (function(){
 
     function initSpecialCharts(_arr){
         if(StudyViewParams.params.studyId.indexOf("mskimpact") === -1 && StudyViewParams.params.studyId.indexOf("genie") === -1) {
-            initSurvialPlotPrep(_arr);
+            //initSurvialPlotPrep(_arr);
         }
 
         if(
@@ -314,14 +314,14 @@ var StudyViewInitCharts = (function(){
                 StudyViewUtil.arrayFindByValue(varName, 'COPY_NUMBER_ALTERATIONS') &&
                 varKeys.MUTATION_COUNT.length > 0 &&
                 varKeys.COPY_NUMBER_ALTERATIONS.length > 0){
-            initScatterPlot(_arr);
+            //initScatterPlot(_arr);
 
             //if(StudyViewParams.params.studyId.indexOf("mskimpact") !== -1){
             //    initSurvialPlotPrep(_arr);
             //}
         }
 
-        initTables();
+        //initTables();
     }
 
     function initSurvialPlotPrep(_arr){
@@ -585,7 +585,7 @@ var StudyViewInitCharts = (function(){
         });
       });
 
-      console.log(datum);
+      left_panel.init();
     }
     function initDcCharts(_data) {
         var createdChartID = 0;
@@ -820,7 +820,9 @@ var StudyViewInitCharts = (function(){
     }
 
     function updateLeftPanel(attr_id, chartFilter) {
-
+      var datum = {};
+      datum[attr_id] = [chartFilter]
+      left_panel.set_status(datum);
     }
 
     function updateBreadCrumbs(chartID, chartFilter) {
@@ -1287,6 +1289,11 @@ var StudyViewInitCharts = (function(){
         getSelectedCasesID: getSelectedCasesID,
         getLayout: function() {
             return msnry;
+        },
+        filterChartFromLeftPanel: function (selections) {
+          _.each(selections, function (selection, key) {
+            varChart[attrNameMapUID[key]].filter(selection);
+          })
         },
         filterChart: function (attr_id, filterId) {
           varChart[attrNameMapUID[attr_id]].filter(filterId);
