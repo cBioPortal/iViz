@@ -1,11 +1,11 @@
 var left_panel = (function() {
 
   var attrs = {
-    GENDER: [ 
+    GENDER: [
       {
-        NAME: "FEMALE", 
+        NAME: "FEMALE",
         VALUE: "female"
-      }, 
+      },
       {
         NAME: "NA",
         VALUE: "na",
@@ -13,13 +13,13 @@ var left_panel = (function() {
     ],
     OS_STATUS: [
       {
-        NAME: "Deceased",
+        NAME: "DECEASED",
         VALUE: "deceased",
-      }, 
+      },
       {
-        NAME: "Living",
+        NAME: "LIVING",
         VALUE: "living"
-      }, 
+      },
       {
         NAME: "NA",
         VALUE: "na"
@@ -46,18 +46,18 @@ var left_panel = (function() {
         NAME: "POLE (Ultra-mutated)",
         VALUE: "pole"
       }
-    ], 
-    RACE: [ 
+    ],
+    RACE: [
       {
-        NAME: "American Indian or Alaska native",
+        NAME: "AMERICAN INDIAN OR ALASKA NATIVE",
         VALUE: "american_indian"
-      }, 
+      },
       {
-        NAME: "Asian",
+        NAME: "ASIAN",
         VALUE: "asian"
-      }, 
+      },
       {
-        NAME: "Black or African American",
+        NAME: "BLACK OR AFRICAN AMERICAN",
         VALUE: "black"
       },
       {
@@ -65,15 +65,15 @@ var left_panel = (function() {
         VALUE: "na"
       },
       {
-        NAME: "Native Hawaiian or other pacific islander",
+        NAME: "NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER",
         VALUE: "native_american"
-      }, 
+      },
       {
-        NAME: "White",
+        NAME: "WHITE",
         VALUE: "white"
       }
-    ], 
-    STUDY_ID: [ 
+    ],
+    STUDY_ID: [
       {
         NAME: "Uterus TCGA",
         VALUE: "ucec_tcga"
@@ -118,19 +118,16 @@ return {
     });
     //TODO
     //update view -- trigger event listener
+    StudyViewInitCharts.filterChartFromLeftPanel(_result);
   },
   set_status: function(_input) {
-    var pseudo_input = {
-      OS_STATUS: ["NA", "Deceased"],
-      RACE: ["Asian", "White", "Black or African American"],
-      GENDER: ["FEMALE"]
-    };
-    $('#left_panel input[type=checkbox]').attr('checked', false);
+    var pseudo_input = _input;
+    $('#left_panel input[type=checkbox]').prop('checked', false);
 
     $.each(Object.keys(pseudo_input), function(_index, _selected_attr_category) {
       var _obj = pseudo_input[_selected_attr_category];
       $.each(_obj, function(_inner_index, _selected_attr_val) {
-        
+
         //find the value maps to the display name
         var _defined_selected_attr_val = "";
         $.each(Object.keys(attrs), function(_tmp_index, _tmp_key) {
@@ -138,20 +135,20 @@ return {
           $.each(_tmp_obj, function(_tmp_tmp_index, _tmp_obj) {
             if (_tmp_obj.NAME === _selected_attr_val)
               _defined_selected_attr_val = _tmp_obj.VALUE;
-          });          
+          });
         });
 
         $('#left_panel input[type=checkbox]').each(function() {
           var _this_checkbox_id = $(this).attr("id");
           if (_this_checkbox_id === _selected_attr_category + "_" + _defined_selected_attr_val) {
-            $(this).attr("checked", true);
+            $("#" + _this_checkbox_id).prop("checked", true);
           }
-        });        
+        });
       });
     });
 
   }
 }
- 
+
 }());
 
