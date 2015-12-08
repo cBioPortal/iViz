@@ -135,6 +135,42 @@ var StudyViewInitCharts = (function(){
     }
 
     function initData(dataObtained) {
+        numOfCases = null;
+        ndx = null; //Crossfilter dimension
+        msnry = null;
+        totalCharts = null;
+        //mutatedGenes = [];
+        //cna = [];
+        dataArr = {};
+        pie = []; //Displayed attributes info; dataType: STRING; NUMBER; OR BOOLEAN
+        bar = []; //Displayed attributes info; dataType: NUMBER
+
+        //Each attribute will have one unique ID. If the chart of one attribute
+        //has been deleted; this ID will push into removedChart array. This
+        //array will be used when the chart deleted and redraw charts.
+        removedChart = [];
+
+        //The relationshio between "The unique attribute name" and
+        //"The unique ID number in whole page"
+        attrNameMapUID = {};
+        varChart = [];
+        varName = []; //Store all attributes in all data
+        varKeys = {}; //Store all keys for each attribute
+
+        //The relationshio between "The ID of div standing for each Chart
+        //in HTML" and "The unique ID number in whole page".
+        HTMLtagsMapUID = [];
+
+        //Could be displayed Charts Type 'pie;bar'.
+        //Mix combination; seperate by comma
+        varType = {};
+
+        //Only for NUMBER dataType; store min; max and difference value
+        distanceMinMaxArray = [];
+        dataType = {};
+        displayedID = []; //Displayed Charts ID number
+        varDisplay = [];
+
         var _attr = dataObtained.attr,
             _arr = dataObtained.arr,
             _attrLength = _attr.length,
@@ -386,13 +422,13 @@ var StudyViewInitCharts = (function(){
                 var _itemElems = msnry.getItemElements(),
                     _itemElemsLength = _itemElems.length;
 
-                for(var j=0; j< _itemElemsLength; j++){
-                    if( instance.element.id === _itemElems[j].id){
-                        $("#" + _itemElems[j].id).css('z-index','20');
-                    }else{
-                        $("#" + _itemElems[j].id).css('z-index','1');
-                    }
-                }
+                //for(var j=0; j< _itemElemsLength; j++){
+                //    if( instance.element.id === _itemElems[j].id){
+                //        $("#" + _itemElems[j].id).css('z-index','20');
+                //    }else{
+                //        $("#" + _itemElems[j].id).css('z-index','1');
+                //    }
+                //}
             });
 
             //Remove z-index of all charts
@@ -536,8 +572,21 @@ var StudyViewInitCharts = (function(){
             initSpecialCharts(_data.arr);
         }
         initDcCharts(_data);
+        initLeftPanel();
     }
 
+    function initLeftPanel(target) {
+        var initAttrs = ['GENDER', 'OS_STATUS', 'MOLECULAR_SUBTYPE', 'RACE'];
+        var datum = {};
+      _.each(initAttrs, function(attr, index) {
+        console.log(attr, varChart[attrNameMapUID[attr]].getLabels());
+        datum.attr = varChart[attrNameMapUID[attr]].getLabels().map(function (label) {
+          return label.name;
+        });
+      });
+
+      console.log(datum);
+    }
     function initDcCharts(_data) {
         var createdChartID = 0;
 
@@ -766,7 +815,7 @@ var StudyViewInitCharts = (function(){
             redrawSpecialPlots();
             // update the breadcrumbs
             updateBreadCrumbs(chartID, chartFilter);
-            updateLeftPanel(displayedID[chartID], chartFilterId)
+            updateLeftPanel(displayedID[chartID], chartFilter)
         }
     }
 

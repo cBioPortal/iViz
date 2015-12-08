@@ -225,6 +225,17 @@ var StudyViewInitTopComponents = (function() {
         _customDialogQtip.content.text = $('#study-view-case-select-custom-dialog');
         $('#study-view-header-right-1').qtip(_customDialogQtip);
 
+        $('#study-view-header-left-7').click(function () {
+          dataFolder = 'ucs_tcga';
+          $('#dc-plots-loading-wait').show();
+          $('#study-view-charts').empty();
+          $('#study-view-header-function').empty();
+          $.ajax({url: "data/" + dataFolder + "/configs.json"})
+            .then(function (data) {
+              StudyView.preConfig = data;
+              StudyViewMainController.init(StudyView.preConfig);
+            })
+        })
         initAddCharts("#study-view-header-right");
         // ensure header has proper values
         StudyViewInitCharts.changeHeader();

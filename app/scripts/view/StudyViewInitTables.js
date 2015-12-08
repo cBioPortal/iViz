@@ -36,6 +36,7 @@ var StudyViewInitTables = (function() {
     var workers = [];
 
     function init(input,callback) {
+        workers = [];
         initData(input);
         initTables();
         if(typeof callback === 'function'){

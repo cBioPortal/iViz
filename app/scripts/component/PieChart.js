@@ -1250,6 +1250,16 @@ var PieChart = function(){
         $("#"+DIV.chartDiv+"-pie-icon").css('display', 'none');
     }
 
+    function findFilterId(filter_id) {
+      _.each(label, function (labelDatum){
+        if(labelDatum.id === filter_id) {
+          return labelDatum.name;
+        }
+      });
+
+      return '';
+    }
+
     return {
         init: function(_param){
             initParam(_param);
@@ -1289,11 +1299,15 @@ var PieChart = function(){
         plotDataCallbackFunc: function(_callback) {
             plotDataCallback = _callback;
         },
-        filter: function(filter_id) {
+        filter: function(filter_name) {
+          var filter_id = findFilterId(filter_name);
           pieChart.onClick({
             key: label[filter_id].name,
             value: label[filter_id].value
           });
+        },
+        getLabels: function () {
+          return label;
         }
     };
 };

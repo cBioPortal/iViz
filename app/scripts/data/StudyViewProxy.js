@@ -562,6 +562,20 @@ var StudyViewProxy = (function () {
 
   return {
     init: function (callbackFunc) {
+        parObject = {};
+        sampleIdStr = '';
+        patientIdStr = '';
+        patientToSampleMapping = {};
+        sampleToPatientMapping = {};
+        ajaxParameters = {};
+        obtainDataObject = {};
+
+      //The mapping between obtainDataObject.arr index and sampleID
+        sampleIdArrMapping = {};
+
+      obtainDataObject.attr = [];
+      obtainDataObject.arr = [];
+
       initLocalParameters(function () {
         initAjaxParameters();
         getDataFunc(callbackFunc);

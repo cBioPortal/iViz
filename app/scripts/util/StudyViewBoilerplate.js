@@ -126,14 +126,14 @@ var StudyViewBoilerplate ={
             target: '',
             viewport: $(window)
         },
-        show: { 
-            when: false, 
+        show: {
+            when: false,
             ready: true,
             event: function(){
                 $(this).qtip('hide');
             }
-        }, 
-        hide: { 
+        },
+        hide: {
             delay: 2000
         },
         style: {
@@ -158,7 +158,7 @@ var StudyViewBoilerplate ={
 
     scatterPlotOptions: {
         canvas: {  //position of components
-            /* //For Scatter Plot with 
+            /* //For Scatter Plot with
             width: 430,
             height: 350,
             xLeft: 100,     //The left/starting point for x axis
@@ -166,7 +166,7 @@ var StudyViewBoilerplate ={
             yTop: 10,      //The top/ending point for y axis
             yBottom: 280   //The bottom/starting point for y axis
             */
-           
+
             width: 370,
             height: 320,
             xLeft: 80,     //The left/starting point for x axis
@@ -175,14 +175,14 @@ var StudyViewBoilerplate ={
             yBottom: 240   //The bottom/starting point for y axis
         },
         style: { //Default style setting
-            fill: "#2986e2", 
+            fill: "#2986e2",
             stroke: "#2986e2",
             stroke_width: "0",
             size: "60",
             shape: "circle" //default, may vary for different mutation types
         },
 
-        names: { 
+        names: {
             div: "study-view-scatter-plot",
             header: "study-view-scatter-plot-header",
             body: "study-view-scatter-plot-body-svg",
@@ -191,7 +191,7 @@ var StudyViewBoilerplate ={
             log_scale_x: "study-view-scatter-plot-log-scale-x",
             log_scale_y: "study-view-scatter-plot-log-scale-y",
             download_pdf: "study-view-scatter-plot-pdf",
-            download_svg: "study-view-scatter-plot-svg"         
+            download_svg: "study-view-scatter-plot-svg"
         },
         elem: {
             svg: "",
@@ -214,8 +214,8 @@ var StudyViewBoilerplate ={
         },
         legends: []
     },
-    
-    scatterPlotDatum: {              
+
+    scatterPlotDatum: {
         x_val: "",
         y_val: "",
         case_id: "",
@@ -223,7 +223,7 @@ var StudyViewBoilerplate ={
         stroke: "",
         fill: ""
     },
-    
+
     headerDiv: function() {
         var _header = $('<div></div>'),
             _headerLeft = $('<div></div>'),
@@ -237,12 +237,14 @@ var StudyViewBoilerplate ={
             _span4 = $("<input type='button' />"),
             _span5 = $('<span></span>'),
             _span6 = $("<input type='button' />"),
+          _span7 = $("<input type='button' />"),
             _form = $('<form></form>'),
             _input1 = $('<input></input>'),
             _input2 = $('<input></input>'),
             _input3 = $('<input></input>'),
             _input4 = $('<input></input>');
-        
+            _input5 = $('<input type="button"/>');
+
         _headerLeft.attr('id','study-view-header-left');
 
         _span1
@@ -259,7 +261,7 @@ var StudyViewBoilerplate ={
             })
             .css({
                 float: "left"
-            });   
+            });
         _input1
             .attr({
                 type: "hidden",
@@ -288,10 +290,19 @@ var StudyViewBoilerplate ={
 //                class: "study-view-header hidden"
                 class: "study-view-header-button"
             });
+      _input5
+        .attr({
+          type: "button",
+          id: "study-view-header-left-6",
+          value: "Query",
+//                class: "study-view-header hidden"
+          class: "study-view-header-button"
+        });
         _form.append(_input1);
         _form.append(_input2);
         _form.append(_input3);
         _form.append(_input4);
+      _form.append(_input5);
 
 
         //Clear all button moved to after breadcrumbs
@@ -321,6 +332,12 @@ var StudyViewBoilerplate ={
             'id': 'study-view-header-left-5'
         });
 
+
+      _span7.attr({
+        'id': 'study-view-header-left-7'
+      })
+        .val('Switch');
+
         //Download button
         _span6
             .attr({
@@ -335,6 +352,7 @@ var StudyViewBoilerplate ={
         _headerLeft.append(_form);
         _headerLeft.append(_span4);
         _headerLeft.append(_span6);
+      //_headerLeft.append(_span7);
 
         _headerRight.attr('id','study-view-header-right');
         _headerRight.append(_span1);
@@ -356,7 +374,7 @@ var StudyViewBoilerplate ={
 
         return _header;
     },
-    
+
     customDialogDiv:
             "<div class='hidden' id='study-view-case-select-custom-dialog'>" +
                 "Please input IDs (one per line)" +
@@ -372,39 +390,39 @@ var StudyViewBoilerplate ={
 //                "<ul>" +
 //                "</ul>" +
 //            "</div>",
-    
+
     tutorialDiv:
             "<div  id='study-view-tutorial' class='study-view-header'>" +
                 "<span>Tutorial</span>" +
             "</div>",
-    
-    updateTableDiv: 
+
+    updateTableDiv:
             "<div style='float: left'>" +
             "<input type='button' "+
                 "id='study-view-dataTable-updateTable' "+
                 "class='study-view-middle-button' "+
                 "value = 'Update Table'/>" +
             "</div>",
-    
-    updateChartsDiv: 
+
+    updateChartsDiv:
             "<div style='float: left'>" +
             "<input type='button' "+
                 "id='study-view-dataTable-updateCharts' "+
                 "class='study-view-middle-button' "+
                 "value = 'Update Charts'/>" +
             "</div>",
-    
+
     upArrowDiv:
             "<img src='images/arrow_top.png' " +
                 "height='25px' alt='Update Charts' " +
                 "style='float: left'/>",
-    
+
     downArrowDiv:
             "<img src='images/arrow_bottom.png' " +
                 "height='25px' alt='Update Table' " +
                 "style='float: left'/>",
-        
-    scatterPlotDiv: 
+
+    scatterPlotDiv:
             "<div id='study-view-scatter-plot' class='study-view-dc-chart w2 h1half'"+
             "data-step='1' data-intro='Scatter Plot<br/>x: CNA<br/>y: MUTATIONS COUNT'>" +
             "<div id='study-view-scatter-plot-header-wrapper' style='float:right; width: 100%; height: 22px;'>"+
@@ -415,7 +433,7 @@ var StudyViewBoilerplate ={
             "<img style='width:10px; height:10px;margin-top:4px; margin-right:4px;float:left;' class='study-view-drag-icon' src='images/move.svg'/>"+
             "<span style='float:left;' class='study-view-chart-plot-delete study-view-scatter-plot-delete'>x</span>"+
             "</div></div>"+
-            
+
             "<div id='study-view-scatter-plot-body'>"+
             "<div id='study-view-scatter-plot-body-top-chart'></div>"+
             "<div id='study-view-scatter-plot-body-svg'></div>"+
@@ -428,8 +446,8 @@ var StudyViewBoilerplate ={
             "<img src='images/ajax-loader.gif'/></div>"+
             "<div id='study-view-scatter-plot-control-panel'></div>"+
             "</div>",
-    
-    dataTableDiv: 
+
+    dataTableDiv:
             "<table id='dataTable'>"+
             "<tfoot>"+
             "<tr>"+
