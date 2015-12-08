@@ -1,0 +1,143 @@
+<!doctype html>
+<html class="no-js">
+<head>
+  <meta charset="utf-8">
+  <title>study view test</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+  <!-- build:css(.) styles/vendor.css -->
+  <!-- bower:css -->
+  <link rel="stylesheet" href="bower_components/chosen/chosen.css" />
+  <link rel="stylesheet" href="bower_components/datatables/media/css/jquery.dataTables.css" />
+  <link rel="stylesheet" href="bower_components/dcjs/dc.css" />
+  <!-- endbower -->
+  <!-- endbuild -->
+  <!-- build:css(.tmp) styles/main.css -->
+  <link rel="stylesheet" href="styles/jquery.qtip.min.css">
+  <link rel="stylesheet" href="styles/chosen.min.css" />
+  <link rel="stylesheet" href="styles/bootstrap-chosen.css" />
+  <link rel="stylesheet" href="styles/jquery.dataTables.css" />
+  <link rel="stylesheet" href="styles/dc.css" />
+  <link rel="stylesheet" href="styles/main.css">
+  <!-- endbuild -->
+  <!-- build:js scripts/vendor/modernizr.js -->
+  <script src="bower_components/modernizr/modernizr.js"></script>
+  <!-- endbuild -->
+  <!--<script src="_components/"></script>-->
+
+</head>
+<body>
+<!--[if lt IE 10]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+  your browser</a> to improve your experience.</p>
+<![endif]-->
+
+
+<div class="container">
+
+    <div class="study-section" id="dc-plots">
+      <div id="study-view-main" style="display: none;">
+        <div id="study-view-left-panel"></div>
+        <div id="study-view-right-panel">
+          <div id="study-view-header-function"></div>
+          <div id="study-view-top-wrapper"></div>
+
+          <div id="study-view-charts"></div>
+
+          <div id="study-view-update"></div>
+
+          <div id='data-table-chart'></div>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+<!-- build:js(.) scripts/vendor.js -->
+<!-- bower:js -->
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/alert.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/carousel.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/collapse.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/dropdown.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/transition.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/scrollspy.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js"></script>
+<script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js"></script>
+<script src="bower_components/chosen/chosen.jquery.min.js"></script>
+<script src="bower_components/datatables/media/js/jquery.dataTables.js"></script>
+<script src="bower_components/d3/d3.js"></script>
+<script src="bower_components/crossfilter/crossfilter.js"></script>
+<script src="bower_components/dcjs/dc.js"></script>
+<script src="bower_components/classie/classie.js"></script>
+<script src="bower_components/get-style-property/get-style-property.js"></script>
+<script src="bower_components/get-size/get-size.js"></script>
+<script src="bower_components/eventie/eventie.js"></script>
+<script src="bower_components/eventEmitter/EventEmitter.js"></script>
+<script src="bower_components/unipointer/unipointer.js"></script>
+<script src="bower_components/unidragger/unidragger.js"></script>
+<script src="bower_components/draggabilly/draggabilly.js"></script>
+<script src="bower_components/doc-ready/doc-ready.js"></script>
+<script src="bower_components/matches-selector/matches-selector.js"></script>
+<script src="bower_components/fizzy-ui-utils/utils.js"></script>
+<script src="bower_components/outlayer/item.js"></script>
+<script src="bower_components/outlayer/outlayer.js"></script>
+<script src="bower_components/packery/dist/packery.pkgd.js"></script>
+<script src="bower_components/underscore/underscore.js"></script>
+<!-- endbower -->
+<!-- endbuild -->
+
+<!-- build:js({app,.tmp}) scripts/main.js -->
+
+<script src="_components/cbio-util.js"></script>
+<script src="_components/FileSaver.min.js"></script>
+<script src="_components/jquery.qtip.min.js"></script>
+<script src="scripts/survival-tab/survivalCurveProxy.js"></script>
+<script src="scripts/survival-tab/survivalCurveView.js"></script>
+<script src="scripts/survival-tab/component/boilerPlate.js"></script>
+<script src="scripts/survival-tab/component/confidenceIntervals.js"></script>
+<script src="scripts/survival-tab/component/kmEstimator.js"></script>
+<script src="scripts/survival-tab/component/logRankTest.js"></script>
+<script src="scripts/survival-tab/component/survivalCurve.js"></script>
+<script src="scripts/survival-tab/survival_tab.js"></script>
+<script src="scripts/component/AddCharts.js"></script>
+<script src="scripts/component/BarChart.js"></script>
+<script src="scripts/component/BreadCrumbs.js"></script>
+<!--<script src="scripts/component/DataTable.js"></script>-->
+<script src="scripts/component/PieChart.js"></script>
+<script src="scripts/component/ScatterPlots.js"></script>
+<script src="scripts/component/Table.js"></script>
+<script src="scripts/controller/StudyViewClinicalTabController.js"></script>
+<script src="scripts/controller/StudyViewCNATabController.js"></script>
+<script src="scripts/controller/StudyViewMainController.js"></script>
+<script src="scripts/controller/StudyViewMutationsTabController.js"></script>
+<script src="scripts/controller/StudyViewParams.js"></script>
+<script src="scripts/controller/StudyViewSummaryTabController.js"></script>
+<script src="scripts/data/StudyViewProxy.js"></script>
+<script src="scripts/util/DcRedrawAllDataTable.js"></script>
+<script src="scripts/util/FnGetColumnData.js"></script>
+<script src="scripts/util/StudyViewBoilerplate.js"></script>
+<script src="scripts/util/StudyViewPrototypes.js"></script>
+<script src="scripts/util/StudyViewUtil.js"></script>
+<script src="scripts/view/StudyViewInitCharts.js"></script>
+<script src="scripts/view/StudyViewInitClinicalTab.js"></script>
+<script src="scripts/view/StudyViewInitCNATab.js"></script>
+<script src="scripts/view/StudyViewInitDataTable.js"></script>
+<script src="scripts/view/StudyViewInitIntroJS.js"></script>
+<script src="scripts/view/StudyViewInitMutationsTab.js"></script>
+<script src="scripts/view/StudyViewInitScatterPlot.js"></script>
+<script src="scripts/view/StudyViewInitTables.js"></script>
+<script src="scripts/view/StudyViewInitTopComponents.js"></script>
+<script src="scripts/view/StudyViewSurvivalPlotView.js"></script>
+<script src="scripts/view/StudyViewWindowEvents.js"></script>
+
+<script src="scripts/main.js"></script>
+<!-- endbuild -->
+</body>
+</html>

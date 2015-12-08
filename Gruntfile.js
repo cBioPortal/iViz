@@ -416,7 +416,7 @@ module.exports = function (grunt) {
 
     grunt.task.run([
       'connect:test',
-      'mocha'
+      //'mocha'
     ]);
   });
 
@@ -437,7 +437,7 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'newer:jshint',
+//    'newer:jshint',
     'test',
     'build'
   ]);
