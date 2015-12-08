@@ -318,7 +318,7 @@ var PieChart = function(){
 
                 removeMarker();
                 // provide the postFilterCallback function with the chartID and the filter for the breadcrumbs
-                postFilterCallback(chartID, filter, findLabelId(filter));
+                postFilterCallback(chartID, filter, _currentFilters);
             });
             pieChart.on("preRedraw",function(chart){
                 var _filters = pieChart.filters();
@@ -1254,7 +1254,7 @@ var PieChart = function(){
       for(var i=0; i<label.length; i++) {
         var labelDatum = label[i];
         if(labelDatum.name.toLowerCase() === filter_name.toLowerCase()) {
-          return labelDatum.id;
+          return i;
           break;
         }
       }

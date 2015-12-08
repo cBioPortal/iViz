@@ -45,6 +45,9 @@
   position: absolute;
   z-index:21;
 }
+#study-view-header-left {
+  float: left;
+}
 #study-view-header-left-0 {
   width: 190px;
 }
@@ -82,7 +85,7 @@
   cursor: default;
 }
 #study-view-header-right {
-  float: right;
+  //float: right;
 }
 #study-view-right-panel {
   width: calc(99% - 240px);

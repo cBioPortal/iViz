@@ -808,20 +808,23 @@ var StudyViewInitCharts = (function(){
     /**
      * DC charts post filter callback function
      */
-    function postFilterCallbackFunc(chartID, chartFilter, chartFilterId){
+    function postFilterCallbackFunc(chartID, chartFilter, filters){
         if(!StudyViewInitScatterPlot.getclearFlag() && !plotDataFlag){
             removeMarker();
             resetBars();
             redrawSpecialPlots();
             // update the breadcrumbs
             updateBreadCrumbs(chartID, chartFilter);
-            updateLeftPanel(displayedID[chartID], chartFilter)
+            updateLeftPanel()
         }
     }
 
-    function updateLeftPanel(attr_id, chartFilter) {
+    function updateLeftPanel() {
       var datum = {};
-      datum[attr_id] = [chartFilter]
+      var initAttrs = ['GENDER', 'OS_STATUS', 'MOLECULAR_SUBTYPE', 'RACE'];
+      _.each(initAttrs, function (attr) {
+        datum[attr] = varChart[attrNameMapUID[attr]].getChart().filters();
+      })
       left_panel.set_status(datum);
     }
 
@@ -1238,6 +1241,7 @@ var StudyViewInitCharts = (function(){
             createLayout();
 //            updateDataTableCallbackFuncs();
             filterCharts();
+            msnry.layout();
         },
         bondDragForLayout: bondDragForLayout,
         getFilteredResults: function() {
@@ -1293,7 +1297,23 @@ var StudyViewInitCharts = (function(){
         filterChartFromLeftPanel: function (selections) {
           _.each(selections, function (selection, key) {
             if(attrNameMapUID.hasOwnProperty(key)) {
-              varChart[attrNameMapUID[key]].filter(selection);
+              var filters = varChart[attrNameMapUID[key]].getChart().filters();
+              var filteredSelection = [];
+              if(filters.length > 0) {
+                _.each(selection, function (sel) {
+                  if(filters.indexOf(sel) === -1) {
+                    filteredSelection.push(sel);
+                  }
+                });
+                _.each(filters, function (filter) {
+                  if(selection.indexOf(filter) === -1) {
+                    filteredSelection.push(filter);
+                  }
+                });
+              }else {
+                filteredSelection = selection;
+              }
+              varChart[attrNameMapUID[key]].filter(filteredSelection);
             }
           })
         },
