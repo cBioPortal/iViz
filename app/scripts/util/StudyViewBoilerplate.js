@@ -355,7 +355,7 @@ var StudyViewBoilerplate ={
       //_headerLeft.append(_span7);
 
         _headerRight.attr('id','study-view-header-right');
-        _headerRight.append(_span1);
+        //_headerRight.append(_span1);
 
         _header.append(_headerLeft);
         _header.append(_headerRight);
