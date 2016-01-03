@@ -242,7 +242,7 @@ var StudyViewBoilerplate ={
             _input1 = $('<input></input>'),
             _input2 = $('<input></input>'),
             _input3 = $('<input></input>'),
-            _input4 = $('<input></input>');
+            _input4 = $('<input></input>'),
             _input5 = $('<input type="button"/>');
 
         _headerLeft.attr('id','study-view-header-left');
