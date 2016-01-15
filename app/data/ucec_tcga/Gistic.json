@@ -1,0 +1,1208 @@
+[
+  {
+    "peakStart": 85988564,
+    "cytoband": "1p22.3",
+    "qval": 0.0000000000000076685,
+    "chromosome": 1,
+    "peakEnd": 85997286,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "DDAH1"
+    ]
+  },
+  {
+    "peakStart": 150519259,
+    "cytoband": "1q21.3",
+    "qval": 0.0000000000000000000,
+    "chromosome": 1,
+    "peakEnd": 150584103,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 41383838,
+    "cytoband": "1p34.2",
+    "qval": 0.00028641000972129405,
+    "chromosome": 1,
+    "peakEnd": 41421573,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "CTPS1",
+      "SCMH1",
+      "CITED4",
+      "SLFNL1"
+    ]
+  },
+  {
+    "peakStart": 246179308,
+    "cytoband": "1q44",
+    "qval": 0.00006700099766021594,
+    "chromosome": 1,
+    "peakEnd": 246185980,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "TRIM58",
+      "OR1C1",
+      "OR2T7",
+      "ZNF670",
+      "OR2AJ1",
+      "PGBD2",
+      "OR14K1",
+      "OR14A2",
+      "OR2W5",
+      "LYPD8",
+      "MIR3916",
+      "RNA5SP82"
+    ]
+  },
+  {
+    "peakStart": 114095279,
+    "cytoband": "2q13",
+    "qval": 0.0000000000000653550,
+    "chromosome": 2,
+    "peakEnd": 114098412,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "PAX8"
+    ]
+  },
+  {
+    "peakStart": 16093933,
+    "cytoband": "2p24.3",
+    "qval": 0.00029453999013639987,
+    "chromosome": 2,
+    "peakEnd": 16119729,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 168639309,
+    "cytoband": "3q26.2",
+    "qval": 0,
+    "chromosome": 3,
+    "peakEnd": 168639717,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "EGFEM1P"
+    ]
+  },
+  {
+    "peakStart": 13717501,
+    "cytoband": "3p25.1",
+    "qval": 0.000000003743899857,
+    "chromosome": 3,
+    "peakEnd": 13726334,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "LINC00620"
+    ]
+  },
+  {
+    "peakStart": 66729080,
+    "cytoband": "3p14.1",
+    "qval": 0.006026499904692173,
+    "chromosome": 3,
+    "peakEnd": 66737248,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "LRIG1"
+    ]
+  },
+  {
+    "peakStart": 169406986,
+    "cytoband": "3q26.2",
+    "qval": 0.00000000000000000000,
+    "chromosome": 3,
+    "peakEnd": 169425497,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "MECOM",
+      "TERC",
+      "MYNN",
+      "ACTRT3"
+    ]
+  },
+  {
+    "peakStart": 1835546,
+    "cytoband": "4p16.3",
+    "qval": 0.00003570999979274347,
+    "chromosome": 4,
+    "peakEnd": 1843476,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 1288615,
+    "cytoband": "5p15.33",
+    "qval": 0.00001350399998045759,
+    "chromosome": 5,
+    "peakEnd": 1288694,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "SDHA",
+      "SLC6A3",
+      "SLC9A3",
+      "TERT",
+      "TRIP13",
+      "PDCD6",
+      "SLC12A7",
+      "TPPP",
+      "EXOC3",
+      "CEP72",
+      "AHRR",
+      "BRD9",
+      "ZDHHC11",
+      "CLPTM1L",
+      "NKD2",
+      "EXOC3-AS1",
+      "CCDC127",
+      "PLEKHG4B",
+      "SLC6A19",
+      "SLC6A18",
+      "LRRC14B",
+      "ZDHHC11B",
+      "MIR4457",
+      "MIR4456",
+      "MIR4635"
+    ]
+  },
+  {
+    "peakStart": 176848019,
+    "cytoband": "5q35.3",
+    "qval": 0.14390000700950623,
+    "chromosome": 5,
+    "peakEnd": 176851193,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 11397982,
+    "cytoband": "6p24.2",
+    "qval": 0.00000000036149000460,
+    "chromosome": 6,
+    "peakEnd": 11404118,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "NEDD9"
+    ]
+  },
+  {
+    "peakStart": 151963527,
+    "cytoband": "6q25.1",
+    "qval": 0.0010426000226289034,
+    "chromosome": 6,
+    "peakEnd": 151964204,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "ESR1",
+      "CCDC170"
+    ]
+  },
+  {
+    "peakStart": 18497348,
+    "cytoband": "6p22.3",
+    "qval": 0.0000939960009418428,
+    "chromosome": 6,
+    "peakEnd": 18497778,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "RNF144B"
+    ]
+  },
+  {
+    "peakStart": 117282582,
+    "cytoband": "7q31.2",
+    "qval": 0.08973599970340729,
+    "chromosome": 7,
+    "peakEnd": 117333728,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "CFTR",
+      "CTTNBP2"
+    ]
+  },
+  {
+    "peakStart": 129545928,
+    "cytoband": "8q24.21",
+    "qval": 0.0000000000000000000,
+    "chromosome": 8,
+    "peakEnd": 129551311,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 41969648,
+    "cytoband": "8p11.21",
+    "qval": 0.0000000000342730011,
+    "chromosome": 8,
+    "peakEnd": 41994151,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 128754563,
+    "cytoband": "8q24.21",
+    "qval": 0.00000000000000000000,
+    "chromosome": 8,
+    "peakEnd": 128754871,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "MYC"
+    ]
+  },
+  {
+    "peakStart": 38385914,
+    "cytoband": "8p11.22",
+    "qval": 0.001153400051407516,
+    "chromosome": 8,
+    "peakEnd": 38406795,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "FGFR1",
+      "TACC1",
+      "BAG4",
+      "DDHD2",
+      "WHSC1L1",
+      "PLEKHA2",
+      "PPAPDC1B",
+      "LETM2",
+      "C8ORF86",
+      "RPS20P22"
+    ]
+  },
+  {
+    "peakStart": 3750862,
+    "cytoband": "9p24.2",
+    "qval": 0.00020614999812096357,
+    "chromosome": 9,
+    "peakEnd": 3759975,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "GLIS3"
+    ]
+  },
+  {
+    "peakStart": 139860631,
+    "cytoband": "9q34.3",
+    "qval": 0.06374400109052658,
+    "chromosome": 9,
+    "peakEnd": 139885820,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "ABCA2",
+      "C8G",
+      "ENTPD2",
+      "FUT7",
+      "PTGDS",
+      "TRAF2",
+      "CLIC3",
+      "FBXW5",
+      "NPDC1",
+      "LCN12",
+      "C9ORF142",
+      "LCNL1",
+      "C9ORF139",
+      "PRR31"
+    ]
+  },
+  {
+    "peakStart": 77064320,
+    "cytoband": "10q22.2",
+    "qval": 0.0000000000000722560,
+    "chromosome": 10,
+    "peakEnd": 77068958,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "COMTD1"
+    ]
+  },
+  {
+    "peakStart": 77657173,
+    "cytoband": "11q14.1",
+    "qval": 0.00008456000068690628,
+    "chromosome": 11,
+    "peakEnd": 77663710,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "CAPN5",
+      "CLNS1A",
+      "LRRC32",
+      "MYO7A",
+      "NDUFC2",
+      "OMP",
+      "PAK1",
+      "PRKRIR",
+      "THRSP",
+      "GAB2",
+      "TSKU",
+      "AAMDC",
+      "RSF1",
+      "ACER3",
+      "C11ORF30",
+      "USP35",
+      "KCTD14",
+      "ALG8",
+      "INTS4",
+      "B3GNT6",
+      "GDPD4",
+      "AQP11",
+      "DKFZP434E1119",
+      "KCTD21",
+      "GUCY2EP"
+    ]
+  },
+  {
+    "peakStart": 46406857,
+    "cytoband": "11p11.2",
+    "qval": 0.12483999878168106,
+    "chromosome": 11,
+    "peakEnd": 46470372,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 56487667,
+    "cytoband": "12q13.2",
+    "qval": 0.000000002401000065,
+    "chromosome": 12,
+    "peakEnd": 56490162,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "ERBB3"
+    ]
+  },
+  {
+    "peakStart": 25334354,
+    "cytoband": "12p12.1",
+    "qval": 0.02795100025832653,
+    "chromosome": 12,
+    "peakEnd": 25337292,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 48243377,
+    "cytoband": "12q13.11",
+    "qval": 0.00018621000344865024,
+    "chromosome": 12,
+    "peakEnd": 48259126,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "VDR",
+      "ENDOU",
+      "RAPGEF3",
+      "HDAC7",
+      "SLC48A1"
+    ]
+  },
+  {
+    "peakStart": 111176519,
+    "cytoband": "13q34",
+    "qval": 0.07856199890375137,
+    "chromosome": 13,
+    "peakEnd": 111237467,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "LINC00452",
+      "LINC00565"
+    ]
+  },
+  {
+    "peakStart": 77404750,
+    "cytoband": "14q24.3",
+    "qval": 0.009653300046920776,
+    "chromosome": 14,
+    "peakEnd": 77405619,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 105595444,
+    "cytoband": "14q32.33",
+    "qval": 0.019592000171542168,
+    "chromosome": 14,
+    "peakEnd": 105603415,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "JAG2",
+      "NUDT14"
+    ]
+  },
+  {
+    "peakStart": 99044250,
+    "cytoband": "15q26.3",
+    "qval": 0.15278999507427216,
+    "chromosome": 15,
+    "peakEnd": 99067541,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "WASH3P",
+      "OR4F13P",
+      "FAM138E",
+      "DDX11L9"
+    ]
+  },
+  {
+    "peakStart": 30890462,
+    "cytoband": "16p11.2",
+    "qval": 0.0003337700036354363,
+    "chromosome": 16,
+    "peakEnd": 30900757,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "MIR4519"
+    ]
+  },
+  {
+    "peakStart": 37863585,
+    "cytoband": "17q12",
+    "qval": 0.0000000000000000000,
+    "chromosome": 17,
+    "peakEnd": 37875909,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "ERBB2",
+      "GRB7",
+      "MIEN1",
+      "PGAP3",
+      "MIR4728"
+    ]
+  },
+  {
+    "peakStart": 27066963,
+    "cytoband": "17q11.2",
+    "qval": 0.00000195200004782237,
+    "chromosome": 17,
+    "peakEnd": 27075423,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "ALDOC",
+      "RPL23A",
+      "SDF2",
+      "SUPT6H",
+      "FOXN1",
+      "SLC13A2",
+      "UNC119",
+      "TRAF4",
+      "KIAA0100",
+      "SPAG5",
+      "SARM1",
+      "SNORD4B",
+      "SNORD4A",
+      "SNORD42B",
+      "SNORD42A",
+      "FAM222B",
+      "RAB34",
+      "PIGS",
+      "SLC46A1",
+      "TLCD1",
+      "SGK494",
+      "TMEM199",
+      "PROCA1",
+      "NEK8"
+    ]
+  },
+  {
+    "peakStart": 24029209,
+    "cytoband": "18q11.2",
+    "qval": 0.0007258100085891783,
+    "chromosome": 18,
+    "peakEnd": 24041182,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 3615632,
+    "cytoband": "18p11.31",
+    "qval": 0.020695000886917114,
+    "chromosome": 18,
+    "peakEnd": 3646519,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 30307098,
+    "cytoband": "19q12",
+    "qval": 0.0000000000000000000,
+    "chromosome": 19,
+    "peakEnd": 30339140,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "CCNE1"
+    ]
+  },
+  {
+    "peakStart": 13341329,
+    "cytoband": "19p13.2",
+    "qval": 0.0000000000000053465,
+    "chromosome": 19,
+    "peakEnd": 13395726,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "CACNA1A",
+      "LYL1",
+      "NFIX",
+      "STX10",
+      "IER2",
+      "TRMT1",
+      "NACC1"
+    ]
+  },
+  {
+    "peakStart": 30232289,
+    "cytoband": "20q11.21",
+    "qval": 0.0000000111800000369,
+    "chromosome": 20,
+    "peakEnd": 30232467,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "BCL2L1",
+      "ID1",
+      "COX4I2",
+      "MIR3193"
+    ]
+  },
+  {
+    "peakStart": 46013864,
+    "cytoband": "20q13.12",
+    "qval": 0.0000002596200090466,
+    "chromosome": 20,
+    "peakEnd": 46022556,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 3746863,
+    "cytoband": "20p13",
+    "qval": 0.12483999878168106,
+    "chromosome": 20,
+    "peakEnd": 3746906,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "MAVS",
+      "MIR103A2"
+    ]
+  },
+  {
+    "peakStart": 60975864,
+    "cytoband": "20q13.33",
+    "qval": 0.00000607740003033541,
+    "chromosome": 20,
+    "peakEnd": 60975899,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "LAMA5",
+      "RPS21",
+      "OSBPL2",
+      "ADRM1",
+      "CABLES2",
+      "MIR1-1HG",
+      "GATA5",
+      "RBBP8NL",
+      "MIR133A2",
+      "MIR4758"
+    ]
+  },
+  {
+    "peakStart": 30558450,
+    "cytoband": "22q12.2",
+    "qval": 0.0011906999861821532,
+    "chromosome": 22,
+    "peakEnd": 30567907,
+    "sangerGenes": [],
+    "ampdel": true,
+    "nonSangerGenes": [
+      "SEC14L6"
+    ]
+  },
+  {
+    "peakStart": 27015184,
+    "cytoband": "1p36.11",
+    "qval": 0.00000000000000000274,
+    "chromosome": 1,
+    "peakEnd": 27119975,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "GPN2",
+      "ZDHHC18"
+    ]
+  },
+  {
+    "peakStart": 14923720,
+    "cytoband": "1p36.21",
+    "qval": 0.00000000000165950001,
+    "chromosome": 1,
+    "peakEnd": 15447498,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "LINC00339"
+    ]
+  },
+  {
+    "peakStart": 140981064,
+    "cytoband": "2q22.1",
+    "qval": 0.0000000000000000016,
+    "chromosome": 2,
+    "peakEnd": 142891872,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 242416490,
+    "cytoband": "2q37.3",
+    "qval": 0.00037461999454535544,
+    "chromosome": 2,
+    "peakEnd": 242476062,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 3705291,
+    "cytoband": "2p25.3",
+    "qval": 0.16978999972343445,
+    "chromosome": 2,
+    "peakEnd": 3753538,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "KCNK3"
+    ]
+  },
+  {
+    "peakStart": 115528203,
+    "cytoband": "3q13.31",
+    "qval": 0.000000018448000461,
+    "chromosome": 3,
+    "peakEnd": 117719035,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "TUSC7",
+      "LINC00901",
+      "MIR4447"
+    ]
+  },
+  {
+    "peakStart": 59705135,
+    "cytoband": "3p14.2",
+    "qval": 0.000000085171002695,
+    "chromosome": 3,
+    "peakEnd": 61237398,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 181525131,
+    "cytoband": "4q34.3",
+    "qval": 0.0000000000000000000,
+    "chromosome": 4,
+    "peakEnd": 182082374,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 20727494,
+    "cytoband": "4p15.2",
+    "qval": 0.00016286999743897468,
+    "chromosome": 4,
+    "peakEnd": 21951779,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "SLIT2",
+      "KCNIP4",
+      "PACRGL",
+      "RNA5SP157"
+    ]
+  },
+  {
+    "peakStart": 1112519,
+    "cytoband": "4p16.3",
+    "qval": 0.0023248998913913965,
+    "chromosome": 4,
+    "peakEnd": 1117691,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 91039783,
+    "cytoband": "4q22.1",
+    "qval": 0.00023516999499406666,
+    "chromosome": 4,
+    "peakEnd": 92523213,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "RNA5SP164"
+    ]
+  },
+  {
+    "peakStart": 58261529,
+    "cytoband": "5q12.1",
+    "qval": 0.0000000000000000000,
+    "chromosome": 5,
+    "peakEnd": 59818040,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "FKSG49",
+      "MIR582"
+    ]
+  },
+  {
+    "peakStart": 161767537,
+    "cytoband": "6q26",
+    "qval": 0.000000002150100098,
+    "chromosome": 6,
+    "peakEnd": 163152563,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "PARK2"
+    ]
+  },
+  {
+    "peakStart": 110239721,
+    "cytoband": "7q31.1",
+    "qval": 0.0000424899990321137,
+    "chromosome": 7,
+    "peakEnd": 111353361,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 705284,
+    "cytoband": "7p22.3",
+    "qval": 0.00008033699850784615,
+    "chromosome": 7,
+    "peakEnd": 769810,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "GPER1",
+      "PDGFA",
+      "PRKAR1B",
+      "ADAP1",
+      "SUN1",
+      "GET4",
+      "CYP2W1",
+      "DNAAF5",
+      "FAM20C",
+      "C7ORF50",
+      "ZFAND2A",
+      "COX19",
+      "GPR146",
+      "UNCX",
+      "MIR339"
+    ]
+  },
+  {
+    "peakStart": 69055524,
+    "cytoband": "7q11.22",
+    "qval": 0.003054700093343854,
+    "chromosome": 7,
+    "peakEnd": 70258282,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 151830319,
+    "cytoband": "7q36.1",
+    "qval": 0.00020552999922074378,
+    "chromosome": 7,
+    "peakEnd": 152135594,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "LINC00689",
+      "MIR595"
+    ]
+  },
+  {
+    "peakStart": 3548234,
+    "cytoband": "8p23.2",
+    "qval": 0.0000000003397999937,
+    "chromosome": 8,
+    "peakEnd": 3655372,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 23427541,
+    "cytoband": "8p21.2",
+    "qval": 0.0000000008118399841,
+    "chromosome": 8,
+    "peakEnd": 24817145,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "MIR4287"
+    ]
+  },
+  {
+    "peakStart": 8312601,
+    "cytoband": "9p23",
+    "qval": 0.0003705600101966411,
+    "chromosome": 9,
+    "peakEnd": 10617850,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "RN7SL5P"
+    ]
+  },
+  {
+    "peakStart": 136627002,
+    "cytoband": "9q34.2",
+    "qval": 0.014214999973773956,
+    "chromosome": 9,
+    "peakEnd": 136862529,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "ABO",
+      "RXRA",
+      "DKFZP434A062",
+      "SNORD36C",
+      "SNORD36B",
+      "SNORD36A",
+      "SNORD24",
+      "LINC00094",
+      "FAM163B",
+      "DNLZ",
+      "RNU6ATAC",
+      "MIR4669"
+    ]
+  },
+  {
+    "peakStart": 80330736,
+    "cytoband": "9q21.2",
+    "qval": 0.06805399805307388,
+    "chromosome": 9,
+    "peakEnd": 80649210,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 89621061,
+    "cytoband": "10q23.31",
+    "qval": 0.0000000000000000000,
+    "chromosome": 10,
+    "peakEnd": 89735597,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 456120,
+    "cytoband": "11p15.5",
+    "qval": 0.000000238960012666,
+    "chromosome": 11,
+    "peakEnd": 496073,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "RPLP2",
+      "SCT",
+      "TMEM80",
+      "SNORA52",
+      "MIR210HG"
+    ]
+  },
+  {
+    "peakStart": 83165912,
+    "cytoband": "11q14.1",
+    "qval": 0.0002502799907233566,
+    "chromosome": 11,
+    "peakEnd": 85348445,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "DLG2",
+      "TMEM126B"
+    ]
+  },
+  {
+    "peakStart": 99119355,
+    "cytoband": "12q23.1",
+    "qval": 0.0000000201159995328,
+    "chromosome": 12,
+    "peakEnd": 100380198,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "FAM71C",
+      "RNA5SP366"
+    ]
+  },
+  {
+    "peakStart": 132093024,
+    "cytoband": "12q24.33",
+    "qval": 0.0003170600102748722,
+    "chromosome": 12,
+    "peakEnd": 132175106,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "ZNF140",
+      "ANHX",
+      "ZNF891"
+    ]
+  },
+  {
+    "peakStart": 48876592,
+    "cytoband": "13q14.2",
+    "qval": 0.00000266500001089298,
+    "chromosome": 13,
+    "peakEnd": 49059721,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "RCBTB2",
+      "RB1",
+      "LPAR6"
+    ]
+  },
+  {
+    "peakStart": 33399002,
+    "cytoband": "14q13.1",
+    "qval": 0.005764999892562628,
+    "chromosome": 14,
+    "peakEnd": 34273570,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "NPAS3"
+    ]
+  },
+  {
+    "peakStart": 40539564,
+    "cytoband": "15q15.1",
+    "qval": 0.0000000240860007494,
+    "chromosome": 15,
+    "peakEnd": 40671957,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 71385682,
+    "cytoband": "15q23",
+    "qval": 0.000215709995245561,
+    "chromosome": 15,
+    "peakEnd": 72076988,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "THSD4",
+      "CT62"
+    ]
+  },
+  {
+    "peakStart": 78129906,
+    "cytoband": "16q23.1",
+    "qval": 0.0000000000000000283,
+    "chromosome": 16,
+    "peakEnd": 79246771,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "RNA5SP431"
+    ]
+  },
+  {
+    "peakStart": 3773953,
+    "cytoband": "16p13.3",
+    "qval": 0.00009588499960955232,
+    "chromosome": 16,
+    "peakEnd": 3932725,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "CREBBP"
+    ]
+  },
+  {
+    "peakStart": 61653251,
+    "cytoband": "16q21",
+    "qval": 0.00000642570012132637,
+    "chromosome": 16,
+    "peakEnd": 62071401,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 72807956,
+    "cytoband": "16q22.3",
+    "qval": 0.0000000000087694999,
+    "chromosome": 16,
+    "peakEnd": 73097663,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "ZFHX3"
+    ]
+  },
+  {
+    "peakStart": 29420578,
+    "cytoband": "17q11.2",
+    "qval": 0.000000055849000091,
+    "chromosome": 17,
+    "peakEnd": 29710352,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "EVI2A",
+      "EVI2B",
+      "NF1",
+      "OMG",
+      "MIR4733"
+    ]
+  },
+  {
+    "peakStart": 17712173,
+    "cytoband": "17p11.2",
+    "qval": 0.00032675001421011984,
+    "chromosome": 17,
+    "peakEnd": 17749555,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "UBBP4",
+      "MTND1P15"
+    ]
+  },
+  {
+    "peakStart": 40759937,
+    "cytoband": "17q21.31",
+    "qval": 0.00000434469984611496,
+    "chromosome": 17,
+    "peakEnd": 41188342,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 48492168,
+    "cytoband": "18q21.2",
+    "qval": 0.008898500353097916,
+    "chromosome": 18,
+    "peakEnd": 48616656,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 3084537,
+    "cytoband": "19p13.3",
+    "qval": 0,
+    "chromosome": 19,
+    "peakEnd": 3132908,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "GNA11"
+    ]
+  },
+  {
+    "peakStart": 58865394,
+    "cytoband": "19q13.43",
+    "qval": 0.002188999904319644,
+    "chromosome": 19,
+    "peakEnd": 58878226,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 23945575,
+    "cytoband": "19p12",
+    "qval": 0.00001001100008579670,
+    "chromosome": 19,
+    "peakEnd": 24013276,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": []
+  },
+  {
+    "peakStart": 13974549,
+    "cytoband": "20p12.1",
+    "qval": 0.00008452100155409425,
+    "chromosome": 20,
+    "peakEnd": 16036115,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "FLRT3",
+      "RNA5SP475"
+    ]
+  },
+  {
+    "peakStart": 48883796,
+    "cytoband": "22q13.32",
+    "qval": 0.0000000000000000001,
+    "chromosome": 22,
+    "peakEnd": 49287130,
+    "sangerGenes": [],
+    "ampdel": false,
+    "nonSangerGenes": [
+      "ARSA"
+    ]
+  }
+]
