@@ -1,4 +1,4 @@
-# study-view-test
+# iViz
 Stand-alone library to analysis cohorts. It's seperated from cBioPortal Study View.
 
 
