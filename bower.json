@@ -12,7 +12,9 @@
     "packery": "~1.4.3",
     "underscore": "~1.8.3",
     "bootstrap-chosen": "~1.0.1",
-    "qtip2": "~2.2.1"
+    "qtip2": "~2.2.1",
+    "vue": "~1.0.15",
+    "font-awesome": "https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" 
   },
   "overrides": {
     "bootstrap-sass": {
