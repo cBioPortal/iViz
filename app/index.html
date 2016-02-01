@@ -10,9 +10,11 @@
   <script src="/bower_components/packery/dist/packery.pkgd.min.js"></script>
   <script src="/bower_components/draggabilly/dist/draggabilly.pkgd.min.js"></script>
   <script src="/bower_components/underscore/underscore.js"></script>
+  <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
   <link rel="stylesheet" href="/bower_components/dcjs/dc.css" />
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
 
   <script src="scripts/main.js"></script>
 
@@ -24,8 +26,8 @@
       font-family: sans-serif;
     }
     .grid {
-      background: #DDD;
-      max-width: 1200px;
+      max-width: 2200px;
+      padding-top: 60px;
     }
     .grid:after {
       content: '';
@@ -35,22 +37,45 @@
     .grid-item {
       width: 250px;
       height: 250px;
-      border: 1px solid hsla(0, 0%, 0%, 0.5);
-      padding-left: 50px;
-    }
-    .grid-item h6 {
-      font-size: 11px;
+      border:1px;
+      border-color:lightgrey;
+      border-style:solid;
+      margin: 5px;
     }
     .grid-item:hover {
-      border-color: hsla(0, 0%, 100%, 0.5);
+      border-color: grey;
+      background: #F8F9F9;
       cursor: move;
+    }
+    .navbar button {
+      margin: 10px;
+      margin-left: 20px;
+    }
+    .dc-bar-chart {
+      margin-left: 45px;
+      margin-top: 30px;
+
     }
   </style>
 
 </head>
 <body>
 
-  <div class="grid" id="main-grid"></div>
+  <div class="container-fluid">
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div id="main-header">
+        <a href='javascript:dc.filterAll(); dc.renderAll();' class='reset'>
+          <button type='button' class='btn btn-default' >Reset All</button>
+        </a>
+      </div>
+    </nav>
+    <div class="grid" id="main-grid"></div>
+  </div>
 
 </body>
+<script>
+  $( document ).ready(function() {
+    iViz.init();
+  });
+</script>
 </html>
