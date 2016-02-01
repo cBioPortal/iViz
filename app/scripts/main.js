@@ -1,49 +1,55 @@
-/*
- * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
- * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
- * is on an "as is" basis, and Memorial Sloan-Kettering Cancer Center has no
- * obligations to provide maintenance, support, updates, enhancements or
- * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
- * liable to any party for direct, indirect, special, incidental or
- * consequential damages, including lost profits, arising out of the use of this
- * software and its documentation, even if Memorial Sloan-Kettering Cancer
- * Center has been advised of the possibility of such damage.
- */
+$.ajax({url: "data/converted/ucec_tcga.json"})
+  .then(function (data) {
 
-/*
- * This file is part of cBioPortal.
- *
- * cBioPortal is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+    // ---- data processing ----
+    var patient_data = data.groups.patient.data,
+        sample_data = data.groups.sample.data;
+    var ndx_patient = crossfilter(patient_data),
+        ndx_sample = crossfilter(sample_data);
 
+    // ---- fill the empty slots in the matrix
+    _.each(patient_data, function(_data_obj) {
+      _.each(_.pluck(data.groups.patient.attr_meta, "attr_id"), function(_attr_id) {
+        if (!_data_obj.hasOwnProperty(_attr_id)) {
+          _data_obj[_attr_id] = "NA";
+        }
+      });
+      _.each(_.pluck(data.groups.sample.attr_meta, "attr_id"), function(_attr_id) {
+        if (!_data_obj.hasOwnProperty(_attr_id)) {
+          _data_obj[_attr_id] = "NA";
+        }
+      });
+    });
 
-//Charts Array, store all pie chart/ bar chart instances
+    // ---- define charts ----
+    _.each(data.groups.patient.attr_meta, function(_attr_obj) {
+      var _attr_id = _attr_obj.attr_id;
+      var _dim = ndx_patient.dimension(function(d) { return d[_attr_id]; });
+      var _countPerFunc = _dim.group().reduceCount();
+      $("#main-grid").append("<div class='grid-item'><h6>" + _attr_obj.display_name + "</h6><div class='dc-chart' id='chart-ring-patient-" + _attr_id + "'></div></div>");
+      var _chart = dc.pieChart("#chart-ring-patient-" + _attr_id);
+      _chart.width(150).height(150).dimension(_dim).group(_countPerFunc).innerRadius(15);
+    });
+    _.each(data.groups.sample.attr_meta, function(_attr_obj) {
+      var _attr_id = _attr_obj.attr_id;
+      if (_attr_id !== "mutated_genes" && _attr_id !== "cna_details") {
+        var _dim = ndx_sample.dimension(function(d) { return d[_attr_id]; });
+        var _countPerFunc = _dim.group().reduceCount();
+        $("#main-grid").append("<div class='grid-item'><h6>" + _attr_obj.display_name + "</h6><div class='dc-chart' id='chart-ring-sample-" + _attr_id + "'></div></div>");
+        var _chart = dc.pieChart("#chart-ring-sample-" + _attr_id);
+        _chart.width(150).height(150).dimension(_dim).group(_countPerFunc).innerRadius(15);
+      }
+    });
 
-var StudyView = {};
-var hasMutation = true;
-var hasCNA = true;
-var dataFolder = 'ucec_tcga'
-$(document).ready(function () {
+    // ---- render ----
+    var $grid = $('.grid').packery({
+      itemSelector: '.grid-item'
+    });
+    $grid.find('.grid-item').each(function(i, gridItem) {
+      var draggie = new Draggabilly(gridItem);
+      $grid.packery('bindDraggabillyEvents', draggie);
+    });
+    dc.renderAll();
 
-  $.ajax({url: "data/" + dataFolder + "/configs.json"})
-    .then(function (data) {
-      StudyView.preConfig = data;
-      StudyViewMainController.init(StudyView.preConfig);
-    })
-
-});
+  });
 
