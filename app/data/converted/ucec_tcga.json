@@ -222,61 +222,71 @@
               "datatype": "STRING",
               "description": "Study by patients",
               "display_name": "Study by patients",
-              "attr_id": "study_id"
+              "attr_id": "study_id",
+              "view_type": "pie_chart"
             },
 		        "AGE": {
-		            "datatype": "NUMBER",
-		            "description": "Age at which a condition or disease was first diagnosed.",
-		            "display_name": "Diagnosis Age",
-		            "attr_id": "AGE"
+              "datatype": "NUMBER",
+              "description": "Age at which a condition or disease was first diagnosed.",
+              "display_name": "Diagnosis Age",
+              "attr_id": "AGE",
+              "view_type": "bar_chart"
 		        },
 		        "DFS_MONTHS": {
-		            "datatype": "NUMBER",
-		            "description": "Disease free (months) since initial treatment.",
-		            "display_name": "Disease Free (Months)",
-		            "attr_id": "DFS_MONTHS"
+              "datatype": "NUMBER",
+              "description": "Disease free (months) since initial treatment.",
+              "display_name": "Disease Free (Months)",
+              "attr_id": "DFS_MONTHS",
+              "view_type": "bar_chart"
 		        },
 		        "DFS_STATUS": {
-		            "datatype": "STRING",
-		            "description": "Disease free status since initial treatment.",
-		            "display_name": "Disease Free Status",
-		            "attr_id": "DFS_STATUS"
+              "datatype": "STRING",
+              "description": "Disease free status since initial treatment.",
+              "display_name": "Disease Free Status",
+              "attr_id": "DFS_STATUS",
+              "view_type": "pie_chart"
 		        },
 		        "GENDER": {
-		            "datatype": "STRING",
-		            "description": "Patient gender.",
-		            "display_name": "Person Gender",
-		            "attr_id": "GENDER"
+              "datatype": "STRING",
+              "description": "Patient gender.",
+              "display_name": "Person Gender",
+              "attr_id": "GENDER",
+              "view_type": "pie_chart"
 		        },
 		        "MENOPAUSE_STATUS": {
-		            "datatype": "STRING",
-		            "description": "Text term to signify the status of a woman's menopause, the permanent cessation of menses, usually defined by 6 to 12 months of amenorrhea.",
-		            "display_name": "Menopause Status",
-		            "attr_id": "MENOPAUSE_STATUS"
+              "datatype": "STRING",
+              "description": "Text term to signify the status of a woman's menopause, the permanent cessation of menses, usually defined by 6 to 12 months of amenorrhea.",
+              "display_name": "Menopause Status",
+              "attr_id": "MENOPAUSE_STATUS",
+              "view_type": "pie_chart"
 		        },
 		        "OS_MONTHS": {
-		            "datatype": "NUMBER",
-		            "description": "Overall survival in months since initial diagonosis.",
-		            "display_name": "Overall Survival (Months)",
-		            "attr_id": "OS_MONTHS"
+              "datatype": "NUMBER",
+              "description": "Overall survival in months since initial diagonosis.",
+              "display_name": "Overall Survival (Months)",
+              "attr_id": "OS_MONTHS",
+              "view_type": "bar_chart"
 		        },
 		        "OS_STATUS": {
-		            "datatype": "STRING",
-		            "description": "Overall patient survival status.",
-		            "display_name": "Overall Survival Status",
-		            "attr_id": "OS_STATUS"
+              "datatype": "STRING",
+              "description": "Overall patient survival status.",
+              "display_name": "Overall Survival Status",
+              "attr_id": "OS_STATUS",
+              "view_type": "pie_chart"
 		        },
 		        "RACE": {
-		            "datatype": "STRING",
-		            "description": "Race",
-		            "display_name": "Race",
-		            "attr_id": "RACE"
+              "datatype": "STRING",
+              "description": "Race",
+              "display_name": "Race",
+              "attr_id": "RACE",
+              "view_type": "pie_chart"
 		        },
 		        "WEIGHT": {
-		            "datatype": "NUMBER",
-		            "description": "Weight measured in kilograms.",
-		            "display_name": "Patient Weight",
-		            "attr_id": "WEIGHT"
+              "datatype": "NUMBER",
+              "description": "Weight measured in kilograms.",
+              "display_name": "Patient Weight",
+              "attr_id": "WEIGHT",
+              "view_type": "bar_chart"
 		        }
 			},
 			"group_meta": {
@@ -669,97 +679,120 @@
           "datatype": "STRING",
           "description": "Study by samples",
           "display_name": "Study by samples",
-          "attr_id": "study_id"
+          "attr_id": "study_id",
+          "view_type": "pie_chart"
+        },
+        "mutation_count": {
+          "datatype": "NUMBER",
+          "description": "Mutation Count",
+          "display_name": "Mutation Count",
+          "attr_id": "mutation_count",
+          "view_type": "bar_chart"
         },
 				"BCR_SAMPLE_UUID": {
 					"datatype": "STRING",
 					"description": "BCR sample uuid",
 					"display_name": "BCR sample uuid",
-					"attr_id": "BCR_SAMPLE_UUID"
+					"attr_id": "BCR_SAMPLE_UUID",
+          "view_type": "pie_chart"
 				},
 				"CNA_CLUSTER_K4": {
 					"datatype": "STRING",
 					"description": "CNA cluster K4.",
 					"display_name": "CNA Cluster K4",
-					"attr_id": "CNA_CLUSTER_K4"
+					"attr_id": "CNA_CLUSTER_K4",
+          "view_type": "pie_chart"
 				},
 				"IS_FFPE": {
 					"datatype": "STRING",
 					"description": "If the sample is from PPFE",
 					"display_name": "Is FFPE",
-					"attr_id": "IS_FFPE"
+					"attr_id": "IS_FFPE",
+          "view_type": "pie_chart"
 				},
 				"METHYLATION_CLUSTER": {
 					"datatype": "STRING",
 					"description": "Methylation cluster.",
 					"display_name": "Methylation Cluster",
-					"attr_id": "METHYLATION_CLUSTER"
+					"attr_id": "METHYLATION_CLUSTER",
+          "view_type": "pie_chart"
 				},
 				"MICRO_RNA_CLUSTER": {
 					"datatype": "STRING",
 					"description": "MicroRNA cluster.",
 					"display_name": "MicroRNA Cluster",
-					"attr_id": "MICRO_RNA_CLUSTER"
+					"attr_id": "MICRO_RNA_CLUSTER",
+          "view_type": "pie_chart"
 				},
 				"MICRO_RNA_SCORE": {
 					"datatype": "NUMBER",
 					"description": "MicroRNA score.",
 					"display_name": "MicroRNA Score",
-					"attr_id": "MICRO_RNA_SCORE"
+					"attr_id": "MICRO_RNA_SCORE",
+          "view_type": "pie_chart"
 				},
 				"MLH1_SILENCING": {
 					"datatype": "STRING",
 					"description": "Epigenetic silencing status of MLH1.",
 					"display_name": "MLH1 Silencing",
-					"attr_id": "MLH1_SILENCING"
+					"attr_id": "MLH1_SILENCING",
+          "view_type": "pie_chart"
 				},
 				"MOLECULAR_SUBTYPE": {
 					"datatype": "STRING",
 					"description": "Molecular subtype.",
 					"display_name": "Molecular Subtype",
-					"attr_id": "MOLECULAR_SUBTYPE"
+					"attr_id": "MOLECULAR_SUBTYPE",
+          "view_type": "pie_chart"
 				},
 				"MRNA_EXPRESSION_CLUSTER": {
 					"datatype": "STRING",
 					"description": "MRNA expression cluster.",
 					"display_name": "MRNA Expression Cluster",
-					"attr_id": "MRNA_EXPRESSION_CLUSTER"
+					"attr_id": "MRNA_EXPRESSION_CLUSTER",
+          "view_type": "pie_chart"
 				},
 				"MSI_STATUS_5_MARKER_CALL": {
 					"datatype": "STRING",
 					"description": "MSI status 5 marker call.",
 					"display_name": "MSI Status 5 Marker Call",
-					"attr_id": "MSI_STATUS_5_MARKER_CALL"
+					"attr_id": "MSI_STATUS_5_MARKER_CALL",
+          "view_type": "pie_chart"
 				},
 				"MSI_STATUS_7_MARKER_CALL": {
 					"datatype": "STRING",
 					"description": "MSI status 7 marker call.",
 					"display_name": "MSI Status 7 Marker Call",
-					"attr_id": "MSI_STATUS_7_MARKER_CALL"
+					"attr_id": "MSI_STATUS_7_MARKER_CALL",
+          "view_type": "pie_chart"
 				},
 				"MUTATION_RATE_CLUSTER": {
 					"datatype": "STRING",
 					"description": "Mutation rate cluster",
 					"display_name": "Mutation Rate Cluster",
-					"attr_id": "MUTATION_RATE_CLUSTER"
+					"attr_id": "MUTATION_RATE_CLUSTER",
+          "view_type": "pie_chart"
 				},
 				"OCT_EMBEDDED": {
 					"datatype": "STRING",
 					"description": "Oct embedded",
 					"display_name": "Oct embedded",
-					"attr_id": "OCT_EMBEDDED"
+					"attr_id": "OCT_EMBEDDED",
+          "view_type": "pie_chart"
 				},
 				"SAMPLE_TYPE": {
 					"datatype": "STRING",
 					"description": "The type of sample (i.e., normal, primary, met, recurrence).",
 					"display_name": "Sample Type",
-					"attr_id": "SAMPLE_TYPE"
+					"attr_id": "SAMPLE_TYPE",
+          "view_type": "pie_chart"
 				},
 				"mutated_genes": {
 					"datatype": "TABLE",
 					"description": "List of mutated genes",
 					"display_name": "Mutated Genes",
           "attr_id": "mutated_genes",
+          "view_type": "table",
 					"gene_list": [
 						{
 							"gene_symbol": "ABL2",
@@ -1392,6 +1425,7 @@
 					"description": "List of cna altered genes",
 					"display_name": "CNA altered Genes",
           "attr_id": "cna_details",
+          "view_type": "table",
 					"gene_list": [
 						{
 							"gene_symbol": "IGF1R",
