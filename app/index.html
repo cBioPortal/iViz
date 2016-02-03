@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css" />
 
   <script src="scripts/main.js"></script>
+  <script src="scripts/dc_charts.js"></script>
 
 </head>
 <body>
@@ -25,8 +26,10 @@
     <nav class="navbar navbar-default navbar-fixed-top">
       <div id="main-header">
         <a href='javascript:dc.filterAll(); dc.renderAll();' class='reset'>
-          <button type='button' class='btn btn-default' >Reset All</button>
+          <button type='button' class='btn btn-default'>Reset All</button>
         </a>
+        <button type='button' class='btn btn-default' id="save_cohort_btn">Save Cohort</button>
+        <button type='button' class='btn btn-default' id="import_cohort_btn">Import Cohort</button>
       </div>
     </nav>
     <div class="grid" id="main-grid"></div>
