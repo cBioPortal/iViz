@@ -1,4 +1,4 @@
-var dc_charts = function (meta, data) {
+var dc_charts = function (meta, data, type, selection_callback_func) {
 
   var settings = {
     pie_chart: {
@@ -12,15 +12,33 @@ var dc_charts = function (meta, data) {
     }
   };
 
-  var meta, data;
-  this.meta = meta;
-  this.data = data;
+  var filters = {}, selected_cases = [];
 
-  var ndx = crossfilter(data),
-      chart_inst_arr = [];
+  var ndx = crossfilter(data);
 
-  var applied_filters_arr = [];
+  // ---- a separate sample/patient id chart for sync use only ----
+  // TODO: hide this chart
+  var dim_hide, countPerFunc_hide;
+  if (type === "patient") {
+    dim_hide = ndx.dimension(function (d) { return d.patient_id; }),
+    countPerFunc_hide = dim_hide.group().reduceCount();
+  } else if (type === "sample") {
+    dim_hide = ndx.dimension(function (d) { return d.sample_id; }),
+    countPerFunc_hide = dim_hide.group().reduceCount();
+  }
+  $("#main-grid").append(
+    "<div class='grid-item' id='" + type + "_id_chart_div'>" +
+    "<div class='dc-chart dc-pie-chart' id='" + type +"_id_chart'></div>" +
+    "</div>"
+  );
+  var _chart_hide = dc.pieChart("#" + type + "_id_chart");
+  _chart_hide.width(settings.pie_chart.width)
+    .height(settings.pie_chart.height)
+    .dimension(dim_hide)
+    .group(countPerFunc_hide)
+    .innerRadius(settings.pie_chart.inner_radius);
 
+  // ---- automatically create charts by iterate attributes meta ----
   _.each(meta, function (_attr_obj) {
 
     if ($.inArray(_attr_obj.view_type, ["pie_chart", "bar_chart"]) !== -1) {
@@ -41,7 +59,6 @@ var dc_charts = function (meta, data) {
         "</div>"
       );
 
-
       // init and define dc chart instances based on chart types
       switch (_attr_obj.view_type) {
 
@@ -58,8 +75,6 @@ var dc_charts = function (meta, data) {
             .innerRadius(settings.pie_chart.inner_radius);
 
           $("#" + _chart_id).append("<p class='text-center'>" + _attr_obj.display_name + "</p>");
-
-
 
           break;
 
@@ -89,11 +104,6 @@ var dc_charts = function (meta, data) {
             .xAxisLabel(_attr_obj.display_name)
             .margins({top: 10, right: 20, bottom: 50, left: 50});
 
-          //active filter recording
-          _chart_inst.on("filtered", function (_chart_inst, filter) {
-            console.log(filter);
-          });
-
           break;
 
         case "scatter_plots":
@@ -103,31 +113,84 @@ var dc_charts = function (meta, data) {
 
       }
 
-      //active filter recording
-      _chart_inst.on("filtered", function (_chart_inst, filter) {
-        var _filter_str = _attr_obj.attr_id + ": " + filter;
-        if ($.inArray(_filter_str, applied_filters_arr) === -1) {
-          applied_filters_arr.push(_filter_str);
-        } else {
-          var _index = applied_filters_arr.indexOf(_filter_str);
-          applied_filters_arr.splice(_index, 1);
-        }
-      });
+      // ---- activate individual reset button ----
 
-      //active individual reset button
       d3.select("a#" + _reset_btn_id).on("click", function () {
         _chart_inst.filterAll();
         dc.redrawAll();
       });
 
-      chart_inst_arr.push(_chart_inst);
+      // ---- activate filter recording ----
+
+      _chart_inst.on("filtered", function (_chart_inst, filter) {
+
+        // add or remove filters
+        if (filter === null) { //filter comes in as null when clicking "reset"
+          //remove all filters applied to this particular attribute
+          filters[_attr_obj.attr_id] = [];
+          filters[_attr_obj.attr_id].length = 0;
+          delete filters[_attr_obj.attr_id];
+        } else {
+          if (filters.hasOwnProperty(_attr_obj.attr_id)) {
+            if ($.inArray(filter, filters[_attr_obj.attr_id]) === -1) { //add filter
+              filters[_attr_obj.attr_id].push(filter);
+            } else {
+              filters[_attr_obj.attr_id] = _.filter(filters[_attr_obj.attr_id], function(d) { return d !== filter; }); //remove filter
+              if (filters[_attr_obj.attr_id].length === 0) {
+                delete filters[_attr_obj.attr_id];
+              }
+            }
+          } else {
+            filters[_attr_obj.attr_id] = [filter];
+          }
+        }
+
+        // save and refresh selected samples
+        var _dup_selected_cases_arr = [];
+        _.each(Object.keys(filters), function(_filter_attr_id) {
+          var _single_attr_selected_cases = [];
+          var _filters_for_single_attr = filters[_filter_attr_id];
+          _.each(data, function(_data_obj) {
+            if (_data_obj.hasOwnProperty(_filter_attr_id)) {
+              if ($.inArray(_data_obj[_filter_attr_id], _filters_for_single_attr) !== -1) {
+                _single_attr_selected_cases.push(type === "patient"? _data_obj.patient_id: _data_obj.sample_id);
+              }
+            }
+          });
+          _dup_selected_cases_arr.push(_single_attr_selected_cases);
+        });
+        if (_dup_selected_cases_arr.length !== 0) {
+          _.each(_dup_selected_cases_arr, function(_dup_selected_cases) {
+            selected_cases = _.intersection(selected_cases, _dup_selected_cases);
+          });
+        }
+
+        // call callback function to handle the sync between chart groups
+        if (type === "patient") {
+          selection_callback_func(selected_cases, "sample");
+        } else if (type === "sample") {
+          selection_callback_func(selected_cases, "patient");
+        }
+
+      }); // closing active filter recording
+
     }
 
   });
 
   return {
-    getFilters: function() {
-      return applied_filters_arr;
+    get_selected_cases: function() {
+      return selected_cases;
+    },
+    set_sel_by_cases: function(_selected_cases) {
+      _chart_hide.filter(null);
+      selected_cases = _selected_cases;
+      _.each(selected_cases, function(_case_id) {
+        _chart_hide.filter(_case_id);
+      });
+    },
+    filters: function() {
+      return filters;
     }
   }
 

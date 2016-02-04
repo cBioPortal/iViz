@@ -2,9 +2,13 @@ var iViz = (function() {
 
   return {
     init: function() {
+
+      $("#main-grid").empty();
+
       $.ajax({url: "data/converted/ucec_tcga.json"})
         .then(function (data) {
 
+          // fill the empty slots in the data matrix
           _.each(data.groups.patient.data, function(_data_obj) {
             _.each(_.pluck(data.groups.patient.attr_meta, "attr_id"), function (_attr_id) {
               if (!_data_obj.hasOwnProperty(_attr_id)) {
@@ -20,9 +24,25 @@ var iViz = (function() {
             });
           });
 
-          var patient_charts = new dc_charts(data.groups.patient.attr_meta, data.groups.patient.data);
-          var sample_charts = new dc_charts(data.groups.sample.attr_meta, data.groups.sample.data);
+          // init and define dc chart instances
+          var patient_charts_inst = new dc_charts(
+            data.groups.patient.attr_meta,
+            data.groups.patient.data,
+            "patient",
+            sync_callback_func
+          );
+          var sample_charts_inst = new dc_charts(
+            data.groups.sample.attr_meta,
+            data.groups.sample.data,
+            "sample",
+            sync_callback_func
+          );
 
+          // init case selection
+          patient_charts_inst.set_sel_by_cases(_.pluck(data.groups.patient.data, "patient_id"));
+          sample_charts_inst.set_sel_by_cases(_.pluck(data.groups.sample.data, "sample_id"));
+
+          // render dc charts
           var $grid = $('.grid').packery({
             itemSelector: '.grid-item',
             columnWidth: 250,
@@ -34,14 +54,46 @@ var iViz = (function() {
           });
           dc.renderAll();
 
+          // attach event listener for saving cohort
           $("#save_cohort_btn").click(function (){
-            alert(patient_charts.getFilters());
-            alert(sample_charts.getFilters());
+            alert(patient_charts_inst.filters());
+            alert(sample_charts_inst.filters());
+            alert(patient_charts_inst.get_selected_cases());
+            alert(sample_charts_inst.get_selected_cases());
           });
 
+          // attach event listener for importing cohort
           $("#import_cohort_btn").click(function (){
             alert("something!");
           });
+
+          // callback function to sync patients charts and sample charts
+          // @selected_cases: cases selected in the other group
+          // @update_type: the type of group charts (patient or sample) that needs to be updated
+          function sync_callback_func (selected_cases, update_type) {
+
+            //map case ids: patient <-> sample
+            var _selected_mapping_cases = [];
+            _selected_mapping_cases.length = 0;
+            if (update_type === "patient") {
+              var _mapping_obj = data.groups.group_mapping.sample.patient;
+            } else if (update_type === "sample") {
+              var _mapping_obj = data.groups.group_mapping.patient.sample;
+            }
+            _.each(selected_cases, function(_case) {
+              _.each(_mapping_obj[_case], function(_id) {
+                _selected_mapping_cases.push(_id);
+              });
+            });
+
+            if (update_type === "patient") {
+              patient_charts_inst.set_sel_by_cases(_selected_mapping_cases);
+            } else if (update_type === "sample") {
+              sample_charts_inst.set_sel_by_cases(_selected_mapping_cases);
+            }
+
+          }
+
 
         });
     }
