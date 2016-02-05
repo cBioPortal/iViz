@@ -26,7 +26,7 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
     dim_hide = ndx.dimension(function (d) { return d.sample_id; }),
     countPerFunc_hide = dim_hide.group().reduceCount();
   }
-  $("#main-grid").append(
+  $("#main-bridge").append(
     "<div class='grid-item' id='" + type + "_id_chart_div'>" +
     "<div class='dc-chart dc-pie-chart' id='" + type +"_id_chart'></div>" +
     "</div>"
