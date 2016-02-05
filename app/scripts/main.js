@@ -38,10 +38,6 @@ var iViz = (function() {
             sync_callback_func
           );
 
-          // init case selection
-          patient_charts_inst.set_sel_by_cases(_.pluck(data.groups.patient.data, "patient_id"));
-          sample_charts_inst.set_sel_by_cases(_.pluck(data.groups.sample.data, "sample_id"));
-
           // render dc charts
           var $grid = $('.grid').packery({
             itemSelector: '.grid-item',
@@ -85,11 +81,12 @@ var iViz = (function() {
                 _selected_mapping_cases.push(_id);
               });
             });
+            _selected_mapping_cases = _.uniq(_selected_mapping_cases);
 
             if (update_type === "patient") {
-              patient_charts_inst.set_sel_by_cases(_selected_mapping_cases);
+              patient_charts_inst.sync(_selected_mapping_cases);
             } else if (update_type === "sample") {
-              sample_charts_inst.set_sel_by_cases(_selected_mapping_cases);
+              sample_charts_inst.sync(_selected_mapping_cases);
             }
 
           }

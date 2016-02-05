@@ -693,6 +693,14 @@
           "view_type": "pie_chart",
           "attr_type": "sample"
         },
+        "is_sequenced": {
+          "datatype": "STRING",
+          "description": "Sample Sequencing",
+          "display_name": "Sequencing Status",
+          "attr_id": "is_sequenced",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
         "mutation_count": {
           "datatype": "NUMBER",
           "description": "Mutation Count",
