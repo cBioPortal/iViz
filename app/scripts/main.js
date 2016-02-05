@@ -8,7 +8,7 @@ var iViz = (function() {
       $.ajax({url: "data/converted/ucec_tcga.json"})
         .then(function (data) {
 
-          // fill the empty slots in the data matrix
+          // ---- fill the empty slots in the data matrix ----
           _.each(data.groups.patient.data, function(_data_obj) {
             _.each(_.pluck(data.groups.patient.attr_meta, "attr_id"), function (_attr_id) {
               if (!_data_obj.hasOwnProperty(_attr_id)) {
@@ -24,7 +24,7 @@ var iViz = (function() {
             });
           });
 
-          // init and define dc chart instances
+          // ----  init and define dc chart instances ----
           var patient_charts_inst = new dc_charts(
             data.groups.patient.attr_meta,
             data.groups.patient.data,
@@ -38,7 +38,7 @@ var iViz = (function() {
             sync_callback_func
           );
 
-          // render dc charts
+          // ---- render dc charts ----
           var $grid = $('.grid').packery({
             itemSelector: '.grid-item',
             columnWidth: 250,
@@ -50,7 +50,7 @@ var iViz = (function() {
           });
           dc.renderAll();
 
-          // attach event listener for saving cohort
+          // ---- attach event listener for saving cohort ----
           $("#save_cohort_btn").click(function (){
             alert(patient_charts_inst.filters());
             alert(sample_charts_inst.filters());
@@ -58,12 +58,12 @@ var iViz = (function() {
             alert(sample_charts_inst.get_selected_cases());
           });
 
-          // attach event listener for importing cohort
+          // ---- attach event listener for importing cohort ----
           $("#import_cohort_btn").click(function (){
             alert("something!");
           });
 
-          // callback function to sync patients charts and sample charts
+          // ---- callback function to sync patients charts and sample charts ----
           // @selected_cases: cases selected in the other group
           // @update_type: the type of group charts (patient or sample) that needs to be updated
           function sync_callback_func (selected_cases, update_type) {

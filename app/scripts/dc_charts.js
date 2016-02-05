@@ -17,7 +17,7 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
   var ndx = crossfilter(data);
 
   // ---- a separate sample/patient id chart for sync use only ----
-  // TODO: hide this chart
+
   var dim_hide, countPerFunc_hide;
   if (type === "patient") {
     dim_hide = ndx.dimension(function (d) { return d.patient_id; }),
@@ -31,17 +31,18 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
     "<div class='dc-chart dc-pie-chart' id='" + type +"_id_chart'></div>" +
     "</div>"
   );
-  var _chart_hide = dc.pieChart("#" + type + "_id_chart");
-  _chart_hide.width(settings.pie_chart.width)
+  var _chart_invisible = dc.pieChart("#" + type + "_id_chart");
+  _chart_invisible.width(settings.pie_chart.width)
     .height(settings.pie_chart.height)
     .dimension(dim_hide)
     .group(countPerFunc_hide)
     .innerRadius(settings.pie_chart.inner_radius);
 
   // ---- automatically create charts by iterate attributes meta ----
+
   _.each(meta, function (_attr_obj) {
 
-    if ($.inArray(_attr_obj.view_type, ["pie_chart", "bar_chart"]) !== -1) {
+    if ($.inArray(_attr_obj.view_type, ["pie_chart", "bar_chart"]) !== -1) { //TODO: remove this, should be able to handle all view types
 
       var _chart_div_id = "chart-" + _attr_obj.attr_id + _attr_obj.attr_type + "-" + "-div",
           _reset_btn_id = "chart-" + _attr_obj.attr_id + _attr_obj.attr_type + "-" + "-reset",
@@ -145,7 +146,7 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
           }
         }
 
-        // selected samples out of all samples based on filters only
+        // selected samples (from all data) based on filters
         var _dup_selected_cases_arr = [];
         _.each(Object.keys(filters), function(_filter_attr_id) {
           var _single_attr_selected_cases = [];
@@ -169,7 +170,7 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
         // call callback function to handle the sync between chart groups
         selection_callback_func(selected_cases, type === "patient" ? "sample" : "patient");
 
-      }); // closing active filter recording
+      }); // --- closing active filter recording
 
     }
 
@@ -180,9 +181,9 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
       return selected_cases;
     },
     sync: function(_selected_cases) {
-      _chart_hide.filter(null);
+      _chart_invisible.filter(null);
       _.each(_selected_cases, function(_case_id) {
-        _chart_hide.filter(_case_id);
+        _chart_invisible.filter(_case_id);
       });
     },
     filters: function() {
