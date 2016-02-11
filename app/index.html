@@ -11,6 +11,7 @@
   <script src="/bower_components/draggabilly/dist/draggabilly.pkgd.min.js"></script>
   <script src="/bower_components/underscore/underscore.js"></script>
   <script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="/bower_components/vue/dist/vue.min.js"></script>
 
   <link rel="stylesheet" href="/bower_components/dcjs/dc.css" />
   <link rel="stylesheet" href="styles/main.css">
@@ -28,8 +29,12 @@
         <a href='javascript:iViz.init();' class='reset'>
           <button type='button' class='btn btn-default'>Reset All</button>
         </a>
-        <button type='button' class='btn btn-default' id="save_cohort_btn">Save Cohort</button>
-        <button type='button' class='btn btn-default' id="import_cohort_btn">Import Cohort</button>
+        <span id="stat">
+          Samples Selected <mark>{{ selected_samples_num }}</mark> &nbsp;&nbsp;
+          Patients Selected <mark>{{ selected_patients_num }}</mark>
+          <br><span v-for="filter in filters" id="filters-list">{{{ filter.text }}}&nbsp;&nbsp;&nbsp;</span>
+        </span>
+
       </div>
     </nav>
     <div class="grid" id="main-grid"></div>

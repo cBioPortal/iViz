@@ -4,9 +4,22 @@
 body {
   font-family: sans-serif;
 }
+
+#main-header {
+  margin-left: 25px;
+  margin-bottom: 15px;
+  margin-top: 5px;
+}
+
+#main-header #stat {
+  bottom: -5px;
+  left: 10px;
+  position: relative;
+}
+
 .grid {
   max-width: 2200px;
-  padding-top: 60px;
+  top: 130px;
 }
 .grid:after {
   content: '';
@@ -30,8 +43,8 @@ body {
   cursor: move;
 }
 .navbar button {
-  margin: 10px;
-  margin-left: 20px;
+  margin-top: 10px;
+  margin-left: 5px;
 }
 .dc-bar-chart {
   margin-left: 45px;

@@ -2,7 +2,7 @@ var iViz = (function() {
 
   var patient_charts_inst, sample_charts_inst;
   var selected_patients = [], selected_samples = [];
-  var data;
+  var data, vm;
 
   var id_mapping = function(_mapping_obj, _input_cases) {
     var _selected_mapping_cases = [];
@@ -137,7 +137,35 @@ var iViz = (function() {
             } else if (update_type === "patient") {
               patient_charts_inst.sync(id_mapping(data.groups.group_mapping.sample.patient, _selected_samples_by_filters_only));
             }
-            
+
+            // update vue
+            iViz.vm().filters = [];
+            iViz.vm().filters.length = 0;
+            _.each(Object.keys(patient_charts_inst.filters()), function(_key) {
+              iViz.vm().filters.push({ text : "<span class='label label-primary'>" + _key + ": " + iViz.patient_charts_inst().filters()[_key] + "</span>" });
+            });
+            _.each(Object.keys(sample_charts_inst.filters()), function(_key) {
+              iViz.vm().filters.push({ text : "<span class='label label-info'>" + _key + ": " + iViz.sample_charts_inst().filters()[_key] + "</span>" });
+            });
+            iViz.vm().selected_samples_num = selected_samples.length;
+            iViz.vm().selected_patients_num = selected_patients.length;
+
+          } // ---- end of the sync call back func
+
+          // --- vue to extract filters ---
+          if (typeof vm === "undefined") {
+            vm = new Vue({
+              el: '#main-header',
+              data: {
+                filters: [],
+                selected_samples_num: _.pluck(data.groups.sample.data, "sample_id").length,
+                selected_patients_num: _.pluck(data.groups.patient.data, "patient_id").length
+              }
+            });
+          } else {
+            vm.filters = [];
+            vm.selected_samples_num = _.pluck(data.groups.sample.data, "sample_id").length;
+            vm.selected_patients_num = _.pluck(data.groups.patient.data, "patient_id").length
           }
 
         });
@@ -154,6 +182,15 @@ var iViz = (function() {
     },
     selected_patients: function() {
       return selected_patients;
+    },
+    vm: function() {
+      return vm;
+    },
+    patient_charts_inst: function() {
+      return patient_charts_inst;
+    },
+    sample_charts_inst: function() {
+      return sample_charts_inst;
     }
 
   }
