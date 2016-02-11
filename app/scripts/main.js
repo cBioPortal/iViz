@@ -1,12 +1,29 @@
 var iViz = (function() {
 
+  var patient_charts_inst, sample_charts_inst;
+  var selected_patients = [], selected_samples = [];
+  var data;
+
+  var id_mapping = function(_mapping_obj, _input_cases) {
+    var _selected_mapping_cases = [];
+    _selected_mapping_cases.length = 0;
+    _.each(_input_cases, function(_case) {
+      _.each(_mapping_obj[_case], function(_id) {
+        _selected_mapping_cases.push(_id);
+      });
+    });
+    return _.uniq(_selected_mapping_cases);
+  }
+
   return {
     init: function() {
 
       $("#main-grid").empty();
 
       $.ajax({url: "data/converted/ucec_tcga.json"})
-        .then(function (data) {
+        .then(function (_data) {
+
+          data = _data;
 
           // ---- fill the empty slots in the data matrix ----
           _.each(data.groups.patient.data, function(_data_obj) {
@@ -25,13 +42,13 @@ var iViz = (function() {
           });
 
           // ----  init and define dc chart instances ----
-          var patient_charts_inst = new dc_charts(
+          patient_charts_inst = new dc_charts(
             data.groups.patient.attr_meta,
             data.groups.patient.data,
             "patient",
             sync_callback_func
           );
-          var sample_charts_inst = new dc_charts(
+          sample_charts_inst = new dc_charts(
             data.groups.sample.attr_meta,
             data.groups.sample.data,
             "sample",
@@ -52,47 +69,91 @@ var iViz = (function() {
 
           // ---- attach event listener for saving cohort ----
           $("#save_cohort_btn").click(function (){
-            alert(patient_charts_inst.filters());
-            alert(sample_charts_inst.filters());
-            alert(patient_charts_inst.get_selected_cases());
-            alert(sample_charts_inst.get_selected_cases());
           });
 
           // ---- attach event listener for importing cohort ----
           $("#import_cohort_btn").click(function (){
-            alert("something!");
           });
 
           // ---- callback function to sync patients charts and sample charts ----
           // @selected_cases: cases selected in the other group
           // @update_type: the type of group charts (patient or sample) that needs to be updated
-          function sync_callback_func (selected_cases, update_type) {
 
-            //map case ids: patient <-> sample
-            var _selected_mapping_cases = [];
-            _selected_mapping_cases.length = 0;
-            if (update_type === "patient") {
-              var _mapping_obj = data.groups.group_mapping.sample.patient;
-            } else if (update_type === "sample") {
-              var _mapping_obj = data.groups.group_mapping.patient.sample;
-            }
-            _.each(selected_cases, function(_case) {
-              _.each(_mapping_obj[_case], function(_id) {
-                _selected_mapping_cases.push(_id);
+          selected_patients = _.pluck(data.groups.patient.data, "patient_id");
+          selected_samples = _.pluck(data.groups.sample.data, "sample_id");
+
+          function sync_callback_func (update_type, sel_act) { //sel_act: add or remove (cases)
+
+            //samples selected based only on filters
+            var _dup_selected_samples_arr = [];
+            _.each(Object.keys(sample_charts_inst.filters()), function(_filter_attr_id) {
+              var _single_attr_selected_cases = [];
+              var _filters_for_single_attr = sample_charts_inst.filters()[_filter_attr_id];
+              _.each(data.groups.sample.data, function(_data_obj) {
+                if (_data_obj.hasOwnProperty(_filter_attr_id)) {
+                  if ($.inArray(_data_obj[_filter_attr_id], _filters_for_single_attr) !== -1) {
+                    _single_attr_selected_cases.push(_data_obj.sample_id);
+                  }
+                }
               });
+              _dup_selected_samples_arr.push(_single_attr_selected_cases);
             });
-            _selected_mapping_cases = _.uniq(_selected_mapping_cases);
-
-            if (update_type === "patient") {
-              patient_charts_inst.sync(_selected_mapping_cases);
-            } else if (update_type === "sample") {
-              sample_charts_inst.sync(_selected_mapping_cases);
+            var _selected_samples_by_filters_only = _.pluck(data.groups.sample.data, "sample_id");
+            if (_dup_selected_samples_arr.length !== 0) {
+              _.each(_dup_selected_samples_arr, function(_dup_selected_cases) {
+                _selected_samples_by_filters_only = _.intersection(_selected_samples_by_filters_only, _dup_selected_cases);
+              });
             }
 
+            //patients selected based only on filters
+            var _dup_selected_patients_arr = [];
+            _.each(Object.keys(patient_charts_inst.filters()), function(_filter_attr_id) {
+              var _single_attr_selected_cases = [];
+              var _filters_for_single_attr = patient_charts_inst.filters()[_filter_attr_id];
+              _.each(data.groups.patient.data, function(_data_obj) {
+                if (_data_obj.hasOwnProperty(_filter_attr_id)) {
+                  if ($.inArray(_data_obj[_filter_attr_id], _filters_for_single_attr) !== -1) {
+                    _single_attr_selected_cases.push(_data_obj.patient_id);
+                  }
+                }
+              });
+              _dup_selected_patients_arr.push(_single_attr_selected_cases);
+            });
+            var _selected_patients_by_filters_only = _.pluck(data.groups.patient.data, "patient_id");
+            if (_dup_selected_patients_arr.length !== 0) {
+              _.each(_dup_selected_patients_arr, function(_dup_selected_cases) {
+                _selected_patients_by_filters_only = _.intersection(_selected_patients_by_filters_only, _dup_selected_cases);
+              });
+            }
+
+            // find the intersection between two groups
+            var mapped_selected_samples = id_mapping(data.groups.group_mapping.patient.sample, _selected_patients_by_filters_only);
+            selected_samples = _.intersection(mapped_selected_samples, _selected_samples_by_filters_only);
+            selected_patients = id_mapping(data.groups.group_mapping.sample.patient, selected_samples);
+
+            // sync view
+            if (update_type === "sample") {
+              sample_charts_inst.sync(id_mapping(data.groups.group_mapping.patient.sample, _selected_patients_by_filters_only));
+            } else if (update_type === "patient") {
+              patient_charts_inst.sync(id_mapping(data.groups.group_mapping.sample.patient, _selected_samples_by_filters_only));
+            }
+            
           }
 
-
         });
+    },
+
+    patient_filters: function() {
+      return patient_charts_inst.filters();
+    },
+    sample_filters: function() {
+      return sample_charts_inst.filters()
+    },
+    selected_samples: function() {
+      return selected_samples;
+    },
+    selected_patients: function() {
+      return selected_patients;
     }
 
   }

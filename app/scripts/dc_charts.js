@@ -146,29 +146,8 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
           }
         }
 
-        // selected samples (from all data) based on filters
-        var _dup_selected_cases_arr = [];
-        _.each(Object.keys(filters), function(_filter_attr_id) {
-          var _single_attr_selected_cases = [];
-          var _filters_for_single_attr = filters[_filter_attr_id];
-          _.each(data, function(_data_obj) {
-            if (_data_obj.hasOwnProperty(_filter_attr_id)) {
-              if ($.inArray(_data_obj[_filter_attr_id], _filters_for_single_attr) !== -1) {
-                _single_attr_selected_cases.push(type === "patient"? _data_obj.patient_id: _data_obj.sample_id);
-              }
-            }
-          });
-          _dup_selected_cases_arr.push(_single_attr_selected_cases);
-        });
-        selected_cases = _.pluck(data, type==="patient"?"patient_id":"sample_id");
-        if (_dup_selected_cases_arr.length !== 0) {
-          _.each(_dup_selected_cases_arr, function(_dup_selected_cases) {
-            selected_cases = _.intersection(selected_cases, _dup_selected_cases);
-          });
-        }
-
         // call callback function to handle the sync between chart groups
-        selection_callback_func(selected_cases, type === "patient" ? "sample" : "patient");
+        selection_callback_func(type === "patient" ? "sample" : "patient", filter === null? "add": "remove");
 
       }); // --- closing active filter recording
 
@@ -179,6 +158,9 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
   return {
     get_selected_cases: function() {
       return selected_cases;
+    },
+    reset: function(){
+      dc.redrawAll();
     },
     sync: function(_selected_cases) {
       _chart_invisible.filter(null);
