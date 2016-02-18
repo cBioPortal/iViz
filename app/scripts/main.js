@@ -82,7 +82,7 @@ var iViz = (function() {
           selected_patients = _.pluck(data.groups.patient.data, "patient_id");
           selected_samples = _.pluck(data.groups.sample.data, "sample_id");
 
-          function sync_callback_func (update_type, sel_act) { //sel_act: add or remove (cases)
+          function sync_callback_func (update_type) { //sel_act: add or remove (cases)
 
             //samples selected based only on filters
             var _dup_selected_samples_arr = [];
@@ -150,9 +150,9 @@ var iViz = (function() {
             iViz.vm().selected_samples_num = selected_samples.length;
             iViz.vm().selected_patients_num = selected_patients.length;
 
-          } // ---- end of the sync call back func
+          } // ---- close sync callback function
 
-          // --- vue to extract filters ---
+          // --- using vue to show filters in header ---
           if (typeof vm === "undefined") {
             vm = new Vue({
               el: '#main-header',
@@ -169,19 +169,43 @@ var iViz = (function() {
           }
 
         });
-    },
+    }, // ---- close init function ----
 
     patient_filters: function() {
       return patient_charts_inst.filters();
     },
     sample_filters: function() {
-      return sample_charts_inst.filters()
+      return sample_charts_inst.filters();
     },
     selected_samples: function() {
-      return selected_samples;
-    },
-    selected_patients: function() {
-      return selected_patients;
+
+      var _result = [];
+
+      _.each(selected_samples, function(_selected_sample) {
+
+        var _index = data.groups.sample.data_indices.sample_id[_selected_sample];
+        var _study_id = data.groups.sample.data[_index]["study_id"];
+
+        // extract study information
+        if ($.inArray(_study_id, _.pluck(_result, "studyID")) !== -1) {
+          _.each(_result, function(_result_obj) {
+            if (_result_obj["studyID"] === _study_id) {
+              _result_obj["samples"].push(_selected_sample);
+            }
+          });
+        } else {
+          _result.push({"studyID": _study_id, "samples": [_selected_sample]});
+        }
+
+        //map samples to patients
+        _.each(_result, function(_result_obj) {
+          _result_obj["patients"] = id_mapping(data.groups.group_mapping.sample.patient, _result_obj["samples"]);
+        });
+
+      });
+
+      return _result;
+
     },
     vm: function() {
       return vm;

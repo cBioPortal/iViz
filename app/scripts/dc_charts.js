@@ -147,7 +147,7 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
         }
 
         // call callback function to handle the sync between chart groups
-        selection_callback_func(type === "patient" ? "sample" : "patient", filter === null? "add": "remove");
+        selection_callback_func(type === "patient" ? "sample" : "patient");
 
       }); // --- closing active filter recording
 
