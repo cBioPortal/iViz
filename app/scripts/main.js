@@ -177,7 +177,7 @@ var iViz = (function() {
     sample_filters: function() {
       return sample_charts_inst.filters();
     },
-    selected_samples: function() {
+    selected_cases: function() {
 
       var _result = [];
 
