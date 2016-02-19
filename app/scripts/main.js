@@ -20,7 +20,7 @@ var iViz = (function() {
 
       $("#main-grid").empty();
 
-      $.ajax({url: "data/converted/ucec_tcga.json"})
+      $.ajax({url: "data/converted/mixed_tcga.json"})
         .then(function (_data) {
 
           data = _data;

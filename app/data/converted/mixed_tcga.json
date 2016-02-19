@@ -1,0 +1,2221 @@
+{
+  "groups": {
+    "patient": {
+      "data": [
+        {
+          "patient_id":"TCGA-AP-A1DH",
+          "study_id":"ucec_tcga",
+          "AGE":"62",
+          "DFS_MONTHS":"59.66",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"59.66",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"150"
+        },
+        {
+          "patient_id":"TCGA-AP-A1DK",
+          "study_id":"ucec_tcga",
+          "AGE":"53",
+          "DFS_MONTHS":"54.20",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"54.20",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"70"
+        },
+        {
+          "patient_id":"TCGA-AP-A1DM",
+          "study_id":"ucec_tcga",
+          "AGE":"60",
+          "DFS_MONTHS":"43.66",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"43.66",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"110"
+        },
+        {
+          "patient_id":"TCGA-AP-A1DO",
+          "study_id":"ucec_tcga",
+          "AGE":"62",
+          "DFS_MONTHS":"31.27",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"31.27",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"220"
+        },
+        {
+          "patient_id":"TCGA-AP-A1DP",
+          "study_id":"ucec_tcga",
+          "AGE":"70",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"NA",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"35.51",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"230"
+        },
+        {
+          "patient_id":"TCGA-AP-A1DQ",
+          "study_id":"ucec_tcga",
+          "AGE":"76",
+          "DFS_MONTHS":"38.93",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"38.93",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"100"
+        },
+        {
+          "patient_id":"TCGA-AP-A1DR",
+          "study_id":"ucec_tcga",
+          "AGE":"59",
+          "DFS_MONTHS":"37.16",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"37.16",
+          "OS_STATUS":"LIVING",
+          "RACE":"BLACK OR AFRICAN AMERICAN",
+          "WEIGHT":"270"
+        },
+        {
+          "patient_id":"TCGA-AP-A1DV",
+          "study_id":"ucec_tcga",
+          "AGE":"59",
+          "DFS_MONTHS":"6.70",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"6.70",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"170"
+        },
+        {
+          "patient_id":"TCGA-AP-A1E0",
+          "study_id":"ucec_tcga",
+          "AGE":"40",
+          "DFS_MONTHS":"22.70",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Pre (<6 months since LMP AND no prior bilateral ovariectomy AND not on estrogen replacement)",
+          "OS_MONTHS":"22.70",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"110"
+        },
+        {
+          "patient_id":"TCGA-AP-A1E1",
+          "study_id":"ucec_tcga",
+          "AGE":"74",
+          "DFS_MONTHS":"10.41",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"10.41",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"260"
+        },
+        {
+          "patient_id":"TCGA-BK-A0C9",
+          "study_id":"ucec_tcga",
+          "AGE":"57",
+          "DFS_MONTHS":"9.49",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"9.49",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"490"
+        },
+        {
+          "patient_id":"TCGA-AP-A052",
+          "study_id":"ucec_tcga",
+          "AGE":"59",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"NA",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"21.98",
+          "OS_STATUS":"DECEASED",
+          "RACE":"BLACK OR AFRICAN AMERICAN",
+          "WEIGHT":"500"
+        },
+        {
+          "patient_id":"TCGA-D1-A17T",
+          "study_id":"ucec_tcga",
+          "AGE":"67",
+          "DFS_MONTHS":"2.33",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"2.33",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"130"
+        },
+        {
+          "patient_id":"TCGA-BG-A0VX",
+          "study_id":"ucec_tcga",
+          "AGE":"58",
+          "DFS_MONTHS":"16.10",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"16.10",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"90"
+        },
+        {
+          "patient_id":"TCGA-BK-A139",
+          "study_id":"ucec_tcga",
+          "AGE":"74",
+          "DFS_MONTHS":"7.85",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"7.85",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"770"
+        },
+        {
+          "patient_id":"TCGA-N5-A4R8",
+          "study_id":"ucs_tcga",
+          "AGE":"65",
+          "DFS_MONTHS":"32.22",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"32.22",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"54"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RA",
+          "study_id":"ucs_tcga",
+          "AGE":"63",
+          "DFS_MONTHS":"16.52",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"44.69",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"72"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RJ",
+          "study_id":"ucs_tcga",
+          "AGE":"61",
+          "DFS_MONTHS":"67.90",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"126.43",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"84"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RM",
+          "study_id":"ucs_tcga",
+          "AGE":"62",
+          "DFS_MONTHS":"74.44",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"98.30",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"70"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RN",
+          "study_id":"ucs_tcga",
+          "AGE":"71",
+          "DFS_MONTHS":"12.46",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"12.46",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"76"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RO",
+          "study_id":"ucs_tcga",
+          "AGE":"67",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"NA",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"55.78",
+          "OS_STATUS":"DECEASED",
+          "RACE":"BLACK OR AFRICAN AMERICAN",
+          "WEIGHT":"78"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RS",
+          "study_id":"ucs_tcga",
+          "AGE":"65",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"NA",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"NA",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"60"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RT",
+          "study_id":"ucs_tcga",
+          "AGE":"69",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"MALE",
+          "MENOPAUSE_STATUS":"NA",
+          "OS_MONTHS":"67.95",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"56"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RU",
+          "study_id":"ucs_tcga",
+          "AGE":"54",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"NA",
+          "GENDER":"MALE",
+          "MENOPAUSE_STATUS":"NA",
+          "OS_MONTHS":"189.53",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"58"
+        },
+        {
+          "patient_id":"TCGA-N5-A4RV",
+          "study_id":"ucs_tcga",
+          "AGE":"62",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"MALE",
+          "MENOPAUSE_STATUS":"NA",
+          "OS_MONTHS":"56.21",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"55"
+        },
+        {
+          "patient_id":"TCGA-N5-A59E",
+          "study_id":"ucs_tcga",
+          "AGE":"62",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"NA",
+          "GENDER":"MALE",
+          "MENOPAUSE_STATUS":"NA",
+          "OS_MONTHS":"142.67",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"88"
+        },
+        {
+          "patient_id":"TCGA-N5-A59F",
+          "study_id":"ucs_tcga",
+          "AGE":"65",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"NA",
+          "GENDER":"MALE",
+          "MENOPAUSE_STATUS":"NA",
+          "OS_MONTHS":"16.26",
+          "OS_STATUS":"DECEASED",
+          "RACE":"BLACK OR AFRICAN AMERICAN",
+          "WEIGHT":"73"
+        },
+        {
+          "patient_id":"TCGA-N6-A4V9",
+          "study_id":"ucs_tcga",
+          "AGE":"59",
+          "DFS_MONTHS":"153.09",
+          "DFS_STATUS":"DiseaseFree",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"[Unknown]",
+          "OS_MONTHS":"24.35",
+          "OS_STATUS":"LIVING",
+          "RACE":"WHITE",
+          "WEIGHT":"86"
+        },
+        {
+          "patient_id":"TCGA-N6-A4VC",
+          "study_id":"ucs_tcga",
+          "AGE":"83",
+          "DFS_MONTHS":"NA",
+          "DFS_STATUS":"NA",
+          "GENDER":"FEMALE",
+          "MENOPAUSE_STATUS":"Post (prior bilateral ovariectomy OR >12 mo since LMP with no prior hysterectomy)",
+          "OS_MONTHS":"274.23",
+          "OS_STATUS":"DECEASED",
+          "RACE":"WHITE",
+          "WEIGHT":"82"
+        }
+      ],
+      "data_indices": {
+        "patient_id": {
+          "TCGA-AP-A1DH": 0,
+          "TCGA-AP-A1DK": 1,
+          "TCGA-AP-A1DM": 2,
+          "TCGA-AP-A1DO": 3,
+          "TCGA-AP-A1DP": 4,
+          "TCGA-AP-A1DQ": 5,
+          "TCGA-AP-A1DR": 6,
+          "TCGA-AP-A1DV": 7,
+          "TCGA-AP-A1E0": 8,
+          "TCGA-AP-A1E1": 9,
+          "TCGA-BK-A0C9": 10,
+          "TCGA-AP-A052": 11,
+          "TCGA-D1-A17T": 12,
+          "TCGA-BG-A0VX": 13,
+          "TCGA-BK-A139": 14,
+          "TCGA-N5-A4R8": 15,
+          "TCGA-N5-A4RA": 16,
+          "TCGA-N5-A4RJ": 17,
+          "TCGA-N5-A4RM": 18,
+          "TCGA-N5-A4RN": 19,
+          "TCGA-N5-A4RO": 20,
+          "TCGA-N5-A4RS": 21,
+          "TCGA-N5-A4RT": 22,
+          "TCGA-N5-A4RU": 23,
+          "TCGA-N5-A4RV": 24,
+          "TCGA-N5-A59E": 25,
+          "TCGA-N5-A59F": 26,
+          "TCGA-N6-A4V9": 27,
+          "TCGA-N6-A4VC": 28
+        }
+      },
+      "attr_meta": {
+        "study_id": {
+          "datatype": "STRING",
+          "description": "Study by patients",
+          "display_name": "Study by patients",
+          "attr_id": "study_id",
+          "view_type": "pie_chart",
+          "attr_type": "patient"
+        },
+        "AGE": {
+          "datatype": "NUMBER",
+          "description": "Age at which a condition or disease was first diagnosed.",
+          "display_name": "Diagnosis Age",
+          "attr_id": "AGE",
+          "view_type": "bar_chart",
+          "attr_type": "patient"
+        },
+        "DFS_MONTHS": {
+          "datatype": "NUMBER",
+          "description": "Disease free (months) since initial treatment.",
+          "display_name": "Disease Free (Months)",
+          "attr_id": "DFS_MONTHS",
+          "view_type": "bar_chart",
+          "attr_type": "patient"
+        },
+        "DFS_STATUS": {
+          "datatype": "STRING",
+          "description": "Disease free status since initial treatment.",
+          "display_name": "Disease Free Status",
+          "attr_id": "DFS_STATUS",
+          "view_type": "pie_chart",
+          "attr_type": "patient"
+        },
+        "GENDER": {
+          "datatype": "STRING",
+          "description": "Patient gender.",
+          "display_name": "Person Gender",
+          "attr_id": "GENDER",
+          "view_type": "pie_chart",
+          "attr_type": "patient"
+        },
+        "MENOPAUSE_STATUS": {
+          "datatype": "STRING",
+          "description": "Text term to signify the status of a woman's menopause, the permanent cessation of menses, usually defined by 6 to 12 months of amenorrhea.",
+          "display_name": "Menopause Status",
+          "attr_id": "MENOPAUSE_STATUS",
+          "view_type": "pie_chart",
+          "attr_type": "patient"
+        },
+        "OS_MONTHS": {
+          "datatype": "NUMBER",
+          "description": "Overall survival in months since initial diagonosis.",
+          "display_name": "Overall Survival (Months)",
+          "attr_id": "OS_MONTHS",
+          "view_type": "bar_chart",
+          "attr_type": "patient"
+        },
+        "OS_STATUS": {
+          "datatype": "STRING",
+          "description": "Overall patient survival status.",
+          "display_name": "Overall Survival Status",
+          "attr_id": "OS_STATUS",
+          "view_type": "pie_chart",
+          "attr_type": "patient"
+        },
+        "RACE": {
+          "datatype": "STRING",
+          "description": "Race",
+          "display_name": "Race",
+          "attr_id": "RACE",
+          "view_type": "pie_chart",
+          "attr_type": "patient"
+        },
+        "WEIGHT": {
+          "datatype": "NUMBER",
+          "description": "Weight measured in kilograms.",
+          "display_name": "Patient Weight",
+          "attr_id": "WEIGHT",
+          "view_type": "bar_chart",
+          "attr_type": "patient"
+        }
+      },
+      "group_meta": {
+        "id": "patient",
+        "type": "patient_data"
+      }
+    },
+    "sample": {
+      "data": [
+        {
+          "sample_id":"TCGA-AP-A1DH-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.00000979462769324636,
+          "BCR_SAMPLE_UUID":"da4b6bf2-0e9d-495a-8220-93359d2afa67",
+          "CNA_CLUSTER_K4":"1",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"3",
+          "MICRO_RNA_SCORE":"0.897648505",
+          "MLH1_SILENCING":"1",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"1",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-H",
+          "MSI_STATUS_7_MARKER_CALL":"MSI-H",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1DK-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.00030930738909129877,
+          "BCR_SAMPLE_UUID":"1cb12a0f-0081-441f-a86e-71d76ef5b8d0",
+          "CNA_CLUSTER_K4":"1",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"3",
+          "MICRO_RNA_CLUSTER":"2",
+          "MICRO_RNA_SCORE":"0.953263868",
+          "MLH1_SILENCING":"0",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"1",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-H",
+          "MSI_STATUS_7_MARKER_CALL":"MSI-H",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1DM-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.04152483650803261,
+          "BCR_SAMPLE_UUID":"7f4344cf-a5d7-4623-abe8-9f046723ea0a",
+          "CNA_CLUSTER_K4":"2",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"5",
+          "MICRO_RNA_SCORE":"0.932869329",
+          "MLH1_SILENCING":"1",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"2",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-H",
+          "MSI_STATUS_7_MARKER_CALL":"MSI-H",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1DO-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.2143598525631081,
+          "BCR_SAMPLE_UUID":"f2b59490-86fe-409a-89f1-e11f744e0d75",
+          "CNA_CLUSTER_K4":"3",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"5",
+          "MICRO_RNA_SCORE":"0.932869329",
+          "MLH1_SILENCING":"1",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"2",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-H",
+          "MSI_STATUS_7_MARKER_CALL":"MSI-H",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1DP-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.034148077894747365,
+          "BCR_SAMPLE_UUID":"b5206087-88de-4963-9239-189d159f7b35",
+          "CNA_CLUSTER_K4":"3",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"5",
+          "MICRO_RNA_SCORE":"0.932869329",
+          "MLH1_SILENCING":"1",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"NA",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-H",
+          "MSI_STATUS_7_MARKER_CALL":"MSI-H",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1DQ-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26],
+          "log2_cna": 0.5010281254357368,
+          "BCR_SAMPLE_UUID":"812485e9-fbb8-431b-8c49-d2f1a9391457",
+          "CNA_CLUSTER_K4":"4",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"3",
+          "MICRO_RNA_CLUSTER":"4",
+          "MICRO_RNA_SCORE":"0.652238476",
+          "MLH1_SILENCING":"0",
+          "MOLECULAR_SUBTYPE":"Copy-number high (Serous-like)",
+          "MRNA_EXPRESSION_CLUSTER":"1",
+          "MSI_STATUS_5_MARKER_CALL":"MSS",
+          "MSI_STATUS_7_MARKER_CALL":"MSS",
+          "MUTATION_RATE_CLUSTER":"1_LOW",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1DR-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.00024945231257843904,
+          "BCR_SAMPLE_UUID":"438480e7-9b80-44a4-89d8-6b7a27028f35",
+          "CNA_CLUSTER_K4":"1",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"5",
+          "MICRO_RNA_SCORE":"0.80219575",
+          "MLH1_SILENCING":"1",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"2",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-H",
+          "MSI_STATUS_7_MARKER_CALL":"MSI-H",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1DV-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [27, 28, 29, 30, 31, 32],
+          "log2_cna": 0.019458206650401873,
+          "BCR_SAMPLE_UUID":"a03f9020-3ded-4c1c-bf7e-1fa3a47e76de",
+          "CNA_CLUSTER_K4":"2",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"6",
+          "MICRO_RNA_SCORE":"0.898513296",
+          "MLH1_SILENCING":"0",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"2",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-L",
+          "MSI_STATUS_7_MARKER_CALL":"MSS",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1E0-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.0003502189667892388,
+          "BCR_SAMPLE_UUID":"9862bae4-6ad0-4607-ab28-cc6bf73d77d0",
+          "CNA_CLUSTER_K4":"1",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"1",
+          "MICRO_RNA_SCORE":"0.918650794",
+          "MLH1_SILENCING":"0",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"1",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-L",
+          "MSI_STATUS_7_MARKER_CALL":"MSS",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A1E1-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.03375821675182634,
+          "BCR_SAMPLE_UUID":"1a9a1020-c9ee-4bbf-98e8-fbe5041a6099",
+          "CNA_CLUSTER_K4":"3",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"5",
+          "MICRO_RNA_SCORE":"0.932869329",
+          "MLH1_SILENCING":"1",
+          "MOLECULAR_SUBTYPE":"NA",
+          "MRNA_EXPRESSION_CLUSTER":"2",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-H",
+          "MSI_STATUS_7_MARKER_CALL":"MSI-H",
+          "MUTATION_RATE_CLUSTER":"NA",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-BK-A0C9-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 338,
+          "mutated_genes": [0, 1, 2, 3, 4, 5, 6, 6, 7, 8, 9, 9, 64, 45, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 72, 20, 21, 22, 75, 53, 53, 23, 24, 25, 26, 27, 28, 29, 100, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.583851723463483,
+          "BCR_SAMPLE_UUID":"155181e3-7733-44be-8ef8-7e24cebb59a4",
+          "CNA_CLUSTER_K4":"2",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"6",
+          "MICRO_RNA_SCORE":"0.936182815",
+          "MLH1_SILENCING":"1",
+          "MOLECULAR_SUBTYPE":"MSI (Hyper-mutated)",
+          "MRNA_EXPRESSION_CLUSTER":"3",
+          "MSI_STATUS_5_MARKER_CALL":"MSI-H",
+          "MSI_STATUS_7_MARKER_CALL":"MSI-H",
+          "MUTATION_RATE_CLUSTER":"2_HIGH",
+          "OCT_EMBEDDED":"false",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-AP-A052-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 26,
+          "mutated_genes": [42, 43, 44, 45, 46, 97, 53, 47],
+          "is_sequenced": "Yes",
+          "cna_details": [33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108],
+          "log2_cna": 0.2774006180818812,
+          "BCR_SAMPLE_UUID":"33c21dca-f3b3-48cd-9fc5-ad316598f23e",
+          "CNA_CLUSTER_K4":"4",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"3",
+          "MICRO_RNA_CLUSTER":"NA",
+          "MICRO_RNA_SCORE":"NA",
+          "MLH1_SILENCING":"0",
+          "MOLECULAR_SUBTYPE":"Copy-number high (Serous-like)",
+          "MRNA_EXPRESSION_CLUSTER":"1",
+          "MSI_STATUS_5_MARKER_CALL":"MSS",
+          "MSI_STATUS_7_MARKER_CALL":"MSS",
+          "MUTATION_RATE_CLUSTER":"1_LOW",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-D1-A17T-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 48,
+          "mutated_genes": [48, 48, 49, 50, 51, 52, 93, 53, 53, 54, 82, 100, 100, 55],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.046443927893890305,
+          "BCR_SAMPLE_UUID":"179bdb8c-c4fd-4949-8aca-eca735a5320f",
+          "CNA_CLUSTER_K4":"2",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"1",
+          "MICRO_RNA_CLUSTER":"6",
+          "MICRO_RNA_SCORE":"0.807152783",
+          "MLH1_SILENCING":"0",
+          "MOLECULAR_SUBTYPE":"Copy-number low (Endometriod)",
+          "MRNA_EXPRESSION_CLUSTER":"3",
+          "MSI_STATUS_5_MARKER_CALL":"MSS",
+          "MSI_STATUS_7_MARKER_CALL":"MSS",
+          "MUTATION_RATE_CLUSTER":"1_LOW",
+          "OCT_EMBEDDED":"false",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-BG-A0VX-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 160,
+          "mutated_genes": [56, 57, 42, 58, 59, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 53, 53, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.00000791105365835983,
+          "BCR_SAMPLE_UUID":"5797d32b-e482-4af3-b043-ad84c84e0296",
+          "CNA_CLUSTER_K4":"1",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"4",
+          "MICRO_RNA_CLUSTER":"4",
+          "MICRO_RNA_SCORE":"0.918013002",
+          "MLH1_SILENCING":"0",
+          "MOLECULAR_SUBTYPE":"Copy-number low (Endometriod)",
+          "MRNA_EXPRESSION_CLUSTER":"3",
+          "MSI_STATUS_5_MARKER_CALL":"MSS",
+          "MSI_STATUS_7_MARKER_CALL":"MSS",
+          "MUTATION_RATE_CLUSTER":"2_HIGH",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-BK-A139-01",
+          "study_id":"ucec_tcga",
+          "mutation_count": 76,
+          "mutated_genes": [88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101],
+          "is_sequenced": "Yes",
+          "cna_details": [109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133],
+          "log2_cna": 0.45310836842789415,
+          "BCR_SAMPLE_UUID":"d777e49b-cb47-44f3-ad42-4d23af7e296c",
+          "CNA_CLUSTER_K4":"4",
+          "IS_FFPE":"NO",
+          "METHYLATION_CLUSTER":"2",
+          "MICRO_RNA_CLUSTER":"4",
+          "MICRO_RNA_SCORE":"0.877287726",
+          "MLH1_SILENCING":"0",
+          "MOLECULAR_SUBTYPE":"Copy-number high (Serous-like)",
+          "MRNA_EXPRESSION_CLUSTER":"1",
+          "MSI_STATUS_5_MARKER_CALL":"MSS",
+          "MSI_STATUS_7_MARKER_CALL":"MSS",
+          "MUTATION_RATE_CLUSTER":"1_LOW",
+          "OCT_EMBEDDED":"false",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-BK-A139-02",
+          "study_id":"ucec_tcga",
+          "mutation_count": 0,
+          "mutated_genes": [],
+          "is_sequenced": "Yes",
+          "log2_cna": 0.6928050238485971,
+          "BCR_SAMPLE_UUID":"A4EE1CC7-9CAC-4E7E-96DB-D38981E5F506",
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"false",
+          "SAMPLE_TYPE":"Recurrent Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4R8-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 57,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": "NA",
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RA-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 49,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.641243123689671,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RJ-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 59,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.49647118222422315,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RM-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 56,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.5319602320831766,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RN-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 74,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.5405689872042425,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RO-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 55,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.965849843327472,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RS-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 32,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.29101891674001734,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RT-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 102,
+          "mutated_genes": [],
+          "is_sequenced": "No",
+          "cna_details": [],
+          "log2_cna": 0.686075890015659,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RU-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 67,
+          "mutated_genes": [],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.5600854801172341,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A4RV-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 51,
+          "mutated_genes": [],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.47180209844809073,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A59E-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 66,
+          "mutated_genes": [],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.7028384857605755,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N5-A59F-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 66,
+          "mutated_genes": [],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.6112065252598982,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N6-A4V9-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 40,
+          "mutated_genes": [],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.6804250244560058,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        },
+        {
+          "sample_id":"TCGA-N6-A4VC-01",
+          "study_id":"ucs_tcga",
+          "mutation_count": 50,
+          "mutated_genes": [],
+          "is_sequenced": "Yes",
+          "cna_details": [],
+          "log2_cna": 0.623166101417655,
+          "IS_FFPE":"NO",
+          "OCT_EMBEDDED":"true",
+          "SAMPLE_TYPE":"Primary Tumor"
+        }
+      ],
+      "data_indices": {
+        "sample_id": {
+          "TCGA-AP-A1DH-01": 0,
+          "TCGA-AP-A1DK-01": 1,
+          "TCGA-AP-A1DM-01": 2,
+          "TCGA-AP-A1DO-01": 3,
+          "TCGA-AP-A1DP-01": 4,
+          "TCGA-AP-A1DQ-01": 5,
+          "TCGA-AP-A1DR-01": 6,
+          "TCGA-AP-A1DV-01": 7,
+          "TCGA-AP-A1E0-01": 8,
+          "TCGA-AP-A1E1-01": 9,
+          "TCGA-BK-A0C9-01": 10,
+          "TCGA-AP-A052-01": 11,
+          "TCGA-D1-A17T-01": 12,
+          "TCGA-BG-A0VX-01": 13,
+          "TCGA-BK-A139-01": 14,
+          "TCGA-BK-A139-02": 15,
+          "TCGA-N5-A4R8-01": 16,
+          "TCGA-N5-A4RA-01": 17,
+          "TCGA-N5-A4RJ-01": 18,
+          "TCGA-N5-A4RM-01": 19,
+          "TCGA-N5-A4RN-01": 20,
+          "TCGA-N5-A4RO-01": 21,
+          "TCGA-N5-A4RS-01": 22,
+          "TCGA-N5-A4RT-01": 23,
+          "TCGA-N5-A4RU-01": 24,
+          "TCGA-N5-A4RV-01": 25,
+          "TCGA-N5-A59E-01": 26,
+          "TCGA-N5-A59F-01": 27,
+          "TCGA-N6-A4V9-01": 28,
+          "TCGA-N6-A4VC-01": 29
+        }
+      },
+      "attr_meta": {
+        "study_id": {
+          "datatype": "STRING",
+          "description": "Study by samples",
+          "display_name": "Study by samples",
+          "attr_id": "study_id",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "is_sequenced": {
+          "datatype": "STRING",
+          "description": "Sample Sequencing",
+          "display_name": "Sequencing Status",
+          "attr_id": "is_sequenced",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "mutation_count": {
+          "datatype": "NUMBER",
+          "description": "Mutation Count",
+          "display_name": "Mutation Count",
+          "attr_id": "mutation_count",
+          "view_type": "bar_chart",
+          "attr_type": "sample"
+        },
+        "BCR_SAMPLE_UUID": {
+          "datatype": "STRING",
+          "description": "BCR sample uuid",
+          "display_name": "BCR sample uuid",
+          "attr_id": "BCR_SAMPLE_UUID",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "CNA_CLUSTER_K4": {
+          "datatype": "STRING",
+          "description": "CNA cluster K4.",
+          "display_name": "CNA Cluster K4",
+          "attr_id": "CNA_CLUSTER_K4",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "IS_FFPE": {
+          "datatype": "STRING",
+          "description": "If the sample is from PPFE",
+          "display_name": "Is FFPE",
+          "attr_id": "IS_FFPE",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "METHYLATION_CLUSTER": {
+          "datatype": "STRING",
+          "description": "Methylation cluster.",
+          "display_name": "Methylation Cluster",
+          "attr_id": "METHYLATION_CLUSTER",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "MICRO_RNA_CLUSTER": {
+          "datatype": "STRING",
+          "description": "MicroRNA cluster.",
+          "display_name": "MicroRNA Cluster",
+          "attr_id": "MICRO_RNA_CLUSTER",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "MICRO_RNA_SCORE": {
+          "datatype": "NUMBER",
+          "description": "MicroRNA score.",
+          "display_name": "MicroRNA Score",
+          "attr_id": "MICRO_RNA_SCORE",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "MLH1_SILENCING": {
+          "datatype": "STRING",
+          "description": "Epigenetic silencing status of MLH1.",
+          "display_name": "MLH1 Silencing",
+          "attr_id": "MLH1_SILENCING",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "MOLECULAR_SUBTYPE": {
+          "datatype": "STRING",
+          "description": "Molecular subtype.",
+          "display_name": "Molecular Subtype",
+          "attr_id": "MOLECULAR_SUBTYPE",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "MRNA_EXPRESSION_CLUSTER": {
+          "datatype": "STRING",
+          "description": "MRNA expression cluster.",
+          "display_name": "MRNA Expression Cluster",
+          "attr_id": "MRNA_EXPRESSION_CLUSTER",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "MSI_STATUS_5_MARKER_CALL": {
+          "datatype": "STRING",
+          "description": "MSI status 5 marker call.",
+          "display_name": "MSI Status 5 Marker Call",
+          "attr_id": "MSI_STATUS_5_MARKER_CALL",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "MSI_STATUS_7_MARKER_CALL": {
+          "datatype": "STRING",
+          "description": "MSI status 7 marker call.",
+          "display_name": "MSI Status 7 Marker Call",
+          "attr_id": "MSI_STATUS_7_MARKER_CALL",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "MUTATION_RATE_CLUSTER": {
+          "datatype": "STRING",
+          "description": "Mutation rate cluster",
+          "display_name": "Mutation Rate Cluster",
+          "attr_id": "MUTATION_RATE_CLUSTER",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "OCT_EMBEDDED": {
+          "datatype": "STRING",
+          "description": "Oct embedded",
+          "display_name": "Oct embedded",
+          "attr_id": "OCT_EMBEDDED",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "SAMPLE_TYPE": {
+          "datatype": "STRING",
+          "description": "The type of sample (i.e., normal, primary, met, recurrence).",
+          "display_name": "Sample Type",
+          "attr_id": "SAMPLE_TYPE",
+          "view_type": "pie_chart",
+          "attr_type": "sample"
+        },
+        "mutated_genes": {
+          "datatype": "TABLE",
+          "description": "List of mutated genes",
+          "display_name": "Mutated Genes",
+          "attr_id": "mutated_genes",
+          "view_type": "table",
+          "attr_type": "sample",
+          "gene_list": [
+            {
+              "gene_symbol": "ABL2",
+              "cytoband": "1q25.2",
+              "length": "13257",
+              "num_muts": "21"
+            },
+            {
+              "gene_symbol": "OR2M2",
+              "cytoband": "1q44",
+              "length": "1044",
+              "num_muts": "12"
+            },
+            {
+              "gene_symbol": "ACTB",
+              "cytoband": "7p22",
+              "length": "3256",
+              "num_muts": "3"
+            },
+            {
+              "gene_symbol": "F5",
+              "cytoband": "1q23",
+              "length": "7158",
+              "num_muts": "48"
+            },
+            {
+              "gene_symbol": "HIST1H3D",
+              "cytoband": "6p22.1",
+              "length": "865",
+              "num_muts": "3"
+            },
+            {
+              "gene_symbol": "MIB1",
+              "cytoband": "18q11.2",
+              "length": "10033",
+              "num_muts": "9"
+            },
+            {
+              "gene_symbol": "KIAA1109",
+              "cytoband": "4q27",
+              "length": "20470",
+              "num_muts": "50"
+            },
+            {
+              "gene_symbol": "IGKV2-24",
+              "cytoband": "2p12",
+              "length": "390",
+              "num_muts": "3"
+            },
+            {
+              "gene_symbol": "AR",
+              "cytoband": "Xq12",
+              "length": "12094",
+              "num_muts": "15"
+            },
+            {
+              "gene_symbol": "CTCF",
+              "cytoband": "16q21-q22.3",
+              "length": "4301",
+              "qval": "6.34000014e-12",
+              "num_muts": "52"
+            },
+            {
+              "gene_symbol": "SMARCD1",
+              "cytoband": "12q13-q14",
+              "length": "5136",
+              "num_muts": "8"
+            },
+            {
+              "gene_symbol": "ZFHX3",
+              "cytoband": "16q22.3",
+              "length": "17503",
+              "num_muts": "82"
+            },
+            {
+              "gene_symbol": "STAG2",
+              "cytoband": "Xq25",
+              "length": "8187",
+              "num_muts": "28"
+            },
+            {
+              "gene_symbol": "OR8D2",
+              "cytoband": "11q24.2",
+              "length": "1051",
+              "num_muts": "8"
+            },
+            {
+              "gene_symbol": "NF1",
+              "cytoband": "17q11.2",
+              "length": "26685",
+              "num_muts": "38"
+            },
+            {
+              "gene_symbol": "BRDT",
+              "cytoband": "1p22.1",
+              "length": "4322",
+              "num_muts": "27"
+            },
+            {
+              "gene_symbol": "NFE2L2",
+              "cytoband": "2q31",
+              "length": "5907",
+              "qval": "6.7800002057e-8",
+              "num_muts": "14"
+            },
+            {
+              "gene_symbol": "NOTCH2",
+              "cytoband": "1p13-p11",
+              "length": "16803",
+              "num_muts": "18"
+            },
+            {
+              "gene_symbol": "NOTCH4",
+              "cytoband": "6p21.3",
+              "length": "9748",
+              "num_muts": "12"
+            },
+            {
+              "gene_symbol": "ARHGAP35",
+              "cytoband": "19q13.3",
+              "length": "11245",
+              "num_muts": "52"
+            },
+            {
+              "gene_symbol": "TMPRSS2",
+              "cytoband": "21q22.3",
+              "length": "6117",
+              "num_muts": "8"
+            },
+            {
+              "gene_symbol": "TIGD4",
+              "cytoband": "4q31.3",
+              "length": "2472",
+              "num_muts": "15"
+            },
+            {
+              "gene_symbol": "CBLC",
+              "cytoband": "19q13.2",
+              "length": "1579",
+              "num_muts": "5"
+            },
+            {
+              "gene_symbol": "A2ML1",
+              "cytoband": "12p13.31",
+              "length": "7303",
+              "num_muts": "22"
+            },
+            {
+              "gene_symbol": "PCDHB1",
+              "cytoband": "5q31",
+              "length": "2534",
+              "num_muts": "16"
+            },
+            {
+              "gene_symbol": "GNL3L",
+              "cytoband": "Xp11.22",
+              "length": "2589",
+              "num_muts": "16"
+            },
+            {
+              "gene_symbol": "MDC1",
+              "cytoband": "6p21.3",
+              "length": "8064",
+              "num_muts": "14"
+            },
+            {
+              "gene_symbol": "NUP93",
+              "cytoband": "16q13",
+              "length": "9928",
+              "num_muts": "11"
+            },
+            {
+              "gene_symbol": "RELN",
+              "cytoband": "7q22",
+              "length": "12642",
+              "num_muts": "49"
+            },
+            {
+              "gene_symbol": "ZNF180",
+              "cytoband": "19q13.2",
+              "length": "3574",
+              "num_muts": "26"
+            },
+            {
+              "gene_symbol": "OR52N1",
+              "cytoband": "11p15.4",
+              "length": "963",
+              "num_muts": "9"
+            },
+            {
+              "gene_symbol": "DDX10",
+              "cytoband": "11q22-q23",
+              "length": "8461",
+              "num_muts": "17"
+            },
+            {
+              "gene_symbol": "KRT39",
+              "cytoband": "17q21.2",
+              "length": "1936",
+              "num_muts": "14"
+            },
+            {
+              "gene_symbol": "PTPRO",
+              "cytoband": "12p13.3-p13.2|12p13-p12",
+              "length": "7519",
+              "num_muts": "16"
+            },
+            {
+              "gene_symbol": "RASA1",
+              "cytoband": "5q13.3",
+              "length": "5232",
+              "qval": "0.0608999989926815",
+              "num_muts": "30"
+            },
+            {
+              "gene_symbol": "RAD50",
+              "cytoband": "5q31",
+              "length": "8091",
+              "num_muts": "19"
+            },
+            {
+              "gene_symbol": "RIT1",
+              "cytoband": "1q22",
+              "length": "3846",
+              "num_muts": "3"
+            },
+            {
+              "gene_symbol": "PGBD4",
+              "cytoband": "15q14",
+              "length": "2318",
+              "num_muts": "16"
+            },
+            {
+              "gene_symbol": "EP300",
+              "cytoband": "22q13.2",
+              "length": "9585",
+              "num_muts": "32"
+            },
+            {
+              "gene_symbol": "SMAD2",
+              "cytoband": "18q21.1",
+              "length": "13770",
+              "num_muts": "9"
+            },
+            {
+              "gene_symbol": "SMAD3",
+              "cytoband": "15q22.33",
+              "length": "9113",
+              "num_muts": "7"
+            },
+            {
+              "gene_symbol": "FBXW7",
+              "cytoband": "4q31.3",
+              "length": "10288",
+              "qval": "0",
+              "num_muts": "45"
+            },
+            {
+              "gene_symbol": "ZNF267",
+              "cytoband": "16p11.2",
+              "length": "3701",
+              "qval": "0.06830000132322311",
+              "num_muts": "22"
+            },
+            {
+              "gene_symbol": "MSN",
+              "cytoband": "Xq11.1",
+              "length": "3942",
+              "num_muts": "18"
+            },
+            {
+              "gene_symbol": "ARNT",
+              "cytoband": "1q21",
+              "length": "6516",
+              "num_muts": "5"
+            },
+            {
+              "gene_symbol": "ANKRD11",
+              "cytoband": "16q24.3",
+              "length": "16946",
+              "num_muts": "19"
+            },
+            {
+              "gene_symbol": "PSIP1",
+              "cytoband": "9p22.3",
+              "length": "6768",
+              "num_muts": "17"
+            },
+            {
+              "gene_symbol": "NUP214",
+              "cytoband": "9q34.1",
+              "length": "13016",
+              "num_muts": "18"
+            },
+            {
+              "gene_symbol": "ARID1A",
+              "cytoband": "1p35.3",
+              "length": "9246",
+              "qval": "1.7899999538e-10",
+              "num_muts": "108"
+            },
+            {
+              "gene_symbol": "RYR2",
+              "cytoband": "1q43",
+              "length": "17668",
+              "num_muts": "115"
+            },
+            {
+              "gene_symbol": "GPR142",
+              "cytoband": "17q25.1",
+              "length": "1608",
+              "num_muts": "12"
+            },
+            {
+              "gene_symbol": "AFF1",
+              "cytoband": "4q21",
+              "length": "10733",
+              "num_muts": "13"
+            },
+            {
+              "gene_symbol": "ATM",
+              "cytoband": "11q22-q23",
+              "length": "22317",
+              "num_muts": "57"
+            },
+            {
+              "gene_symbol": "PIK3CA",
+              "cytoband": "3q26.3",
+              "length": "9411",
+              "qval": "1.69999995e-12",
+              "num_muts": "172"
+            },
+            {
+              "gene_symbol": "COL11A1",
+              "cytoband": "1p21",
+              "length": "8265",
+              "num_muts": "36"
+            },
+            {
+              "gene_symbol": "NLRP3",
+              "cytoband": "1q44",
+              "length": "4757",
+              "num_muts": "20"
+            },
+            {
+              "gene_symbol": "OR2M7",
+              "cytoband": "1q44",
+              "length": "1006",
+              "num_muts": "10"
+            },
+            {
+              "gene_symbol": "CLTCL1",
+              "cytoband": "22q11.21",
+              "length": "9843",
+              "num_muts": "21"
+            },
+            {
+              "gene_symbol": "ACVR1",
+              "cytoband": "2q23-q24",
+              "length": "3988",
+              "num_muts": "11"
+            },
+            {
+              "gene_symbol": "CSMD3",
+              "cytoband": "8q23.3",
+              "length": "20567",
+              "num_muts": "129"
+            },
+            {
+              "gene_symbol": "HIST1H3E",
+              "cytoband": "6p22.2",
+              "length": "462",
+              "num_muts": "5"
+            },
+            {
+              "gene_symbol": "AFF2",
+              "cytoband": "Xq28",
+              "length": "14006",
+              "num_muts": "31"
+            },
+            {
+              "gene_symbol": "MAGEE1",
+              "cytoband": "Xq13.3",
+              "length": "3699",
+              "num_muts": "11"
+            },
+            {
+              "gene_symbol": "C7ORF62",
+              "cytoband": "7q21.13",
+              "length": "1023",
+              "num_muts": "10"
+            },
+            {
+              "gene_symbol": "MTOR",
+              "cytoband": "1p36.2",
+              "length": "12119",
+              "num_muts": "41"
+            },
+            {
+              "gene_symbol": "TNKS",
+              "cytoband": "8p23.1",
+              "length": "14186",
+              "num_muts": "15"
+            },
+            {
+              "gene_symbol": "BCHE",
+              "cytoband": "3q26.1-q26.2",
+              "length": "3082",
+              "num_muts": "18"
+            },
+            {
+              "gene_symbol": "CNTN6",
+              "cytoband": "3p26.3",
+              "length": "5589",
+              "num_muts": "34"
+            },
+            {
+              "gene_symbol": "CNTNAP5",
+              "cytoband": "2q14.3",
+              "length": "5446",
+              "num_muts": "36"
+            },
+            {
+              "gene_symbol": "OR5F1",
+              "cytoband": "11q12.1",
+              "length": "945",
+              "num_muts": "9"
+            },
+            {
+              "gene_symbol": "CACNA1F",
+              "cytoband": "Xp11.23",
+              "length": "6928",
+              "num_muts": "41"
+            },
+            {
+              "gene_symbol": "PCLO",
+              "cytoband": "7q21.11",
+              "length": "18757",
+              "num_muts": "86"
+            },
+            {
+              "gene_symbol": "RUNX1T1",
+              "cytoband": "8q22",
+              "length": "13527",
+              "num_muts": "15"
+            },
+            {
+              "gene_symbol": "OR51A7",
+              "cytoband": "11p15.4",
+              "length": "939",
+              "num_muts": "9"
+            },
+            {
+              "gene_symbol": "PDYN",
+              "cytoband": "20p13",
+              "length": "2648",
+              "num_muts": "4"
+            },
+            {
+              "gene_symbol": "FOXA2",
+              "cytoband": "20p11",
+              "length": "2603",
+              "qval": "0.00005750000127591193",
+              "num_muts": "13"
+            },
+            {
+              "gene_symbol": "ZNF836",
+              "cytoband": "19q13.41",
+              "length": "4229",
+              "num_muts": "27"
+            },
+            {
+              "gene_symbol": "OR4K2",
+              "cytoband": "14q11.2",
+              "length": "1078",
+              "num_muts": "12"
+            },
+            {
+              "gene_symbol": "POLE",
+              "cytoband": "12q24.3",
+              "length": "16700",
+              "num_muts": "47"
+            },
+            {
+              "gene_symbol": "L1TD1",
+              "cytoband": "1p31.3",
+              "length": "3849",
+              "num_muts": "27"
+            },
+            {
+              "gene_symbol": "SIN3A",
+              "cytoband": "15q24.2",
+              "length": "12453",
+              "num_muts": "29"
+            },
+            {
+              "gene_symbol": "OR4K5",
+              "cytoband": "14q11.2",
+              "length": "1078",
+              "num_muts": "12"
+            },
+            {
+              "gene_symbol": "CTNNB1",
+              "cytoband": "3p21",
+              "length": "6606",
+              "qval": "1.69999995e-12",
+              "num_muts": "80"
+            },
+            {
+              "gene_symbol": "BCORL1",
+              "cytoband": "Xq25-q26.1",
+              "length": "7996",
+              "num_muts": "31"
+            },
+            {
+              "gene_symbol": "SLC35G5",
+              "cytoband": "8p23.1",
+              "length": "1321",
+              "num_muts": "10"
+            },
+            {
+              "gene_symbol": "FAT4",
+              "cytoband": "4q28.1",
+              "length": "16439",
+              "num_muts": "107"
+            },
+            {
+              "gene_symbol": "OR5H14",
+              "cytoband": "3q12.1",
+              "length": "1080",
+              "num_muts": "8"
+            },
+            {
+              "gene_symbol": "RPGR",
+              "cytoband": "Xp21.1",
+              "length": "7143",
+              "num_muts": "20"
+            },
+            {
+              "gene_symbol": "FAT1",
+              "cytoband": "4q35",
+              "length": "16168",
+              "num_muts": "92"
+            },
+            {
+              "gene_symbol": "SMR3A",
+              "cytoband": "4q13.3",
+              "length": "665",
+              "num_muts": "4"
+            },
+            {
+              "gene_symbol": "MYOM1",
+              "cytoband": "18p11.31",
+              "length": "6573",
+              "num_muts": "40"
+            },
+            {
+              "gene_symbol": "HELT",
+              "cytoband": "4q35.1",
+              "length": "1236",
+              "num_muts": "8"
+            },
+            {
+              "gene_symbol": "OR2B11",
+              "cytoband": "1q44",
+              "length": "1054",
+              "num_muts": "9"
+            },
+            {
+              "gene_symbol": "BRCA2",
+              "cytoband": "13q12.3",
+              "length": "11269",
+              "num_muts": "60"
+            },
+            {
+              "gene_symbol": "GLI3",
+              "cytoband": "7p13",
+              "length": "9239",
+              "num_muts": "28"
+            },
+            {
+              "gene_symbol": "ASH2L",
+              "cytoband": "8p11.2",
+              "length": "5795",
+              "num_muts": "12"
+            },
+            {
+              "gene_symbol": "H3F3A",
+              "cytoband": "1q42.12",
+              "length": "3146",
+              "num_muts": "4"
+            },
+            {
+              "gene_symbol": "TP53",
+              "cytoband": "17p13.1",
+              "length": "3924",
+              "qval": "1.69999995e-12",
+              "num_muts": "74"
+            },
+            {
+              "gene_symbol": "PIK3R1",
+              "cytoband": "5q13.1",
+              "length": "10791",
+              "qval": "1.69999995e-12",
+              "num_muts": "117"
+            },
+            {
+              "gene_symbol": "POM121L12",
+              "cytoband": "7p12.1",
+              "length": "1269",
+              "num_muts": "10"
+            },
+            {
+              "gene_symbol": "PTEN",
+              "cytoband": "10q23.3",
+              "length": "10048",
+              "qval": "1.69999995e-12",
+              "num_muts": "255"
+            },
+            {
+              "gene_symbol": "LCE2B",
+              "cytoband": "1q21",
+              "length": "646",
+              "num_muts": "4"
+            }
+          ]
+        },
+        "cna": {
+          "datatype": "TABLE",
+          "description": "List of cna altered genes",
+          "display_name": "CNA altered Genes",
+          "attr_id": "cna_details",
+          "view_type": "table",
+          "attr_type": "sample",
+          "gene_list": [
+            {
+              "gene_symbol": "IGF1R",
+              "cytoband": "15q26.3",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "MYC",
+              "cytoband": "8q24.21",
+              "gistic": "0",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "NFE2L2",
+              "cytoband": "2q31",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "CHD2",
+              "cytoband": "15q26",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "MEF2A",
+              "cytoband": "15q26",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "PTPRS",
+              "cytoband": "19p13.3",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "MLLT1",
+              "cytoband": "19p13.3",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "TNFSF9",
+              "cytoband": "19p13.3",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "CD70",
+              "cytoband": "19p13",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "INSR",
+              "cytoband": "19p13.3-p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "DNMT1",
+              "cytoband": "19p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "S1PR2",
+              "cytoband": "19p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "TYK2",
+              "cytoband": "19p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "KEAP1",
+              "cytoband": "19p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "DNM2",
+              "cytoband": "19p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "SMARCA4",
+              "cytoband": "19p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "CALR",
+              "cytoband": "19p13.3-p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "LYL1",
+              "cytoband": "19p13.2",
+              "gistic": "5.3465e-15",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "DNAJB1",
+              "cytoband": "19p13.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "NOTCH3",
+              "cytoband": "19p13.2-p13.1",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "BRD4",
+              "cytoband": "19p13.1",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "JAK3",
+              "cytoband": "19p13.1",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "PIK3R2",
+              "cytoband": "19q13.2-q13.4",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "ELL",
+              "cytoband": "19p13.1",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "CRTC1",
+              "cytoband": "19p13.11",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "MEF2B",
+              "cytoband": "19p13.11",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "TPM4",
+              "cytoband": "19p13.1",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "DIS3",
+              "cytoband": "13q22.1",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "ERCC5",
+              "cytoband": "13q33",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "IRS2",
+              "cytoband": "13q34",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "MIR17HG",
+              "cytoband": "13q31.3",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "FGF14",
+              "cytoband": "13q34",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "CUL4A",
+              "cytoband": "13q34",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "RBM10",
+              "cytoband": "Xp11.23",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "ARAF",
+              "cytoband": "Xp11.4-p11.2",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "SSX1",
+              "cytoband": "Xp11.23",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "WAS",
+              "cytoband": "Xp11.4-p11.21",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "GATA1",
+              "cytoband": "Xp11.23",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "TFE3",
+              "cytoband": "Xp11.22",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "RPL15",
+              "cytoband": "3p24.2",
+              "alter": "DEL"
+            },
+            {
+              "gene_symbol": "IL7R",
+              "cytoband": "5p13",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "RICTOR",
+              "cytoband": "5p13.1",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "SDHA",
+              "cytoband": "5p15",
+              "gistic": "0.00001350399998045759",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "TERT",
+              "cytoband": "5p15.33",
+              "gistic": "0.00001350399998045759",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "ICE1",
+              "cytoband": "5p15.32",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "GOLPH3",
+              "cytoband": "5p13.3",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "SKP2",
+              "cytoband": "5p13",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "LIFR",
+              "cytoband": "5p13-p12",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "FGF10",
+              "cytoband": "5p13-p12",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "FGFR1",
+              "cytoband": "8p11.23-p11.22",
+              "gistic": "0.001153400051407516",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "WHSC1L1",
+              "cytoband": "8p11.2",
+              "gistic": "0.001153400051407516",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "MAGED1",
+              "cytoband": "Xp11.23",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "KDM5C",
+              "cytoband": "Xp11.22-p11.21",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "SMC1A",
+              "cytoband": "Xp11.22-p11.21",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "CHIC2",
+              "cytoband": "4q11",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "PDGFRA",
+              "cytoband": "4q12",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "KIT",
+              "cytoband": "4q12",
+              "alter": "AMP"
+            },
+            {
+              "gene_symbol": "KDR",
+              "cytoband": "4q11-q12",
+              "alter": "AMP"
+            }
+          ]
+        }
+      },
+      "group_meta": {
+        "id": "sample",
+        "type": "sample_data"
+      }
+    },
+    "group_mapping": {
+      "sample": {
+        "patient": {
+          "TCGA-AP-A1DH-01": ["TCGA-AP-A1DH"],
+          "TCGA-AP-A1DK-01": ["TCGA-AP-A1DK"],
+          "TCGA-AP-A1DM-01": ["TCGA-AP-A1DM"],
+          "TCGA-AP-A1DO-01": ["TCGA-AP-A1DO"],
+          "TCGA-AP-A1DP-01": ["TCGA-AP-A1DP"],
+          "TCGA-AP-A1DQ-01": ["TCGA-AP-A1DQ"],
+          "TCGA-AP-A1DR-01": ["TCGA-AP-A1DR"],
+          "TCGA-AP-A1DV-01": ["TCGA-AP-A1DV"],
+          "TCGA-AP-A1E0-01": ["TCGA-AP-A1E0"],
+          "TCGA-AP-A1E1-01": ["TCGA-AP-A1E1"],
+          "TCGA-BK-A0C9-01": ["TCGA-BK-A0C9"],
+          "TCGA-AP-A052-01": ["TCGA-AP-A052"],
+          "TCGA-D1-A17T-01": ["TCGA-D1-A17T"],
+          "TCGA-BG-A0VX-01": ["TCGA-BG-A0VX"],
+          "TCGA-BK-A139-01": ["TCGA-BK-A139"],
+          "TCGA-BK-A139-02": ["TCGA-BK-A139"],
+          "TCGA-N5-A4R8-01": ["TCGA-N5-A4R8"],
+          "TCGA-N5-A4RA-01": ["TCGA-N5-A4RA"],
+          "TCGA-N5-A4RJ-01": ["TCGA-N5-A4RJ"],
+          "TCGA-N5-A4RM-01": ["TCGA-N5-A4RM"],
+          "TCGA-N5-A4RN-01": ["TCGA-N5-A4RN"],
+          "TCGA-N5-A4RO-01": ["TCGA-N5-A4RO"],
+          "TCGA-N5-A4RS-01": ["TCGA-N5-A4RS"],
+          "TCGA-N5-A4RT-01": ["TCGA-N5-A4RT"],
+          "TCGA-N5-A4RU-01": ["TCGA-N5-A4RU"],
+          "TCGA-N5-A4RV-01": ["TCGA-N5-A4RV"],
+          "TCGA-N5-A59E-01": ["TCGA-N5-A59E"],
+          "TCGA-N5-A59F-01": ["TCGA-N5-A59F"],
+          "TCGA-N6-A4V9-01": ["TCGA-N6-A4V9"],
+          "TCGA-N6-A4VC-01": ["TCGA-N6-A4VC"]
+        }
+      },
+      "patient": {
+        "sample": {
+          "TCGA-AP-A1DH": ["TCGA-AP-A1DH-01"],
+          "TCGA-AP-A1DK": ["TCGA-AP-A1DK-01"],
+          "TCGA-AP-A1DM": ["TCGA-AP-A1DM-01"],
+          "TCGA-AP-A1DO": ["TCGA-AP-A1DO-01"],
+          "TCGA-AP-A1DP": ["TCGA-AP-A1DP-01"],
+          "TCGA-AP-A1DQ": ["TCGA-AP-A1DQ-01"],
+          "TCGA-AP-A1DR": ["TCGA-AP-A1DR-01"],
+          "TCGA-AP-A1DV": ["TCGA-AP-A1DV-01"],
+          "TCGA-AP-A1E0": ["TCGA-AP-A1E0-01"],
+          "TCGA-AP-A1E1": ["TCGA-AP-A1E1-01"],
+          "TCGA-BK-A0C9": ["TCGA-BK-A0C9-01"],
+          "TCGA-AP-A052": ["TCGA-AP-A052-01"],
+          "TCGA-D1-A17T": ["TCGA-D1-A17T-01"],
+          "TCGA-BG-A0VX": ["TCGA-BG-A0VX-01"],
+          "TCGA-BK-A139": ["TCGA-BK-A139-02", "TCGA-BK-A139-01"],
+          "TCGA-N5-A4R8": ["TCGA-N5-A4R8-01"],
+          "TCGA-N5-A4RA": ["TCGA-N5-A4RA-01"],
+          "TCGA-N5-A4RJ": ["TCGA-N5-A4RJ-01"],
+          "TCGA-N5-A4RM": ["TCGA-N5-A4RM-01"],
+          "TCGA-N5-A4RN": ["TCGA-N5-A4RN-01"],
+          "TCGA-N5-A4RO": ["TCGA-N5-A4RO-01"],
+          "TCGA-N5-A4RS": ["TCGA-N5-A4RS-01"],
+          "TCGA-N5-A4RT": ["TCGA-N5-A4RT-01"],
+          "TCGA-N5-A4RU": ["TCGA-N5-A4RU-01"],
+          "TCGA-N5-A4RV": ["TCGA-N5-A4RV-01"],
+          "TCGA-N5-A59E": ["TCGA-N5-A59E-01"],
+          "TCGA-N5-A59F": ["TCGA-N5-A59F-01"],
+          "TCGA-N6-A4V9": ["TCGA-N6-A4V9-01"],
+          "TCGA-N6-A4VC": ["TCGA-N6-A4VC-01"]
+        }
+      }
+    },
+    "cohort_meta": {
+      "id": ""
+    }
+  }
+}
