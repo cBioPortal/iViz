@@ -62,7 +62,9 @@ var iViz = (function() {
             rowHeight: 250
           });
           $grid.find('.grid-item').each(function(i, gridItem) {
-            var draggie = new Draggabilly(gridItem);
+            var draggie = new Draggabilly(gridItem, {
+              handle: '.dc-chart-drag'
+            });
             $grid.packery('bindDraggabillyEvents', draggie);
           });
           dc.renderAll();
