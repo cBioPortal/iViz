@@ -56,6 +56,7 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
       $("#main-grid").append(
         "<div id='" + _chart_div_id + "'>" +
         "<a id='" + _reset_btn_id + "'>Reset</a>" +
+        "<i class='fa fa-arrows dc-chart-drag'></i>" +
         "<div class='dc-chart' id='" + _chart_id + "'></div>" +
         "</div>"
       );
