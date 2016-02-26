@@ -172,42 +172,41 @@ var iViz = (function() {
 
         });
     }, // ---- close init function ----
-
-    patient_filters: function() {
-      return patient_charts_inst.filters();
-    },
-    sample_filters: function() {
-      return sample_charts_inst.filters();
-    },
-    selected_cases: function() {
-
-      var _result = [];
-
+    stat: function() {
+      var result = {};
+      result["filters"] = {};
+      
+      // extract and reformat selected cases
+      var _selected_cases = [];
+  
       _.each(selected_samples, function(_selected_sample) {
-
+    
         var _index = data.groups.sample.data_indices.sample_id[_selected_sample];
         var _study_id = data.groups.sample.data[_index]["study_id"];
-
+    
         // extract study information
-        if ($.inArray(_study_id, _.pluck(_result, "studyID")) !== -1) {
-          _.each(_result, function(_result_obj) {
+        if ($.inArray(_study_id, _.pluck(_selected_cases, "studyID")) !== -1) {
+          _.each(_selected_cases, function(_result_obj) {
             if (_result_obj["studyID"] === _study_id) {
               _result_obj["samples"].push(_selected_sample);
             }
           });
         } else {
-          _result.push({"studyID": _study_id, "samples": [_selected_sample]});
+          _selected_cases.push({"studyID": _study_id, "samples": [_selected_sample]});
         }
-
+    
         //map samples to patients
-        _.each(_result, function(_result_obj) {
+        _.each(_selected_cases, function(_result_obj) {
           _result_obj["patients"] = id_mapping(data.groups.group_mapping.sample.patient, _result_obj["samples"]);
         });
-
+    
       });
-
-      return _result;
-
+  
+      result.filters["patients"] = patient_charts_inst.filters();
+      result.filters["samples"] = sample_charts_inst.filters();
+      result["selected_cases"] = _selected_cases;
+      
+      return result;
     },
     vm: function() {
       return vm;
