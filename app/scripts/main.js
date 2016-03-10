@@ -211,6 +211,13 @@ var iViz = (function() {
     vm: function() {
       return vm;
     },
+    view: {component: {}},
+    util: {},
+    opts: {
+      dc: {
+        transitionDuration: 400
+      }
+    },
     patient_charts_inst: function() {
       return patient_charts_inst;
     },

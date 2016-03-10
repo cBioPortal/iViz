@@ -5,7 +5,7 @@
     "bootstrap": "",
     "chosen": "~1.4.2",
     "datatables": "#1.10.2",
-    "dcjs": "~1.7.4",
+    "dcjs": "~2.0.0",
     "draggabilly": "~1.2.4",
     "jquery": "#2.1.4",
     "modernizr": "~2.8.2",
@@ -13,7 +13,7 @@
     "underscore": "~1.8.3",
     "qtip2": "~2.2.1",
     "vue": "~1.0.15",
-    "font-awesome": "https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" 
+    "components-font-awesome": "^4.5.0"
   },
   "overrides": {
     "bootstrap-sass": {
@@ -35,7 +35,10 @@
       ]
     },
     "chosen": {
-      "main": ["chosen.jquery.min.js", "chosen.min.css"]
+      "main": [
+        "chosen.jquery.min.js",
+        "chosen.min.css"
+      ]
     },
     "qtip2": {
       "main": [
