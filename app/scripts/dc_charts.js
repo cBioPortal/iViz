@@ -165,8 +165,9 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
     get_selected_cases: function() {
       return selected_cases;
     },
-    reset: function(){
+    reset: function () {
       dc.redrawAll();
+      iViz.view.grid.layout();
     },
     sync: function(_selected_cases) {
       _chart_invisible.filter(null);

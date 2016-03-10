@@ -2,7 +2,7 @@ var iViz = (function() {
 
   var patient_charts_inst, sample_charts_inst;
   var selected_patients = [], selected_samples = [];
-  var data, vm;
+  var data, vm, grid;
 
   var id_mapping = function(_mapping_obj, _input_cases) {
     var _selected_mapping_cases = [];
@@ -56,19 +56,23 @@ var iViz = (function() {
           );
 
           // ---- render dc charts ----
-          var $grid = $('.grid').packery({
+          grid = new Packery(document.querySelector('.grid'), {
             itemSelector: '.grid-item',
             columnWidth: 250,
-            rowHeight: 250
+            rowHeight: 250,
+            gutter: 5
           });
-          $grid.find('.grid-item').each(function(i, gridItem) {
+
+          _.each(grid.getItemElements(), function (gridItem, index) {
             var draggie = new Draggabilly(gridItem, {
               handle: '.dc-chart-drag'
             });
-            $grid.packery('bindDraggabillyEvents', draggie);
+            grid.bindDraggabillyEvents(draggie);
           });
-          dc.renderAll();
 
+          dc.renderAll();
+          grid.layout();
+          
           // ---- attach event listener for saving cohort ----
           $("#save_cohort_btn").click(function (){
           });
@@ -211,7 +215,17 @@ var iViz = (function() {
     vm: function() {
       return vm;
     },
-    view: {component: {}},
+    view: {
+      component: {},
+      grid: {
+        get: function () {
+          return grid;
+        },
+        layout: function () {
+          grid.layout();
+        }
+      }
+    },
     util: {},
     opts: {
       dc: {
