@@ -31,14 +31,13 @@
  */
 
 /**
- * Created by Hongxin Zhang on 3/10/16.
+ * @author Hongxin Zhang on 3/10/16.
  */
 
 'use strict';
-(function (iViz, dc, _, $) {
-  
-  //iViz pie chart component. It includes DC pie chart.
-  iViz.view.component.pieChart = function () {
+(function(iViz, dc, _, $) {
+  // iViz pie chart component. It includes DC pie chart.
+  iViz.view.component.pieChart = function() {
     var content = {};
     var v = {};
 
@@ -103,47 +102,43 @@
       category: ''
     };
 
-    /*HTML options*/
+    /* HTML options*/
     v.opts = {};
 
+    /**
+     * This is the function to initialize dc pie chart instance.
+     */
     function initDCPieChart() {
       if (v.opts.hasOwnProperty('divId') &&
         v.data.hasOwnProperty('ndx') &&
         v.data.hasOwnProperty('attr_id')) {
-
-        var width = v.opts.width || 130,
-          height = v.opts.height,
-          radius = (width - 20) / 2,
-          color = $.extend(true, [], v.data.color),
-          NAIndex = -1,
-          attr = v.data.attr_id,
-          cluster = v.data.ndx.dimension(function (d) {
-            return d[attr];
-          });
+        var width = v.opts.width || 130;
+        var height = v.opts.height;
+        var radius = (width - 20) / 2;
+        var color = $.extend(true, [], v.data.color);
+        var NAIndex = -1;
+        var attr = v.data.attr_id;
+        var cluster = v.data.ndx.dimension(function(d) {
+          return d[attr];
+        });
 
         v.chart = dc.pieChart('#' + v.opts.divId);
 
-        v.data.attrKeys = cluster.group().all().map(function (d) {
+        v.data.attrKeys = cluster.group().all().map(function(d) {
           return d.key;
         });
 
-        v.data.category = iViz.util.pieChart.getCategory(v.data.attr, v.data.attrKeys);
+        v.data.category = iViz.util.pieChart.getCategory(v.data.attr,
+          v.data.attrKeys);
 
-        //if (attr !== 'CASE_ID') {
-        v.data.attrKeys.sort(function (a, b) {
-          if (a < b) {
-            return -1;
-          } else {
-            return 1;
-          }
+        v.data.attrKeys.sort(function(a, b) {
+          return a < b ? -1 : 1;
         });
 
         NAIndex = v.data.attrKeys.indexOf('NA');
         if (NAIndex !== -1) {
           color.splice(NAIndex, 0, '#CCCCCC');
         }
-
-        //}
 
         v.chart
           .width(width)
@@ -153,19 +148,21 @@
           .group(cluster.group())
           .transitionDuration(v.opts.transitionDuration || 400)
           .ordinalColors(color)
-          .label(function (d) {
+          .label(function(d) {
             return d.value;
           })
-          .ordering(function (d) {
+          .ordering(function(d) {
             return d.key;
           });
-      }
-      else {
-        //TODO: Need a handler if no dimension ID passed.
+      } else {
+        // TODO:
+        /**
+         * Need a handler if no dimension ID passed.
+         */
       }
     }
 
-    content.init = function (data, opts) {
+    content.init = function(data, opts) {
       v.opts = $.extend(true, v.opts, opts);
       v.data = $.extend(true, v.data, data);
 
@@ -174,32 +171,32 @@
       return v.chart;
     };
 
-    content.getChart = function () {
+    content.getChart = function() {
       return v.chart;
     };
 
     return content;
   };
 
-  //Utils designed for pie chart.
-  iViz.util.pieChart = (function () {
+  // Utils designed for pie chart.
+  iViz.util.pieChart = (function() {
     var util = {};
     var v = {};
 
-    v.category = ['w1', 'h1']; //Size class name for chart
-    
-    v.labelLT = 5; //Label length threshold
-    v.labelHeaderLT = 4; //Label header length threshold
+    v.category = ['w1', 'h1']; // Size class name for chart
 
-    //If the name lenght bigger the threshold, it will be truncated.
-    v.labelWLT = 30; //Label length threshold for wider table
-    v.labelHeaderWLT = 20; //Label header length threshold for wider table
+    v.labelLT = 5; // Label length threshold
+    v.labelHeaderLT = 4; // Label header length threshold
 
-    util.getCategory = function (attr, attrKeys) {
+    // If the name lenght bigger the threshold, it will be truncated.
+    v.labelWLT = 30; // Label length threshold for wider table
+    v.labelHeaderWLT = 20; // Label header length threshold for wider table
+
+    util.getCategory = function(attr, attrKeys) {
       var category = $.extend(true, {}, v.category);
       var maxAttrL = 0;
 
-      _.each(attrKeys, function (key) {
+      _.each(attrKeys, function(key) {
         if (key.length > maxAttrL) {
           maxAttrL = key.length;
         }
@@ -207,7 +204,7 @@
 
       category[0] = maxAttrL <= v.labelLT ? 'w1' : 'w2';
 
-      //Default settings for special attribtues.
+      // Default settings for special attribtues.
       if (['CANCER_TYPE', 'CANCER_TYPE_DETAILED'].indexOf(attr) !== -1) {
         category[0] = 'w2';
       }
@@ -219,5 +216,7 @@
 
     return util;
   })();
-  
-})(window.iViz, window.dc, window._, window.$ || windown.jQuery || window.jquery);
+})(window.iViz,
+  window.dc,
+  window._,
+  window.$ || window.jQuery);
