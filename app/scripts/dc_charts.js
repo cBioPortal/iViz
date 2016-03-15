@@ -9,7 +9,8 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
     bar_chart: {
       width: 400,
       height: 180
-    }
+    },
+    transitionDuration: iViz.opts.dc.transitionDuration
   };
 
   var filters = {}, selected_cases = [];
@@ -48,9 +49,6 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
           _reset_btn_id = "chart-" + _attr_obj.attr_id + _attr_obj.attr_type + "-" + "-reset",
           _chart_id = "chart-" + _attr_obj.attr_type + "_" + _attr_obj.attr_id;
 
-      var dim = ndx.dimension(function (d) { return d[_attr_obj.attr_id]; }),
-          countPerFunc = dim.group().reduceCount(), _chart_inst;
-
       // append html element
       // TODO: replace with template
       $("#main-grid").append(
@@ -69,12 +67,17 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
           $("#" + _chart_div_id).addClass("grid-item");
           $("#" + _chart_id).addClass("dc-pie-chart");
 
-          _chart_inst = dc.pieChart("#" + _chart_id);
-          _chart_inst.width(settings.pie_chart.width)
-            .height(settings.pie_chart.height)
-            .dimension(dim)
-            .group(countPerFunc)
-            .innerRadius(settings.pie_chart.inner_radius);
+          var _pie_chart = new iViz.view.component.pieChart();
+          var _data = $.extend(true, {}, _attr_obj);
+          
+          _data.ndx = ndx;
+          _pie_chart.init(_data, {
+            divId: _chart_id,
+            width: settings.pie_chart.width,
+            height: settings.pie_chart.height,
+            transitionDuration: settings.transitionDuration
+          });
+          _chart_inst = _pie_chart.getChart();
 
           $("#" + _chart_id).append("<p class='text-center'>" + _attr_obj.display_name + "</p>");
 
@@ -88,6 +91,8 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
           }), function (d) {
             return parseFloat(d);
           });
+          var dim = ndx.dimension(function (d) { return d[_attr_obj.attr_id]; }),
+            countPerFunc = dim.group().reduceCount(), _chart_inst;
           var _min = d3.min(_bar_chart_data), _max = d3.max(_bar_chart_data);
 
           $("#" + _chart_div_id).addClass("grid-item");
@@ -160,8 +165,9 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
     get_selected_cases: function() {
       return selected_cases;
     },
-    reset: function(){
+    reset: function () {
       dc.redrawAll();
+      iViz.view.grid.layout();
     },
     sync: function(_selected_cases) {
       _chart_invisible.filter(null);
