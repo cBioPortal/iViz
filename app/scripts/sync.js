@@ -4,10 +4,10 @@ iViz.sync = (function() {
     // ---- callback function to sync patients charts and sample charts ----
     // @selected_cases: cases selected in the other group
     // @update_type: the type of group charts (patient or sample) that needs to be updated
-    call_back: function(mapping, data, update_type) {
+    call_back: function(mapping, update_type) {
     
-        var _selected_samples_by_filters_only = iViz.sync.select_by_filters(iViz.sample_charts_inst().filters(), data, "sample");
-        var _selected_patients_by_filters_only = iViz.sync.select_by_filters(iViz.patient_charts_inst().filters(), data, "patient");
+        var _selected_samples_by_filters_only = iViz.sync.select_by_filters(iViz.sample_charts_inst().filters(), iViz.get_data("sample"), "sample");
+        var _selected_patients_by_filters_only = iViz.sync.select_by_filters(iViz.patient_charts_inst().filters(), iViz.get_data("patient"), "patient");
     
         // find the intersection between two groups
         var mapped_selected_samples = iViz.util.id_mapping(mapping.patient.sample, _selected_patients_by_filters_only);
@@ -49,6 +49,7 @@ iViz.sync = (function() {
           _.each(_data, function(_data_obj) {
             if (_data_obj.hasOwnProperty(_filter_attr_id)) {
               if (parseFloat(_data_obj[_filter_attr_id]) <= _filter_range_max && parseFloat(_data_obj[_filter_attr_id]) >= _filter_range_min) {
+                console.log(_data_obj);
                 _single_attr_selected_cases.push(_type === "sample"? _data_obj.sample_id: _data_obj.patient_id);
               }
             }

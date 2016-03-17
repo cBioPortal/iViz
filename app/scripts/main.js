@@ -151,6 +151,12 @@ var iViz = (function() {
         transitionDuration: 400
       }
     },
+    get_data: function(_type) {
+      return (_type === "patient")? data.groups.patient.data: data.groups.sample.data;
+    },
+    get_mapping: function() {
+      return data.groups.group_mapping;
+    },
     patient_charts_inst: function() {
       return patient_charts_inst;
     },

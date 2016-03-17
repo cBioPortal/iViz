@@ -139,7 +139,7 @@ var dc_charts = function (meta, data, mapping, type) {
           delete filters[_attr_obj.attr_id];
           
           // call callback function to handle the sync between chart groups
-          iViz.sync.call_back(mapping, data, type === "patient" ? "sample" : "patient");
+          iViz.sync.call_back(mapping, type === "patient" ? "sample" : "patient");
         
         } else { 
         
@@ -150,7 +150,7 @@ var dc_charts = function (meta, data, mapping, type) {
               filters[_attr_obj.attr_id] = filter;
               
               // call callback function to handle the sync between chart groups
-              iViz.sync.call_back(mapping, data, type === "patient" ? "sample" : "patient"); 
+              iViz.sync.call_back(mapping, type === "patient" ? "sample" : "patient"); 
             }, 0);
             
           } else if (_attr_obj.view_type === "pie_chart") {
@@ -176,7 +176,7 @@ var dc_charts = function (meta, data, mapping, type) {
             }
 
             // call callback function to handle the sync between chart groups
-            iViz.sync.call_back(mapping, data, type === "patient" ? "sample" : "patient");
+            iViz.sync.call_back(mapping, type === "patient" ? "sample" : "patient");
             
           }
         }
