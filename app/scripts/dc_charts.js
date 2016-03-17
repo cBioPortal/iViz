@@ -1,4 +1,4 @@
-var dc_charts = function (meta, data, type, selection_callback_func) {
+var dc_charts = function (meta, data, mapping, type) {
 
   var settings = {
     pie_chart: {
@@ -130,30 +130,56 @@ var dc_charts = function (meta, data, type, selection_callback_func) {
       // ---- activate filter recording ----
 
       _chart_inst.on("filtered", function (_chart_inst, filter) {
-
-        // add or remove filters
+  
         if (filter === null) { //filter comes in as null when clicking "reset"
+          
           //remove all filters applied to this particular attribute
-          filters[_attr_obj.attr_id] = [];
+          filters[_attr_obj.attr_id] = []; 
           filters[_attr_obj.attr_id].length = 0;
           delete filters[_attr_obj.attr_id];
-        } else {
-          if (filters.hasOwnProperty(_attr_obj.attr_id)) {
-            if ($.inArray(filter, filters[_attr_obj.attr_id]) === -1) { //add filter
-              filters[_attr_obj.attr_id].push(filter);
-            } else {
-              filters[_attr_obj.attr_id] = _.filter(filters[_attr_obj.attr_id], function(d) { return d !== filter; }); //remove filter
-              if (filters[_attr_obj.attr_id].length === 0) {
-                delete filters[_attr_obj.attr_id];
+          
+          // call callback function to handle the sync between chart groups
+          iViz.sync.call_back(mapping, data, type === "patient" ? "sample" : "patient");
+        
+        } else { 
+        
+          if (_attr_obj.view_type === "bar_chart") {
+  
+            //delay event trigger for bar charts
+            dc.events.trigger(function() { 
+              filters[_attr_obj.attr_id] = filter;
+              
+              // call callback function to handle the sync between chart groups
+              iViz.sync.call_back(mapping, data, type === "patient" ? "sample" : "patient"); 
+            }, 0);
+            
+          } else if (_attr_obj.view_type === "pie_chart") {
+  
+            // update existing filter category
+            if (filters.hasOwnProperty(_attr_obj.attr_id)) {
+              //add filter
+              if ($.inArray(filter, filters[_attr_obj.attr_id]) === -1) { 
+                filters[_attr_obj.attr_id].push(filter);
+              //remove filter
+              } else {
+                filters[_attr_obj.attr_id] = _.filter(filters[_attr_obj.attr_id], function (d) {
+                  return d !== filter;
+                }); 
+                if (filters[_attr_obj.attr_id].length === 0) {
+                  delete filters[_attr_obj.attr_id];
+                }
               }
+          
+            } else {
+              // add new filter category
+              filters[_attr_obj.attr_id] = [filter];
             }
-          } else {
-            filters[_attr_obj.attr_id] = [filter];
+
+            // call callback function to handle the sync between chart groups
+            iViz.sync.call_back(mapping, data, type === "patient" ? "sample" : "patient");
+            
           }
         }
-
-        // call callback function to handle the sync between chart groups
-        selection_callback_func(type === "patient" ? "sample" : "patient");
 
       }); // --- closing active filter recording
 
