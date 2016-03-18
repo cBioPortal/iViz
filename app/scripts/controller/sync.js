@@ -1,24 +1,28 @@
+/*!
+ Functions to sync patient charts group and sample charts group 
+*/
+
 iViz.sync = (function() {
   return {
   
     // ---- callback function to sync patients charts and sample charts ----
     // @selected_cases: cases selected in the other group
     // @update_type: the type of group charts (patient or sample) that needs to be updated
-    call_back: function(mapping, update_type) {
+    call_back: function(update_type) {
     
         var _selected_samples_by_filters_only = iViz.sync.select_by_filters(iViz.sample_charts_inst().filters(), iViz.get_data("sample"), "sample");
         var _selected_patients_by_filters_only = iViz.sync.select_by_filters(iViz.patient_charts_inst().filters(), iViz.get_data("patient"), "patient");
     
         // find the intersection between two groups
-        var mapped_selected_samples = iViz.util.id_mapping(mapping.patient.sample, _selected_patients_by_filters_only);
+        var mapped_selected_samples = iViz.util.id_mapping(iViz.get_mapping().patient.sample, _selected_patients_by_filters_only);
         iViz.set_selected_samples(_.intersection(mapped_selected_samples, _selected_samples_by_filters_only));
-        iViz.set_selected_patients(iViz.util.id_mapping(mapping.sample.patient, iViz.get_selected_samples()));
+        iViz.set_selected_patients(iViz.util.id_mapping(iViz.get_mapping().sample.patient, iViz.get_selected_samples()));
     
         // sync view
         if (update_type === "sample") {
-          iViz.sample_charts_inst().sync(iViz.util.id_mapping(mapping.patient.sample, _selected_patients_by_filters_only));
+          iViz.sample_charts_inst().sync(iViz.util.id_mapping(iViz.get_mapping().patient.sample, _selected_patients_by_filters_only));
         } else if (update_type === "patient") {
-          iViz.patient_charts_inst().sync(iViz.util.id_mapping(mapping.sample.patient, _selected_samples_by_filters_only));
+          iViz.patient_charts_inst().sync(iViz.util.id_mapping(iViz.get_mapping().sample.patient, _selected_samples_by_filters_only));
         }
     
         // update vue
@@ -34,7 +38,8 @@ iViz.sync = (function() {
         iViz.vm().selected_patients_num = iViz.get_selected_patients().length;
     
     },
-    // select samples or patients based on only samples/patients filters
+
+    // syncing util: select samples or patients based on only samples/patients filters
     select_by_filters: function(_filters, _data, _type) { //_type: sample or patient
       var _dup_selected_cases_arr = [];
       _.each(Object.keys(_filters), function(_filter_attr_id) {
@@ -49,7 +54,6 @@ iViz.sync = (function() {
           _.each(_data, function(_data_obj) {
             if (_data_obj.hasOwnProperty(_filter_attr_id)) {
               if (parseFloat(_data_obj[_filter_attr_id]) <= _filter_range_max && parseFloat(_data_obj[_filter_attr_id]) >= _filter_range_min) {
-                console.log(_data_obj);
                 _single_attr_selected_cases.push(_type === "sample"? _data_obj.sample_id: _data_obj.patient_id);
               }
             }
