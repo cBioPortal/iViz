@@ -1,3 +1,35 @@
+/*
+ * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
+ * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
+ * is on an 'as is' basis, and Memorial Sloan-Kettering Cancer Center has no
+ * obligations to provide maintenance, support, updates, enhancements or
+ * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
+ * liable to any party for direct, indirect, special, incidental or
+ * consequential damages, including lost profits, arising out of the use of this
+ * software and its documentation, even if Memorial Sloan-Kettering Cancer
+ * Center has been advised of the possibility of such damage.
+ */
+
+/*
+ * This file is part of cBioPortal.
+ *
+ * cBioPortal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*!
  Functions to sync patient charts group and sample charts group 
 */
@@ -8,75 +40,75 @@ iViz.sync = (function() {
     // ---- callback function to sync patients charts and sample charts ----
     // @selected_cases: cases selected in the other group
     // @update_type: the type of group charts (patient or sample) that needs to be updated
-    call_back: function(update_type) {
+    callBack: function(updateType) {
     
-        var _selected_samples_by_filters_only = iViz.sync.select_by_filters(iViz.sample_charts_inst().filters(), iViz.get_data("sample"), "sample");
-        var _selected_patients_by_filters_only = iViz.sync.select_by_filters(iViz.patient_charts_inst().filters(), iViz.get_data("patient"), "patient");
+        var _selectedSamplesByFiltersOnly = iViz.sync.selectByFilters(iViz.sampleChartsInst().filters(), iViz.getData("sample"), "sample");
+        var _selectedPatientsByFiltersOnly = iViz.sync.selectByFilters(iViz.patientChartsInst().filters(), iViz.getData("patient"), "patient");
     
         // find the intersection between two groups
-        var mapped_selected_samples = iViz.util.id_mapping(iViz.get_mapping().patient.sample, _selected_patients_by_filters_only);
-        iViz.set_selected_samples(_.intersection(mapped_selected_samples, _selected_samples_by_filters_only));
-        iViz.set_selected_patients(iViz.util.id_mapping(iViz.get_mapping().sample.patient, iViz.get_selected_samples()));
+        var mappedSelectedSamples = iViz.util.idMapping(iViz.getMapping().patient.sample, _selectedPatientsByFiltersOnly);
+        iViz.setSelectedSamples(_.intersection(mappedSelectedSamples, _selectedSamplesByFiltersOnly));
+        iViz.setSelectedPatients(iViz.util.idMapping(iViz.getMapping().sample.patient, iViz.getSelectedSamples()));
     
         // sync view
-        if (update_type === "sample") {
-          iViz.sample_charts_inst().sync(iViz.util.id_mapping(iViz.get_mapping().patient.sample, _selected_patients_by_filters_only));
-        } else if (update_type === "patient") {
-          iViz.patient_charts_inst().sync(iViz.util.id_mapping(iViz.get_mapping().sample.patient, _selected_samples_by_filters_only));
+        if (updateType === "sample") {
+          iViz.sampleChartsInst().sync(iViz.util.idMapping(iViz.getMapping().patient.sample, _selectedPatientsByFiltersOnly));
+        } else if (updateType === "patient") {
+          iViz.patientChartsInst().sync(iViz.util.idMapping(iViz.getMapping().sample.patient, _selectedSamplesByFiltersOnly));
         }
     
         // update vue
         iViz.vm().filters = [];
         iViz.vm().filters.length = 0;
-        _.each(Object.keys(iViz.patient_charts_inst().filters()), function(_key) {
-          iViz.vm().filters.push({ text : "<span class='label label-primary'>" + _key + ": " + iViz.patient_charts_inst().filters()[_key] + "</span>" });
+        _.each(Object.keys(iViz.patientChartsInst().filters()), function(_key) {
+          iViz.vm().filters.push({ text : "<span class='label label-primary'>" + _key + ": " + iViz.patientChartsInst().filters()[_key] + "</span>" });
         });
-        _.each(Object.keys(iViz.sample_charts_inst().filters()), function(_key) {
-          iViz.vm().filters.push({ text : "<span class='label label-info'>" + _key + ": " + iViz.sample_charts_inst().filters()[_key] + "</span>" });
+        _.each(Object.keys(iViz.sampleChartsInst().filters()), function(_key) {
+          iViz.vm().filters.push({ text : "<span class='label label-info'>" + _key + ": " + iViz.sampleChartsInst().filters()[_key] + "</span>" });
         });
-        iViz.vm().selected_samples_num = iViz.get_selected_samples().length;
-        iViz.vm().selected_patients_num = iViz.get_selected_patients().length;
+        iViz.vm().selectedSamplesNum = iViz.getSelectedSamples().length;
+        iViz.vm().selectedPatientsNum = iViz.getSelectedPatients().length;
     
     },
 
     // syncing util: select samples or patients based on only samples/patients filters
-    select_by_filters: function(_filters, _data, _type) { //_type: sample or patient
-      var _dup_selected_cases_arr = [];
-      _.each(Object.keys(_filters), function(_filter_attr_id) {
+    selectByFilters: function(_filters, _data, _type) { //_type: sample or patient
+      var _dupSelectedCasesArr = [];
+      _.each(Object.keys(_filters), function(_filterAttrId) {
       
-        var _single_attr_selected_cases = [];
-        var _filters_for_single_attr = _filters[_filter_attr_id];
+        var _singleAttrSelectedCases = [];
+        var _filtersForSingleAttr = _filters[_filterAttrId];
       
-        if (iViz.util.is_range_filter(_filters_for_single_attr)) {
+        if (iViz.util.isRangeFilter(_filtersForSingleAttr)) {
         
-          var _filter_range_min = parseFloat(_filters_for_single_attr[0]);
-          var _filter_range_max = parseFloat(_filters_for_single_attr[1]);
-          _.each(_data, function(_data_obj) {
-            if (_data_obj.hasOwnProperty(_filter_attr_id)) {
-              if (parseFloat(_data_obj[_filter_attr_id]) <= _filter_range_max && parseFloat(_data_obj[_filter_attr_id]) >= _filter_range_min) {
-                _single_attr_selected_cases.push(_type === "sample"? _data_obj.sample_id: _data_obj.patient_id);
+          var _filterRangeMin = parseFloat(_filtersForSingleAttr[0]);
+          var _filterRangeMax = parseFloat(_filtersForSingleAttr[1]);
+          _.each(_data, function(_dataObj) {
+            if (_dataObj.hasOwnProperty(_filterAttrId)) {
+              if (parseFloat(_dataObj[_filterAttrId]) <= _filterRangeMax && parseFloat(_dataObj[_filterAttrId]) >= _filterRangeMin) {
+                _singleAttrSelectedCases.push(_type === "sample"? _dataObj.sample_id: _dataObj.patient_id);
               }
             }
           });
         
         } else {
-          _.each(_data, function(_data_obj) {
-            if (_data_obj.hasOwnProperty(_filter_attr_id)) {
-              if ($.inArray(_data_obj[_filter_attr_id], _filters_for_single_attr) !== -1) {
-                _single_attr_selected_cases.push(_type === "sample"? _data_obj.sample_id: _data_obj.patient_id);
+          _.each(_data, function(_dataObj) {
+            if (_dataObj.hasOwnProperty(_filterAttrId)) {
+              if ($.inArray(_dataObj[_filterAttrId], _filtersForSingleAttr) !== -1) {
+                _singleAttrSelectedCases.push(_type === "sample"? _dataObj.sample_id: _dataObj.patient_id);
               }
             }
           });
         }
-        _dup_selected_cases_arr.push(_single_attr_selected_cases);
+        _dupSelectedCasesArr.push(_singleAttrSelectedCases);
       });
-      var _selected_cases_by_filters_only = _.pluck(_data, _type === "sample"? "sample_id": "patient_id");
-      if (_dup_selected_cases_arr.length !== 0) {
-        _.each(_dup_selected_cases_arr, function(_dup_selected_cases) {
-          _selected_cases_by_filters_only = _.intersection(_selected_cases_by_filters_only, _dup_selected_cases);
+      var _selectedCasesByFiltersOnly = _.pluck(_data, _type === "sample"? "sample_id": "patient_id");
+      if (_dupSelectedCasesArr.length !== 0) {
+        _.each(_dupSelectedCasesArr, function(_dupSelectedCases) {
+          _selectedCasesByFiltersOnly = _.intersection(_selectedCasesByFiltersOnly, _dupSelectedCases);
         });
       }
-      return _selected_cases_by_filters_only;
+      return _selectedCasesByFiltersOnly;
     }
   
   }

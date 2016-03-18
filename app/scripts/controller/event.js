@@ -1,63 +1,95 @@
+/*
+ * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
+ * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
+ * is on an 'as is' basis, and Memorial Sloan-Kettering Cancer Center has no
+ * obligations to provide maintenance, support, updates, enhancements or
+ * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
+ * liable to any party for direct, indirect, special, incidental or
+ * consequential damages, including lost profits, arising out of the use of this
+ * software and its documentation, even if Memorial Sloan-Kettering Cancer
+ * Center has been advised of the possibility of such damage.
+ */
+
+/*
+ * This file is part of cBioPortal.
+ *
+ * cBioPortal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /* Functions responding to events */
 
 iViz.event = (function() {
   return {
 
-    reset_all: function(_chart_inst, _reset_btn_id) {
-      d3.select("a#" + _reset_btn_id).on("click", function () {
-        _chart_inst.filterAll();
+    reset_all: function(_chartInst, _resetBtnId) {
+      d3.select("a#" + _resetBtnId).on("click", function () {
+        _chartInst.filterAll();
         dc.redrawAll();
       });
     },
-    filtered: function(_chart_inst, _attr_obj, _filters, type) {
-      _chart_inst.on("filtered", function (_chart_inst, filter) {
+    filtered: function(_chartInst, _attrObj, _filters, type) {
+      _chartInst.on("filtered", function (_chartInst, filter) {
     
         if (filter === null) { //filter comes in as null when clicking "reset"
       
           //remove all filters applied to this particular attribute
-          _filters[_attr_obj.attr_id] = [];
-          _filters[_attr_obj.attr_id].length = 0;
-          delete _filters[_attr_obj.attr_id];
+          _filters[_attrObj.attr_id] = [];
+          _filters[_attrObj.attr_id].length = 0;
+          delete _filters[_attrObj.attr_id];
       
           // call callback function to handle the sync between chart groups
-          iViz.sync.call_back(type === "patient" ? "sample" : "patient");
+          iViz.sync.callBack(type === "patient" ? "sample" : "patient");
       
         } else {
       
-          if (_attr_obj.view_type === "bar_chart") {
+          if (_attrObj.view_type === "bar_chart") {
         
             //delay event trigger for bar charts
             dc.events.trigger(function() {
-              _filters[_attr_obj.attr_id] = filter;
+              _filters[_attrObj.attr_id] = filter;
           
               // call callback function to handle the sync between chart groups
-              iViz.sync.call_back(type === "patient" ? "sample" : "patient");
+              iViz.sync.callBack(type === "patient" ? "sample" : "patient");
             }, 0);
         
-          } else if (_attr_obj.view_type === "pie_chart") {
+          } else if (_attrObj.view_type === "pie_chart") {
         
             // update existing filter category
-            if (_filters.hasOwnProperty(_attr_obj.attr_id)) {
+            if (_filters.hasOwnProperty(_attrObj.attr_id)) {
               //add filter
-              if ($.inArray(filter, _filters[_attr_obj.attr_id]) === -1) {
-                _filters[_attr_obj.attr_id].push(filter);
+              if ($.inArray(filter, _filters[_attrObj.attr_id]) === -1) {
+                _filters[_attrObj.attr_id].push(filter);
                 //remove filter
               } else {
-                _filters[_attr_obj.attr_id] = _.filter(_filters[_attr_obj.attr_id], function (d) {
+                _filters[_attrObj.attr_id] = _.filter(_filters[_attrObj.attr_id], function (d) {
                   return d !== filter;
                 });
-                if (_filters[_attr_obj.attr_id].length === 0) {
-                  delete _filters[_attr_obj.attr_id];
+                if (_filters[_attrObj.attr_id].length === 0) {
+                  delete _filters[_attrObj.attr_id];
                 }
               }
           
             } else {
               // add new filter category
-              _filters[_attr_obj.attr_id] = [filter];
+              _filters[_attrObj.attr_id] = [filter];
             }
         
             // call callback function to handle the sync between chart groups
-            iViz.sync.call_back(type === "patient" ? "sample" : "patient");
+            iViz.sync.callBack(type === "patient" ? "sample" : "patient");
         
           }
         }

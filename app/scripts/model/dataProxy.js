@@ -29,36 +29,3 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-iViz.view.component.barChart = function() {
-
-  return {
-    init: function(ndx, data, _attrObj, settings, _chartId) {
-      
-      var _barChartData = _.map(_.filter(_.pluck(data, _attrObj.attr_id), function (d) {
-        return d !== "NA"
-      }), function (d) {
-        return parseFloat(d);
-      });
-      var dim = ndx.dimension(function (d) { return d[_attrObj.attr_id]; }),
-          countPerFunc = dim.group().reduceCount(), _chartInst;
-      var _min = d3.min(_barChartData), _max = d3.max(_barChartData);
-  
-      _chartInst = dc.barChart("#" + _chartId);
-      _chartInst.width(settings.barChart.width)
-        .height(settings.barChart.height)
-        .gap(2)
-        .dimension(dim)
-        .group(countPerFunc)
-        .x(d3.scale.linear().domain([_min * 1.1 - _max * 0.1, _max]))
-        .elasticY(true)
-        .centerBar(true)
-        .xAxisLabel(_attrObj.display_name)
-        .margins({top: 10, right: 20, bottom: 50, left: 50});
-      
-      return _chartInst;
-  
-    }
-  }
-  
-}();

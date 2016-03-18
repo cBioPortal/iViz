@@ -30,35 +30,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-iViz.view.component.barChart = function() {
+/*! 
+  Invisible charts functioning as bridges between different chart groups 
+  Each chart group has its own invisible chart, consisting of sample/patient ids 
+*/
 
+iViz.bridgeChart = function() {
   return {
-    init: function(ndx, data, _attrObj, settings, _chartId) {
-      
-      var _barChartData = _.map(_.filter(_.pluck(data, _attrObj.attr_id), function (d) {
-        return d !== "NA"
-      }), function (d) {
-        return parseFloat(d);
-      });
-      var dim = ndx.dimension(function (d) { return d[_attrObj.attr_id]; }),
-          countPerFunc = dim.group().reduceCount(), _chartInst;
-      var _min = d3.min(_barChartData), _max = d3.max(_barChartData);
-  
-      _chartInst = dc.barChart("#" + _chartId);
-      _chartInst.width(settings.barChart.width)
-        .height(settings.barChart.height)
-        .gap(2)
-        .dimension(dim)
-        .group(countPerFunc)
-        .x(d3.scale.linear().domain([_min * 1.1 - _max * 0.1, _max]))
-        .elasticY(true)
-        .centerBar(true)
-        .xAxisLabel(_attrObj.display_name)
-        .margins({top: 10, right: 20, bottom: 50, left: 50});
-      
-      return _chartInst;
-  
+    
+    init: function(ndx, settings, type) {
+      var dimHide, countPerFuncHide;
+      if (type === "patient") {
+        dimHide = ndx.dimension(function (d) { return d.patient_id; }),
+          countPerFuncHide = dimHide.group().reduceCount();
+      } else if (type === "sample") {
+        dimHide = ndx.dimension(function (d) { return d.sample_id; }),
+          countPerFuncHide = dimHide.group().reduceCount();
+      }
+      $("#main-bridge").append(
+        "<div class='grid-item' id='" + type + "_id_chart_div'>" +
+        "<div class='dc-chart dc-pie-chart' id='" + type +"_id_chart'></div>" +
+        "</div>"
+      );
+      var _chartInvisible = dc.pieChart("#" + type + "_id_chart");
+      _chartInvisible.width(settings.pieChart.width)
+        .height(settings.pieChart.height)
+        .dimension(dimHide)
+        .group(countPerFuncHide)
+        .innerRadius(settings.pieChart.inner_radius);
+      return _chartInvisible;
     }
+
   }
-  
 }();
