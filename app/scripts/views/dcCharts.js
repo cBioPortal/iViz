@@ -50,35 +50,35 @@ var dcCharts = function (meta, data, mapping, type) {
   var ndx_ = crossfilter(data);
 
   // ---- a separate sample/patient id chart for sync use only ----
-  var _chartInvisible = iViz.bridgeChart.init(ndx_, settings_, type);
+  var chartInvisible_ = iViz.bridgeChart.init(ndx_, settings_, type);
 
   // ---- automatically create charts by iterating attributes meta ----
   _.each(meta, function (_attrObj) {
 
-    if ($.inArray(_attrObj.view_type, ["pie_chart", "bar_chart"]) !== -1) { //TODO: remove this, should be able to handle all view types
+    if ($.inArray(_attrObj.view_type, ['pie_chart', 'bar_chart']) !== -1) { //TODO: remove this, should be able to handle all view types
 
-      var _chartDivId = "chart-" + _attrObj.attr_id + _attrObj.attr_type + "-" + "-div",
-          _resetBtnId = "chart-" + _attrObj.attr_id + _attrObj.attr_type + "-" + "-reset",
-          _chartId = "chart-" + _attrObj.attr_type + "_" + _attrObj.attr_id;
+      var _chartDivId = 'chart-' + _attrObj.attr_id + _attrObj.attr_type + '-' + '-div',
+          _resetBtnId = 'chart-' + _attrObj.attr_id + _attrObj.attr_type + '-' + '-reset',
+          _chartId = 'chart-' + _attrObj.attr_type + '_' + _attrObj.attr_id;
 
       // append html element
       // TODO: replace with template
-      $("#main-grid").append(
-        "<div id='" + _chartDivId + "'>" +
-        "<a id='" + _resetBtnId + "'>Reset</a>" +
-        "<i class='fa fa-arrows dc-chart-drag'></i>" +
-        "<div class='dc-chart' id='" + _chartId + "'></div>" +
-        "</div>"
+      $('#main-grid').append(
+        '<div id="' + _chartDivId + '">' +
+        '<a id="' + _resetBtnId + '">Reset</a>' +
+        '<i class="fa fa-arrows dc-chart-drag"></i>' +
+        '<div class="dc-chart" id="' + _chartId + '"></div>' +
+        '</div>'
       );
       
       // init and define dc chart instances based on chart types
       var _chartInst;
       switch (_attrObj.view_type) {
 
-        case "pie_chart":
+        case 'pie_chart':
 
-          $("#" + _chartDivId).addClass("grid-item");
-          $("#" + _chartId).addClass("dc-pie-chart");
+          $('#' + _chartDivId).addClass('grid-item');
+          $('#' + _chartId).addClass('dc-pie-chart');
 
           var _pieChart = new iViz.view.component.pieChart();
           var _data = $.extend(true, {}, _attrObj);
@@ -92,23 +92,23 @@ var dcCharts = function (meta, data, mapping, type) {
           });
           _chartInst = _pieChart.getChart();
 
-          $("#" + _chartId).append("<p class='text-center'>" + _attrObj.display_name + "</p>");
+          $('#' + _chartId).append('<p class="text-center">' + _attrObj.display_name + '</p>');
 
           break;
 
-        case "bar_chart":
+        case 'bar_chart':
   
-          $("#" + _chartDivId).addClass("grid-item");
-          $("#" + _chartDivId).addClass("grid-item--width2");
-          $("#" + _chartId).addClass("dc-bar-chart");
+          $('#' + _chartDivId).addClass('grid-item');
+          $('#' + _chartDivId).addClass('grid-item--width2');
+          $('#' + _chartId).addClass('dc-bar-chart');
   
           _chartInst = iViz.view.component.barChart.init(ndx_, data, _attrObj, settings_, _chartId);
 
           break;
 
-        case "scatter_plots":
+        case 'scatter_plots':
           break;
-        case "table":
+        case 'table':
           break;
 
       }
@@ -127,9 +127,9 @@ var dcCharts = function (meta, data, mapping, type) {
       iViz.view.grid.layout();
     },
     sync: function(_selected_cases) {
-      _chartInvisible.filter(null);
+      chartInvisible_.filter(null);
       _.each(_selected_cases, function(_case_id) {
-        _chartInvisible.filter(_case_id);
+        chartInvisible_.filter(_case_id);
       });
     },
     filters: function() {

@@ -46,7 +46,7 @@ iViz.util = (function() {
     
     isRangeFilter: function(filterObj) {
       if (filterObj.filterType !== undefined) {
-        if (filterObj.filterType === "RangedFilter") return true;
+        if (filterObj.filterType === 'RangedFilter') return true;
       } return false;
     }
 

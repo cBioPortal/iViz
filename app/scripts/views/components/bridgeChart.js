@@ -40,19 +40,19 @@ iViz.bridgeChart = function() {
     
     init: function(ndx, settings, type) {
       var dimHide, countPerFuncHide;
-      if (type === "patient") {
+      if (type === 'patient') {
         dimHide = ndx.dimension(function (d) { return d.patient_id; }),
           countPerFuncHide = dimHide.group().reduceCount();
-      } else if (type === "sample") {
+      } else if (type === 'sample') {
         dimHide = ndx.dimension(function (d) { return d.sample_id; }),
           countPerFuncHide = dimHide.group().reduceCount();
       }
-      $("#main-bridge").append(
-        "<div class='grid-item' id='" + type + "_id_chart_div'>" +
-        "<div class='dc-chart dc-pie-chart' id='" + type +"_id_chart'></div>" +
+      $('#main-bridge').append(
+        '<div class="grid-item" id="' + type + '_id_chart_div">' +
+        '<div class="dc-chart dc-pie-chart" id="' + type +'_id_chart"></div>' +
         "</div>"
       );
-      var _chartInvisible = dc.pieChart("#" + type + "_id_chart");
+      var _chartInvisible = dc.pieChart('#' + type + '_id_chart');
       _chartInvisible.width(settings.pieChart.width)
         .height(settings.pieChart.height)
         .dimension(dimHide)

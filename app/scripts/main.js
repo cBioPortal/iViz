@@ -39,26 +39,26 @@ var iViz = (function() {
   return {
     init: function() {
 
-      $("#main-grid").empty();
+      $('#main-grid').empty();
 
       // TODO: replace with wrapper to assemble data_ from web APIs
-      $.ajax({url: "data_/converted/mixed_tcga.json"})
+      $.ajax({url: 'data_/converted/mixed_tcga.json'})
         .then(function (_data) {
 
           data_ = _data;
 
           // ---- fill the empty slots in the data matrix ----
           _.each(data_.groups.patient.data, function(_dataObj) {
-            _.each(_.pluck(data_.groups.patient.attr_meta, "attr_id"), function (_attrId) {
+            _.each(_.pluck(data_.groups.patient.attr_meta, 'attr_id'), function (_attrId) {
               if (!_dataObj.hasOwnProperty(_attrId)) {
-                _dataObj[_attrId] = "NA";
+                _dataObj[_attrId] = 'NA';
               }
             });
           });
           _.each(data_.groups.sample.data, function(_dataObj) {
-            _.each(_.pluck(data_.groups.sample.attr_meta, "attr_id"), function (_attrId) {
+            _.each(_.pluck(data_.groups.sample.attr_meta, 'attr_id'), function (_attrId) {
               if (!_dataObj.hasOwnProperty(_attrId)) {
-                _dataObj[_attrId] = "NA";
+                _dataObj[_attrId] = 'NA';
               }
             });
           });
@@ -68,13 +68,13 @@ var iViz = (function() {
             data_.groups.patient.attr_meta,
             data_.groups.patient.data,
             data_.groups.group_mapping,
-            "patient"
+            'patient'
           );
           sampleChartsInst_ = new dcCharts(
             data_.groups.sample.attr_meta,
             data_.groups.sample.data,
             data_.groups.group_mapping,
-            "sample"
+            'sample'
           );
 
           // ---- render dc charts ----
@@ -96,23 +96,23 @@ var iViz = (function() {
           grid_.layout();
 
           // ---- set default selected cases ----
-          selectedPatients_ = _.pluck(data_.groups.patient.data, "patient_id");
-          selectedSamples_ = _.pluck(data_.groups.sample.data, "sample_id");
+          selectedPatients_ = _.pluck(data_.groups.patient.data, 'patient_id');
+          selectedSamples_ = _.pluck(data_.groups.sample.data, 'sample_id');
 
           // --- using vue to show filters in header ---
-          if (typeof vm_ === "undefined") {
+          if (typeof vm_ === 'undefined') {
             vm_ = new Vue({
               el: '#main-header',
               data: {
                 filters: [],
-                selectedSamplesNum: _.pluck(data_.groups.sample.data, "sample_id").length,
-                selectedPatientsNum: _.pluck(data_.groups.patient.data, "patient_id").length
+                selectedSamplesNum: _.pluck(data_.groups.sample.data, 'sample_id').length,
+                selectedPatientsNum: _.pluck(data_.groups.patient.data, 'patient_id').length
               }
             });
           } else {
             vm_.filters = [];
-            vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, "sample_id").length;
-            vm_.selectedPatientsNum = _.pluck(data_.groups.patient.data, "patient_id").length;
+            vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, 'sample_id').length;
+            vm_.selectedPatientsNum = _.pluck(data_.groups.patient.data, 'patient_id').length;
           }
 
         });
@@ -120,7 +120,7 @@ var iViz = (function() {
     
     stat: function() {
       var _result = {};
-      _result["filters"] = {};
+      _result['filters'] = {};
       
       // extract and reformat selected cases
       var _selectedCases = [];
@@ -128,29 +128,29 @@ var iViz = (function() {
       _.each(selectedSamples_, function(_selectedSample) {
     
         var _index = data_.groups.sample.data_indices.sample_id[_selectedSample];
-        var _studyId = data_.groups.sample.data[_index]["study_id"];
+        var _studyId = data_.groups.sample.data[_index]['study_id'];
     
         // extract study information
-        if ($.inArray(_studyId, _.pluck(_selectedCases, "studyID")) !== -1) {
+        if ($.inArray(_studyId, _.pluck(_selectedCases, 'studyID')) !== -1) {
           _.each(_selectedCases, function(_resultObj) {
-            if (_resultObj["studyID"] === _studyId) {
-              _resultObj["samples"].push(_selectedSample);
+            if (_resultObj['studyID'] === _studyId) {
+              _resultObj['samples'].push(_selectedSample);
             }
           });
         } else {
-          _selectedCases.push({"studyID": _studyId, "samples": [_selectedSample]});
+          _selectedCases.push({'studyID': _studyId, 'samples': [_selectedSample]});
         }
     
         //map samples to patients
         _.each(_selectedCases, function(_resultObj) {
-          _resultObj["patients"] = iViz.util.idMapping(data_.groups.group_mapping.sample.patient, _resultObj["samples"]);
+          _resultObj['patients'] = iViz.util.idMapping(data_.groups.group_mapping.sample.patient, _resultObj['samples']);
         });
     
       });
   
-      _result.filters["patients"] = patientChartsInst_.filters();
-      _result.filters["samples"] = sampleChartsInst_.filters();
-      _result["selected_cases"] = _selectedCases;
+      _result.filters['patients'] = patientChartsInst_.filters();
+      _result.filters['samples'] = sampleChartsInst_.filters();
+      _result['selected_cases'] = _selectedCases;
       
       return _result;
     },
@@ -176,7 +176,7 @@ var iViz = (function() {
       }
     },
     getData: function(_type) {
-      return (_type === "patient")? data_.groups.patient.data: data_.groups.sample.data;
+      return (_type === 'patient')? data_.groups.patient.data: data_.groups.sample.data;
     },
     getMapping: function() {
       return data_.groups.group_mapping;

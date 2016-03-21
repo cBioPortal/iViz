@@ -36,7 +36,7 @@ iViz.view.component.barChart = function() {
     init: function(ndx, data, attrObj, settings, chartId) {
       
       var _barChartData = _.map(_.filter(_.pluck(data, attrObj.attr_id), function (d) {
-        return d !== "NA"
+        return d !== 'NA'
       }), function (d) {
         return parseFloat(d);
       });
@@ -44,7 +44,7 @@ iViz.view.component.barChart = function() {
           countPerFunc = dim.group().reduceCount(), _chartInst;
       var _min = d3.min(_barChartData), _max = d3.max(_barChartData);
   
-      _chartInst = dc.barChart("#" + chartId);
+      _chartInst = dc.barChart('#' + chartId);
       _chartInst.width(settings.barChart.width)
         .height(settings.barChart.height)
         .gap(2)

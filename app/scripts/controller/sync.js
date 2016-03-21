@@ -42,8 +42,8 @@ iViz.sync = (function() {
     // @update_type: the type of group charts (patient or sample) that needs to be updated
     callBack: function(updateType) {
     
-        var _selectedSamplesByFiltersOnly = iViz.sync.selectByFilters(iViz.sampleChartsInst().filters(), iViz.getData("sample"), "sample");
-        var _selectedPatientsByFiltersOnly = iViz.sync.selectByFilters(iViz.patientChartsInst().filters(), iViz.getData("patient"), "patient");
+        var _selectedSamplesByFiltersOnly = iViz.sync.selectByFilters(iViz.sampleChartsInst().filters(), iViz.getData('sample'), 'sample');
+        var _selectedPatientsByFiltersOnly = iViz.sync.selectByFilters(iViz.patientChartsInst().filters(), iViz.getData('patient'), 'patient');
     
         // find the intersection between two groups
         var mappedSelectedSamples = iViz.util.idMapping(iViz.getMapping().patient.sample, _selectedPatientsByFiltersOnly);
@@ -51,9 +51,9 @@ iViz.sync = (function() {
         iViz.setSelectedPatients(iViz.util.idMapping(iViz.getMapping().sample.patient, iViz.getSelectedSamples()));
     
         // sync view
-        if (updateType === "sample") {
+        if (updateType === 'sample') {
           iViz.sampleChartsInst().sync(iViz.util.idMapping(iViz.getMapping().patient.sample, _selectedPatientsByFiltersOnly));
-        } else if (updateType === "patient") {
+        } else if (updateType === 'patient') {
           iViz.patientChartsInst().sync(iViz.util.idMapping(iViz.getMapping().sample.patient, _selectedSamplesByFiltersOnly));
         }
     
@@ -61,10 +61,10 @@ iViz.sync = (function() {
         iViz.vm().filters = [];
         iViz.vm().filters.length = 0;
         _.each(Object.keys(iViz.patientChartsInst().filters()), function(_key) {
-          iViz.vm().filters.push({ text : "<span class='label label-primary'>" + _key + ": " + iViz.patientChartsInst().filters()[_key] + "</span>" });
+          iViz.vm().filters.push({ text : '<span class="label label-primary">' + _key + ': ' + iViz.patientChartsInst().filters()[_key] + '</span>' });
         });
         _.each(Object.keys(iViz.sampleChartsInst().filters()), function(_key) {
-          iViz.vm().filters.push({ text : "<span class='label label-info'>" + _key + ": " + iViz.sampleChartsInst().filters()[_key] + "</span>" });
+          iViz.vm().filters.push({ text : '<span class="label label-info">' + _key + ': ' + iViz.sampleChartsInst().filters()[_key] + '</span>' });
         });
         iViz.vm().selectedSamplesNum = iViz.getSelectedSamples().length;
         iViz.vm().selectedPatientsNum = iViz.getSelectedPatients().length;
@@ -86,7 +86,7 @@ iViz.sync = (function() {
           _.each(data, function(_dataObj) {
             if (_dataObj.hasOwnProperty(_filterAttrId)) {
               if (parseFloat(_dataObj[_filterAttrId]) <= _filterRangeMax && parseFloat(_dataObj[_filterAttrId]) >= _filterRangeMin) {
-                _singleAttrSelectedCases.push(type === "sample"? _dataObj.sample_id: _dataObj.patient_id);
+                _singleAttrSelectedCases.push(type === 'sample'? _dataObj.sample_id: _dataObj.patient_id);
               }
             }
           });
@@ -95,14 +95,14 @@ iViz.sync = (function() {
           _.each(data, function(_dataObj) {
             if (_dataObj.hasOwnProperty(_filterAttrId)) {
               if ($.inArray(_dataObj[_filterAttrId], _filtersForSingleAttr) !== -1) {
-                _singleAttrSelectedCases.push(type === "sample"? _dataObj.sample_id: _dataObj.patient_id);
+                _singleAttrSelectedCases.push(type === 'sample'? _dataObj.sample_id: _dataObj.patient_id);
               }
             }
           });
         }
         _dupSelectedCasesArr.push(_singleAttrSelectedCases);
       });
-      var _selectedCasesByFiltersOnly = _.pluck(data, type === "sample"? "sample_id": "patient_id");
+      var _selectedCasesByFiltersOnly = _.pluck(data, type === 'sample'? 'sample_id': 'patient_id');
       if (_dupSelectedCasesArr.length !== 0) {
         _.each(_dupSelectedCasesArr, function(_dupSelectedCases) {
           _selectedCasesByFiltersOnly = _.intersection(_selectedCasesByFiltersOnly, _dupSelectedCases);
