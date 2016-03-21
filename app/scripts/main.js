@@ -42,7 +42,7 @@ var iViz = (function() {
       $('#main-grid').empty();
 
       // TODO: replace with wrapper to assemble data_ from web APIs
-      $.ajax({url: 'data_/converted/mixed_tcga.json'})
+      $.ajax({url: 'data/converted/mixed_tcga.json'})
         .then(function (_data) {
 
           data_ = _data;
@@ -198,8 +198,15 @@ var iViz = (function() {
     },
     getSelectedPatients: function() {
       return selectedPatients_;
+    },
+    applyFitlers: function() {
+      console.log(patientChartsInst_.filters());
+      console.log(sampleChartsInst_.filters());
+    },
+    applySamples: function() {
+      
+      
     }
-
   }
 }());
 
