@@ -72,37 +72,37 @@ iViz.sync = (function() {
     },
 
     // syncing util: select samples or patients based on only samples/patients filters
-    selectByFilters: function(_filters, _data, _type) { //_type: sample or patient
+    selectByFilters: function(filters, data, type) { //type: sample or patient
       var _dupSelectedCasesArr = [];
-      _.each(Object.keys(_filters), function(_filterAttrId) {
+      _.each(Object.keys(filters), function(_filterAttrId) {
       
         var _singleAttrSelectedCases = [];
-        var _filtersForSingleAttr = _filters[_filterAttrId];
+        var _filtersForSingleAttr = filters[_filterAttrId];
       
         if (iViz.util.isRangeFilter(_filtersForSingleAttr)) {
         
           var _filterRangeMin = parseFloat(_filtersForSingleAttr[0]);
           var _filterRangeMax = parseFloat(_filtersForSingleAttr[1]);
-          _.each(_data, function(_dataObj) {
+          _.each(data, function(_dataObj) {
             if (_dataObj.hasOwnProperty(_filterAttrId)) {
               if (parseFloat(_dataObj[_filterAttrId]) <= _filterRangeMax && parseFloat(_dataObj[_filterAttrId]) >= _filterRangeMin) {
-                _singleAttrSelectedCases.push(_type === "sample"? _dataObj.sample_id: _dataObj.patient_id);
+                _singleAttrSelectedCases.push(type === "sample"? _dataObj.sample_id: _dataObj.patient_id);
               }
             }
           });
         
         } else {
-          _.each(_data, function(_dataObj) {
+          _.each(data, function(_dataObj) {
             if (_dataObj.hasOwnProperty(_filterAttrId)) {
               if ($.inArray(_dataObj[_filterAttrId], _filtersForSingleAttr) !== -1) {
-                _singleAttrSelectedCases.push(_type === "sample"? _dataObj.sample_id: _dataObj.patient_id);
+                _singleAttrSelectedCases.push(type === "sample"? _dataObj.sample_id: _dataObj.patient_id);
               }
             }
           });
         }
         _dupSelectedCasesArr.push(_singleAttrSelectedCases);
       });
-      var _selectedCasesByFiltersOnly = _.pluck(_data, _type === "sample"? "sample_id": "patient_id");
+      var _selectedCasesByFiltersOnly = _.pluck(data, type === "sample"? "sample_id": "patient_id");
       if (_dupSelectedCasesArr.length !== 0) {
         _.each(_dupSelectedCasesArr, function(_dupSelectedCases) {
           _selectedCasesByFiltersOnly = _.intersection(_selectedCasesByFiltersOnly, _dupSelectedCases);

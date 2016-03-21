@@ -33,20 +33,20 @@
 iViz.util = (function() {
   return {
     
-    idMapping: function(_mappingObj, _inputCases) {
+    idMapping: function(mappingObj, inputCases) {
       var _selectedMappingCases = [];
       _selectedMappingCases.length = 0;
-      _.each(_inputCases, function(_case) {
-        _.each(_mappingObj[_case], function(_id) {
+      _.each(inputCases, function(_case) {
+        _.each(mappingObj[_case], function(_id) {
           _selectedMappingCases.push(_id);
         });
       });
       return _.uniq(_selectedMappingCases);
     },
     
-    isRangeFilter: function(_filterObj) {
-      if (_filterObj.filterType !== undefined) {
-        if (_filterObj.filterType === "RangedFilter") return true;
+    isRangeFilter: function(filterObj) {
+      if (filterObj.filterType !== undefined) {
+        if (filterObj.filterType === "RangedFilter") return true;
       } return false;
     }
 

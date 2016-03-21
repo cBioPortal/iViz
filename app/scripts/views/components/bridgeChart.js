@@ -57,7 +57,7 @@ iViz.bridgeChart = function() {
         .height(settings.pieChart.height)
         .dimension(dimHide)
         .group(countPerFuncHide)
-        .innerRadius(settings.pieChart.inner_radius);
+        .innerRadius(settings.pieChart.innerRadius);
       return _chartInvisible;
     }
 

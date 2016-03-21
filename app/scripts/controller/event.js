@@ -35,57 +35,57 @@
 iViz.event = (function() {
   return {
 
-    reset_all: function(_chartInst, _resetBtnId) {
-      d3.select("a#" + _resetBtnId).on("click", function () {
-        _chartInst.filterAll();
+    resetAll: function(chartInst, resetBtnId) {
+      d3.select("a#" + resetBtnId).on("click", function () {
+        chartInst.filterAll();
         dc.redrawAll();
       });
     },
-    filtered: function(_chartInst, _attrObj, _filters, type) {
-      _chartInst.on("filtered", function (_chartInst, filter) {
+    filtered: function(chartInst, attrObj, filters, type) {
+      chartInst.on("filtered", function (_chartInst, filter) {
     
         if (filter === null) { //filter comes in as null when clicking "reset"
       
           //remove all filters applied to this particular attribute
-          _filters[_attrObj.attr_id] = [];
-          _filters[_attrObj.attr_id].length = 0;
-          delete _filters[_attrObj.attr_id];
+          filters[attrObj.attr_id] = [];
+          filters[attrObj.attr_id].length = 0;
+          delete filters[attrObj.attr_id];
       
           // call callback function to handle the sync between chart groups
           iViz.sync.callBack(type === "patient" ? "sample" : "patient");
       
         } else {
       
-          if (_attrObj.view_type === "bar_chart") {
+          if (attrObj.view_type === "bar_chart") {
         
             //delay event trigger for bar charts
             dc.events.trigger(function() {
-              _filters[_attrObj.attr_id] = filter;
+              filters[attrObj.attr_id] = filter;
           
               // call callback function to handle the sync between chart groups
               iViz.sync.callBack(type === "patient" ? "sample" : "patient");
             }, 0);
         
-          } else if (_attrObj.view_type === "pie_chart") {
+          } else if (attrObj.view_type === "pie_chart") {
         
             // update existing filter category
-            if (_filters.hasOwnProperty(_attrObj.attr_id)) {
+            if (filters.hasOwnProperty(attrObj.attr_id)) {
               //add filter
-              if ($.inArray(filter, _filters[_attrObj.attr_id]) === -1) {
-                _filters[_attrObj.attr_id].push(filter);
+              if ($.inArray(filter, filters[attrObj.attr_id]) === -1) {
+                filters[attrObj.attr_id].push(filter);
                 //remove filter
               } else {
-                _filters[_attrObj.attr_id] = _.filter(_filters[_attrObj.attr_id], function (d) {
+                filters[attrObj.attr_id] = _.filter(filters[attrObj.attr_id], function (d) {
                   return d !== filter;
                 });
-                if (_filters[_attrObj.attr_id].length === 0) {
-                  delete _filters[_attrObj.attr_id];
+                if (filters[attrObj.attr_id].length === 0) {
+                  delete filters[attrObj.attr_id];
                 }
               }
           
             } else {
               // add new filter category
-              _filters[_attrObj.attr_id] = [filter];
+              filters[attrObj.attr_id] = [filter];
             }
         
             // call callback function to handle the sync between chart groups

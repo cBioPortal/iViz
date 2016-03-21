@@ -32,31 +32,31 @@
 
 var iViz = (function() {
 
-  var patientChartsInst, sampleChartsInst;
-  var selectedPatients = [], selectedSamples = [];
-  var data, vm, grid;
+  var patientChartsInst_, sampleChartsInst_;
+  var selectedPatients_ = [], selectedSamples_ = [];
+  var data_, vm_, grid_;
 
   return {
     init: function() {
 
       $("#main-grid").empty();
 
-      // TODO: replace with wrapper to assemble data from web APIs
-      $.ajax({url: "data/converted/mixed_tcga.json"})
+      // TODO: replace with wrapper to assemble data_ from web APIs
+      $.ajax({url: "data_/converted/mixed_tcga.json"})
         .then(function (_data) {
 
-          data = _data;
+          data_ = _data;
 
           // ---- fill the empty slots in the data matrix ----
-          _.each(data.groups.patient.data, function(_dataObj) {
-            _.each(_.pluck(data.groups.patient.attr_meta, "attr_id"), function (_attrId) {
+          _.each(data_.groups.patient.data, function(_dataObj) {
+            _.each(_.pluck(data_.groups.patient.attr_meta, "attr_id"), function (_attrId) {
               if (!_dataObj.hasOwnProperty(_attrId)) {
                 _dataObj[_attrId] = "NA";
               }
             });
           });
-          _.each(data.groups.sample.data, function(_dataObj) {
-            _.each(_.pluck(data.groups.sample.attr_meta, "attr_id"), function (_attrId) {
+          _.each(data_.groups.sample.data, function(_dataObj) {
+            _.each(_.pluck(data_.groups.sample.attr_meta, "attr_id"), function (_attrId) {
               if (!_dataObj.hasOwnProperty(_attrId)) {
                 _dataObj[_attrId] = "NA";
               }
@@ -64,71 +64,71 @@ var iViz = (function() {
           });
 
           // ----  init and define dc chart instances ----
-          patientChartsInst = new dcCharts(
-            data.groups.patient.attr_meta,
-            data.groups.patient.data,
-            data.groups.group_mapping,
+          patientChartsInst_ = new dcCharts(
+            data_.groups.patient.attr_meta,
+            data_.groups.patient.data,
+            data_.groups.group_mapping,
             "patient"
           );
-          sampleChartsInst = new dcCharts(
-            data.groups.sample.attr_meta,
-            data.groups.sample.data,
-            data.groups.group_mapping,
+          sampleChartsInst_ = new dcCharts(
+            data_.groups.sample.attr_meta,
+            data_.groups.sample.data,
+            data_.groups.group_mapping,
             "sample"
           );
 
           // ---- render dc charts ----
-          grid = new Packery(document.querySelector('.grid'), {
+          grid_ = new Packery(document.querySelector('.grid'), {
             itemSelector: '.grid-item',
             columnWidth: 250,
             rowHeight: 250,
             gutter: 5
           });
 
-          _.each(grid.getItemElements(), function (gridItem) {
-            var draggie = new Draggabilly(gridItem, {
+          _.each(grid_.getItemElements(), function (_gridItem) {
+            var _draggie = new Draggabilly(_gridItem, {
               handle: '.dc-chart-drag'
             });
-            grid.bindDraggabillyEvents(draggie);
+            grid_.bindDraggabillyEvents(_draggie);
           });
 
           dc.renderAll();
-          grid.layout();
+          grid_.layout();
 
           // ---- set default selected cases ----
-          selectedPatients = _.pluck(data.groups.patient.data, "patient_id");
-          selectedSamples = _.pluck(data.groups.sample.data, "sample_id");
+          selectedPatients_ = _.pluck(data_.groups.patient.data, "patient_id");
+          selectedSamples_ = _.pluck(data_.groups.sample.data, "sample_id");
 
           // --- using vue to show filters in header ---
-          if (typeof vm === "undefined") {
-            vm = new Vue({
+          if (typeof vm_ === "undefined") {
+            vm_ = new Vue({
               el: '#main-header',
               data: {
                 filters: [],
-                selectedSamplesNum: _.pluck(data.groups.sample.data, "sample_id").length,
-                selectedPatientsNum: _.pluck(data.groups.patient.data, "patient_id").length
+                selectedSamplesNum: _.pluck(data_.groups.sample.data, "sample_id").length,
+                selectedPatientsNum: _.pluck(data_.groups.patient.data, "patient_id").length
               }
             });
           } else {
-            vm.filters = [];
-            vm.selectedSamplesNum = _.pluck(data.groups.sample.data, "sample_id").length;
-            vm.selectedPatientsNum = _.pluck(data.groups.patient.data, "patient_id").length;
+            vm_.filters = [];
+            vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, "sample_id").length;
+            vm_.selectedPatientsNum = _.pluck(data_.groups.patient.data, "patient_id").length;
           }
 
         });
     }, // ---- close init function ----
     
     stat: function() {
-      var result = {};
-      result["filters"] = {};
+      var _result = {};
+      _result["filters"] = {};
       
       // extract and reformat selected cases
       var _selectedCases = [];
   
-      _.each(selectedSamples, function(_selectedSample) {
+      _.each(selectedSamples_, function(_selectedSample) {
     
-        var _index = data.groups.sample.data_indices.sample_id[_selectedSample];
-        var _studyId = data.groups.sample.data[_index]["study_id"];
+        var _index = data_.groups.sample.data_indices.sample_id[_selectedSample];
+        var _studyId = data_.groups.sample.data[_index]["study_id"];
     
         // extract study information
         if ($.inArray(_studyId, _.pluck(_selectedCases, "studyID")) !== -1) {
@@ -143,29 +143,29 @@ var iViz = (function() {
     
         //map samples to patients
         _.each(_selectedCases, function(_resultObj) {
-          _resultObj["patients"] = iViz.util.idMapping(data.groups.group_mapping.sample.patient, _resultObj["samples"]);
+          _resultObj["patients"] = iViz.util.idMapping(data_.groups.group_mapping.sample.patient, _resultObj["samples"]);
         });
     
       });
   
-      result.filters["patients"] = patientChartsInst.filters();
-      result.filters["samples"] = sampleChartsInst.filters();
-      result["selected_cases"] = _selectedCases;
+      _result.filters["patients"] = patientChartsInst_.filters();
+      _result.filters["samples"] = sampleChartsInst_.filters();
+      _result["selected_cases"] = _selectedCases;
       
-      return result;
+      return _result;
     },
     
     vm: function() {
-      return vm;
+      return vm_;
     },
     view: {
       component: {},
       grid: {
         get: function () {
-          return grid;
+          return grid_;
         },
         layout: function () {
-          grid.layout();
+          grid_.layout();
         }
       }
     },
@@ -176,28 +176,28 @@ var iViz = (function() {
       }
     },
     getData: function(_type) {
-      return (_type === "patient")? data.groups.patient.data: data.groups.sample.data;
+      return (_type === "patient")? data_.groups.patient.data: data_.groups.sample.data;
     },
     getMapping: function() {
-      return data.groups.group_mapping;
+      return data_.groups.group_mapping;
     },
     patientChartsInst: function() {
-      return patientChartsInst;
+      return patientChartsInst_;
     },
     sampleChartsInst: function() {
-      return sampleChartsInst;
+      return sampleChartsInst_;
     },
     setSelectedSamples: function(_input) {
-      selectedSamples = _input;
+      selectedSamples_ = _input;
     },
     getSelectedSamples: function() {
-      return selectedSamples;
+      return selectedSamples_;
     },
     setSelectedPatients: function(_input) {
-      selectedPatients = _input;
+      selectedPatients_ = _input;
     },
     getSelectedPatients: function() {
-      return selectedPatients;
+      return selectedPatients_;
     }
 
   }

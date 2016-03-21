@@ -32,11 +32,11 @@
 
 var dcCharts = function (meta, data, mapping, type) {
 
-  var settings = {
+  var settings_ = {
     pieChart: {
       width: 150,
       height: 150,
-      inner_radius: 15
+      innerRadius: 15
     },
     barChart: {
       width: 400,
@@ -45,12 +45,12 @@ var dcCharts = function (meta, data, mapping, type) {
     transitionDuration: iViz.opts.dc.transitionDuration
   };
 
-  var filters = {}, selectedCases = [];
+  var filters_ = {};
 
-  var ndx = crossfilter(data);
+  var ndx_ = crossfilter(data);
 
   // ---- a separate sample/patient id chart for sync use only ----
-  var _chart_invisible = iViz.bridgeChart.init(ndx, settings, type);
+  var _chartInvisible = iViz.bridgeChart.init(ndx_, settings_, type);
 
   // ---- automatically create charts by iterating attributes meta ----
   _.each(meta, function (_attrObj) {
@@ -83,12 +83,12 @@ var dcCharts = function (meta, data, mapping, type) {
           var _pieChart = new iViz.view.component.pieChart();
           var _data = $.extend(true, {}, _attrObj);
           
-          _data.ndx = ndx;
+          _data.ndx = ndx_;
           _pieChart.init(_data, {
             divId: _chartId,
-            width: settings.pieChart.width,
-            height: settings.pieChart.height,
-            transitionDuration: settings.transitionDuration
+            width: settings_.pieChart.width,
+            height: settings_.pieChart.height,
+            transitionDuration: settings_.transitionDuration
           });
           _chartInst = _pieChart.getChart();
 
@@ -102,7 +102,7 @@ var dcCharts = function (meta, data, mapping, type) {
           $("#" + _chartDivId).addClass("grid-item--width2");
           $("#" + _chartId).addClass("dc-bar-chart");
   
-          _chartInst = iViz.view.component.barChart.init(ndx, data, _attrObj, settings, _chartId);
+          _chartInst = iViz.view.component.barChart.init(ndx_, data, _attrObj, settings_, _chartId);
 
           break;
 
@@ -113,8 +113,8 @@ var dcCharts = function (meta, data, mapping, type) {
 
       }
       
-      iViz.event.reset_all(_chartInst, _resetBtnId);
-      iViz.event.filtered(_chartInst, _attrObj, filters, type);
+      iViz.event.resetAll(_chartInst, _resetBtnId);
+      iViz.event.filtered(_chartInst, _attrObj, filters_, type);
 
     }
 
@@ -127,13 +127,13 @@ var dcCharts = function (meta, data, mapping, type) {
       iViz.view.grid.layout();
     },
     sync: function(_selected_cases) {
-      _chart_invisible.filter(null);
+      _chartInvisible.filter(null);
       _.each(_selected_cases, function(_case_id) {
-        _chart_invisible.filter(_case_id);
+        _chartInvisible.filter(_case_id);
       });
     },
     filters: function() {
-      return filters;
+      return filters_;
     }
 
   }
