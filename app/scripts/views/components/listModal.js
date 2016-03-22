@@ -45,9 +45,9 @@
     ' class="vc-list-group-item"><div v-on:click="addNewVC()"' +
     ' class="vc-list-content">Add to New Virtual' +
     ' Cohort</div></li></ul></div></div><add-vc :add-new-vc.sync="showPopup"' +
-    ' :from-iViz="false" :selected-samples-num="1"' +
-    ' :cancer-study-id="cancerStudyId" :sample="sample"' +
-    ' selected-patients-num="0"></add-vc>',
+    ' :selected-patients-num=0 :from-iViz="false"' +
+    ' :selected-samples-num=1' +
+    ' :cancer-study-id="cancerStudyId" :sample="sample"></add-vc>',
     props: {
       show: {
         type: Boolean,
@@ -73,16 +73,16 @@
         this.show = false;
       },
       addToVC: function(virtualCohortID) {
-        var message = iViz.session.events.addSampleToVirtualCohort(
+        var _message = iViz.session.events.addSampleToVirtualCohort(
           virtualCohortID,
           this.cancerStudyId, this.sample);
         var msgToShow = 'Error while adding sample';
-        if (message === 'success') {
+        if (_message === 'success') {
           msgToShow = 'Added sample Virtual Study';
-        } else if (message === 'warn') {
+        } else if (_message === 'warn') {
           msgToShow = 'Sample already present is Virtual Study';
         }
-        jQuery.notify(msgToShow, message);
+        jQuery.notify(msgToShow, _message);
         this.close();
       },
       addNewVC: function() {

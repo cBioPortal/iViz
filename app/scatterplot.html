@@ -5,7 +5,7 @@
 
   <!-- bower:js -->
   <script src="/bower_components/modernizr/modernizr.js"></script>
-  <script src="/bower_components/jquery/jquery.js"></script>
+  <script src="/bower_components/jquery/dist/jquery.js"></script>
   <script src="/bower_components/chosen/chosen.jquery.min.js"></script>
   <script src="/bower_components/datatables/media/js/jquery.dataTables.js"></script>
   <script src="/bower_components/d3/d3.js"></script>
@@ -45,15 +45,15 @@
 
 
   <script src="scripts/main.js"></script>
-  <script src="scripts/vue_core.js"></script>
-  <script src="scripts/controller/session.events.js"></script>
-  <script src="scripts/controller/session.utils.js"></script>
-  <script src="scripts/views/components/modal.template.component.js"></script>
+  <script src="scripts/vueCore.js"></script>
+  <script src="scripts/controller/sessionEvents.js"></script>
+  <script src="scripts/controller/sessionUtils.js"></script>
+  <script src="scripts/views/components/modalTemplate.js"></script>
   <script src="scripts/views/components/addVCPopup.js"></script>
-  <script src="scripts/model/session.service.js"></script>
+  <script src="scripts/model/sessionService.js"></script>
 
 
-  <script src="scripts/views/components/list.modal.js"></script>
+  <script src="scripts/views/components/listModal.js"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
 </head>
@@ -66,14 +66,15 @@
 
 <script type="text/javascript">
 $( document ).ready(function() {
-  
-    url = "http://localhost:8080/api/sessions/";
+
+  URL = "http://localhost:8080/api/sessions/";
   iViz.session.vmScatter.init();
 
     $(document).on('click', '#button', function (e) {
-      iViz.session.vmScatter.getinstance().sampleID = $(e.target).val();
-      iViz.session.vmScatter.getinstance().cancerStudyID = 'ucec_tcga';
-      iViz.session.vmScatter.getinstance().showList = true;
+      var _vm =iViz.session.vmScatter.getInstance();
+      _vm.sampleID = $(e.target).val();
+      _vm.cancerStudyID = 'ucec_tcga1';
+      _vm.showList = true;
     });
     $('#container').highcharts({
         chart: {

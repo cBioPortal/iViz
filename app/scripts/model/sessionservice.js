@@ -36,26 +36,26 @@
 'use strict';
 (function(iViz, _, $) {
   iViz.session.model = (function() {
-    var localStorageAdd = function(id, virtualCohort) {
+    var localStorageAdd_ = function(id, virtualCohort) {
       virtualCohort.virtualCohortID = id;
-      var virtualCohorts = iViz.session.utils.getVirtualCohorts();
-      virtualCohorts.push(virtualCohort);
-      iViz.session.utils.setVirtualCohorts(virtualCohorts);
+      var _virtualCohorts = iViz.session.utils.getVirtualCohorts();
+      _virtualCohorts.push(virtualCohort);
+      iViz.session.utils.setVirtualCohorts(_virtualCohorts);
     };
 
-    var localStorageDelete = function(virtualCohort) {
-      var virtualCohorts = iViz.session.utils.getVirtualCohorts();
-      virtualCohorts = _.without(virtualCohorts, _.findWhere(virtualCohorts,
+    var localStorageDelete_ = function(virtualCohort) {
+      var _virtualCohorts = iViz.session.utils.getVirtualCohorts();
+      _virtualCohorts = _.without(_virtualCohorts, _.findWhere(_virtualCohorts,
         {virtualCohortID: virtualCohort.virtualCohortID}));
-      iViz.session.utils.setVirtualCohorts(virtualCohorts);
+      iViz.session.utils.setVirtualCohorts(_virtualCohorts);
     };
 
-    var localStorageEdit = function(updateVirtualCohort) {
-      var virtualCohorts = iViz.session.utils.getVirtualCohorts();
-      _.extend(_.findWhere(virtualCohorts, {
+    var localStorageEdit_ = function(updateVirtualCohort) {
+      var _virtualCohorts = iViz.session.utils.getVirtualCohorts();
+      _.extend(_.findWhere(_virtualCohorts, {
         virtualCohortID: updateVirtualCohort.virtualCohortID
       }), updateVirtualCohort);
-      iViz.session.utils.setVirtualCohorts(virtualCohorts);
+      iViz.session.utils.setVirtualCohorts(_virtualCohorts);
     };
 
     return {
@@ -65,26 +65,26 @@
         };
         $.ajax({
           type: 'POST',
-          url: url,
+          url: URL,
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(data)
         }).done(function(response) {
-          localStorageAdd(response.id,
+          localStorageAdd_(response.id,
             response.data.virtualCohort);
         }).fail(function() {
-          localStorageAdd(iViz.session.utils.generateUUID(),
+          localStorageAdd_(iViz.session.utils.generateUUID(),
             data.virtualCohort);
         });
       },
       removeSession: function(_virtualCohort) {
         $.ajax({
           type: 'DELETE',
-          url: url + _virtualCohort.virtualCohortID,
+          url: URL + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8'
         }).done(function() {
-          localStorageDelete(_virtualCohort);
+          localStorageDelete_(_virtualCohort);
         }).fail(function() {
-          localStorageDelete(_virtualCohort);
+          localStorageDelete_(_virtualCohort);
         });
       },
       editSession: function(_virtualCohort) {
@@ -93,29 +93,34 @@
         };
         $.ajax({
           type: 'PUT',
-          url: url + _virtualCohort.virtualCohortID,
+          url: URL + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(data)
         }).done(function(response) {
-          localStorageEdit(response.data.virtualCohort);
-        }).fail(function() {
-          localStorageEdit(_virtualCohort);
+          localStorageEdit_(response.data.virtualCohort);
+        }).fail(function(jqXHR) {
+          if (jqXHR.status === 404) {
+            localStorageDelete_(_virtualCohort);
+            iViz.session.model.saveSession(_virtualCohort);
+          } else {
+            localStorageEdit_(_virtualCohort);
+          }
         });
       },
       loadUserVirtualCohorts: function(userID) {
         $.ajax({
           type: 'GET',
-          url: url + 'query/',
+          url: URL + 'query/',
           contentType: 'application/json;charset=UTF-8',
           data: {userid: userID}
         }).done(function(response) {
-          var virtualCohorts = [];
+          var _virtualCohorts = [];
           $.each(response, function(key, val) {
-            var virtualCohort = val.data.virtualCohort;
-            virtualCohort.virtualCohortID = val.id;
-            virtualCohorts.push(virtualCohort);
+            var _virtualCohort = val.data.virtualCohort;
+            _virtualCohort.virtualCohortID = val.id;
+            _virtualCohorts.push(_virtualCohort);
           });
-          iViz.session.utils.setVirtualCohorts(virtualCohorts);
+          iViz.session.utils.setVirtualCohorts(_virtualCohorts);
         }).fail(function() {
           console.log('unable to get user virtual cohorts');
         });
@@ -124,12 +129,11 @@
       getVirtualCohortDetails: function(virtualCohortID) {
         $.ajax({
           type: 'GET',
-          url: url + virtualCohortID,
+          url: URL + virtualCohortID,
           contentType: 'application/json;charset=UTF-8'
         }).done(function(response) {
-          var toReturn = _.omit(response.data.virtualCohort,
+          return _.omit(response.data.virtualCohort,
             ['created', 'userID', 'virtualCohortID']);
-          return toReturn;
         }).fail(function() {
           return null;
         });

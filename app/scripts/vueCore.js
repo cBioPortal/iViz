@@ -38,11 +38,11 @@
   iViz.session = {};
 
   iViz.session.manage = (function() {
-    var vmInstance;
+    var vmInstance_;
 
     return {
       init: function() {
-        vmInstance = new Vue({
+        vmInstance_ = new Vue({
           el: '#main-header',
           data: {
             showVCList: false,
@@ -58,22 +58,22 @@
           }
         });
       },
-      getinstance: function() {
-        if (typeof vmInstance === 'undefined') {
+      getInstance: function() {
+        if (typeof vmInstance_ === 'undefined') {
           this.init();
         }
-        return vmInstance;
+        return vmInstance_;
       }
     };
   })();
 
-  //This is an example to add sample to a virtual cohort from scatter plot
+  // This is an example to add sample to a virtual cohort from scatter plot
   iViz.session.vmScatter = (function() {
-    var vmInstance;
+    var vmInstance_;
 
     return {
       init: function() {
-        vmInstance = new Vue({
+        vmInstance_ = new Vue({
           el: '#scatter-container',
           data: {
             showList: false,
@@ -88,8 +88,11 @@
           }
         });
       },
-      getinstance: function() {
-        return vmInstance;
+      getInstance: function() {
+        if (typeof vmInstance_ === 'undefined') {
+          this.init();
+        }
+        return vmInstance_;
       }
     };
   })();

@@ -51,17 +51,16 @@
   <script src="scripts/views/dcCharts.js"></script>>
   <script src="scripts/views/components/pieChart.js"></script>
   <script src="scripts/views/components/barChart.js"></script>
-  <script src="scripts/vue_core.js"></script>
-  <script src="scripts/controller/session.events.js"></script>
-  <script src="scripts/controller/session.utils.js"></script>
-  <script src="scripts/views/components/editable.field.component.js"></script>
-  <script src="scripts/views/components/editable.row.component.js"></script>
-  <script src="scripts/views/components/modal.template.component.js"></script>
+  <script src="scripts/vueCore.js"></script>
+  <script src="scripts/controller/sessionEvents.js"></script>
+  <script src="scripts/controller/sessionUtils.js"></script>
+  <script src="scripts/views/components/editableFieldComponent.js"></script>
+  <script src="scripts/views/components/editableRowComponent.js"></script>
+  <script src="scripts/views/components/modalTemplate.js"></script>
   <script src="scripts/views/components/addVCPopup.js"></script>
-  <script src="scripts/model/session.service.js"></script>
+  <script src="scripts/model/sessionService.js"></script>
   
   
-  <script src="scripts/views/components/list.modal.js"></script>
   <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
 </head>
 <body>
@@ -126,7 +125,7 @@
   $( document ).ready(function() {
     iViz.session.manage.init();
     iViz.init();
-    url = "http://localhost:8080/api/sessions/";
+    URL = "http://localhost:8080/api/sessions/";
   });
 </script>
 </html>

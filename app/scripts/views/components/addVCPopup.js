@@ -37,9 +37,33 @@
 (function(Vue, iViz) {
   Vue.component('addVc', {
 
-    props: ['addNewVc', 'fromIViz', 'selectedSamplesNum', 'selectedPatientsNum',
-      'name',
-      'description', 'cancerStudyId', 'sample'],
+    props: {
+      addNewVc: {
+        type: Boolean
+      },
+      fromIViz: {
+        type: Boolean
+      },
+      selectedSamplesNum: {
+        type: Number
+      },
+      selectedPatientsNum: {
+        type: Number
+      },
+      name: {
+        type: String,
+        default: 'My Virtual Cohort'
+      },
+      description: {
+        type: String
+      },
+      cancerStudyId: {
+        type: String
+      }, sample: {
+        type: String
+      }
+
+    },
     template: '<modaltemplate :show.sync="addNewVc" size="modal-lg"><div' +
     ' slot="header"><h3 class="modal-title">Save Virtual' +
     ' Cohorts</h3></div><div slot="body"><div' +
@@ -56,19 +80,25 @@
     ' @click="addNewVc = false">Cancel</button><button type="button"' +
     ' class="btn' +
     ' btn-default"@click="saveCohort()">Save</button></div></modaltemplate>',
+    watch: {
+      addNewVc: function() {
+        this.name = 'My Virtual Cohort';
+        this.description = '';
+      }
+    },
     methods: {
       saveCohort: function() {
-        var stats = {};
+        var _stats = {};
         if (this.fromIViz) {
-          stats = iViz.stat();
+          _stats = iViz.stat();
         } else {
-          var _selectedCases = iViz.session.utils.buildCaseListObject(
+          var _selectedCases = iViz.session.utils.buildCaseListObject([],
             this.cancerStudyId,
             this.sample);
-          stats.filters = {};
-          stats.selected_cases = _selectedCases;
+          _stats.filters = {patients: {}, samples: {}};
+          _stats.selected_cases = _selectedCases;
         }
-        iViz.session.events.saveCohort(stats,
+        iViz.session.events.saveCohort(_stats,
           this.selectedPatientsNum, this.selectedSamplesNum, null, this.name,
           this.description || '');
         this.addNewVc = false;
