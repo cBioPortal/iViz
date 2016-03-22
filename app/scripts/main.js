@@ -100,11 +100,15 @@ var iViz = (function() {
           selectedSamples_ = _.pluck(data_.groups.sample.data, 'sample_id');
 
           // --- using vue to show filters in header ---
-          if (typeof vm === "undefined") {
-            vm_ = iViz.session.manage.getinstance();
-            vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, "sample_id").length;
-            vm_.selectedPatientsNum = _.pluck(data_.groups.patient.data, "patient_id").length;
-            vm_.filters = [];
+          if (typeof vm_ === 'undefined') {
+            vm_ = new Vue({
+              el: '#main-header',
+              data: {
+                filters: [],
+                selectedSamplesNum: _.pluck(data_.groups.sample.data, 'sample_id').length,
+                selectedPatientsNum: _.pluck(data_.groups.patient.data, 'patient_id').length
+              }
+            });
           } else {
             vm_.filters = [];
             vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, 'sample_id').length;
