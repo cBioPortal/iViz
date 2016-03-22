@@ -67,7 +67,11 @@ iViz.session.events = (function() {
           studyID: cancerStudyID
         });
         if (typeof match === 'undefined') {
-          var _selectedCase = $.extend(true, {}, selectedCase);
+          var _selectedCase = {
+            studyID: '',
+            samples: [],
+            patients: []
+          };
           _selectedCase.studyID = cancerStudyID;
           _selectedCase.samples.push(sampleID);
           var _selectedCases = [];

@@ -101,10 +101,10 @@ var iViz = (function() {
 
           // --- using vue to show filters in header ---
           if (typeof vm === "undefined") {
-            vm = iViz.session.manage.getinstance();
-            vm.selectedSamplesNum = _.pluck(data.groups.sample.data, "sample_id").length;
-            vm.selectedPatientsNum = _.pluck(data.groups.patient.data, "patient_id").length;
-            vm.filters = [];
+            vm_ = iViz.session.manage.getinstance();
+            vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, "sample_id").length;
+            vm_.selectedPatientsNum = _.pluck(data_.groups.patient.data, "patient_id").length;
+            vm_.filters = [];
           } else {
             vm_.filters = [];
             vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, 'sample_id').length;
