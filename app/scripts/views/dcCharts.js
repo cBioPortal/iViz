@@ -45,7 +45,7 @@ var dcCharts = function (meta, data, mapping, type) {
     transitionDuration: iViz.opts.dc.transitionDuration
   };
 
-  var filters_ = {};
+  var filters_ = {}, chartInsts_ = [];
 
   var ndx_ = crossfilter(data);
 
@@ -115,6 +115,8 @@ var dcCharts = function (meta, data, mapping, type) {
       
       iViz.event.resetAll(_chartInst, _resetBtnId);
       iViz.event.filtered(_chartInst, _attrObj, filters_, type);
+  
+      chartInsts_.push(_chartInst);
 
     }
 
@@ -135,6 +137,24 @@ var dcCharts = function (meta, data, mapping, type) {
     filters: function() {
       return filters_;
     }
+    //applyFilters: function(_filters) {
+    //  _.each(chartInsts_, function(_chartInst) {
+    //    _chartInst.filter(null);
+    //    _chartInst.redraw();
+    //    // extract attr id associates with chart instance
+    //    var _attrId = _chartInst.anchorName().replace("chart-patient_", "");
+    //    _attrId = _attrId.replace("chart-sample_", ""); 
+    //    _.each(Object.keys(_filters), function(_key) {
+    //      if (_key === _attrId) {
+    //        //TODO: detect charts type
+    //        _.each(_filters[_key], function(_filter_item) {
+    //          console.log(_filter_item);
+    //          _chartInst.filter(_filter_item);
+    //        });
+    //      }
+    //    })
+    //  });
+    //}
 
   }
 };
