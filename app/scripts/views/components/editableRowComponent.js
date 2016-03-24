@@ -51,10 +51,10 @@
     ' class="fa fa-pencil"></em></button><button class="btn btn-danger"' +
     ' @click="clickDelete(data)"><em class="fa' +
     ' fa-trash"></em></button><button class="btn btn-success"><em class="fa' +
-    ' fa-share-alt"></em></button><button class="btn btn-default"><em' +
+    ' fa-share-alt"></em></button><button class="btn btn-default" @click="clickImport(data)"><em' +
     ' class="fa fa-filter"></em></button></div></td></tr>',
     props: [
-      'data'
+      'data','showmodal'
     ],
     data: function() {
       return {
@@ -83,6 +83,10 @@
           _virtualStudy.studyName = 'My virtual study';
         }
         iViz.session.events.editVirtualCohort(_virtualStudy);
+      },
+      clickImport: function(_virtualStudy) {
+        this.showmodal = false;
+        iViz.applyVC(_virtualStudy);
       }
     }
   });

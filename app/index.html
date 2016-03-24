@@ -68,64 +68,66 @@
   <script src="scripts/views/components/modalTemplate.js"></script>
   <script src="scripts/views/components/addVCPopup.js"></script>
   <script src="scripts/model/sessionServices.js"></script>
+  <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
   <!-- endbuild -->
+
 </head>
 <body>
 
-  <div class="container-fluid">
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div id="main-header">
-        <a href='javascript:iViz.init();' class='reset'>
-          <button type='button' class='btn btn-default'>Reset All</button>
-        </a>
-        <button type='button' class='btn btn-default'
-                @click="addNewVC = true" 
-                id="save_cohort_btn">Save 
-          Cohort
-        </button>
-        <button type='button' class="btn btn-default" 
-                @click="showVCList = true">
-          <i class="fa fa-bars"></i></button><span id="stat">
+<div class="container-fluid">
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div id="main-header">
+      <a href='javascript:iViz.init();' class='reset'>
+        <button type='button' class='btn btn-default'>Reset All</button>
+      </a>
+      <button type='button' class='btn btn-default'
+              @click="addNewVC = true"
+              id="save_cohort_btn">Save
+        Cohort
+      </button>
+      <button type='button' class="btn btn-default"
+              @click="showVCList = true">
+        <i class="fa fa-bars"></i></button><span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
           Patients Selected <mark>{{ selectedPatientsNum }}</mark>
           <br><span v-for="filter in filters" id="filters-list">{{{ filter.text }}}&nbsp;&nbsp;&nbsp;</span>
         </span>
-        <add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"
-                       :selected-samples-num="selectedSamplesNum" 
-                       :selected-patients-num="selectedPatientsNum"></add-vc>
-        
+      <add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"
+              :selected-samples-num="selectedSamplesNum"
+              :selected-patients-num="selectedPatientsNum"></add-vc>
 
-        <modaltemplate :show.sync="showVCList" size="modal-xlg">
-          <div slot="header">
-            <h4 class="modal-title">Virtual Cohorts</h4>
-          </div>
 
-          <div slot="body">
-            <table class="table table-bordered table-hover table-condensed">
-              <thead>
-              <tr style="font-weight: bold">
-                <td style="width:20%">Name</td>
-                <td style="width:40%">Description</td>
-                <td style="width:10%">Patients</td>
-                <td style="width:10%">Samples</td>
-                <td style="width:20%">Operations</td>
-              </tr>
-              </thead>
-              <tr is="editable-row" :data="virtualCohort" v-for="virtualCohort in virtualCohorts">
-              </tr>
-            </table>
-          </div>
+      <modaltemplate :show.sync="showVCList" size="modal-xlg">
+        <div slot="header">
+          <h4 class="modal-title">Virtual Cohorts</h4>
+        </div>
 
-          <div slot="footer">
-            <button type="button" class="btn btn-default"
-                    onclick="window.location.href='/index.html'">Add new</button>
-          </div>
-          </modaltemplate>
-      </div>
-    </nav>
-    <div class="grid" id="main-grid"></div>
-    <div id="main-bridge" style="display: none;"></div>
-  </div>
+        <div slot="body">
+          <table class="table table-bordered table-hover table-condensed">
+            <thead>
+            <tr style="font-weight: bold">
+              <td style="width:20%">Name</td>
+              <td style="width:40%">Description</td>
+              <td style="width:10%">Patients</td>
+              <td style="width:10%">Samples</td>
+              <td style="width:20%">Operations</td>
+            </tr>
+            </thead>
+            <tr is="editable-row" :data="virtualCohort" :showmodal.sync="showVCList" v-for="virtualCohort in virtualCohorts">
+            </tr>
+          </table>
+        </div>
+
+        <div slot="footer">
+          <!--<button type="button" class="btn btn-default"-->
+                  <!--onclick="window.location.href='/index.html'">Add new</button>-->
+        </div>
+      </modaltemplate>
+    </div>
+  </nav>
+  <div class="grid" id="main-grid"></div>
+  <div id="main-bridge" style="display: none;"></div>
+</div>
 
 </body>
 <script>

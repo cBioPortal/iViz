@@ -37,16 +37,40 @@ var iViz = (function() {
   var data_, vm_, grid_;
 
   return {
-    init: function() {
+    init: function(_inputSampleList, _inputPatientList) {
 
       $('#main-grid').empty();
 
       // TODO: replace with wrapper to assemble data_ from web APIs
-      $.ajax({url: 'data/converted/mixed_tcga.json'})
-        .then(function (_data) {
+      $.ajax(
+          {
+            url: 'data/converted/mixed_tcga.json',
+            sampleList: _inputSampleList,
+            patientList: _inputPatientList
+          }
+        ).then(function (_data) {
 
           data_ = _data;
-
+          
+          //TODO: should filter with setter/getter
+          if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
+            var _sampleData = _.filter(_data.groups.sample.data, function(_dataObj){ return $.inArray(_dataObj['sample_id'], _inputSampleList) !== -1 });
+            var _sampleDataIndices = {}; 
+            for (var _i = 0; _i < _sampleData.length; _i++) {
+              _sampleDataIndices[_sampleData[_i].sample_id] = _i;
+            }
+            var _patientData = _.filter(_data.groups.patient.data, function(_dataObj){ return $.inArray(_dataObj['patient_id'], _inputPatientList) !== -1 });
+            var _patientDataIndices = {};
+            for (var _j = 0; _j < _patientData.length; _j++) {
+              _patientDataIndices[_patientData[_j].patient_id] = _j;
+            }
+  
+            data_.groups.patient.data = _patientData;
+            data_.groups.sample.data = _sampleData;
+            data_.groups.patient.data_indices.patient_id = _patientDataIndices;
+            data_.groups.sample.data_indices.sample_id = _sampleDataIndices;            
+          }
+          
           // ---- fill the empty slots in the data matrix ----
           _.each(data_.groups.patient.data, function(_dataObj) {
             _.each(_.pluck(data_.groups.patient.attr_meta, 'attr_id'), function (_attrId) {
@@ -195,14 +219,17 @@ var iViz = (function() {
     getSelectedPatients: function() {
       return selectedPatients_;
     },
-    applyFitlers: function() {
-      console.log(patientChartsInst_.filters());
-      console.log(sampleChartsInst_.filters());
-    },
-    applySamples: function() {
-      
-      
+    applyVC: function(_vc) { 
+      var _selectedSamples = [], _selectedPatients = [];
+      _.each(_.pluck(_vc.selectedCases, "samples"), function(_arr) {
+        _selectedSamples = _selectedSamples.concat(_arr);
+      });
+      _.each(_.pluck(_vc.selectedCases, "patients"), function(_arr) {
+        _selectedPatients = _selectedPatients.concat(_arr);
+      });   
+      iViz.init(_selectedSamples, _selectedPatients);
     }
+
   }
 }());
 
