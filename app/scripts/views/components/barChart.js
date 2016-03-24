@@ -30,35 +30,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-iViz.view.component.barChart = function() {
+'use strict';
+(function(iViz, dc, _, $, d3) {
+  // iViz pie chart component. It includes DC pie chart.
+  iViz.view.component.barChart = function() {
+    return {
+      init: function(ndx, data, attrObj, settings, chartId) {
+        var _barChartData = _.map(_.filter(_.pluck(data, attrObj.attr_id), function(d) {
+          return d !== 'NA';
+        }), function(d) {
+          return parseFloat(d);
+        });
+        var dim = ndx.dimension(function(d) {
+          return d[attrObj.attr_id];
+        });
+        var countPerFunc = dim.group().reduceCount();
+        var _chartInst;
+        var _min = d3.min(_barChartData);
+        var _max = d3.max(_barChartData);
 
-  return {
-    init: function(ndx, data, attrObj, settings, chartId) {
-      
-      var _barChartData = _.map(_.filter(_.pluck(data, attrObj.attr_id), function (d) {
-        return d !== 'NA'
-      }), function (d) {
-        return parseFloat(d);
-      });
-      var dim = ndx.dimension(function (d) { return d[attrObj.attr_id]; }),
-          countPerFunc = dim.group().reduceCount(), _chartInst;
-      var _min = d3.min(_barChartData), _max = d3.max(_barChartData);
-  
-      _chartInst = dc.barChart('#' + chartId);
-      _chartInst.width(settings.barChart.width)
-        .height(settings.barChart.height)
-        .gap(2)
-        .dimension(dim)
-        .group(countPerFunc)
-        .x(d3.scale.linear().domain([_min * 1.1 - _max * 0.1, _max]))
-        .elasticY(true)
-        .centerBar(true)
-        .xAxisLabel(attrObj.display_name)
-        .margins({top: 10, right: 20, bottom: 50, left: 50});
-      
-      return _chartInst;
-  
-    }
-  }
-  
-}();
+        _chartInst = dc.barChart('#' + chartId);
+        _chartInst.width(settings.barChart.width)
+          .height(settings.barChart.height)
+          .gap(2)
+          .dimension(dim)
+          .group(countPerFunc)
+          .x(d3.scale.linear().domain([_min * 1.1 - _max * 0.1, _max]))
+          .elasticY(true)
+          .centerBar(true)
+          .xAxisLabel(attrObj.display_name)
+          .margins({top: 10, right: 20, bottom: 50, left: 50});
+
+        return _chartInst;
+      }
+    };
+  };
+})(window.iViz,
+  window.dc,
+  window._,
+  window.$ || window.jQuery,
+  window.d3);

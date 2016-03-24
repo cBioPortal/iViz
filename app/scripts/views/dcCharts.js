@@ -102,7 +102,8 @@ var dcCharts = function (meta, data, mapping, type) {
           $('#' + _chartDivId).addClass('grid-item--width2');
           $('#' + _chartId).addClass('dc-bar-chart');
   
-          _chartInst = iViz.view.component.barChart.init(ndx_, data, _attrObj, settings_, _chartId);
+          var _barChart = new iViz.view.component.barChart();
+          _chartInst = _barChart.init(ndx_, data, _attrObj, settings_, _chartId);
 
           break;
 
