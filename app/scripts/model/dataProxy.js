@@ -29,3 +29,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+'use strict';
+(function(iViz, $) {
+  iViz.data = {};
+  iViz.data.init = function(_callbackFunc, _inputSampleList, _inputPatientList) {
+    $.ajax(
+      {
+        url: 'data/converted/mixed_tcga.json',
+        sampleList: _inputSampleList,
+        patientList: _inputPatientList
+      }
+    ).then(function(_data) {
+      _callbackFunc(_data, _inputSampleList, _inputPatientList);
+    });
+  }
+}(window.iViz, window.$));
