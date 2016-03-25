@@ -30,6 +30,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * @author suny1@mskcc.org on 3/15/16.
+ */
+
 'use strict';
 (function(iViz, $) {
   iViz.data = {};

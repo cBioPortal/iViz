@@ -30,134 +30,125 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var dcCharts = function (meta, data, mapping, type) {
+/**
+ * @author suny1@mskcc.org on 3/15/16.
+ */
 
-  var settings_ = {
-    pieChart: {
-      width: 150,
-      height: 150,
-      innerRadius: 15
-    },
-    barChart: {
-      width: 400,
-      height: 180
-    },
-    transitionDuration: iViz.opts.dc.transitionDuration
-  };
-
-  var filters_ = {}, chartInsts_ = [];
-
-  var ndx_ = crossfilter(data);
-
-  // ---- a separate sample/patient id chart for sync use only ----
-  var chartInvisible_ = iViz.bridgeChart.init(ndx_, settings_, type);
-
-  // ---- automatically create charts by iterating attributes meta ----
-  _.each(meta, function (_attrObj) {
-
-    if ($.inArray(_attrObj.view_type, ['pie_chart', 'bar_chart']) !== -1) { //TODO: remove this, should be able to handle all view types
-
-      var _chartDivId = 'chart-' + _attrObj.attr_id + _attrObj.attr_type + '-' + '-div',
+'use strict';
+(function(iViz, dc, _, $) {
+  
+  iViz.dcCharts = function (meta, data, mapping, type) {
+    
+    var settings_ = {
+      pieChart: {
+        width: 150,
+        height: 150,
+        innerRadius: 15
+      },
+      barChart: {
+        width: 400,
+        height: 180
+      },
+      transitionDuration: iViz.opts.dc.transitionDuration
+    };
+    
+    var filters_ = {}, chartInsts_ = [];
+    
+    var ndx_ = crossfilter(data);
+    
+    // ---- a separate sample/patient id chart for sync use only ----
+    var chartInvisible_ = iViz.bridgeChart.init(ndx_, settings_, type);
+    
+    // ---- automatically create charts by iterating attributes meta ----
+    _.each(meta, function (_attrObj) {
+      
+      if ($.inArray(_attrObj.view_type, ['pie_chart', 'bar_chart']) !== -1) { //TODO: remove this, should be able to handle all view types
+        
+        var _chartDivId = 'chart-' + _attrObj.attr_id + _attrObj.attr_type + '-' + '-div',
           _resetBtnId = 'chart-' + _attrObj.attr_id + _attrObj.attr_type + '-' + '-reset',
           _chartId = 'chart-' + _attrObj.attr_type + '_' + _attrObj.attr_id;
-
-      // append html element
-      // TODO: replace with template
-      $('#main-grid').append(
-        '<div id="' + _chartDivId + '">' +
-        '<a id="' + _resetBtnId + '">Reset</a>' +
-        '<i class="fa fa-arrows dc-chart-drag"></i>' +
-        '<div class="dc-chart" id="' + _chartId + '"></div>' +
-        '</div>'
-      );
-      
-      // init and define dc chart instances based on chart types
-      var _chartInst;
-      switch (_attrObj.view_type) {
-
-        case 'pie_chart':
-
-          $('#' + _chartDivId).addClass('grid-item');
-          $('#' + _chartId).addClass('dc-pie-chart');
-
-          var _pieChart = new iViz.view.component.pieChart();
-          var _data = $.extend(true, {}, _attrObj);
+        
+        // append html element
+        // TODO: replace with template
+        $('#main-grid').append(
+          '<div id="' + _chartDivId + '">' +
+          '<a id="' + _resetBtnId + '">Reset</a>' +
+          '<i class="fa fa-arrows dc-chart-drag"></i>' +
+          '<div class="dc-chart" id="' + _chartId + '"></div>' +
+          '</div>'
+        );
+        
+        // init and define dc chart instances based on chart types
+        var _chartInst;
+        switch (_attrObj.view_type) {
           
-          _data.ndx = ndx_;
-          _pieChart.init(_data, {
-            divId: _chartId,
-            width: settings_.pieChart.width,
-            height: settings_.pieChart.height,
-            transitionDuration: settings_.transitionDuration
-          });
-          _chartInst = _pieChart.getChart();
-
-          $('#' + _chartId).append('<p class="text-center">' + _attrObj.display_name + '</p>');
-
-          break;
-
-        case 'bar_chart':
-  
-          $('#' + _chartDivId).addClass('grid-item');
-          $('#' + _chartDivId).addClass('grid-item--width2');
-          $('#' + _chartId).addClass('dc-bar-chart');
-  
-          var _barChart = new iViz.view.component.barChart();
-          _chartInst = _barChart.init(ndx_, data, _attrObj, settings_, _chartId);
-
-          break;
-
-        case 'scatter_plots':
-          break;
-        case 'table':
-          break;
-
+          case 'pie_chart':
+            
+            $('#' + _chartDivId).addClass('grid-item');
+            $('#' + _chartId).addClass('dc-pie-chart');
+            
+            var _pieChart = new iViz.view.component.pieChart();
+            var _data = $.extend(true, {}, _attrObj);
+            
+            _data.ndx = ndx_;
+            _pieChart.init(_data, {
+              divId: _chartId,
+              width: settings_.pieChart.width,
+              height: settings_.pieChart.height,
+              transitionDuration: settings_.transitionDuration
+            });
+            _chartInst = _pieChart.getChart();
+            
+            $('#' + _chartId).append('<p class="text-center">' + _attrObj.display_name + '</p>');
+            
+            break;
+          
+          case 'bar_chart':
+            
+            $('#' + _chartDivId).addClass('grid-item');
+            $('#' + _chartDivId).addClass('grid-item--width2');
+            $('#' + _chartId).addClass('dc-bar-chart');
+            
+            var _barChart = new iViz.view.component.barChart();
+            _chartInst = _barChart.init(ndx_, data, _attrObj, settings_, _chartId);
+            
+            break;
+          
+          case 'scatter_plots':
+            break;
+          case 'table':
+            break;
+          
+        }
+        
+        iViz.event.resetAll(_chartInst, _resetBtnId);
+        iViz.event.filtered(_chartInst, _attrObj, filters_, type);
+        
+        chartInsts_.push(_chartInst);
+        
       }
       
-      iViz.event.resetAll(_chartInst, _resetBtnId);
-      iViz.event.filtered(_chartInst, _attrObj, filters_, type);
+      return this;
+      
+    });
+    
+    return {
+      reset: function () {
+        dc.redrawAll();
+        iViz.view.grid.layout();
+      },
+      sync: function(_selected_cases) {
+        chartInvisible_.filter(null);
+        _.each(_selected_cases, function(_case_id) {
+          chartInvisible_.filter(_case_id);
+        });
+      },
+      filters: function() {
+        return filters_;
+      }
+    }
+  };
   
-      chartInsts_.push(_chartInst);
-
-    }
-
-  });
-
-  return {
-
-    reset: function () {
-      dc.redrawAll();
-      iViz.view.grid.layout();
-    },
-    sync: function(_selected_cases) {
-      chartInvisible_.filter(null);
-      _.each(_selected_cases, function(_case_id) {
-        chartInvisible_.filter(_case_id);
-      });
-    },
-    filters: function() {
-      return filters_;
-    }
-    //applyFilters: function(_filters) {
-    //  _.each(chartInsts_, function(_chartInst) {
-    //    _chartInst.filter(null);
-    //    _chartInst.redraw();
-    //    // extract attr id associates with chart instance
-    //    var _attrId = _chartInst.anchorName().replace("chart-patient_", "");
-    //    _attrId = _attrId.replace("chart-sample_", ""); 
-    //    _.each(Object.keys(_filters), function(_key) {
-    //      if (_key === _attrId) {
-    //        //TODO: detect charts type
-    //        _.each(_filters[_key], function(_filter_item) {
-    //          console.log(_filter_item);
-    //          _chartInst.filter(_filter_item);
-    //        });
-    //      }
-    //    })
-    //  });
-    //}
-
-  }
-};
+}(window.iViz, window.dc, window._, window.$));  
 
 

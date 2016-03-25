@@ -30,14 +30,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var iViz = (function () {
+var iViz = (function(_, $) {
   
-  var patientChartsInst_, sampleChartsInst_;
-  var selectedPatients_ = [], selectedSamples_ = [];
-  var data_, vm_, grid_;
+  var patientChartsInst_;
+  var sampleChartsInst_;
+  var selectedPatients_ = [];
+  var selectedSamples_ = [];
+  var data_;
+  var vm_;
+  var grid_;
   
   return {
-    init: function (_inputSampleList, _inputPatientList) {
+    init: function(_inputSampleList, _inputPatientList) {
       
       $('#main-grid').empty();
       
@@ -47,7 +51,7 @@ var iViz = (function () {
         
         data_ = _data;
         
-        //TODO: should filter with setter/getter
+        // TODO: should filter with setter/getter
         if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
           var _sampleData = _.filter(_data.groups.sample.data, function (_dataObj) {
             return $.inArray(_dataObj['sample_id'], _inputSampleList) !== -1
@@ -87,13 +91,13 @@ var iViz = (function () {
         });
         
         // ----  init and define dc chart instances ----
-        patientChartsInst_ = new dcCharts(
+        patientChartsInst_ = new iViz.dcCharts(
           data_.groups.patient.attr_meta,
           data_.groups.patient.data,
           data_.groups.group_mapping,
           'patient'
         );
-        sampleChartsInst_ = new dcCharts(
+        sampleChartsInst_ = new iViz.dcCharts(
           data_.groups.sample.attr_meta,
           data_.groups.sample.data,
           data_.groups.group_mapping,
@@ -123,7 +127,7 @@ var iViz = (function () {
         selectedSamples_ = _.pluck(data_.groups.sample.data, 'sample_id');
         
         // --- using vue to show filters in header ---
-        if (typeof vm === "undefined") {
+        if (typeof vm_ === "undefined") {
           vm_ = iViz.session.manage.getInstance();
           vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, 'sample_id').length;
           vm_.selectedPatientsNum = _.pluck(data_.groups.patient.data, 'patient_id').length;
@@ -160,7 +164,7 @@ var iViz = (function () {
           _selectedCases.push({'studyID': _studyId, 'samples': [_selectedSample]});
         }
         
-        //map samples to patients
+        // map samples to patients
         _.each(_selectedCases, function (_resultObj) {
           _resultObj['patients'] = iViz.util.idMapping(data_.groups.group_mapping.sample.patient, _resultObj['samples']);
         });
@@ -230,7 +234,7 @@ var iViz = (function () {
     }
     
   }
-}());
+}(window._, window.$));
 
 
 

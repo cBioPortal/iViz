@@ -30,44 +30,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Functions responding to events */
+/**
+ * @author suny1@mskcc.org on 3/15/16.
+ */
 
-iViz.event = (function() {
-  return {
-
-    resetAll: function(chartInst, resetBtnId) {
+'use strict';
+(function(iViz, dc){
+  
+    iViz.event = {};
+  
+    iViz.event.resetAll = function(chartInst, resetBtnId) {
       d3.select('a#' + resetBtnId).on('click', function () {
         chartInst.filterAll();
         dc.redrawAll();
       });
-    },
-    filtered: function(chartInst, attrObj, filters, type) {
+    }  
+  
+    iViz.event.filtered = function(chartInst, attrObj, filters, type) {
       chartInst.on('filtered', function (_chartInst, filter) {
-    
+        
         if (filter === null) { //filter comes in as null when clicking 'reset'
-      
-          //remove all filters applied to this particular attribute
+          
+          // remove all filters applied to this particular attribute
           filters[attrObj.attr_id] = [];
           filters[attrObj.attr_id].length = 0;
           delete filters[attrObj.attr_id];
-      
+          
           // call callback function to handle the sync between chart groups
           iViz.sync.callBack(type === 'patient' ? 'sample' : 'patient');
-      
+          
         } else {
-      
+          
           if (attrObj.view_type === 'bar_chart') {
-        
+            
             //delay event trigger for bar charts
             dc.events.trigger(function() {
               filters[attrObj.attr_id] = filter;
-          
+              
               // call callback function to handle the sync between chart groups
               iViz.sync.callBack(type === 'patient' ? 'sample' : 'patient');
             }, 0);
-        
+            
           } else if (attrObj.view_type === 'pie_chart') {
-        
+            
             // update existing filter category
             if (filters.hasOwnProperty(attrObj.attr_id)) {
               //add filter
@@ -82,20 +87,19 @@ iViz.event = (function() {
                   delete filters[attrObj.attr_id];
                 }
               }
-          
+              
             } else {
               // add new filter category
               filters[attrObj.attr_id] = [filter];
             }
-        
+            
             // call callback function to handle the sync between chart groups
             iViz.sync.callBack(type === 'patient' ? 'sample' : 'patient');
-        
+            
           }
         }
-    
+        
       }); // --- closing active filter recording
-    }
-    
-  }
-}());
+    }  
+
+} (window.iViz, window.dc));

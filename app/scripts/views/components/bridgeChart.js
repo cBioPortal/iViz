@@ -30,36 +30,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! 
-  Invisible charts functioning as bridges between different chart groups 
-  Each chart group has its own invisible chart, consisting of sample/patient ids 
-*/
+/**
+ * @author suny1@mskcc.org on 3/15/16.
+ *
+ * Invisible charts functioning as bridges between different chart groups
+ * Each chart group has its own invisible chart, consisting of sample/patient ids
+ *
+ */
 
-iViz.bridgeChart = function() {
-  return {
-    
-    init: function(ndx, settings, type) {
-      var dimHide, countPerFuncHide;
-      if (type === 'patient') {
-        dimHide = ndx.dimension(function (d) { return d.patient_id; }),
-          countPerFuncHide = dimHide.group().reduceCount();
-      } else if (type === 'sample') {
-        dimHide = ndx.dimension(function (d) { return d.sample_id; }),
-          countPerFuncHide = dimHide.group().reduceCount();
-      }
-      $('#main-bridge').append(
-        '<div class="grid-item" id="' + type + '_id_chart_div">' +
-        '<div class="dc-chart dc-pie-chart" id="' + type +'_id_chart"></div>' +
-        "</div>"
-      );
-      var _chartInvisible = dc.pieChart('#' + type + '_id_chart');
-      _chartInvisible.width(settings.pieChart.width)
-        .height(settings.pieChart.height)
-        .dimension(dimHide)
-        .group(countPerFuncHide)
-        .innerRadius(settings.pieChart.innerRadius);
-      return _chartInvisible;
+'use strict';
+(function($, dc) {
+  iViz.bridgeChart = {};
+  iViz.bridgeChart.init = function(ndx, settings, type) {
+    var dimHide, countPerFuncHide;
+    if (type === 'patient') {
+      dimHide = ndx.dimension(function (d) { return d.patient_id; }),
+        countPerFuncHide = dimHide.group().reduceCount();
+    } else if (type === 'sample') {
+      dimHide = ndx.dimension(function (d) { return d.sample_id; }),
+        countPerFuncHide = dimHide.group().reduceCount();
     }
-
+    $('#main-bridge').append(
+      '<div class="grid-item" id="' + type + '_id_chart_div">' +
+      '<div class="dc-chart dc-pie-chart" id="' + type +'_id_chart"></div>' +
+      "</div>"
+    );
+    var _chartInvisible = dc.pieChart('#' + type + '_id_chart');
+    _chartInvisible.width(settings.pieChart.width)
+      .height(settings.pieChart.height)
+      .dimension(dimHide)
+      .group(countPerFuncHide)
+      .innerRadius(settings.pieChart.innerRadius);
+    return _chartInvisible;
   }
-}();
+  return iViz.bridgeChart;
+}(window.$, window.dc));
