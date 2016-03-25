@@ -38,14 +38,40 @@
 (function(iViz, $) {
   iViz.data = {};
   iViz.data.init = function(_callbackFunc, _inputSampleList, _inputPatientList) {
-    $.ajax(
-      {
-        url: 'data/converted/mixed_tcga.json',
-        sampleList: _inputSampleList,
-        patientList: _inputPatientList
-      }
-    ).then(function(_data) {
-      _callbackFunc(_data, _inputSampleList, _inputPatientList);
-    });
+  
+    var _result = {};
+    var PORTAL_INST_URL = 'http://localhost:8080/cbioportal';
+    var _sampleData = [], _patientData = [], _sampleMeta = [], _patientMeta = [];
+  
+    // ajax calls
+    $.post(PORTAL_INST_URL + '/api/clinicalattributes/patients', {study_id: 'ucec_tcga_pub'}, function(_clinAttrMetaUcecPatient) {
+      var _clinAttrIdsUcecPatient = _.pluck(_clinAttrMetaUcecPatient, 'attr_id');
+      $.post(PORTAL_INST_URL + '/api/clinicaldata/patients', {study_id: 'ucec_tcga_pub', attribute_ids: _clinAttrIdsUcecPatient.join(',')}, function(_clinDataUcecPatient) {
+        $.post(PORTAL_INST_URL + '/api/clinicalattributes/samples', {study_id: 'ucec_tcga_pub'}, function(_clinAttrMetaUcecSample) {
+          var _clinAttrIdsUcecSample = _.pluck(_clinAttrMetaUcecSample, 'attr_id');
+          $.post(PORTAL_INST_URL + '/api/clinicaldata/samples', {study_id: 'ucec_tcga_pub', attribute_ids: _clinAttrIdsUcecSample.join(',')}, function(_clinDataUcecSample) {
+            $.post(PORTAL_INST_URL + '/api/clinicalattributes/patients', {study_id: 'ov_tcga_pub'}, function(_clinAttrMetaOvPatient) {
+              var _clinAttrIdsOvPatient = _.pluck(_clinAttrMetaOvPatient, 'attr_id');
+              $.post(PORTAL_INST_URL + '/api/clinicaldata/patients', {study_id: 'ov_tcga_pub', attribute_ids: _clinAttrIdsOvPatient.join(',')}, function(_clinDataOvPatient) {
+                $.post(PORTAL_INST_URL + '/api/clinicalattributes/samples', {study_id: 'ov_tcga_pub'}, function(_clinAttrMetaOvSample) {
+                  var _clinAttrIdsUOvSample = _.pluck(_clinAttrMetaOvSample, 'attr_id');
+                  $.post(PORTAL_INST_URL + '/api/clinicaldata/samples', {study_id: 'ov_tcga_pub', attribute_ids: _clinAttrIdsUOvSample.join(',')}, function(_clinDataOvSample) {
+                    _sampleData = _.union(_clinDataUcecSample, _clinDataOvSample);
+                    _patientData = _.union(_clinDataUcecPatient, _clinDataOvPatient);
+                    _sampleMeta = _.uniq(_.union(_clinAttrMetaUcecSample, _clinAttrMetaOvSample), 'attr_id');
+                    _patientMeta = _.uniq(_.union(_clinAttrMetaUcecPatient, _clinAttrMetaOvPatient), 'attr_id');
+                  }, "json");
+                }, "json");
+              }, "json");
+            }, "json");
+          }, "json");
+        }, "json");
+      }, "json");
+    }, "json");
+    
+    // converting web API results
+    _result.groups.patient.attr_meta = _patientMeta;
+    _result.groups.sample.attr_meta = _sampleMeta;
+  
   }
 }(window.iViz, window.$));
