@@ -62,7 +62,8 @@
           ],
           "location": "start"
         }
-      ]
+      ],
+      "block-scoped-var": 0
     }
   }
 }
