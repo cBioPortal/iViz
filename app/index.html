@@ -34,6 +34,7 @@
   <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
   <script src="/bower_components/vue/dist/vue.js"></script>
   <script src="/bower_components/notifyjs/dist/notify.js"></script>
+  <script src="/bower_components/clipboard/dist/clipboard.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
   
@@ -132,9 +133,13 @@
 </body>
 <script>
   $( document ).ready(function() {
+    URL = "http://localhost:8080/api/sessions/";
+    var vcId_ = location.search.split('vc_id=')[1];
     iViz.session.manage.init();
     iViz.init();
-    URL = "http://localhost:8080/api/sessions/";
+    if (typeof vcId_ != 'undefined') {
+      iViz.session.model.getVirtualCohortDetails(vcId_)
+    }
   });
 </script>
 </html>

@@ -34,9 +34,13 @@
  */
 
 'use strict';
-(function(Vue, iViz) {
+(function(Vue, iViz, $, Clipboard) {
+  var clipboard = null;
+  $(document).on('mouseleave', '.btn-share', function(e) {
+    $(e.currentTarget).removeClass('tooltipped tooltipped-s');
+    $(e.currentTarget).removeAttr('aria-label');
+  });
   Vue.component('editableRow', {
-    // template: '#editable-row',
     template: '<tr><td class="text center" ><editable-field' +
     ' :name.sync="data.studyName" :edit="edit" type="text"/></td><td' +
     ' class="text center" ><editable-field :name.sync="data.description"' +
@@ -47,19 +51,43 @@
     ' @click="clickSave(data)"><em class="fa fa-save"></em></button><button' +
     ' class="btn btn-default" @click="clickCancel()"><em class="fa' +
     ' fa-times"></em></button></div><div class="buttons" :class="{view:' +
-    ' edit}"><button class="btn btn-info"  @click="clickEdit(data)"><em' +
-    ' class="fa fa-pencil"></em></button><button class="btn btn-danger"' +
+    ' !share}"><div class="input-group"><input id="link-to-share"' +
+    ' v-model="shortenedLink"><button class="btn btn-default btn-share" ' +
+    ' data-clipboard-action="copy" data-clipboard-text={{shortenedLink}}><em' +
+    ' class="fa fa-clipboard" alt="Copy to clipboard"></em></button><button' +
+    ' class="btn btn-default" @click="clickCancel()"><em class="fa' +
+    ' fa-times"></em></button></div></div><div class="buttons"' +
+    ' :class="{view: edit||share}"><button class="btn btn-info"' +
+    ' @click="clickEdit(data)"><em class="fa' +
+    ' fa-pencil"></em></button><button class="btn btn-danger"' +
     ' @click="clickDelete(data)"><em class="fa' +
-    ' fa-trash"></em></button><button class="btn btn-success"><em class="fa' +
-    ' fa-share-alt"></em></button><button class="btn btn-default" @click="clickImport(data)"><em' +
-    ' class="fa fa-filter"></em></button></div></td></tr>',
+    ' fa-trash"></em></button><button class="btn btn-success"' +
+    ' @click="clickShare(data)"><em class="fa' +
+    ' fa-share-alt"></em></button><button class="btn btn-default"' +
+    ' @click="clickImport(data)"><em class="fa' +
+    ' fa-filter"></em></button></div></td></tr>',
     props: [
-      'data','showmodal'
+      'data', 'showmodal'
     ],
     data: function() {
       return {
-        edit: false
+        edit: false,
+        share: false,
+        shortenedLink: '---'
       };
+    },
+    ready: function() {
+      var classname = document.getElementsByClassName('btn-share');
+      if (clipboard !== null) {
+        clipboard.destroy();
+      }
+      clipboard = new Clipboard(classname);
+      clipboard.on('success', function(e) {
+        showTooltip(e.trigger, 'Copied');
+      });
+      clipboard.on('error', function(e) {
+        showTooltip(e.trigger, 'Unable to copy');
+      });
     },
     methods: {
       clickEdit: function(_virtualStudy) {
@@ -71,8 +99,10 @@
         if (this.edit) {
           this.data.studyName = this.backupName;
           this.data.description = this.backupDesc;
+          this.edit = false;
+        } else if (this.share) {
+          this.share = false;
         }
-        this.edit = false;
       },
       clickDelete: function(_virtualStudy) {
         iViz.session.events.removeVirtualCohort(_virtualStudy);
@@ -87,7 +117,24 @@
       clickImport: function(_virtualStudy) {
         this.showmodal = false;
         iViz.applyVC(_virtualStudy);
+      },
+      clickShare: function(_virtualStudy) {
+        // TODO: Create Bitly URL
+        var completeURL = window.location.host + '/?vc_id=' +
+          _virtualStudy.virtualCohortID;
+        this.shortenedLink = completeURL;
+        this.share = true;
       }
     }
   });
-})(window.Vue, window.iViz);
+  /**
+   * This method add tooltip when copy button is clicked
+   * @param {Object} elem trigger object
+   * @param {String} msg message to show
+   */
+  function showTooltip(elem, msg) {
+    $(elem).addClass('tooltipped tooltipped-s');
+    $(elem).attr('aria-label', msg);
+  }
+})(window.Vue, window.iViz,
+  window.$ || window.jQuery, window.Clipboard);
