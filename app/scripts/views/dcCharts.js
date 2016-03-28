@@ -139,9 +139,11 @@
       },
       sync: function(_selected_cases) {
         chartInvisible_.filter(null);
-        _.each(_selected_cases, function(_case_id) {
-          chartInvisible_.filter(_case_id);
-        });
+        //_.each(_selected_cases, function(_case_id) {
+        //  chartInvisible_.filter(_case_id);
+        //});
+        chartInvisible_.filter(_selected_cases);
+
       },
       filters: function() {
         return filters_;
