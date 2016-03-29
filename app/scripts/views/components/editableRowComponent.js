@@ -76,19 +76,6 @@
         shortenedLink: '---'
       };
     },
-    ready: function() {
-      var classname = document.getElementsByClassName('btn-share');
-      if (clipboard !== null) {
-        clipboard.destroy();
-      }
-      clipboard = new Clipboard(classname);
-      clipboard.on('success', function(e) {
-        showTooltip(e.trigger, 'Copied');
-      });
-      clipboard.on('error', function(e) {
-        showTooltip(e.trigger, 'Unable to copy');
-      });
-    },
     methods: {
       clickEdit: function(_virtualStudy) {
         this.backupName = _virtualStudy.studyName;
@@ -124,6 +111,12 @@
           _virtualStudy.virtualCohortID;
         this.shortenedLink = completeURL;
         this.share = true;
+        // Check if ClipBoard instance is present, If yes re-initialize the
+        // instance.
+        if (clipboard instanceof Clipboard) {
+          clipboard.destroy();
+        }
+        initializeClipBoard();
       }
     }
   });
@@ -135,6 +128,20 @@
   function showTooltip(elem, msg) {
     $(elem).addClass('tooltipped tooltipped-s');
     $(elem).attr('aria-label', msg);
+  }
+
+  /**
+   * Initialize Clipboard instance
+   */
+  function initializeClipBoard(){
+    var classname = document.getElementsByClassName('btn-share');
+    clipboard = new Clipboard(classname);
+    clipboard.on('success', function(e) {
+      showTooltip(e.trigger, 'Copied');
+    });
+    clipboard.on('error', function(e) {
+      showTooltip(e.trigger, 'Unable to copy');
+    });
   }
 })(window.Vue, window.iViz,
   window.$ || window.jQuery, window.Clipboard);
