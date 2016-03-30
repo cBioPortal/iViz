@@ -41,14 +41,16 @@ var iViz = (function(_, $) {
   var grid_;
   
   return {
-    init: function(_inputSampleList, _inputPatientList) {
-      
+    init: function(_studyIdArr, _inputSampleList, _inputPatientList) {
+  
       $('#main-grid').empty();
+      $('#main-grid').append('<img src="images/ajax-loader.gif" style="padding:200px;"/>');
       
-      iViz.data.init(dataInitCallbackFunc_, _inputSampleList, _inputPatientList);
+      iViz.data.init(_studyIdArr, dataInitCallbackFunc_, _inputSampleList, _inputPatientList);
       
       function dataInitCallbackFunc_(_data, _inputSampleList, _inputPatientList) {
-        
+  
+        $('#main-grid').empty();
         data_ = _data;
         
         // TODO: should filter with setter/getter
@@ -230,7 +232,7 @@ var iViz = (function(_, $) {
       _.each(_.pluck(_vc.selectedCases, "patients"), function (_arr) {
         _selectedPatients = _selectedPatients.concat(_arr);
       });
-      iViz.init(_selectedSamples, _selectedPatients);
+      iViz.init(["ucec_tcga_pub", "ov_tcga_pub"], _selectedSamples, _selectedPatients);
     }
     
   }

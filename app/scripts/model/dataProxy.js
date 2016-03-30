@@ -37,283 +37,163 @@
 'use strict';
 (function(iViz, $) {
   iViz.data = {};
-  iViz.data.init = function(_callbackFunc, _inputSampleList, _inputPatientList) {
-  
+  iViz.data.init = function(_studyIdArr, _callbackFunc, _inputSampleList, _inputPatientList) {
     var _result = {};
-    var PORTAL_INST_URL = 'http://localhost:8080/cbioportal';
-    var _ajaxSampleMeta = [], _ajaxPatientMeta = [];
-  
-    //$.when(
-    //
-    //  $.ajax({
-    //    method: "POST",
-    //    url: PORTAL_INST_URL + '/api/clinicalattributes/patients',
-    //    data: {study_id: 'ucec_tcga_pub'}
-    //  }),
-    //
-    //  $.ajax({
-    //    method: "POST",
-    //    url: PORTAL_INST_URL + '/api/clinicalattributes/patients',
-    //    data: {study_id: 'ov_tcga_pub'}
-    //  }),
-    //
-    //  $.ajax({
-    //    method: "POST",
-    //    url: PORTAL_INST_URL + '/api/clinicalattributes/samples',
-    //    data: {study_id: 'ucec_tcga_pub'}
-    //  }),
-    //
-    //  $.ajax({
-    //    method: "POST",
-    //    url: PORTAL_INST_URL + '/api/clinicalattributes/samples',
-    //    data: {study_id: 'ov_tcga_pub'}
-    //  })
-    //    
-    //).done(function(_clinAttrMetaUcecPatient, _clinAttrMetaOvPatient, _clinAttrMetaUcecSample, _clinAttrMetaOvSample) {
-    //    
-    //    var _clinAttrIdsUcecPatient = _.pluck(_clinAttrMetaUcecPatient[0], 'attr_id');
-    //    var _clinAttrIdsUcecSample = _.pluck(_clinAttrMetaUcecSample[0], 'attr_id');
-    //    var _clinAttrIdsOvPatient = _.pluck(_clinAttrMetaOvPatient[0], 'attr_id');
-    //    var _clinAttrIdsOvSample = _.pluck(_clinAttrMetaOvSample[0], 'attr_id');
-    //    
-    //    $.when(
-    //
-    //      $.ajax({
-    //        method: "POST",
-    //        url: PORTAL_INST_URL + '/api/clinicaldata/patients',
-    //        data: {study_id: 'ucec_tcga_pub', attribute_ids: _clinAttrIdsUcecPatient.join(',')}
-    //      }),
-    //
-    //      $.ajax({
-    //        method: "POST",
-    //        url: PORTAL_INST_URL + '/api/clinicaldata/patients',
-    //        data: {study_id: 'ov_tcga_pub', attribute_ids: _clinAttrIdsOvPatient.join(',')}
-    //      }),
-    //
-    //      $.ajax({
-    //        method: "POST",
-    //        url: PORTAL_INST_URL + '/api/clinicaldata/samples',
-    //        data: {study_id: 'ucec_tcga_pub', attribute_ids: _clinAttrIdsUcecSample.join(',')}
-    //      }),
-    //
-    //      $.ajax({
-    //        method: "POST",
-    //        url: PORTAL_INST_URL + '/api/clinicaldata/samples',
-    //        data: {study_id: 'ov_tcga_pub', attribute_ids: _clinAttrIdsOvSample.join(',')}
-    //      }),
-    //      
-    //      $.ajax({
-    //        method: "POST",
-    //        url: PORTAL_INST_URL + '/webservice.do?',
-    //        data: {cmd: 'getPatientSampleMapping', cancer_study_id: 'ucec_tcga_pub', case_set_id: 'ucec_tcga_pub_all'}
-    //      }),
-    //
-    //      $.ajax({
-    //        method: "POST",
-    //        url: PORTAL_INST_URL + '/webservice.do?',
-    //        data: {cmd: 'getPatientSampleMapping', cancer_study_id: 'ov_tcga_pub', case_set_id: 'ov_tcga_pub_all'}
-    //      })
-    //      
-    //    ).done(function(_clinDataUcecPatient, _clinDataOvPatient, _clinDataUcecSample, _clinDataOvSample, _ajaxIdMappingObjUcec, _ajaxIdMappingObjOv) {
-    //
-    //        // add in study id as an attribute
-    //        _ajaxPatientMeta.push({
-    //          "datatype": "STRING",
-    //          "description": "Cancer Types",
-    //          "display_name": "Cancer Types",
-    //          "attr_id": "study_id",
-    //          "view_type": "pie_chart"
-    //        });
-    //        
-    //        _ajaxSampleMeta = _ajaxSampleMeta.concat(_.uniq(_.union(_clinAttrMetaUcecSample[0], _clinAttrMetaOvSample[0]), 'attr_id'));
-    //        _ajaxPatientMeta = _ajaxPatientMeta.concat(_.uniq(_.union(_clinAttrMetaUcecPatient[0], _clinAttrMetaOvPatient[0]), 'attr_id'));
-    //       
-    //        // define view type from data type
-    //        _.each(_ajaxSampleMeta, function(_metaObj) {
-    //          if (_metaObj.datatype === "NUMBER") {
-    //            _metaObj.view_type = 'bar_chart';
-    //          } else if (_metaObj.datatype === "STRING") {
-    //            _metaObj.view_type = 'pie_chart';
-    //          }
-    //        });
-    //
-    //        _.each(_ajaxPatientMeta, function(_metaObj) {
-    //          if (_metaObj.datatype === "NUMBER") {
-    //            _metaObj.view_type = 'bar_chart';
-    //          } else if (_metaObj.datatype === "STRING") {
-    //            _metaObj.view_type = 'pie_chart';
-    //          }
-    //        });
-    //
-    //        // converting web API results
-    //        var _jointSample2PatientMapping = {}, _jointPatient2SampleMapping = {};
-    //        $.extend(_jointPatient2SampleMapping, _ajaxIdMappingObjUcec[0], _ajaxIdMappingObjOv[0]);
-    //        var _jointSampleData = [];
-    //        $.each([_clinDataUcecSample[0], _clinDataOvSample[0]], function(_index, _dataGroup) {
-    //          var _sampleIds = _.uniq(_.pluck(_dataGroup, 'sample_id'));
-    //          _.each(_sampleIds, function(_sampleId) {
-    //            var _datum = {};
-    //            _datum.study_id = (_index === 0) ? "ucec_tcga_pub" : "ov_tcga_pub";
-    //            _datum.sample_id = _sampleId;
-    //            _.each(_dataGroup, function(_dataObj) {
-    //              if (_dataObj['sample_id'] === _sampleId) {
-    //                _datum[_dataObj.attr_id] = _dataObj.attr_val;
-    //              }
-    //            });
-    //            _jointSample2PatientMapping[_sampleId] = [_sampleId.substring(0, _sampleId.length - 3)];
-    //            _jointSampleData.push(_datum);
-    //          });
-    //        });
-    //        var _jointPatientData = [];
-    //        $.each([_clinDataUcecPatient[0], _clinDataOvPatient[0]], function(_index, _dataGroup) {
-    //          var _patientIds = _.uniq(_.pluck(_dataGroup, 'patient_id'));
-    //          _.each(_patientIds, function(_patientId) {
-    //            var _datum = {};
-    //            _datum.study_id = (_index === 0) ? "ucec_tcga_pub" : "ov_tcga_pub";
-    //            _datum.patient_id = _patientId;
-    //            _.each(_dataGroup, function(_dataObj) {
-    //              if (_dataObj['patient_id'] === _patientId) {
-    //                _datum[_dataObj.attr_id] = _dataObj.attr_val;
-    //              }
-    //            });
-    //            _jointPatientData.push(_datum);
-    //          });
-    //        });
-    //        
-    //        _result.groups = {};
-    //        _result.groups.patient = {};
-    //        _result.groups.sample = {};
-    //        _result.groups.group_mapping = {};
-    //        _result.groups.patient.attr_meta = _ajaxPatientMeta;
-    //        _result.groups.sample.attr_meta = _ajaxSampleMeta;
-    //        _result.groups.patient.data = _jointPatientData;
-    //        _result.groups.sample.data = _jointSampleData;
-    //        _result.groups.group_mapping.sample = {};
-    //        _result.groups.group_mapping.patient = {};
-    //        _result.groups.group_mapping.sample.patient = _jointSample2PatientMapping;
-    //        _result.groups.group_mapping.patient.sample = _jointPatient2SampleMapping;
-    //
-    //        _callbackFunc(_result, _inputSampleList, _inputPatientList);
-    //        
-    //    });
-    //
-    //});
-
-    // ajax calls
-    $.post(PORTAL_INST_URL + '/api/clinicalattributes/patients', {study_id: 'ucec_tcga_pub'}, function(_clinAttrMetaUcecPatient) {
-      var _clinAttrIdsUcecPatient = _.pluck(_clinAttrMetaUcecPatient, 'attr_id');
-      $.post(PORTAL_INST_URL + '/api/clinicaldata/patients', {study_id: 'ucec_tcga_pub', attribute_ids: _clinAttrIdsUcecPatient.join(',')}, function(_clinDataUcecPatient) {
-        $.post(PORTAL_INST_URL + '/api/clinicalattributes/samples', {study_id: 'ucec_tcga_pub'}, function(_clinAttrMetaUcecSample) {
-          var _clinAttrIdsUcecSample = _.pluck(_clinAttrMetaUcecSample, 'attr_id');
-          $.post(PORTAL_INST_URL + '/api/clinicaldata/samples', {study_id: 'ucec_tcga_pub', attribute_ids: _clinAttrIdsUcecSample.join(',')}, function(_clinDataUcecSample) {
-            $.post(PORTAL_INST_URL + '/api/clinicalattributes/patients', {study_id: 'ov_tcga_pub'}, function(_clinAttrMetaOvPatient) {
-              var _clinAttrIdsOvPatient = _.pluck(_clinAttrMetaOvPatient, 'attr_id');
-              $.post(PORTAL_INST_URL + '/api/clinicaldata/patients', {study_id: 'ov_tcga_pub', attribute_ids: _clinAttrIdsOvPatient.join(',')}, function(_clinDataOvPatient) {
-                $.post(PORTAL_INST_URL + '/api/clinicalattributes/samples', {study_id: 'ov_tcga_pub'}, function(_clinAttrMetaOvSample) {
-                  var _clinAttrIdsUOvSample = _.pluck(_clinAttrMetaOvSample, 'attr_id');
-                  $.post(PORTAL_INST_URL + '/api/clinicaldata/samples', {study_id: 'ov_tcga_pub', attribute_ids: _clinAttrIdsUOvSample.join(',')}, function(_clinDataOvSample) {
-                    $.post(PORTAL_INST_URL + '/webservice.do?', {cmd: 'getPatientSampleMapping', cancer_study_id: 'ucec_tcga_pub', case_set_id: 'ucec_tcga_pub_all'}, function(_ajaxIdMappingObjUcec) {
-                      $.post(PORTAL_INST_URL + '/webservice.do?', {cmd: 'getPatientSampleMapping', cancer_study_id: 'ov_tcga_pub', case_set_id: 'ov_tcga_pub_all'}, function(_ajaxIdMappingObjOv) {
-    
-                        // add in study id as an attribute
-                        _ajaxPatientMeta.push({
-                          "datatype": "STRING",
-                          "description": "Cancer Types",
-                          "display_name": "Cancer Types",
-                          "attr_id": "study_id",
-                          "view_type": "pie_chart"
-                        });
-                        
-                        _ajaxSampleMeta = _ajaxSampleMeta.concat(_.uniq(_.union(_clinAttrMetaUcecSample, _clinAttrMetaOvSample), 'attr_id'));
-                        _ajaxPatientMeta = _ajaxPatientMeta.concat(_.uniq(_.union(_clinAttrMetaUcecPatient, _clinAttrMetaOvPatient), 'attr_id'));
-                       
-                        // define view type from data type
-                        _.each(_ajaxSampleMeta, function(_metaObj) {
-                          if (_metaObj.datatype === "NUMBER") {
-                            _metaObj.view_type = 'bar_chart';
-                          } else if (_metaObj.datatype === "STRING") {
-                            _metaObj.view_type = 'pie_chart';
-                          }
-                        });
-    
-                        _.each(_ajaxPatientMeta, function(_metaObj) {
-                          if (_metaObj.datatype === "NUMBER") {
-                            _metaObj.view_type = 'bar_chart';
-                          } else if (_metaObj.datatype === "STRING") {
-                            _metaObj.view_type = 'pie_chart';
-                          }
-                        });
-      
-                        // create mapping and indices
-                        var _jointSample2PatientMapping = {}, _jointPatient2SampleMapping = {};
-                        var _indexSample = 0, _indexPatient = 0, _patientDataIndicesObj = {}, _sampleDataIndicesObj = {};
-                        $.extend(_jointPatient2SampleMapping, _ajaxIdMappingObjUcec, _ajaxIdMappingObjOv);
-                        var _jointSampleData = [];
-                        $.each([_clinDataUcecSample, _clinDataOvSample], function(_index, _dataGroup) {
-                          var _sampleIds = _.uniq(_.pluck(_dataGroup, 'sample_id'));
-                          _.each(_sampleIds, function(_sampleId) {
-                            var _datum = {};
-                            _datum.study_id = (_index === 0) ? "ucec_tcga_pub" : "ov_tcga_pub";
-                            _datum.sample_id = _sampleId;
-                            _.each(_dataGroup, function(_dataObj) {
-                              if (_dataObj['sample_id'] === _sampleId) {
-                                _datum[_dataObj.attr_id] = _dataObj.attr_val;
-                              }
-                            });
-                            _sampleDataIndicesObj[_sampleId] = _indexSample;
-                            _indexSample += 1;
-                            _jointSample2PatientMapping[_sampleId] = [_sampleId.substring(0, _sampleId.length - 3)];
-                            _jointSampleData.push(_datum);
-                          });
-                        });
-                        var _jointPatientData = [];
-                        $.each([_clinDataUcecPatient, _clinDataOvPatient], function(_index, _dataGroup) {
-                          var _patientIds = _.uniq(_.pluck(_dataGroup, 'patient_id'));
-                          _.each(_patientIds, function(_patientId) {
-                            var _datum = {};
-                            _datum.study_id = (_index === 0) ? "ucec_tcga_pub" : "ov_tcga_pub";
-                            _datum.patient_id = _patientId;
-                            _.each(_dataGroup, function(_dataObj) {
-                              if (_dataObj['patient_id'] === _patientId) {
-                                _datum[_dataObj.attr_id] = _dataObj.attr_val;
-                              }
-                            });
-                            _patientDataIndicesObj[_patientId] = _indexPatient;
-                            _indexPatient += 1;
-                            _jointPatientData.push(_datum);
-                          });
-                        });
-                        
-                        _result.groups = {};
-                        _result.groups.patient = {};
-                        _result.groups.sample = {};
-                        _result.groups.group_mapping = {};
-                        _result.groups.patient.attr_meta = _ajaxPatientMeta;
-                        _result.groups.sample.attr_meta = _ajaxSampleMeta;
-                        _result.groups.patient.data = _jointPatientData;
-                        _result.groups.sample.data = _jointSampleData;
-                        _result.groups.patient.data_indices = {};
-                        _result.groups.sample.data_indices = {};
-                        _result.groups.patient.data_indices.patient_id = _patientDataIndicesObj;
-                        _result.groups.sample.data_indices.sample_id = _sampleDataIndicesObj;
-                        _result.groups.group_mapping.sample = {};
-                        _result.groups.group_mapping.patient = {};
-                        _result.groups.group_mapping.sample.patient = _jointSample2PatientMapping;
-                        _result.groups.group_mapping.patient.sample = _jointPatient2SampleMapping;
-                        
-                        _callbackFunc(_result, _inputSampleList, _inputPatientList);
-                        
-                      }, "json");
-                    }, "json");                    
-                  }, "json");
-                }, "json");
-              }, "json");
-            }, "json");
-          }, "json");
-        }, "json");
-      }, "json");
-    }, "json");
-
+    var PORTAL_INST_URL = 'http://172.21.133.152:8080/cbioportal';
+    // ---- ajax cascade ----
+    var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
+        _ajaxSampleData = [], _ajaxPatientData = [],
+        _ajaxPatient2SampleIdMappingObj = {}, _ajaxSample2PatientIdMappingObj = {};
+    // patient clinical attribute meta
+    $.when.apply($, _studyIdArr.map(function(_studyId) {
+      return $.ajax({
+        method: "POST",
+        url: PORTAL_INST_URL + '/api/clinicalattributes/patients',
+        data: {study_id: _studyId}
+      });
+    })).done(function() {
+      // add in study id as an attribute
+      _ajaxPatientMeta.push({
+        "datatype": "STRING",
+        "description": "Cancer Types",
+        "display_name": "Cancer Types",
+        "attr_id": "study_id",
+        "view_type": "pie_chart"
+      });
+      var _results = [];
+      for (var i = 0; i < arguments.length; i++) {
+        _results = _results.concat(arguments[i][0]);
+      }
+      _ajaxPatientMeta = _ajaxPatientMeta.concat(_.uniq(_results, 'attr_id'));
+      // sample clinical attribute meta
+      $.when.apply($, _studyIdArr.map(function(_studyId) {
+        return $.ajax({
+          method: "POST",
+          url: PORTAL_INST_URL + '/api/clinicalattributes/samples',
+          data: {study_id: _studyId}
+        });
+      })).done(function() {
+        var _results = [];
+        for (var i = 0; i < arguments.length; i++) {
+          _results = _results.concat(arguments[i][0]);
+        }
+        _ajaxSampleMeta = _.uniq(_results, 'attr_id');
+        // patient clinical data
+        $.when.apply($, _studyIdArr.map(function(_studyId) {
+          return $.ajax({
+            method: "POST",
+            url: PORTAL_INST_URL + '/api/clinicaldata/patients',
+            data: {study_id: _studyId, attribute_ids: _.pluck(_ajaxPatientMeta, 'attr_id').join(',')}
+          });
+        })).done(function() {
+          var _results = [];
+          for (var i = 0; i < arguments.length; i++) {
+            _.each(arguments[i][0], function(_dataObj) {
+              // TODO: allow web API to take multi study Ids
+              _dataObj.study_id = _studyIdArr[i];
+            });
+            _results = _results.concat(arguments[i][0]);
+          }
+          _ajaxPatientData = _results;
+          // sample clinical data
+          $.when.apply($, _studyIdArr.map(function(_studyId) {
+            return $.ajax({
+              method: "POST",
+              url: PORTAL_INST_URL + '/api/clinicaldata/samples',
+              data: {study_id: _studyId, attribute_ids: _.pluck(_ajaxSampleMeta, 'attr_id').join(',')}
+            });
+          })).done(function() {
+            var _results = [];
+            for (var i = 0; i < arguments.length; i++) {
+              _.each(arguments[i][0], function(_dataObj) {
+                // TODO: allow web API to take multi study Ids
+                _dataObj.study_id = _studyIdArr[i];
+              });
+              _results = _results.concat(arguments[i][0]);
+            }
+            _ajaxSampleData = _results;
+            // id mapping
+            $.when.apply($, _studyIdArr.map(function(_studyId) {
+              return $.ajax({
+                method: "POST",
+                url: PORTAL_INST_URL + '/webservice.do?',
+                data: {cmd: 'getPatientSampleMapping', cancer_study_id: _studyId, case_set_id: _studyId + '_all'}
+              });
+            })).done(function() {
+              for (var i = 0; i < arguments.length; i++) {
+                _ajaxPatient2SampleIdMappingObj = $.extend({}, JSON.parse(arguments[i][0]), _ajaxPatient2SampleIdMappingObj);
+              }
+              // --- web API results converting ---- 
+              var _patientData = [], _sampleData = [];
+              var _patientIds = _.uniq(_.pluck(_ajaxPatientData, 'patient_id'));
+              var _sampleIds = _.uniq(_.pluck(_ajaxSampleData, 'sample_id'));
+              var _indexSample = 0, _sampleDataIndicesObj = {};
+              _.each(_sampleIds, function(_sampleId) {
+                var _datum = {};
+                _datum['sample_id'] = _sampleId;
+                _.each(_ajaxSampleData, function(_dataObj) {
+                  if (_dataObj['sample_id'] === _sampleId) {
+                    _datum[_dataObj['attr_id']] = _dataObj['attr_val'];
+                    _datum['study_id'] = _dataObj['study_id'];
+                  }
+                });
+                // TODO: using API to get mapping from sample to patient
+                _ajaxSample2PatientIdMappingObj[_sampleId] = [_sampleId.substring(0, _sampleId.length - 3)];
+                _sampleDataIndicesObj[_sampleId] = _indexSample;
+                _indexSample += 1;
+                _sampleData.push(_datum);
+              });
+              var _indexPatient = 0, _patientDataIndicesObj = {};
+              _.each(_patientIds, function(_patientId) {
+                var _datum = {};
+                _datum['patient_id'] = _patientId;
+                _.each(_ajaxPatientData, function(_dataObj) {
+                  if (_dataObj['patient_id'] === _patientId) {
+                    _datum[_dataObj['attr_id']] = _dataObj['attr_val'];
+                    _datum['study_id'] = _dataObj['study_id'];
+                  }
+                });
+                _patientDataIndicesObj[_patientId] = _indexPatient;
+                _indexPatient += 1;
+                _patientData.push(_datum);
+              });
+              // define view type from data type
+              _.each(_ajaxSampleMeta, function(_metaObj) {
+                if (_metaObj.datatype === "NUMBER") {
+                  _metaObj.view_type = 'bar_chart';
+                } else if (_metaObj.datatype === "STRING") {
+                  _metaObj.view_type = 'pie_chart';
+                }
+              });
+              _.each(_ajaxPatientMeta, function(_metaObj) {
+                if (_metaObj.datatype === "NUMBER") {
+                  _metaObj.view_type = 'bar_chart';
+                } else if (_metaObj.datatype === "STRING") {
+                  _metaObj.view_type = 'pie_chart';
+                }
+              });
+              _result.groups = {};
+              _result.groups.patient = {};
+              _result.groups.sample = {};
+              _result.groups.group_mapping = {};
+              _result.groups.patient.attr_meta = _ajaxPatientMeta;
+              _result.groups.sample.attr_meta = _ajaxSampleMeta;
+              _result.groups.patient.data = _patientData;
+              _result.groups.sample.data = _sampleData;
+              _result.groups.patient.data_indices = {};
+              _result.groups.sample.data_indices = {};
+              _result.groups.patient.data_indices.patient_id = _patientDataIndicesObj;
+              _result.groups.sample.data_indices.sample_id = _sampleDataIndicesObj;
+              _result.groups.group_mapping.sample = {};
+              _result.groups.group_mapping.patient = {};
+              _result.groups.group_mapping.sample.patient = _ajaxSample2PatientIdMappingObj;
+              _result.groups.group_mapping.patient.sample = _ajaxPatient2SampleIdMappingObj;
+              _callbackFunc(_result, _inputSampleList, _inputPatientList);
+            });
+          });
+        });
+      });
+    });
   
   }
 }(window.iViz, window.$));

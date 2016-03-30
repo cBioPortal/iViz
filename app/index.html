@@ -78,7 +78,7 @@
 <div class="container-fluid">
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header">
-      <a href='javascript:iViz.init();' class='reset'>
+      <a href='javascript:iViz.init(["ucec_tcga_pub", "ov_tcga_pub"]);' class='reset'>
         <button type='button' class='btn btn-default'>Reset All</button>
       </a>
       <button type='button' class='btn btn-default'
@@ -134,7 +134,7 @@
 <script>
   $( document ).ready(function() {
     iViz.session.manage.init();
-    iViz.init();
+    iViz.init(["ucec_tcga_pub", "ov_tcga_pub"]);
     URL = "http://localhost:8080/api/sessions/";
   });
 </script>
