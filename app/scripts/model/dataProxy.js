@@ -31,19 +31,29 @@
  */
 
 /**
- * @author suny1@mskcc.org on 3/15/16.
+ * @author suny1@mskcc.org on 3/30/16.
+ * 
+ * retriving results in JSON from web APIs and converting/assemble to iViz format
+ * 
  */
 
 'use strict';
 (function(iViz, $) {
+  
   iViz.data = {};
+  
+  // TODO: enable grabing data from sample id list (when importing cohort)
   iViz.data.init = function(_studyIdArr, _callbackFunc, _inputSampleList, _inputPatientList) {
+    
     var _result = {};
     var PORTAL_INST_URL = 'http://172.21.133.152:8080/cbioportal';
+    
     // ---- ajax cascade ----
+    
     var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
         _ajaxSampleData = [], _ajaxPatientData = [],
         _ajaxPatient2SampleIdMappingObj = {}, _ajaxSample2PatientIdMappingObj = {};
+    
     // patient clinical attribute meta
     $.when.apply($, _studyIdArr.map(function(_studyId) {
       return $.ajax({
@@ -52,6 +62,7 @@
         data: {study_id: _studyId}
       });
     })).done(function() {
+    
       // add in study id as an attribute
       _ajaxPatientMeta.push({
         "datatype": "STRING",
@@ -60,11 +71,13 @@
         "attr_id": "study_id",
         "view_type": "pie_chart"
       });
+    
       var _results = [];
       for (var i = 0; i < arguments.length; i++) {
         _results = _results.concat(arguments[i][0]);
       }
       _ajaxPatientMeta = _ajaxPatientMeta.concat(_.uniq(_results, 'attr_id'));
+    
       // sample clinical attribute meta
       $.when.apply($, _studyIdArr.map(function(_studyId) {
         return $.ajax({
@@ -78,6 +91,7 @@
           _results = _results.concat(arguments[i][0]);
         }
         _ajaxSampleMeta = _.uniq(_results, 'attr_id');
+    
         // patient clinical data
         $.when.apply($, _studyIdArr.map(function(_studyId) {
           return $.ajax({
@@ -95,6 +109,7 @@
             _results = _results.concat(arguments[i][0]);
           }
           _ajaxPatientData = _results;
+    
           // sample clinical data
           $.when.apply($, _studyIdArr.map(function(_studyId) {
             return $.ajax({
@@ -112,6 +127,7 @@
               _results = _results.concat(arguments[i][0]);
             }
             _ajaxSampleData = _results;
+    
             // id mapping
             $.when.apply($, _studyIdArr.map(function(_studyId) {
               return $.ajax({
@@ -123,6 +139,7 @@
               for (var i = 0; i < arguments.length; i++) {
                 _ajaxPatient2SampleIdMappingObj = $.extend({}, JSON.parse(arguments[i][0]), _ajaxPatient2SampleIdMappingObj);
               }
+    
               // --- web API results converting ---- 
               var _patientData = [], _sampleData = [];
               var _patientIds = _.uniq(_.pluck(_ajaxPatientData, 'patient_id'));
@@ -157,6 +174,7 @@
                 _indexPatient += 1;
                 _patientData.push(_datum);
               });
+
               // define view type from data type
               _.each(_ajaxSampleMeta, function(_metaObj) {
                 if (_metaObj.datatype === "NUMBER") {
@@ -172,6 +190,7 @@
                   _metaObj.view_type = 'pie_chart';
                 }
               });
+
               _result.groups = {};
               _result.groups.patient = {};
               _result.groups.sample = {};
@@ -188,7 +207,9 @@
               _result.groups.group_mapping.patient = {};
               _result.groups.group_mapping.sample.patient = _ajaxSample2PatientIdMappingObj;
               _result.groups.group_mapping.patient.sample = _ajaxPatient2SampleIdMappingObj;
+              
               _callbackFunc(_result, _inputSampleList, _inputPatientList);
+            
             });
           });
         });
