@@ -69,6 +69,7 @@
   <script src="scripts/views/components/modalTemplate.js"></script>
   <script src="scripts/views/components/addVCPopup.js"></script>
   <script src="scripts/model/sessionServices.js"></script>
+  <script src="scripts/model/dataProxy.js"></script>
   <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
   <!-- endbuild -->
 
@@ -78,7 +79,7 @@
 <div class="container-fluid">
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header">
-      <a href='javascript:iViz.init();' class='reset'>
+      <a href='javascript:iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"]);' class='reset'>
         <button type='button' class='btn btn-default'>Reset All</button>
       </a>
       <button type='button' class='btn btn-default'
@@ -136,7 +137,7 @@
     URL = "http://localhost:8080/api/sessions/";
     var vcId_ = location.search.split('vc_id=')[1];
     iViz.session.manage.init();
-    iViz.init();
+    iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"]);
     if (typeof vcId_ != 'undefined') {
       iViz.session.model.getVirtualCohortDetails(vcId_)
     }
