@@ -127,15 +127,12 @@
       },
 
       getVirtualCohortDetails: function(virtualCohortID) {
-        $.ajax({
-          type: 'GET',
-          url: URL + virtualCohortID,
-          contentType: 'application/json;charset=UTF-8'
-        }).done(function(response) {
-          return _.omit(response.data.virtualCohort,
-            ['created', 'userID', 'virtualCohortID']);
+        $.getJSON(URL + virtualCohortID, function(response) {
+          iViz.applyVC(_.omit(response.data.virtualCohort,
+            ['created', 'userID', 'virtualCohortID']));
+          jQuery.notify('Imported Virtual Cohort', 'success');
         }).fail(function() {
-          return null;
+          jQuery.notify('Error While importing Virtual Cohort', 'error');
         });
       }
     };

@@ -34,6 +34,7 @@
   <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
   <script src="/bower_components/vue/dist/vue.js"></script>
   <script src="/bower_components/notifyjs/dist/notify.js"></script>
+  <script src="/bower_components/clipboard/dist/clipboard.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
   
@@ -48,10 +49,10 @@
   <!-- endbuild -->
   
   <!-- build:css(.tmp) styles/main.css -->
-  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/main.css" />
   <!-- endbuild -->
 
-  <!-- build:js(.) scripts/scripts.js -->
+  <!-- build:js scripts/scripts.js -->
   <script src="scripts/main.js"></script>
   <script src="scripts/controller/util.js"></script>
   <script src="scripts/controller/sync.js"></script>
@@ -133,9 +134,13 @@
 </body>
 <script>
   $( document ).ready(function() {
+    URL = "http://localhost:8080/api/sessions/";
+    var vcId_ = location.search.split('vc_id=')[1];
     iViz.session.manage.init();
     iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"]);
-    URL = "http://localhost:8080/api/sessions/";
+    if (typeof vcId_ != 'undefined') {
+      iViz.session.model.getVirtualCohortDetails(vcId_)
+    }
   });
 </script>
 </html>
