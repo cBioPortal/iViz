@@ -60,13 +60,16 @@
     var chartInvisible_ = iViz.bridgeChart.init(ndx_, settings_, type);
     
     // ---- automatically create charts by iterating attributes meta ----
-    _.each(meta, function (_attrObj) {
+    var _chartCount = 0;
+    $.each(meta, function (_index, _attrObj) {
       
       if ($.inArray(_attrObj.view_type, ['pie_chart', 'bar_chart']) !== -1) { //TODO: remove this, should be able to handle all view types
         
-        var _chartDivId = 'chart-' + _attrObj.attr_id + _attrObj.attr_type + '-' + '-div',
-          _resetBtnId = 'chart-' + _attrObj.attr_id + _attrObj.attr_type + '-' + '-reset',
-          _chartId = 'chart-' + _attrObj.attr_type + '_' + _attrObj.attr_id;
+        _chartCount += 1;
+        
+        var _chartDivId = 'chart-' + _attrObj.attr_id.replace(/\(|\)/g, "") + '-' + _attrObj.attr_type + '-div',
+          _resetBtnId = 'chart-' + _attrObj.attr_id.replace(/\(|\)/g, "") + '-' + _attrObj.attr_type + '-reset',
+          _chartId = 'chart-' + _attrObj.attr_type + '_' + _attrObj.attr_id.replace(/\(|\)/g, "");
         
         // append html element
         // TODO: replace with template

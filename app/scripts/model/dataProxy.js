@@ -42,11 +42,10 @@
   
   iViz.data = {};
   
-  // TODO: enable grabing data from sample id list (when importing cohort)
   iViz.data.init = function(_studyIdArr, _callbackFunc, _inputSampleList, _inputPatientList) {
     
     var _result = {};
-    var PORTAL_INST_URL = 'http://172.21.133.152:8080/cbioportal';
+    var PORTAL_INST_URL = 'http://localhost:8080/cbioportal';
     
     // ---- ajax cascade ----
     
@@ -94,6 +93,11 @@
     
         // patient clinical data
         $.when.apply($, _studyIdArr.map(function(_studyId) {
+  
+          // Only store less than 32 attributes (due to limitation of crossfilter)
+          // TODO: set priority for attributes
+          _ajaxPatientMeta = _ajaxPatientMeta.splice(0, 31);
+         
           return $.ajax({
             method: "POST",
             url: PORTAL_INST_URL + '/api/clinicaldata/patients',
@@ -102,16 +106,16 @@
         })).done(function() {
           var _results = [];
           for (var i = 0; i < arguments.length; i++) {
-            _.each(arguments[i][0], function(_dataObj) {
-              // TODO: allow web API to take multi study Ids
-              _dataObj.study_id = _studyIdArr[i];
-            });
             _results = _results.concat(arguments[i][0]);
           }
           _ajaxPatientData = _results;
     
           // sample clinical data
           $.when.apply($, _studyIdArr.map(function(_studyId) {
+            
+            // Only store less than 32 attributes (due to limitation of crossfilter)
+            // TODO: set priority for attributes
+            _ajaxSampleMeta = _ajaxSampleMeta.splice(0, 31);
             return $.ajax({
               method: "POST",
               url: PORTAL_INST_URL + '/api/clinicaldata/samples',
@@ -120,10 +124,6 @@
           })).done(function() {
             var _results = [];
             for (var i = 0; i < arguments.length; i++) {
-              _.each(arguments[i][0], function(_dataObj) {
-                // TODO: allow web API to take multi study Ids
-                _dataObj.study_id = _studyIdArr[i];
-              });
               _results = _results.concat(arguments[i][0]);
             }
             _ajaxSampleData = _results;
@@ -190,7 +190,7 @@
                   _metaObj.view_type = 'pie_chart';
                 }
               });
-
+              
               _result.groups = {};
               _result.groups.patient = {};
               _result.groups.sample = {};

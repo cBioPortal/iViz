@@ -76,7 +76,7 @@ var iViz = (function(_, $) {
           data_.groups.sample.data_indices.sample_id = _sampleDataIndices;
         }
         
-        // ---- fill the empty slots in the data matrix ----
+        // ---- generating data matrix & fill the empty slots ----
         _.each(data_.groups.patient.data, function (_dataObj) {
           _.each(_.pluck(data_.groups.patient.attr_meta, 'attr_id'), function (_attrId) {
             if (!_dataObj.hasOwnProperty(_attrId)) {
