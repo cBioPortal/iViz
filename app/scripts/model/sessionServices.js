@@ -132,7 +132,16 @@
             ['created', 'userID', 'virtualCohortID']));
           jQuery.notify('Imported Virtual Cohort', 'success');
         }).fail(function() {
-          jQuery.notify('Error While importing Virtual Cohort', 'error');
+          var virtualCohort_ = _.findWhere(iViz.session.utils.getVirtualCohorts(), {
+            virtualCohortID: virtualCohortID
+          });
+          if (virtualCohort_ !== undefined) {
+            iViz.applyVC(_.omit(virtualCohort_,
+              ['created', 'userID', 'virtualCohortID']));
+            jQuery.notify('Imported Virtual Cohort', 'success');
+          } else {
+            jQuery.notify('Error While importing Virtual Cohort', 'error');
+          }
         });
       }
     };
