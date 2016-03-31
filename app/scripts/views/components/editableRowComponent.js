@@ -51,12 +51,14 @@
     ' @click="clickSave(data)"><em class="fa fa-save"></em></button><button' +
     ' class="btn btn-default" @click="clickCancel()"><em class="fa' +
     ' fa-times"></em></button></div><div class="buttons" :class="{view:' +
-    ' !share}"><div class="input-group"><input id="link-to-share"' +
-    ' v-model="shortenedLink"><button class="btn btn-default btn-share" ' +
+    ' !share}"><div class="input-group"> ' +
+    '<input type="text" id="link-to-share" class="form-control"' +
+    'v-model="shortenedLink" disabled><span class="input-group-btn">' +
+    '<button class="btn btn-default btn-share" ' +
     ' data-clipboard-action="copy" data-clipboard-text={{shortenedLink}}><em' +
     ' class="fa fa-clipboard" alt="Copy to clipboard"></em></button><button' +
     ' class="btn btn-default" @click="clickCancel()"><em class="fa' +
-    ' fa-times"></em></button></div></div><div class="buttons"' +
+    ' fa-times"></em></button></span></div></div><div class="buttons"' +
     ' :class="{view: edit||share}"><button class="btn btn-info"' +
     ' @click="clickEdit(data)"><em class="fa' +
     ' fa-pencil"></em></button><button class="btn btn-danger"' +
@@ -64,8 +66,7 @@
     ' fa-trash"></em></button><button class="btn btn-success"' +
     ' @click="clickShare(data)"><em class="fa' +
     ' fa-share-alt"></em></button><button class="btn btn-default"' +
-    ' @click="clickImport(data)"><em class="fa' +
-    ' fa-filter"></em></button></div></td></tr>',
+    ' @click="clickImport(data)">Visualize</button></div></td></tr>',
     props: [
       'data', 'showmodal'
     ],
