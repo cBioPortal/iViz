@@ -45,7 +45,8 @@
   iViz.data.init = function(_studyIdArr, _callbackFunc, _inputSampleList, _inputPatientList) {
     
     var _result = {};
-    var PORTAL_INST_URL = 'http://localhost:8080/cbioportal';
+    //var PORTAL_INST_URL = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1];
+    var PORTAL_INST_URL = "http://localhost:8080/cbioportal";
     
     // ---- ajax cascade ----
     
@@ -154,8 +155,15 @@
                     _datum['study_id'] = _dataObj['study_id'];
                   }
                 });
-                // TODO: using API to get mapping from sample to patient
-                _ajaxSample2PatientIdMappingObj[_sampleId] = [_sampleId.substring(0, _sampleId.length - 3)];
+                // map from sample to patient
+                _.each(Object.keys(_ajaxPatient2SampleIdMappingObj), function(_tmpPatientId) {
+                  var _sampleIdArr = _ajaxPatient2SampleIdMappingObj[_tmpPatientId];
+                  _.each(_sampleIdArr, function(_tmpSampleId) {
+                    if (_tmpSampleId === _sampleId) {
+                      _ajaxSample2PatientIdMappingObj[_sampleId] = _tmpPatientId;
+                    }
+                  });
+                });
                 _sampleDataIndicesObj[_sampleId] = _indexSample;
                 _indexSample += 1;
                 _sampleData.push(_datum);

@@ -66,10 +66,10 @@
       if ($.inArray(_attrObj.view_type, ['pie_chart', 'bar_chart']) !== -1) { //TODO: remove this, should be able to handle all view types
         
         _chartCount += 1;
-        
-        var _chartDivId = 'chart-' + _attrObj.attr_id.replace(/\(|\)/g, "") + '-' + _attrObj.attr_type + '-div',
-          _resetBtnId = 'chart-' + _attrObj.attr_id.replace(/\(|\)/g, "") + '-' + _attrObj.attr_type + '-reset',
-          _chartId = 'chart-' + _attrObj.attr_type + '_' + _attrObj.attr_id.replace(/\(|\)/g, "");
+  
+        var _chartDivId = 'chart-' + _attrObj.attr_id.replace(/\(|\)/g, "").replace(/ /g,"_") + '-' + _attrObj.attr_type + '-div',
+          _resetBtnId = 'chart-' + _attrObj.attr_id.replace(/\(|\)/g, "").replace(/ /g,"_") + '-' + _attrObj.attr_type + '-reset',
+          _chartId = 'chart-' + _attrObj.attr_type + '_' + _attrObj.attr_id.replace(/\(|\)/g, "").replace(/ /g,"_");
         
         // append html element
         // TODO: replace with template
