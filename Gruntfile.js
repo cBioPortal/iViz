@@ -8,8 +8,7 @@
 // If you want to recursively match all subfolders, use:
 // 'test/spec/**/*.js'
 
-module.exports = function (grunt) {
-
+module.exports = function(grunt) {
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
 
@@ -37,7 +36,7 @@ module.exports = function (grunt) {
         tasks: ['wiredep']
       },
       babel: {
-        files: ['<%= config.app %>/scripts/{,*/}*.js'],
+        files: ['<%= config.app %>/scripts/**/*.js'],
         tasks: ['babel:dist']
       },
       babelTest: {
@@ -238,7 +237,16 @@ module.exports = function (grunt) {
     // additional tasks can operate on them
     useminPrepare: {
       options: {
-        dest: '<%= config.dist %>'
+        dest: '<%= config.dist %>',
+        flow: {
+          html: {
+            steps: {
+              js: ['concat', 'uglifyjs'],
+              css: ['cssmin']
+            },
+            post: {}
+          }
+        }
       },
       html: '<%= config.app %>/index.html'
     },
@@ -291,7 +299,10 @@ module.exports = function (grunt) {
           removeOptionalTags: true,
           // true would impact styles with attribute selectors
           removeRedundantAttributes: false,
-          useShortDoctype: true
+          useShortDoctype: true,
+          customAttrSurround: [
+            [/@/, /(?:)/]
+          ]
         },
         files: [{
           expand: true,
@@ -348,6 +359,12 @@ module.exports = function (grunt) {
           cwd: '.',
           src: 'bower_components/bootstrap-sass/assets/fonts/bootstrap/*',
           dest: '<%= config.dist %>'
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '.',
+          src: 'bower_components/components-font-awesome/fonts/*',
+          dest: '<%= config.dist %>'
         }]
       }
     },
@@ -387,29 +404,28 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.registerTask('serve', 'start the server and preview your app',
+    function(target) {
+      if (target === 'dist') {
+        return grunt.task.run(['build', 'browserSync:dist']);
+      }
 
-  grunt.registerTask('serve', 'start the server and preview your app', function (target) {
+      grunt.task.run([
+        'clean:server',
+        'wiredep',
+        'concurrent:server',
+        'postcss',
+        'browserSync:livereload',
+        'watch'
+      ]);
+    });
 
-    if (target === 'dist') {
-      return grunt.task.run(['build', 'browserSync:dist']);
-    }
-
-    grunt.task.run([
-      'clean:server',
-      'wiredep',
-      'concurrent:server',
-      'postcss',
-      'browserSync:livereload',
-      'watch'
-    ]);
-  });
-
-  grunt.registerTask('server', function (target) {
+  grunt.registerTask('server', function(target) {
     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
     grunt.task.run([target ? ('serve:' + target) : 'serve']);
   });
 
-  grunt.registerTask('test', function (target) {
+  grunt.registerTask('test', function(target) {
     if (target !== 'watch') {
       grunt.task.run([
         'clean:server',
@@ -430,9 +446,9 @@ module.exports = function (grunt) {
     'useminPrepare',
     'concurrent:dist',
     'postcss',
-    'concat',
-    'cssmin',
-    'uglify',
+    'concat:generated',
+    'cssmin:generated',
+    'uglify:generated',
     'copy:dist',
     'modernizr',
     'filerev',
