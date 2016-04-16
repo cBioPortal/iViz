@@ -79,52 +79,53 @@
 <div class="container-fluid">
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header">
-      <a href='javascript:iViz.resetAll();' class='reset'>
+      <a href='javascript:iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"]);' class='reset'>
         <button type='button' class='btn btn-default'>Reset All</button>
       </a>
-      <button type='button' class='btn btn-default'
-              @click="addNewVC = true"
-              id="save_cohort_btn">Save
-        Cohort
-      </button>
-      <button type='button' class="btn btn-default"
-              @click="showVCList = true">
-        <i class="fa fa-bars"></i></button><span id="stat">
+      <!--<button type='button' class='btn btn-default'-->
+              <!--@click="addNewVC = true"-->
+              <!--id="save_cohort_btn">Save-->
+        <!--Cohort-->
+      <!--</button>-->
+      <!--<button type='button' class="btn btn-default"-->
+              <!--@click="showVCList = true">-->
+        <!--<i class="fa fa-bars"></i>-->
+        </button><span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
           Patients Selected <mark>{{ selectedPatientsNum }}</mark>
           <br><span v-for="filter in filters" id="filters-list">{{{ filter.text }}}&nbsp;&nbsp;&nbsp;</span>
         </span>
-      <add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"
-              :selected-samples-num="selectedSamplesNum"
-              :selected-patients-num="selectedPatientsNum"></add-vc>
+      <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
+              <!--:selected-samples-num="selectedSamplesNum"-->
+              <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
 
 
-      <modaltemplate :show.sync="showVCList" size="modal-xlg">
-        <div slot="header">
-          <h4 class="modal-title">Virtual Cohorts</h4>
-        </div>
+      <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
+        <!--<div slot="header">-->
+          <!--<h4 class="modal-title">Virtual Cohorts</h4>-->
+        <!--</div>-->
 
-        <div slot="body">
-          <table class="table table-bordered table-hover table-condensed">
-            <thead>
-            <tr style="font-weight: bold">
-              <td style="width:20%">Name</td>
-              <td style="width:40%">Description</td>
-              <td style="width:10%">Patients</td>
-              <td style="width:10%">Samples</td>
-              <td style="width:20%">Operations</td>
-            </tr>
-            </thead>
-            <tr is="editable-row" :data="virtualCohort" :showmodal.sync="showVCList" v-for="virtualCohort in virtualCohorts">
-            </tr>
-          </table>
-        </div>
+        <!--<div slot="body">-->
+          <!--<table class="table table-bordered table-hover table-condensed">-->
+            <!--<thead>-->
+            <!--<tr style="font-weight: bold">-->
+              <!--<td style="width:20%">Name</td>-->
+              <!--<td style="width:40%">Description</td>-->
+              <!--<td style="width:10%">Patients</td>-->
+              <!--<td style="width:10%">Samples</td>-->
+              <!--<td style="width:20%">Operations</td>-->
+            <!--</tr>-->
+            <!--</thead>-->
+            <!--<tr is="editable-row" :data="virtualCohort" :showmodal.sync="showVCList" v-for="virtualCohort in virtualCohorts">-->
+            <!--</tr>-->
+          <!--</table>-->
+        <!--</div>-->
 
-        <div slot="footer">
-          <!--<button type="button" class="btn btn-default"-->
-                  <!--onclick="window.location.href='/index.html'">Add new</button>-->
-        </div>
-      </modaltemplate>
+        <!--<div slot="footer">-->
+          <!--&lt;!&ndash;<button type="button" class="btn btn-default"&ndash;&gt;-->
+                  <!--&lt;!&ndash;onclick="window.location.href='/index.html'">Add new</button>&ndash;&gt;-->
+        <!--</div>-->
+      <!--</modaltemplate>-->
     </div>
   </nav>
   <div class="grid" id="main-grid"></div>
