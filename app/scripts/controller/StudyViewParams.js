@@ -28,22 +28,29 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 
-//Charts Array, store all pie chart/ bar chart instances
 
-var StudyView = {};
-var hasMutation = true;
-var hasCNA = true;
-var dataFolder = 'ucec_tcga'
-$(document).ready(function () {
+var StudyViewParams = {
+    //Global used parameters in StudyView
+    params : {
+        studyId: "",
+        caseIds: "",
+        cnaProfileId: "",
+        mutationProfileId: "",
+        caseSetId: "",
+        hasMutSig: ""
+    },
+    
+    summaryParams: {
+        //This is dc charts transition duration, also set as timeout for redraw
+        //special charts(survival mainly)
+        transitionDuration: 600
+    }, // For Summary Tab
+    mutationsParams: {}, // For Mutations Tab
+    clinicalParams: {}, // For Clinical Tab
+    cnaParams: {} // For CNA Tab
+};
 
-  $.ajax({url: "data/" + dataFolder + "/configs.json"})
-    .then(function (data) {
-      StudyView.preConfig = data;
-      StudyViewMainController.init(StudyView.preConfig);
-    })
-
-});
 

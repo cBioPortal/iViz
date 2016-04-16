@@ -28,22 +28,27 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
+ 
+var KmEstimator = function() {
 
-//Charts Array, store all pie chart/ bar chart instances
+    return {
+        calc: function(inputGrp) { //calculate the survival rate for each time point
+            //each item in the input already has fields: time, num at risk, event/status(0-->censored)
+            var _prev_value = 1;  //cache for the previous value
+            for (var i in inputGrp) {
+                var _case = inputGrp[i];
+                if (_case.status === "1") {
+                    _case.survival_rate = _prev_value * ((_case.num_at_risk - 1) / _case.num_at_risk) ;
+                    _prev_value = _case.survival_rate;
+                } else if (_case.status === "0") {
+                    _case.survival_rate = _prev_value; //survival rate remain the same if the event is "censored"
+                } else {
+                    //TODO: error handling
+                }
+            }
+        }
+    };
 
-var StudyView = {};
-var hasMutation = true;
-var hasCNA = true;
-var dataFolder = 'ucec_tcga'
-$(document).ready(function () {
-
-  $.ajax({url: "data/" + dataFolder + "/configs.json"})
-    .then(function (data) {
-      StudyView.preConfig = data;
-      StudyViewMainController.init(StudyView.preConfig);
-    })
-
-});
-
+}; //Close KmEstimator

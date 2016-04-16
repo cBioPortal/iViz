@@ -28,22 +28,19 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 
-//Charts Array, store all pie chart/ bar chart instances
 
-var StudyView = {};
-var hasMutation = true;
-var hasCNA = true;
-var dataFolder = 'ucec_tcga'
-$(document).ready(function () {
 
-  $.ajax({url: "data/" + dataFolder + "/configs.json"})
-    .then(function (data) {
-      StudyView.preConfig = data;
-      StudyViewMainController.init(StudyView.preConfig);
-    })
-
-});
-
+var StudyViewMutationsTabController = (function() {
+    var init = function (){
+        StudyViewProxy.getMutatedGenesData().then(StudyViewInitMutationsTab.init)
+    };
+    
+    return {
+        init: function() {
+            init();
+        }
+    };
+})();

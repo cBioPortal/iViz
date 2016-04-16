@@ -28,22 +28,29 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+/*
+ * This class is designed to control the logic for Clinial Tab in Study View
+ * 
+ * @autor Hongxin Zhang
+ * 
  */
 
 
-//Charts Array, store all pie chart/ bar chart instances
-
-var StudyView = {};
-var hasMutation = true;
-var hasCNA = true;
-var dataFolder = 'ucec_tcga'
-$(document).ready(function () {
-
-  $.ajax({url: "data/" + dataFolder + "/configs.json"})
-    .then(function (data) {
-      StudyView.preConfig = data;
-      StudyViewMainController.init(StudyView.preConfig);
-    })
-
-});
-
+var StudyViewClinicalTabController = (function(){
+    function init(){
+        StudyViewInitClinicalTab.init(
+            'clinical_table',
+            'clinical-data-table-div',
+            {
+                "arr": StudyViewProxy.getArrData(),
+                "attr": StudyViewProxy.getAttrData()
+            });
+    }
+    
+    return {
+        init: init
+    };
+})();
