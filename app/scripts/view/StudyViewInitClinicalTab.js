@@ -28,22 +28,44 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 
-//Charts Array, store all pie chart/ bar chart instances
 
-var StudyView = {};
-var hasMutation = true;
-var hasCNA = true;
-var dataFolder = 'ucec_tcga'
-$(document).ready(function () {
-
-  $.ajax({url: "data/" + dataFolder + "/configs.json"})
-    .then(function (data) {
-      StudyView.preConfig = data;
-      StudyViewMainController.init(StudyView.preConfig);
-    })
-
-});
-
+var StudyViewInitClinicalTab = (function(){
+    
+    var dataTable;
+    
+    
+    function init(_tableID, _tableContainerId, _data){
+//        tableID = _tableID;
+//        aaData = _aaData;
+//        aoColumns = _aoColumns;
+        dataTable = new DataTable();
+        dataTable.init(_tableID, _tableContainerId, _data);
+        dataTable.updateFrozedColStyle();
+        //initDataTable();
+    }
+    
+//    function initDataTable(){
+//        var oTable = $('#'+tableID).dataTable( {
+//            "sDom": '<"H"fr>t<"F"<"datatable-paging"pil>>',
+//            "bJQueryUI": true,
+//            "aoColumns":aoColumns,
+//            "aaData": aaData,
+//            "sScrollX": "1200px",
+//            "bScrollCollapse": true,
+//            "iDisplayLength": 25
+//        });
+//        
+//        oTable.css("width","100%");
+//        $('.case-id-td').attr("nowrap","nowrap");
+//    }
+    
+    return {
+        init: init,
+        getDataTable: function() {
+            return dataTable;
+        }
+    };
+})();

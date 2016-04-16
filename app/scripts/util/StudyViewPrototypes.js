@@ -28,22 +28,40 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 
-//Charts Array, store all pie chart/ bar chart instances
+// attach the .equals method to Array's prototype to call it on any array
+var StudyViewPrototypes = (function() {
+    
+    function init() {
+        Array.prototype.equals = function (array) {
+            // if the other array is a falsy value, return
+            if (!array)
+                return false;
 
-var StudyView = {};
-var hasMutation = true;
-var hasCNA = true;
-var dataFolder = 'ucec_tcga'
-$(document).ready(function () {
+            // compare lengths - can save a lot of time 
+            if (this.length != array.length)
+                return false;
 
-  $.ajax({url: "data/" + dataFolder + "/configs.json"})
-    .then(function (data) {
-      StudyView.preConfig = data;
-      StudyViewMainController.init(StudyView.preConfig);
-    })
-
-});
+            for (var i = 0, l=this.length; i < l; i++) {
+                // Check if we have nested arrays
+                if (this[i] instanceof Array && array[i] instanceof Array) {
+                    // recurse into the nested arrays
+                    if (!this[i].equals(array[i]))
+                        return false;       
+                }           
+                else if (this[i] != array[i]) { 
+                    // Warning - two different object instances will never be equal: {x:20} != {x:20}
+                    return false;   
+                }           
+            }       
+            return true;
+        };
+    }
+    
+    return {
+        init: init
+    };
+})();
 

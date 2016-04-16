@@ -28,22 +28,29 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 
-//Charts Array, store all pie chart/ bar chart instances
 
-var StudyView = {};
-var hasMutation = true;
-var hasCNA = true;
-var dataFolder = 'ucec_tcga'
-$(document).ready(function () {
-
-  $.ajax({url: "data/" + dataFolder + "/configs.json"})
-    .then(function (data) {
-      StudyView.preConfig = data;
-      StudyViewMainController.init(StudyView.preConfig);
-    })
-
-});
-
+var StudyViewMainController = (function() {
+    var callbackFunc = function (_data) {
+        for(var i=1, tabsL = $('#study-tabs').find('li').length; i < tabsL; i++) {
+            $('#study-tabs').tabs('enable', i);
+        }
+        StudyViewPrototypes.init();
+        if(!(_data.attr.length === 1 && _data.attr[0].attr_id === 'CASE_ID')) {
+            StudyViewSummaryTabController.init(_data);
+        }else {
+            $("#dc-plots-loading-wait").css('display', 'none');
+            $("#dc-plots").append("<div style='width:100%'>"+
+                "There isn't any information for this study.</div>");
+        }
+    };
+    
+    return {
+        init: function(_params) {
+            StudyViewParams.params = _params;
+            StudyViewProxy.init(callbackFunc);
+        }
+    };
+})();
