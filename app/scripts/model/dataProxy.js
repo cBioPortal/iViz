@@ -164,6 +164,7 @@
                     }
                   });
                 });
+                
                 _sampleDataIndicesObj[_sampleId] = _indexSample;
                 _indexSample += 1;
                 _sampleData.push(_datum);

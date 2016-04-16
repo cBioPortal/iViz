@@ -115,9 +115,14 @@
       var _selectedMappingCases = [];
       _selectedMappingCases.length = 0;
       _.each(inputCases, function(_case) {
-        _.each(mappingObj[_case], function(_id) {
-          _selectedMappingCases.push(_id);
-        });
+        if (Array.isArray(mappingObj[_case])) {
+          _.each(mappingObj[_case], function(_id) {
+            _selectedMappingCases.push(_id);
+          });
+        } else {
+          _selectedMappingCases.push(mappingObj[_case]);
+  
+        }
       });
       return _.uniq(_selectedMappingCases);
     };
