@@ -84,6 +84,10 @@
           this.fromFilter = false;
         }
       },
+    },events: {
+     /* 'close': function() {
+        this.attributes.show = false;
+      }*/
     },
     methods: {
       mouseEnter: function() {

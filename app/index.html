@@ -68,6 +68,7 @@
   <script src="scripts/views/components/topChartMainTemplate.js"></script>
   <script src="scripts/views/components/abstractChart.js"></script>
   <script src="scripts/views/components/chartOperationsHeader.js"></script>
+  <script src="scripts/views/components/manageCharts.js"></script>
   <script src="scripts/views/components/pieChartTemplate.js"></script>
   <script src="scripts/views/components/barChartTemplate.js"></script>
   <script src="scripts/views/components/chartImplementation.js"></script>
@@ -98,12 +99,19 @@
         <!--<i class="fa fa-bars"></i>-->
         </button><span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
-          Patients Selected <mark>{{ selectedPatientsNum }}</mark>
-          <br><span v-for="filter in filters" id="filters-list">{{{ filter.text }}}&nbsp;&nbsp;&nbsp;</span>
+          Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
         </span>
       <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
               <!--:selected-samples-num="selectedSamplesNum"-->
               <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
+      <select id="study-view-add-chart" class="chosen-select"
+              v-select :groups="groups"><option id='' value="">Add Chart</option>
+        <!--<option v-for="attributes in groups[0].attributes"></option>-->
+        <option is="manage-charts" :data.sync="group"
+                v-for="(index,group) in groups" :parent="index"></option>
+      </select>
+
+
 
       <div id="breadcrubs-container">
         <div v-for="group in groups">
@@ -113,6 +121,7 @@
           </div>
         </div>
       </div>
+
         <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
         <!--<div slot="header">-->
         <!--<h4 class="modal-title">Virtual Cohorts</h4>-->

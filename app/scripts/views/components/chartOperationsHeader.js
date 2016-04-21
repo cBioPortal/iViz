@@ -33,12 +33,7 @@
  * Created by Karthik Kalletla on 4/14/16.
  */
 'use strict';
-(function(Vue, iViz, $, Clipboard) {
-  var clipboard = null;
-  $(document).on('mouseleave', '.btn-share', function(e) {
-    $(e.currentTarget).removeClass('tooltipped tooltipped-s');
-    $(e.currentTarget).removeAttr('aria-label');
-  });
+(function(Vue, iViz, $) {
   Vue.component('chartOperations', {
     template: '<div class="chart-header"' +
     ' :class="{view:!showOperations}"><table id="tab"><tr><td><i class="fa' +
@@ -48,19 +43,20 @@
     ' dc-chart-pointer" @click="close()"></i></td></tr></table>' +
     '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart','groupid'
+      'showOperations', 'resetBtnId', 'chart', 'groupid'
     ],
-    data: function() {
-      return {};
-    },
     methods: {
       reset: function() {
-        iViz.shared.resetAll(this.chart,this.groupid)
+        iViz.shared.resetAll(this.chart, this.groupid)
       },
       close: function() {
-        console.log("came to close")
+        if (this.chart.hasFilter()) {
+          iViz.shared.resetAll(this.chart, this.groupid)
+        }
+        dc.deregisterChart(this.chart, this.groupid);
+        this.$dispatch('close')
       }
     }
   });
 })(window.Vue, window.iViz,
-  window.$ || window.jQuery, window.Clipboard);
+  window.$ || window.jQuery);

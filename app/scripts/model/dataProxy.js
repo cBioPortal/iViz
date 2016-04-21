@@ -183,22 +183,35 @@
                 _patientData.push(_datum);
               });
 
+              // TODO : temporary fix to show/hide charts
+              var tempCount = 0;
               // define view type from data type
               _.each(_ajaxSampleMeta, function(_metaObj) {
                 _metaObj.filter=[];
+                if(tempCount<10)
+                _metaObj.show= true;
+                else
+                  _metaObj.show= false;
                 if (_metaObj.datatype === "NUMBER") {
                   _metaObj.view_type = 'bar_chart';
                 } else if (_metaObj.datatype === "STRING") {
                   _metaObj.view_type = 'pie_chart';
                 }
+                tempCount++;
               });
+              tempCount = 0;
               _.each(_ajaxPatientMeta, function(_metaObj) {
                 _metaObj.filter=[];
+                if(tempCount<10)
+                  _metaObj.show= true;
+                else
+                  _metaObj.show= false;
                 if (_metaObj.datatype === "NUMBER") {
                   _metaObj.view_type = 'bar_chart';
                 } else if (_metaObj.datatype === "STRING") {
                   _metaObj.view_type = 'pie_chart';
                 }
+                tempCount++;
               });
               
               _result.groups = {};

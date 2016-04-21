@@ -61,7 +61,8 @@
         chartInst: '',
         showOperations: false,
         fromWatch: false,
-        fromFilter: false
+        fromFilter: false,
+        cluster: ''
       }
     },
     watch: {
@@ -85,6 +86,9 @@
         }
       },
     },
+    destroyed: function() {
+      this.cluster.dispose();
+    },
     methods: {
       mouseEnter: function() {
         this.showOperations = true;
@@ -100,11 +104,11 @@
       };
       var color = $.extend(true, [], this.v.data.color);
       var attr = this.attributes.attr_id;
-      var cluster = this.ndx.dimension(function(d) {
+      this.cluster = this.ndx.dimension(function(d) {
         return d[attr];
       });
       this.chartInst = dc.pieChart('#' + this.chartId, this.groupid);
-      this.v.data.attrKeys = cluster.group().all().map(function(d) {
+      this.v.data.attrKeys = this.cluster.group().all().map(function(d) {
         return d.key;
       });
       this.v.data.category =
@@ -123,8 +127,8 @@
         .width(width)
         .height(height)
         .radius(radius)
-        .dimension(cluster)
-        .group(cluster.group())
+        .dimension(this.cluster)
+        .group(this.cluster.group())
         .transitionDuration(400)
         .ordinalColors(color)
         .label(function(d) {

@@ -35,7 +35,7 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('topChartMainTemplate', {
-    template: ' <abstract-chart :data.sync="group.data" :id="group.id"  :type.sync="group.type"           :mappedpatients.sync="patientsync"' +
+    template: ' <abstract-chart :data.sync="group.data" :id="group.id" :type.sync="group.type" :mappedpatients.sync="patientsync"' +
     ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes"' +
     ' v-for="group in     groups"></abstract-chart> ',
     props: [
@@ -44,7 +44,8 @@
       return {
         messages: [],
         patientsync: [],
-        samplesync: []
+        samplesync: [],
+        grid_: ''
       }
     }, watch: {
       'groups': {
@@ -57,24 +58,33 @@
         _.each(this.groups, function(group) {
           dc.renderAll(group.type + '-' + group.id);
         });
-
-        var grid_ = new Packery(document.querySelector('.grid'), {
+        this.updateGrid();
+      }
+    }, methods: {
+      updateGrid: function() {
+        if (this.grid_ !== '') {
+          this.grid_.destroy();
+        }
+        this.grid_ = new Packery(document.querySelector('.grid'), {
           itemSelector: '.grid-item',
           columnWidth: 250,
           rowHeight: 250,
           gutter: 5
         });
-
-        _.each(grid_.getItemElements(), function(_gridItem) {
+        var self_ = this;
+        _.each(self_.grid_.getItemElements(), function(_gridItem) {
           var _draggie = new Draggabilly(_gridItem, {
             handle: '.dc-chart-drag'
           });
-          grid_.bindDraggabillyEvents(_draggie);
+          self_.grid_.bindDraggabillyEvents(_draggie);
         });
-        grid_.layout();
+        self_.grid_.layout();
       }
     },
     events: {
+      'update-grid': function() {
+        this.updateGrid()
+      },
       'data-loaded': function(msg) {
         // TODO:check for all charts loaded
         this.messages.push(msg)

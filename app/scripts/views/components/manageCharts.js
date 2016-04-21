@@ -28,57 +28,19 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 /**
- * Created by Karthik Kalletla on 4/6/16.
+ * Created by Karthik Kalletla on 4/20/16.
  */
 'use strict';
-(function(Vue, dc, iViz, $) {
-  Vue.component('chartImplementation', {
-    template: '<div v-if="attributes.show">' +
-    '<component :is="currentView" :groupid="groupid"' +
-    ' :filters.sync="attributes.filter" v-if="attributes.show" :options="options" :ndx="ndx" :attributes.sync="attributes"></component>' +
-    '</div>',
+(function(Vue, iViz, $, Clipboard) {
+  Vue.component('manageCharts', {
+    template: '<option id="{{attribute.attr_id}}" v-if="!attribute.show" v-for="attribute in data.attributes" value="{{parent}}---{{ $index }}">{{attribute.display_name}}</option>',
     props: [
-      'data', 'ndx', 'attributes', 'groupid'
-    ],
-    data: function() {
-      var options = {};
-      var currentView = '';
-      switch (this.attributes.view_type) {
-        case 'pie_chart':
-          currentView = 'pie-chart';
-          break;
-        case 'bar_chart':
-          currentView = 'bar-chart';
-          var data_ = _.map(
-            _.filter(_.pluck(this.data, this.attributes.attr_id), function(d) {
-              return d !== 'NA';
-            }), function(d) {
-              return parseFloat(d);
-            });
-          options.min = d3.min(data_);
-          options.max = d3.max(data_);
-          break;
-      }
-      return {
-        currentView: currentView,
-        options: options,
-      }
-    },
-    watch: {
-      'attributes.show': function(newVal) {
-        if (!newVal)
-          this.$dispatch('update-grid')
-        $("#study-view-add-chart").trigger("chosen:updated");
-      }
-    },
-    events: {
-      'close': function() {
-        this.attributes.show = false;
-      }
+      'data', 'parent'
+    ], ready: function() {
+      $("#study-view-add-chart").trigger("chosen:updated");
     }
   });
-})(window.Vue, window.dc, window.iViz,
+})(window.Vue, window.iViz,
   window.$ || window.jQuery);
