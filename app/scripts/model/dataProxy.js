@@ -97,7 +97,7 @@
   
           // Only store less than 32 attributes (due to limitation of crossfilter)
           // TODO: set priority for attributes
-          _ajaxPatientMeta = _ajaxPatientMeta.splice(0, 31);
+         // _ajaxPatientMeta = _ajaxPatientMeta.splice(0, 31);
          
           return $.ajax({
             method: "POST",
@@ -116,7 +116,7 @@
             
             // Only store less than 32 attributes (due to limitation of crossfilter)
             // TODO: set priority for attributes
-            _ajaxSampleMeta = _ajaxSampleMeta.splice(0, 31);
+           // _ajaxSampleMeta = _ajaxSampleMeta.splice(0, 31);
             return $.ajax({
               method: "POST",
               url: PORTAL_INST_URL + '/api/clinicaldata/samples',

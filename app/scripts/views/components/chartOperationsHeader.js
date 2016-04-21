@@ -29,50 +29,38 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
- * @author suny1@mskcc.org on 3/15/16.
+ * Created by Karthik Kalletla on 4/14/16.
  */
-
 'use strict';
-(function(iViz, dc) {
-
-  iViz.event = {};
-  iViz.shared = {};
-
-  iViz.shared.resetAll = function(chartInst) {
-    chartInst.filterAll();
-    dc.redrawAll();
-  }
-  iViz.shared.updateFilters = function(filter, filters, attribute, type) {
-    if (filter === null) {
-      filters[attribute] = [];
-      filters[attribute].length = 0;
-      delete filters[attribute];
-    } else {
-      if (type === 'bar_chart') {
-        //delay event trigger for bar charts
-        dc.events.trigger(function() {
-          filters[attribute] = filter;
-        }, 0);
-      } else if (type === 'pie_chart') {
-        if (filters.hasOwnProperty(attribute)) {
-          //add filter
-          if ($.inArray(filter, filters[attribute]) === -1) {
-            filters[attribute].push(filter);
-            //remove filter
-          } else {
-            filters[attribute] = _.filter(filters[attribute], function(d) {
-              return d !== filter;
-            });
-            if (filters[attribute].length === 0) {
-              delete filters[attribute];
-            }
-          }
-        } else {
-          filters[attribute] = [filter];
-        }
+(function(Vue, iViz, $, Clipboard) {
+  var clipboard = null;
+  $(document).on('mouseleave', '.btn-share', function(e) {
+    $(e.currentTarget).removeClass('tooltipped tooltipped-s');
+    $(e.currentTarget).removeAttr('aria-label');
+  });
+  Vue.component('chartOperations', {
+    template: '<div class="chart-header"' +
+    ' :class="{view:!showOperations}"><table id="tab"><tr><td><i class="fa' +
+    ' fa-refresh dc-chart-pointer" aria-hidden="true"' +
+    ' @click="reset()"></i></td><td><i style="margin-left:2px;" class="fa' +
+    ' fa-arrows dc-chart-drag"></i></td><td><i class="fa fa-times' +
+    ' dc-chart-pointer" @click="close()"></i></td></tr></table>' +
+    '</div>',
+    props: [
+      'showOperations', 'resetBtnId', 'chart'
+    ],
+    data: function() {
+      return {};
+    },
+    methods: {
+      reset: function() {
+        iViz.shared.resetAll(this.chart)
+      },
+      close: function() {
+        console.log("came to close")
       }
     }
-  }
-}(window.iViz, window.dc));
+  });
+})(window.Vue, window.iViz,
+  window.$ || window.jQuery, window.Clipboard);

@@ -37,37 +37,6 @@
 'use strict';
 (function(iViz, $, _){
   iViz.sync = {};
-  // ---- callback function to sync patients charts and sample charts ----
-  // @selected_cases: cases selected in the other group
-  // @update_type: the type of group charts (patient or sample) that needs to be updated
-  iViz.sync.callBack = function(updateType) {
-    var _selectedSamplesByFiltersOnly = iViz.sync.selectByFilters(iViz.sampleChartsInst().filters(), iViz.getData('sample'), 'sample');
-    var _selectedPatientsByFiltersOnly = iViz.sync.selectByFilters(iViz.patientChartsInst().filters(), iViz.getData('patient'), 'patient');
-  
-    // find the intersection between two groups
-    var mappedSelectedSamples = iViz.util.idMapping(iViz.getMapping().patient.sample, _selectedPatientsByFiltersOnly);
-    iViz.setSelectedSamples(_.intersection(mappedSelectedSamples, _selectedSamplesByFiltersOnly));
-    iViz.setSelectedPatients(iViz.util.idMapping(iViz.getMapping().sample.patient, iViz.getSelectedSamples()));
-  
-    // sync view
-    if (updateType === 'sample') {
-      iViz.sampleChartsInst().sync(iViz.util.idMapping(iViz.getMapping().patient.sample, _selectedPatientsByFiltersOnly));
-    } else if (updateType === 'patient') {
-      iViz.patientChartsInst().sync(iViz.util.idMapping(iViz.getMapping().sample.patient, _selectedSamplesByFiltersOnly));
-    }
-  
-    // update vue
-    iViz.vm().filters = [];
-    iViz.vm().filters.length = 0;
-    _.each(Object.keys(iViz.patientChartsInst().filters()), function(_key) {
-      iViz.vm().filters.push({ text : '<span class="label label-primary">' + _key + ': ' + iViz.patientChartsInst().filters()[_key] + '</span>' });
-    });
-    _.each(Object.keys(iViz.sampleChartsInst().filters()), function(_key) {
-      iViz.vm().filters.push({ text : '<span class="label label-info">' + _key + ': ' + iViz.sampleChartsInst().filters()[_key] + '</span>' });
-    });
-    iViz.vm().selectedSamplesNum = iViz.getSelectedSamples().length;
-    iViz.vm().selectedPatientsNum = iViz.getSelectedPatients().length;
-  }
   // syncing util: select samples or patients based on only samples/patients filters
   iViz.sync.selectByFilters = function(filters, data, type) { // type: sample or patient
     var _dupSelectedCasesArr = [];
@@ -75,7 +44,6 @@
     
       var _singleAttrSelectedCases = [];
       var _filtersForSingleAttr = filters[_filterAttrId];
-    
       if (iViz.util.isRangeFilter(_filtersForSingleAttr)) {
       
         var _filterRangeMin = parseFloat(_filtersForSingleAttr[0]);

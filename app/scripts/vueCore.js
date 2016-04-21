@@ -39,18 +39,62 @@
 
   iViz.session.manage = (function() {
     var vmInstance_;
+    var settings_={
+      patient:'label label-primary',
+      sample:'label label-info'
+    }
 
     return {
       init: function() {
         vmInstance_ = new Vue({
-          el: '#main-header',
+          el: '#complete-screen',
           data: {
+            groups:[],
+            selectedsamples:[],
+            selectedpatients:[],
+            patientmap:[],
+            samplemap:[],
             showVCList: false,
             addNewVC: false,
-            filters: [],
             selectedPatientsNum: 0,
             selectedSamplesNum: 0,
-            virtualCohorts: []
+            filters: [],
+            virtualCohorts: [],
+            isloading:true
+          },watch: {
+            'selectedsamples': function(val) {
+              iViz.session.manage.getInstance().selectedSamplesNum = val.length;
+              this.updateFilters();
+            },
+            'selectedpatients': function(val) {
+              iViz.session.manage.getInstance().selectedPatientsNum = val.length;
+              this.updateFilters();
+            }
+          },methods:{
+            initialize:function(){
+                this.groups=[],
+                this.selectedsamples=[],
+                this.selectedpatients=[],
+                this.patientmap=[],
+                this.samplemap=[],
+                this.showVCList= false,
+                this.addNewVC= false,
+                this.selectedPatientsNum= 0,
+                this.selectedSamplesNum= 0,
+                this.filters= [],
+                this.virtualCohorts= [],
+                this.isloading=true
+            },
+            updateFilters:function(){
+              var self_=this;
+              this.filters = [];
+              this.filters.length = 0;
+              _.each(this.groups, function(group) {
+                _.each(_.keys(group.filters), function(_key) {
+                  self_.filters.push({ text : '<span class="'+settings_[group.type]+'">' + _key + ': ' + group.filters[_key] + '</span>' });
+                });
+              });
+            }
           }, ready: function() {
             this.$watch('showVCList', function() {
               this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
@@ -66,7 +110,7 @@
       }
     };
   })();
-
+  
   // This is an example to add sample to a virtual cohort from scatter plot
   iViz.session.vmScatter = (function() {
     var vmInstance_;

@@ -229,3 +229,21 @@ body {
   margin-right: -5px;
   border-bottom-color: rgba(0, 0, 0, 0.8)
 }
+
+.dc-chart-pointer{
+  font-size:16px;
+  color:grey;
+  cursor: pointer;
+}
+
+.loading{
+  padding:400px;
+  background-image: url('../images/ajax-loader.gif') ;
+  background-repeat:no-repeat;
+  background-size: 100px 100px;
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  content:"";
+  position: relative;
+}

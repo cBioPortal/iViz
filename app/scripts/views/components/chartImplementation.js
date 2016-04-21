@@ -28,51 +28,42 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-
 /**
- * @author suny1@mskcc.org on 3/15/16.
+ * Created by Karthik Kalletla on 4/6/16.
  */
-
 'use strict';
-(function(iViz, dc) {
-
-  iViz.event = {};
-  iViz.shared = {};
-
-  iViz.shared.resetAll = function(chartInst) {
-    chartInst.filterAll();
-    dc.redrawAll();
-  }
-  iViz.shared.updateFilters = function(filter, filters, attribute, type) {
-    if (filter === null) {
-      filters[attribute] = [];
-      filters[attribute].length = 0;
-      delete filters[attribute];
-    } else {
-      if (type === 'bar_chart') {
-        //delay event trigger for bar charts
-        dc.events.trigger(function() {
-          filters[attribute] = filter;
-        }, 0);
-      } else if (type === 'pie_chart') {
-        if (filters.hasOwnProperty(attribute)) {
-          //add filter
-          if ($.inArray(filter, filters[attribute]) === -1) {
-            filters[attribute].push(filter);
-            //remove filter
-          } else {
-            filters[attribute] = _.filter(filters[attribute], function(d) {
-              return d !== filter;
+(function(Vue, dc, iViz, $) {
+  Vue.component('chartImplementation', {
+    template: '<component :is="currentView" :filters.sync="filters" :options="options" :ndx="ndx" :attributes="attributes"></component>',
+    props: [
+      'data', 'ndx', 'attributes', 'filters'
+    ], data: function() {
+      var options = {};
+      var currentView = '';
+      switch (this.attributes.view_type) {
+        case 'pie_chart':
+          currentView = 'pie-chart';
+          break;
+        case 'bar_chart':
+          currentView = 'bar-chart';
+          var data_ = _.map(
+            _.filter(_.pluck(this.data, this.attributes.attr_id), function(d) {
+              return d !== 'NA';
+            }), function(d) {
+              return parseFloat(d);
             });
-            if (filters[attribute].length === 0) {
-              delete filters[attribute];
-            }
-          }
-        } else {
-          filters[attribute] = [filter];
-        }
+          options.min = d3.min(data_);
+          options.max = d3.max(data_);
+          break;
+      }
+      return {
+        currentView: this.attributes.view_type === 'pie_chart' ? 'pie-chart' :
+          'bar-chart',
+        options: options,
       }
     }
-  }
-}(window.iViz, window.dc));
+  });
+})(window.Vue, window.dc, window.iViz,
+  window.$ || window.jQuery);
