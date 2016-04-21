@@ -247,3 +247,23 @@ body {
   content:"";
   position: relative;
 }
+
+
+#breadcrumbs_container{
+  padding: 5px 10px 0 0;
+}
+.breadcrumb_container{
+  display:inline-block;
+}
+.breadcrumb_remove{
+  vertical-align: middle;
+  margin-top: -2px;
+  padding-right: 10px;
+}
+.breadcrumb_remove:hover{
+  cursor: pointer;
+}
+.breadcrumb_item{
+  padding: 0px 5px;
+  font-weight: bold;
+}

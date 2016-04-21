@@ -41,7 +41,7 @@
 'use strict';
 (function($, dc) {
   iViz.bridgeChart = {};
-  iViz.bridgeChart.init = function(ndx, settings, type) {
+  iViz.bridgeChart.init = function(ndx, settings, type,id) {
     var dimHide, countPerFuncHide;
     if (type === 'patient') {
       dimHide = ndx.dimension(function (d) { return d.patient_id; }),
@@ -51,11 +51,11 @@
         countPerFuncHide = dimHide.group().reduceCount();
     }
     $('#main-bridge').append(
-      '<div class="grid-item" id="' + type + '_id_chart_div">' +
-      '<div class="dc-chart dc-pie-chart" id="' + type +'_id_chart"></div>' +
+      '<div class="grid-item" id="' + type +'_'+id+ '_id_chart_div">' +
+      '<div class="dc-chart dc-pie-chart" id="' + type +'_'+id+ '_id_chart"></div>' +
       "</div>"
     );
-    var _chartInvisible = dc.pieChart('#' + type + '_id_chart');
+    var _chartInvisible = dc.pieChart('#' + type +'_'+id+ '_id_chart', type +'-'+id);
     _chartInvisible.width(settings.pieChart.width)
       .height(settings.pieChart.height)
       .dimension(dimHide)

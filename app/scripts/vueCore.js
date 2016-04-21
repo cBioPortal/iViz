@@ -48,26 +48,39 @@
       init: function() {
         vmInstance_ = new Vue({
           el: '#complete-screen',
-          data: {
-            groups:[],
-            selectedsamples:[],
-            selectedpatients:[],
-            patientmap:[],
-            samplemap:[],
-            showVCList: false,
-            addNewVC: false,
-            selectedPatientsNum: 0,
-            selectedSamplesNum: 0,
-            filters: [],
-            virtualCohorts: [],
-            isloading:true
+          created:function(){
+            this.groups= [];
+              this.selectedsamples= [];
+              this.selectedpatients= [];
+              this.patientmap= [];
+              this.samplemap= [];
+              this.showVCList= false;
+              this.addNewVC= false;
+              this.selectedPatientsNum= 0;
+              this.selectedSamplesNum= 0;
+              this.filters= [];
+              this.virtualCohorts= [];
+              this.isloading= true
+          },data:  {
+              groups: [],
+              selectedsamples: [],
+              selectedpatients: [],
+              patientmap: [],
+              samplemap: [],
+              showVCList: false,
+              addNewVC: false,
+              selectedPatientsNum: 0,
+              selectedSamplesNum: 0,
+              filters: [],
+              virtualCohorts: [],
+              isloading: true
           },watch: {
             'selectedsamples': function(val) {
-              iViz.session.manage.getInstance().selectedSamplesNum = val.length;
+              this.selectedSamplesNum = val.length;
               this.updateFilters();
             },
             'selectedpatients': function(val) {
-              iViz.session.manage.getInstance().selectedPatientsNum = val.length;
+              this.selectedPatientsNum = val.length;
               this.updateFilters();
             }
           },methods:{

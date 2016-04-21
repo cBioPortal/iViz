@@ -56,7 +56,7 @@
     '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ><p class="text-center">{{displayName}}</p></div>' +
     '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'options', 'filters'
+      'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
     data: function() {
       var isBarChart = this.attributes.view_type === 'bar_chart' ? true : false;
@@ -68,8 +68,22 @@
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
-        showOperations: false
+        showOperations: false,
+        fromWatch: false,
+        fromFilter: false
       }
+    }, watch: {
+      'filters': function(newVal, oldVal) {
+        if (!this.fromFilter) {
+          this.fromWatch = true
+          if (newVal.length == 0) {
+            this.chartInst.filter(null);
+            dc.redrawAll(this.groupid)
+          }
+        } else {
+          this.fromFilter = false;
+        }
+      },
     },
     methods: {
       mouseEnter: function() {
@@ -85,12 +99,19 @@
       data_.max = this.options.max;
       this.chartInst =
         _barChart.init(this.ndx, data_, this.attributes, settings_,
-          this.chartId);
-
+          this.chartId, this.groupid);
+      //dc.registerChart(this.chartInst,this.groupid);
       var self_ = this;
-      this.chartInst.on('filtered', function(_chartInst, filter) {
-        iViz.shared.updateFilters(filter, self_.filters,
-          self_.attributes.attr_id, self_.attributes.view_type);
+      this.chartInst.on('filtered', function(_chartInst, _filter) {
+        if (!self_.fromWatch) {
+          self_.fromFilter = true
+          var tempFilters_ = $.extend(true, [], self_.filters);
+          tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
+            self_.attributes.attr_id, self_.attributes.view_type);
+          self_.filters = tempFilters_;
+        } else {
+          self_.fromWatch = false;
+        }
         self_.$dispatch('update-filters')
       });
       this.$dispatch('data-loaded', true)

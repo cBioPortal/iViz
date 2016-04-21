@@ -140,8 +140,7 @@
               for (var i = 0; i < arguments.length; i++) {
                 _ajaxPatient2SampleIdMappingObj = $.extend({}, JSON.parse(arguments[i][0]), _ajaxPatient2SampleIdMappingObj);
               }
-    
-              // --- web API results converting ---- 
+              // --- web API results converting ----
               var _patientData = [], _sampleData = [];
               var _patientIds = _.uniq(_.pluck(_ajaxPatientData, 'patient_id'));
               var _sampleIds = _.uniq(_.pluck(_ajaxSampleData, 'sample_id'));
@@ -160,7 +159,7 @@
                   var _sampleIdArr = _ajaxPatient2SampleIdMappingObj[_tmpPatientId];
                   _.each(_sampleIdArr, function(_tmpSampleId) {
                     if (_tmpSampleId === _sampleId) {
-                      _ajaxSample2PatientIdMappingObj[_sampleId] = _tmpPatientId;
+                      _ajaxSample2PatientIdMappingObj[_sampleId] = new Array(_tmpPatientId);
                     }
                   });
                 });
@@ -186,6 +185,7 @@
 
               // define view type from data type
               _.each(_ajaxSampleMeta, function(_metaObj) {
+                _metaObj.filter=[];
                 if (_metaObj.datatype === "NUMBER") {
                   _metaObj.view_type = 'bar_chart';
                 } else if (_metaObj.datatype === "STRING") {
@@ -193,6 +193,7 @@
                 }
               });
               _.each(_ajaxPatientMeta, function(_metaObj) {
+                _metaObj.filter=[];
                 if (_metaObj.datatype === "NUMBER") {
                   _metaObj.view_type = 'bar_chart';
                 } else if (_metaObj.datatype === "STRING") {

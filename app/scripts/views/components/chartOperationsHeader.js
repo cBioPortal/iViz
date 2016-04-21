@@ -48,14 +48,14 @@
     ' dc-chart-pointer" @click="close()"></i></td></tr></table>' +
     '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart'
+      'showOperations', 'resetBtnId', 'chart','groupid'
     ],
     data: function() {
       return {};
     },
     methods: {
       reset: function() {
-        iViz.shared.resetAll(this.chart)
+        iViz.shared.resetAll(this.chart,this.groupid)
       },
       close: function() {
         console.log("came to close")

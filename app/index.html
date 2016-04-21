@@ -71,6 +71,7 @@
   <script src="scripts/views/components/pieChartTemplate.js"></script>
   <script src="scripts/views/components/barChartTemplate.js"></script>
   <script src="scripts/views/components/chartImplementation.js"></script>
+  <script src="scripts/views/components/breadCrumbTemplate.js"></script>
   <script src="scripts/views/components/modalTemplate.js"></script>
   <script src="scripts/views/components/addVCPopup.js"></script>
   <script src="scripts/model/sessionServices.js"></script>
@@ -104,12 +105,18 @@
               <!--:selected-samples-num="selectedSamplesNum"-->
               <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
 
-
-      <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
+      <div id="breadcrubs-container">
+        <div v-for="group in groups">
+          <div v-for="(index1, item) in group.attributes">
+            <bread-crumb :attributes.sync="item"
+                         :filters.sync="item.filter"></bread-crumb>
+          </div>
+        </div>
+      </div>
+        <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
         <!--<div slot="header">-->
-          <!--<h4 class="modal-title">Virtual Cohorts</h4>-->
+        <!--<h4 class="modal-title">Virtual Cohorts</h4>-->
         <!--</div>-->
-
         <!--<div slot="body">-->
           <!--<table class="table table-bordered table-hover table-condensed">-->
             <!--<thead>-->
@@ -134,7 +141,7 @@
     </div>
   </nav>
     <div class="grid" id="main-grid" :class="{loading:isloading}">
-    <top-chart-main-template :groups.sync="groups"
+      <top-chart-main-template :groups.sync="groups"
                              :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
                              :selectedsamples.sync="selectedsamples"  ></top-chart-main-template>
     </div>

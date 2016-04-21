@@ -40,39 +40,31 @@
   iViz.event = {};
   iViz.shared = {};
 
-  iViz.shared.resetAll = function(chartInst) {
+  iViz.shared.resetAll = function(chartInst,groupid) {
     chartInst.filterAll();
-    dc.redrawAll();
+    dc.redrawAll(groupid);
   }
   iViz.shared.updateFilters = function(filter, filters, attribute, type) {
     if (filter === null) {
-      filters[attribute] = [];
-      filters[attribute].length = 0;
-      delete filters[attribute];
+      filters = [];
     } else {
       if (type === 'bar_chart') {
         //delay event trigger for bar charts
         dc.events.trigger(function() {
-          filters[attribute] = filter;
+          filters = filter
         }, 0);
       } else if (type === 'pie_chart') {
-        if (filters.hasOwnProperty(attribute)) {
           //add filter
-          if ($.inArray(filter, filters[attribute]) === -1) {
-            filters[attribute].push(filter);
-            //remove filter
-          } else {
-            filters[attribute] = _.filter(filters[attribute], function(d) {
-              return d !== filter;
-            });
-            if (filters[attribute].length === 0) {
-              delete filters[attribute];
-            }
-          }
+        if ($.inArray(filter, filters) === -1) {
+          filters.push(filter);
+          //remove filter
         } else {
-          filters[attribute] = [filter];
+          filters = _.filter(filters, function(d) {
+            return d !== filter;
+          });
         }
       }
     }
+    return filters
   }
 }(window.iViz, window.dc));

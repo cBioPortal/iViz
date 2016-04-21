@@ -28,40 +28,50 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 /**
- * Created by Karthik Kalletla on 4/6/16.
+ * Created by Karthik Kalletla on 4/18/16.
  */
 'use strict';
 (function(Vue, dc, iViz, $) {
-  Vue.component('chartImplementation', {
-    template: '<component :is="currentView" :groupid="groupid" :filters.sync="attributes.filter" :options="options" :ndx="ndx" :attributes.sync="attributes"></component>',
+  var settings_ = {
+    pieChart: {
+      width: 150,
+      height: 150,
+      innerRadius: 15
+    },
+    barChart: {
+      width: 400,
+      height: 180
+    },
+    transitionDuration: iViz.opts.dc.transitionDuration
+  };
+  Vue.component('breadCrumb', {
+    template: '<div class="breadcrumb_container" v-if="attributes.filter.length > 0">'+
+    '<span>{{attributes.attr_id}}&nbsp;&nbsp;:&nbsp;&nbsp;</span><div class="breadcrumd_items">' +
+    '<div v-if="filters.filterType === \'RangedFilter\'"><span class="breadcrumb_item">{{filters[0]}}-{{filters[0]}}</span>'+
+    '<img class="breadcrumb_remove" src="../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)"></div><div' +
+    ' v-else>' +
+    '<div v-for="filter in filters" style="display:inline-block;">' +
+    '<span class="breadcrumb_item">{{filter}}</span>'+
+      '<img class="breadcrumb_remove" src="../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">'+
+    '</div></div></div></div>',
     props: [
-      'data', 'ndx', 'attributes','groupid'
-    ], data: function() {
-      var options = {};
-      var currentView = '';
-      switch (this.attributes.view_type) {
-        case 'pie_chart':
-          currentView = 'pie-chart';
-          break;
-        case 'bar_chart':
-          currentView = 'bar-chart';
-          var data_ = _.map(
-            _.filter(_.pluck(this.data, this.attributes.attr_id), function(d) {
-              return d !== 'NA';
-            }), function(d) {
-              return parseFloat(d);
-            });
-          options.min = d3.min(data_);
-          options.max = d3.max(data_);
-          break;
-      }
+      'filters','attributes'
+    ],
+    data: function() {
       return {
-        currentView: this.attributes.view_type === 'pie_chart' ? 'pie-chart' :
-          'bar-chart',
-        options: options,
+      }
+    },
+    watch: {
+    },
+    methods: {
+      removeFilter: function(val) {
+        if(this.attributes.view_type === 'bar_chart'){
+          this.filters = []
+        }else{
+          this.filters.$remove(val)
+        }
       }
     }
   });

@@ -38,20 +38,11 @@ var iViz = (function(_, $) {
   
   return {
     init: function(_studyIdArr, _inputSampleList, _inputPatientList) {
-      if (typeof vm_ === "undefined") {
-        vm_ = iViz.session.manage.getInstance();
-      }else{
-        vm_.initialize();
-      }
-
-     /* $('#main-grid').empty();*/
-     /* $('#main-grid').append('<img src="images/ajax-loader.gif" style="padding:200px;"/>');*/
-      
+      vm_ = iViz.session.manage.getInstance();
       iViz.data.init(_studyIdArr, dataInitCallbackFunc_, _inputSampleList, _inputPatientList);
       
       function dataInitCallbackFunc_(_data, _inputSampleList, _inputPatientList) {
-  
-       /* $('#main-grid').empty();*/
+
         vm_.isloading = false;
         data_ = _data;
         
@@ -98,25 +89,29 @@ var iViz = (function(_, $) {
         var _sampleIds = _.uniq(_.pluck(data_.groups.sample.data, 'sample_id'));
 
         var groups = [];
+        var id_= 1;
         for(var count=0;count<Math.ceil(data_.groups.patient.attr_meta.length/31);count++){
           var group = {};
           var lowerLimit = count+(count*31);
           var upperLimit = lowerLimit +31;
           group.attributes = data_.groups.patient.attr_meta.slice(lowerLimit,upperLimit);
           group.data = data_.groups.patient.data;
-          group.filters = [];
           group.type = 'patient';
+          group.id=id_;
           groups.push(group);
+          id_++;
         }
+        id_= 1;
         for(var count=0;count<Math.ceil(data_.groups.sample.attr_meta.length/31);count++){
           var group = {};
           var lowerLimit = count+(count*31);
           var upperLimit = lowerLimit +31;
           group.attributes = data_.groups.sample.attr_meta.slice(lowerLimit,upperLimit);
           group.data = data_.groups.sample.data;
-          group.filters = [];
           group.type = 'sample';
+          group.id=id_;
           groups.push(group);
+          id_++;
         }
         vm_.selectedsamples = _sampleIds;
         vm_.selectedpatients = _patientIds;
@@ -161,18 +156,25 @@ var iViz = (function(_, $) {
       _result.filters['samples'] = [];
       _.each(vm_.groups, function(group) {
         if(group.type==='patient'){
-          console.log(typeof group.filters)
-          var temp = $.extend(true,_result.filters['patients'],group.filters);
+          var filters_ = []
+          _.each(group.attributes, function(attributes) {
+            if (attributes.filter.length > 0)
+              filters_[attributes.attr_id] = attributes.filter;
+          });
+          var temp = $.extend(true,_result.filters['patients'],filters_);
           var array = $.extend(true,{},temp)
           _result.filters['patients']=array;
         }else if(group.type==='sample'){
-          console.log(typeof group.filters)
-          var temp = $.extend(true,_result.filters['samples'],group.filters);
+          var filters_ = []
+          _.each(group.attributes, function(attributes) {
+            if (attributes.filter.length > 0)
+              filters_[attributes.attr_id] = attributes.filter;
+          });
+          var temp = $.extend(true,_result.filters['samples'],filters_);
           var array = $.extend(true,{},temp)
           _result.filters['samples']=array;
         }
       });
-
       _result['selected_cases'] = _selectedCases;
       return _result;
     },
@@ -250,6 +252,9 @@ var iViz = (function(_, $) {
           });
           iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
         });
+      }else{
+        iViz.session.manage.getInstance().initialize();
+        iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub"])
       }
     }
   }

@@ -41,13 +41,13 @@
   var NAIndex = -1;
   Vue.component('pieChart', {
     template: '<div id={{charDivId}} class="grid-item" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-    '<chart-operations :show-operations="showOperations" :reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
+    '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
     '<div class="dc-chart dc-pie-chart" align="center" style="float:none' +
     ' !important;" id={{chartId}} ><p' +
     ' class="text-center">{{displayName}}</p></div>' +
     '</div>',
     props: [
-      'ndx', 'attributes', 'filters'
+      'ndx', 'attributes', 'filters', 'groupid'
     ],
     data: function() {
       return {
@@ -59,8 +59,31 @@
         chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
-        showOperations: false
+        showOperations: false,
+        fromWatch: false,
+        fromFilter: false
       }
+    },
+    watch: {
+      'filters': function(newVal, oldVal) {
+        if (!this.fromFilter) {
+          this.fromWatch = true
+          if (newVal.length === oldVal.length) {
+            if (newVal.length == 0) {
+              this.chartInst.filterAll();
+              dc.redrawAll(this.groupid)
+            } else {
+              var newFilters = $.extend(true, [], newVal)
+              var exisitngFilters = $.extend(true, [], this.chartInst.filters())
+              var temp = _.difference(exisitngFilters, newFilters);
+              this.chartInst.filter(temp);
+              dc.redrawAll(this.groupid)
+            }
+          }
+        } else {
+          this.fromFilter = false;
+        }
+      },
     },
     methods: {
       mouseEnter: function() {
@@ -70,7 +93,6 @@
       }
     },
     ready: function() {
-
       this.v.data = $.extend(true, {}, this.attributes);
       this.v.data = {
         color: $.extend(true, [], iViz.util.getColors()),
@@ -81,7 +103,7 @@
       var cluster = this.ndx.dimension(function(d) {
         return d[attr];
       });
-      this.chartInst = dc.pieChart('#' + this.chartId);
+      this.chartInst = dc.pieChart('#' + this.chartId, this.groupid);
       this.v.data.attrKeys = cluster.group().all().map(function(d) {
         return d.key;
       });
@@ -112,9 +134,17 @@
           return d.key;
         });
       var self_ = this;
-      this.chartInst.on('filtered', function(_chartInst, filter) {
-        iViz.shared.updateFilters(filter, self_.filters,
-          self_.attributes.attr_id, self_.attributes.view_type);
+      this.chartInst.on('filtered', function(_chartInst, _filter) {
+        if (!self_.fromWatch) {
+          self_.fromFilter = true
+          var tempFilters_ = $.extend(true, [], self_.filters);
+          tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
+            self_.attributes.attr_id, self_.attributes.view_type);
+          self_.filters = tempFilters_;
+        } else {
+          self_.fromWatch = false;
+        }
+
         self_.$dispatch('update-filters')
       });
       this.$dispatch('data-loaded', true)

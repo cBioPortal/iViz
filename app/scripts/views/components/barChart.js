@@ -138,7 +138,7 @@
       // TODO: Should include the log scale initialize function from study-view.
     };
 
-    content.init = function(ndx, data, attrObj, settings, chartId, type) {
+    content.init = function(ndx, data, attrObj, settings, chartId, groupid, type) {
       if(data.min == undefined){
       data_.meta = _.map(_.filter(_.pluck(data, attrObj.attr_id), function(d) {
         return d !== 'NA';
@@ -166,7 +166,7 @@
 
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
-      chartInst_ = dc.barChart('#' + chartId);
+      chartInst_ = dc.barChart('#' + chartId, groupid);
 
       if (type === 'log') {
         logDc_(chartInst_, ndx_, colors_);

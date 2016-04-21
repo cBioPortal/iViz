@@ -48,16 +48,23 @@
   };
   Vue.component('abstractChart', {
     template: ' <div is="chart-implementation"' +
-    ' :ndx="ndx" :data="data"    :filters.sync="filters"  :attributes="attribute" v-for="attribute in attributes"></div>',
+    ' :ndx="ndx" :data="data"  :groupid="groupid"' +
+    '  :attributes.sync="attribute" v-for="attribute in attributes"></div>   ',
     props: [
-      'data', 'attributes', 'filters', 'type', 'mappedsamples',
-      'mappedpatients'
+      'data', 'attributes', 'type', 'mappedsamples', 'id',
+      'mappedpatients', 'groupid'
     ], created: function() {
       var ndx_ = crossfilter(this.data);
       var invisibleBridgeChart_ = iViz.bridgeChart.init(ndx_, settings_,
-        this.type);
+        this.type, this.id);
+      this.groupid = this.type + '-' + this.id;
       this.ndx = ndx_;
       this.chartInvisible = invisibleBridgeChart_;
+    }, destroyed: function() {
+      this.chartInvisible.resetSvg();
+      var id_ = this.type + '_' + this.id + '_id_chart_div';
+      $('#' + id_).remove()
+      dc.chartRegistry.clear(this.groupid);
     },
     data: function() {
       return {
@@ -89,14 +96,14 @@
       'update-filters': function() {
         this.syncPatient = false;
         this.syncSample = false;
-        this.$dispatch('update-all-filters')
+        this.$dispatch('update-all-filters', this.type)
       }
     },
     methods: {
       updateInvisibleChart: function(val) {
         this.chartInvisible.filter(null);
         this.chartInvisible.filter([val]);
-        dc.redrawAll()
+        dc.redrawAll(this.groupid);
       }
     }
   });
