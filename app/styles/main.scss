@@ -229,3 +229,41 @@ body {
   margin-right: -5px;
   border-bottom-color: rgba(0, 0, 0, 0.8)
 }
+
+.dc-chart-pointer{
+  font-size:16px;
+  color:grey;
+  cursor: pointer;
+}
+
+.loading{
+  padding:400px;
+  background-image: url('../images/ajax-loader.gif') ;
+  background-repeat:no-repeat;
+  background-size: 100px 100px;
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  content:"";
+  position: relative;
+}
+
+
+#breadcrumbs_container{
+  padding: 5px 10px 0 0;
+}
+.breadcrumb_container{
+  display:inline-block;
+}
+.breadcrumb_remove{
+  vertical-align: middle;
+  margin-top: -2px;
+  padding-right: 10px;
+}
+.breadcrumb_remove:hover{
+  cursor: pointer;
+}
+.breadcrumb_item{
+  padding: 0px 5px;
+  font-weight: bold;
+}

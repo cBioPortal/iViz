@@ -32,25 +32,18 @@
 
 var iViz = (function(_, $) {
   
-  var patientChartsInst_;
-  var sampleChartsInst_;
-  var selectedPatients_ = [];
-  var selectedSamples_ = [];
   var data_;
   var vm_;
   var grid_;
   
   return {
     init: function(_studyIdArr, _inputSampleList, _inputPatientList) {
-  
-      $('#main-grid').empty();
-      $('#main-grid').append('<img src="images/ajax-loader.gif" style="padding:200px;"/>');
-      
+      vm_ = iViz.session.manage.getInstance();
       iViz.data.init(_studyIdArr, dataInitCallbackFunc_, _inputSampleList, _inputPatientList);
       
       function dataInitCallbackFunc_(_data, _inputSampleList, _inputPatientList) {
-  
-        $('#main-grid').empty();
+
+        vm_.isloading = false;
         data_ = _data;
         
         // TODO: should filter with setter/getter
@@ -91,55 +84,40 @@ var iViz = (function(_, $) {
             }
           });
         });
-        
-        // ----  init and define dc chart instances ----
-        patientChartsInst_ = new iViz.dcCharts(
-          data_.groups.patient.attr_meta,
-          data_.groups.patient.data,
-          data_.groups.group_mapping,
-          'patient'
-        );
-        sampleChartsInst_ = new iViz.dcCharts(
-          data_.groups.sample.attr_meta,
-          data_.groups.sample.data,
-          data_.groups.group_mapping,
-          'sample'
-        );
-        
-        // ---- render dc charts ----
-        grid_ = new Packery(document.querySelector('.grid'), {
-          itemSelector: '.grid-item',
-          columnWidth: 250,
-          rowHeight: 250,
-          gutter: 5
-        });
-        
-        _.each(grid_.getItemElements(), function (_gridItem) {
-          var _draggie = new Draggabilly(_gridItem, {
-            handle: '.dc-chart-drag'
-          });
-          grid_.bindDraggabillyEvents(_draggie);
-        });
-        
-        dc.renderAll();
-        grid_.layout();
-        
-        // ---- set default selected cases ----
-        selectedPatients_ = _.pluck(data_.groups.patient.data, 'patient_id');
-        selectedSamples_ = _.pluck(data_.groups.sample.data, 'sample_id');
-        
-        // --- using vue to show filters in header ---
-        if (typeof vm_ === "undefined") {
-          vm_ = iViz.session.manage.getInstance();
-          vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, 'sample_id').length;
-          vm_.selectedPatientsNum = _.pluck(data_.groups.patient.data, 'patient_id').length;
-          vm_.filters = [];
-        } else {
-          vm_.filters = [];
-          vm_.selectedSamplesNum = _.pluck(data_.groups.sample.data, 'sample_id').length;
-          vm_.selectedPatientsNum = _.pluck(data_.groups.patient.data, 'patient_id').length;
+
+        var _patientIds = _.uniq(_.pluck(data_.groups.patient.data, 'patient_id'));
+        var _sampleIds = _.uniq(_.pluck(data_.groups.sample.data, 'sample_id'));
+
+        var groups = [];
+        var id_= 1;
+        for(var count=0;count<Math.ceil(data_.groups.patient.attr_meta.length/31);count++){
+          var group = {};
+          var lowerLimit = count+(count*31);
+          var upperLimit = lowerLimit +31;
+          group.attributes = data_.groups.patient.attr_meta.slice(lowerLimit,upperLimit);
+          group.data = data_.groups.patient.data;
+          group.type = 'patient';
+          group.id=id_;
+          groups.push(group);
+          id_++;
         }
-        
+        id_= 1;
+        for(var count=0;count<Math.ceil(data_.groups.sample.attr_meta.length/31);count++){
+          var group = {};
+          var lowerLimit = count+(count*31);
+          var upperLimit = lowerLimit +31;
+          group.attributes = data_.groups.sample.attr_meta.slice(lowerLimit,upperLimit);
+          group.data = data_.groups.sample.data;
+          group.type = 'sample';
+          group.id=id_;
+          groups.push(group);
+          id_++;
+        }
+        vm_.selectedsamples = _sampleIds;
+        vm_.selectedpatients = _patientIds;
+        vm_.patientmap = data_.groups.group_mapping.patient.sample;
+        vm_.samplemap = data_.groups.group_mapping.sample.patient;
+        vm_.groups = groups;
       };
     }, // ---- close init function ----
     
@@ -150,7 +128,7 @@ var iViz = (function(_, $) {
       // extract and reformat selected cases
       var _selectedCases = [];
       
-      _.each(selectedSamples_, function (_selectedSample) {
+      _.each(vm_.selectedsamples, function (_selectedSample) {
         
         var _index = data_.groups.sample.data_indices.sample_id[_selectedSample];
         var _studyId = data_.groups.sample.data[_index]['study_id'];
@@ -172,11 +150,32 @@ var iViz = (function(_, $) {
         });
         
       });
-      
-      _result.filters['patients'] = patientChartsInst_.filters();
-      _result.filters['samples'] = sampleChartsInst_.filters();
+      var patientChartsFilters_ = [];
+      var sampleChartsFilters_ = [];
+      _result.filters['patients'] =[];
+      _result.filters['samples'] = [];
+      _.each(vm_.groups, function(group) {
+        if(group.type==='patient'){
+          var filters_ = []
+          _.each(group.attributes, function(attributes) {
+            if (attributes.filter.length > 0)
+              filters_[attributes.attr_id] = attributes.filter;
+          });
+          var temp = $.extend(true,_result.filters['patients'],filters_);
+          var array = $.extend(true,{},temp)
+          _result.filters['patients']=array;
+        }else if(group.type==='sample'){
+          var filters_ = []
+          _.each(group.attributes, function(attributes) {
+            if (attributes.filter.length > 0)
+              filters_[attributes.attr_id] = attributes.filter;
+          });
+          var temp = $.extend(true,_result.filters['samples'],filters_);
+          var array = $.extend(true,{},temp)
+          _result.filters['samples']=array;
+        }
+      });
       _result['selected_cases'] = _selectedCases;
-      
       return _result;
     },
     
@@ -200,86 +199,64 @@ var iViz = (function(_, $) {
         transitionDuration: 400
       }
     },
-    getData: function (_type) {
-      return (_type === 'patient') ? data_.groups.patient.data : data_.groups.sample.data;
+    applyVC: function (_vc) {
+      var _selectedSamples = [], _selectedPatients = [];
+      _.each(_.pluck(_vc.selectedCases, "samples"), function (_arr) {
+        _selectedSamples = _selectedSamples.concat(_arr);
+      });
+      _.each(_.pluck(_vc.selectedCases, "patients"), function (_arr) {
+        _selectedPatients = _selectedPatients.concat(_arr);
+      });
+      iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub"], _selectedSamples, _selectedPatients);
     },
-    getMapping: function () {
-      return data_.groups.group_mapping;
-    },
-    patientChartsInst: function () {
-      return patientChartsInst_;
-    },
-    sampleChartsInst: function () {
-      return sampleChartsInst_;
-    },
-    setSelectedSamples: function (_input) {
-      selectedSamples_ = _input;
-    },
-    getSelectedSamples: function () {
-      return selectedSamples_;
-    },
-    setSelectedPatients: function (_input) {
-      selectedPatients_ = _input;
-    },
-    getSelectedPatients: function () {
-      return selectedPatients_;
-    },
-    //applyVC: function (_vc) {
-    //  var _selectedSamples = [], _selectedPatients = [];
-    //  _.each(_.pluck(_vc.selectedCases, "samples"), function (_arr) {
-    //    _selectedSamples = _selectedSamples.concat(_arr);
-    //  });
-    //  _.each(_.pluck(_vc.selectedCases, "patients"), function (_arr) {
-    //    _selectedPatients = _selectedPatients.concat(_arr);
-    //  });
-    //  iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"], _selectedSamples, _selectedPatients);
-    //},
-    //resetAll: function() {
-    //  var _selectedStudyIds = []
-    //  var _currentURL = window.location.href;
-    //  if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") !== -1) {
-    //    var _vcId;
-    //    var query = location.search.substr(1);
-    //    _.each(query.split('&'), function(_part) {
-    //      var item = _part.split('=');
-    //      if (item[0] === 'vc_id') {
-    //        _vcId = item[1];
-    //      } else if (item[0] === 'study_id') {
-    //        _selectedStudyIds = _selectedStudyIds.concat(item[1].split(','));
-    //      }
-    //    });
-    //    $.getJSON(URL + _vcId, function(response) {
-    //      _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
-    //      var _selectedPatientIds = [];
-    //      _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function(_patientIds) {
-    //        _selectedPatientIds = _selectedPatientIds.concat(_patientIds);
-    //      });
-    //      var _selectedSampleIds = [];
-    //      _.each(_.pluck(response.data.virtualCohort.selectedCases, "samples"), function(_sampleIds) {
-    //        _selectedSampleIds = _selectedSampleIds.concat(_sampleIds);
-    //      });
-    //      iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
-    //    });
-    //  } else if (_currentURL.indexOf("vc_id") === -1 && _currentURL.indexOf("study_id") !== -1) {
-    //    _selectedStudyIds = _selectedStudyIds.concat(location.search.split('study_id=')[1].split(','));
-    //    iViz.init(_selectedStudyIds);
-    //  } else if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") === -1) {
-    //    var _vcId = location.search.split('vc_id=')[1];
-    //    $.getJSON(URL + _vcId, function(response) {
-    //      _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
-    //      var _selectedPatientIds = [];
-    //      _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function(_patientIds) {
-    //        _selectedPatientIds = _selectedPatientIds.concat(_patientIds);
-    //      });
-    //      var _selectedSampleIds = [];
-    //      _.each(_.pluck(response.data.virtualCohort.selectedCases, "samples"), function(_sampleIds) {
-    //        _selectedSampleIds = _selectedSampleIds.concat(_sampleIds);
-    //      });
-    //      iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
-    //    });
-    //  }
-    //}
-    
+    resetAll: function() {
+      var _selectedStudyIds = []
+      var _currentURL = window.location.href;
+      if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") !== -1) {
+        var _vcId;
+        var query = location.search.substr(1);
+        _.each(query.split('&'), function(_part) {
+          var item = _part.split('=');
+          if (item[0] === 'vc_id') {
+            _vcId = item[1];
+          } else if (item[0] === 'study_id') {
+            _selectedStudyIds = _selectedStudyIds.concat(item[1].split(','));
+          }
+        });
+        $.getJSON(URL + _vcId, function(response) {
+          _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
+          var _selectedPatientIds = [];
+          _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function(_patientIds) {
+            _selectedPatientIds = _selectedPatientIds.concat(_patientIds);
+          });
+          var _selectedSampleIds = [];
+          _.each(_.pluck(response.data.virtualCohort.selectedCases, "samples"), function(_sampleIds) {
+            _selectedSampleIds = _selectedSampleIds.concat(_sampleIds);
+          });
+          iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
+        });
+      } else if (_currentURL.indexOf("vc_id") === -1 && _currentURL.indexOf("study_id") !== -1) {
+        _selectedStudyIds = _selectedStudyIds.concat(location.search.split('study_id=')[1].split(','));
+        iViz.init(_selectedStudyIds);
+      } else if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") === -1) {
+        var _vcId = location.search.split('vc_id=')[1];
+        $.getJSON(URL + _vcId, function(response) {
+          _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
+          var _selectedPatientIds = [];
+          _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function(_patientIds) {
+            _selectedPatientIds = _selectedPatientIds.concat(_patientIds);
+          });
+          var _selectedSampleIds = [];
+          _.each(_.pluck(response.data.virtualCohort.selectedCases, "samples"), function(_sampleIds) {
+            _selectedSampleIds = _selectedSampleIds.concat(_sampleIds);
+          });
+          iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
+        });
+      }else{
+        iViz.session.manage.getInstance().initialize();
+        iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub"])
+      }
+    }
   }
 }(window._, window.$));
 

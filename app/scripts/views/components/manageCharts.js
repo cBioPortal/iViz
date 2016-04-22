@@ -29,39 +29,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
- * @author suny1@mskcc.org on 3/15/16.
- *
- * Invisible charts functioning as bridges between different chart groups
- * Each chart group has its own invisible chart, consisting of sample/patient ids
- *
+ * Created by Karthik Kalletla on 4/20/16.
  */
-
 'use strict';
-(function($, dc) {
-  iViz.bridgeChart = {};
-  iViz.bridgeChart.init = function(ndx, settings, type,id) {
-    var dimHide, countPerFuncHide;
-    if (type === 'patient') {
-      dimHide = ndx.dimension(function (d) { return d.patient_id; }),
-        countPerFuncHide = dimHide.group().reduceCount();
-    } else if (type === 'sample') {
-      dimHide = ndx.dimension(function (d) { return d.sample_id; }),
-        countPerFuncHide = dimHide.group().reduceCount();
+(function(Vue, iViz, $, Clipboard) {
+  Vue.component('manageCharts', {
+    template: '<option id="{{attribute.attr_id}}" v-if="!attribute.show" v-for="attribute in data.attributes" value="{{parent}}---{{ $index }}">{{attribute.display_name}}</option>',
+    props: [
+      'data', 'parent'
+    ], ready: function() {
+      $("#study-view-add-chart").trigger("chosen:updated");
     }
-    $('#main-bridge').append(
-      '<div class="grid-item" id="' + type +'_'+id+ '_id_chart_div">' +
-      '<div class="dc-chart dc-pie-chart" id="' + type +'_'+id+ '_id_chart"></div>' +
-      "</div>"
-    );
-    var _chartInvisible = dc.pieChart('#' + type +'_'+id+ '_id_chart', type +'-'+id);
-    _chartInvisible.width(settings.pieChart.width)
-      .height(settings.pieChart.height)
-      .dimension(dimHide)
-      .group(countPerFuncHide)
-      .innerRadius(settings.pieChart.innerRadius);
-    return _chartInvisible;
-  }
-  return iViz.bridgeChart;
-}(window.$, window.dc));
+  });
+})(window.Vue, window.iViz,
+  window.$ || window.jQuery);

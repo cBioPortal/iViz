@@ -58,7 +58,6 @@
   <script src="scripts/controller/sync.js"></script>
   <script src="scripts/controller/event.js"></script>
   <script src="scripts/views/components/bridgeChart.js"></script>
-  <script src="scripts/views/dcCharts.js"></script>>
   <script src="scripts/views/components/pieChart.js"></script>
   <script src="scripts/views/components/barChart.js"></script>
   <script src="scripts/vueCore.js"></script>
@@ -66,6 +65,14 @@
   <script src="scripts/controller/sessionUtil.js"></script>
   <script src="scripts/views/components/editableFieldComponent.js"></script>
   <script src="scripts/views/components/editableRowComponent.js"></script>
+  <script src="scripts/views/components/topChartMainTemplate.js"></script>
+  <script src="scripts/views/components/abstractChart.js"></script>
+  <script src="scripts/views/components/chartOperationsHeader.js"></script>
+  <script src="scripts/views/components/manageCharts.js"></script>
+  <script src="scripts/views/components/pieChartTemplate.js"></script>
+  <script src="scripts/views/components/barChartTemplate.js"></script>
+  <script src="scripts/views/components/chartImplementation.js"></script>
+  <script src="scripts/views/components/breadCrumbTemplate.js"></script>
   <script src="scripts/views/components/modalTemplate.js"></script>
   <script src="scripts/views/components/addVCPopup.js"></script>
   <script src="scripts/model/sessionServices.js"></script>
@@ -76,7 +83,7 @@
 </head>
 <body>
 
-<div class="container-fluid">
+<div class="container-fluid" id="complete-screen">
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header">
       <a href='javascript:iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"]);' class='reset'>
@@ -92,19 +99,33 @@
         <!--<i class="fa fa-bars"></i>-->
         </button><span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
-          Patients Selected <mark>{{ selectedPatientsNum }}</mark>
-          <br><span v-for="filter in filters" id="filters-list">{{{ filter.text }}}&nbsp;&nbsp;&nbsp;</span>
+          Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
         </span>
       <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
               <!--:selected-samples-num="selectedSamplesNum"-->
               <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
+      <select id="study-view-add-chart" class="chosen-select"
+              v-select :groups="groups"><option id='' value="">Add Chart</option>
+        <!--<option v-for="attributes in groups[0].attributes"></option>-->
+        <option is="manage-charts" :data.sync="group"
+                v-for="(index,group) in groups" :parent="index"></option>
+      </select>
 
 
-      <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
+
+      <div id="breadcrubs-container">
+        <div v-for="group in groups">
+          <div v-for="(index1, item) in group.attributes">
+            <bread-crumb :attributes.sync="item"
+                         :filters.sync="item.filter"></bread-crumb>
+          </div>
+        </div>
+      </div>
+
+        <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
         <!--<div slot="header">-->
-          <!--<h4 class="modal-title">Virtual Cohorts</h4>-->
+        <!--<h4 class="modal-title">Virtual Cohorts</h4>-->
         <!--</div>-->
-
         <!--<div slot="body">-->
           <!--<table class="table table-bordered table-hover table-condensed">-->
             <!--<thead>-->
@@ -128,20 +149,26 @@
       <!--</modaltemplate>-->
     </div>
   </nav>
-  <div class="grid" id="main-grid"></div>
+    <div class="grid" id="main-grid" :class="{loading:isloading}">
+      <top-chart-main-template :groups.sync="groups"
+                             :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
+                             :selectedsamples.sync="selectedsamples"  ></top-chart-main-template>
+    </div>
   <div id="main-bridge" style="display: none;"></div>
+
+
 </div>
 
 </body>
 <script>
   $( document ).ready(function() {
-    URL = "http://localhost:8080/api/sessions/";
+    URL = "http://localhost:8081/api/sessions/";
     var vcId_ = location.search.split('vc_id=')[1];
     iViz.session.manage.init();
     if (typeof vcId_ != 'undefined') {
       iViz.session.model.getVirtualCohortDetails(vcId_);
     } else {
-      iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"]);
+      iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub"]);
     }
   });
 </script>

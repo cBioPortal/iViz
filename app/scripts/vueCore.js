@@ -43,14 +43,42 @@
     return {
       init: function() {
         vmInstance_ = new Vue({
-          el: '#main-header',
+          el: '#complete-screen',
           data: {
+            groups: [],
+            selectedsamples: [],
+            selectedpatients: [],
+            patientmap: [],
+            samplemap: [],
             showVCList: false,
             addNewVC: false,
-            filters: [],
             selectedPatientsNum: 0,
             selectedSamplesNum: 0,
-            virtualCohorts: []
+            filters: [],
+            virtualCohorts: [],
+            isloading: true
+          }, watch: {
+            'selectedsamples': function(val) {
+              this.selectedSamplesNum = val.length;
+            },
+            'selectedpatients': function(val) {
+              this.selectedPatientsNum = val.length;
+            }
+          }, methods: {
+            initialize: function() {
+              this.groups = [],
+                this.selectedsamples = [],
+                this.selectedpatients = [],
+                this.patientmap = [],
+                this.samplemap = [],
+                this.showVCList = false,
+                this.addNewVC = false,
+                this.selectedPatientsNum = 0,
+                this.selectedSamplesNum = 0,
+                this.filters = [],
+                this.virtualCohorts = [],
+                this.isloading = true
+            }
           }, ready: function() {
             this.$watch('showVCList', function() {
               this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
@@ -66,6 +94,25 @@
       }
     };
   })();
+
+
+  Vue.directive('select', {
+    twoWay: true,
+    params: ['groups'],
+    bind: function() {
+      var self = this
+      $(this.el).chosen({
+          width: '30%'
+        })
+        .change(function() {
+            if (this.value !== '') {
+              var value = this.el.value.split('---');
+              self.params.groups[value[0]].attributes[value[1]].show = true
+            }
+          }.bind(this)
+        );
+    }
+  })
 
   // This is an example to add sample to a virtual cohort from scatter plot
   iViz.session.vmScatter = (function() {

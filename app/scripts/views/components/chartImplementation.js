@@ -28,40 +28,57 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-
 /**
- * @author suny1@mskcc.org on 3/15/16.
- *
- * Invisible charts functioning as bridges between different chart groups
- * Each chart group has its own invisible chart, consisting of sample/patient ids
- *
+ * Created by Karthik Kalletla on 4/6/16.
  */
-
 'use strict';
-(function($, dc) {
-  iViz.bridgeChart = {};
-  iViz.bridgeChart.init = function(ndx, settings, type,id) {
-    var dimHide, countPerFuncHide;
-    if (type === 'patient') {
-      dimHide = ndx.dimension(function (d) { return d.patient_id; }),
-        countPerFuncHide = dimHide.group().reduceCount();
-    } else if (type === 'sample') {
-      dimHide = ndx.dimension(function (d) { return d.sample_id; }),
-        countPerFuncHide = dimHide.group().reduceCount();
+(function(Vue, dc, iViz, $) {
+  Vue.component('chartImplementation', {
+    template: '<div v-if="attributes.show">' +
+    '<component :is="currentView" :groupid="groupid"' +
+    ' :filters.sync="attributes.filter" v-if="attributes.show" :options="options" :ndx="ndx" :attributes.sync="attributes"></component>' +
+    '</div>',
+    props: [
+      'data', 'ndx', 'attributes', 'groupid'
+    ],
+    data: function() {
+      var options = {};
+      var currentView = '';
+      switch (this.attributes.view_type) {
+        case 'pie_chart':
+          currentView = 'pie-chart';
+          break;
+        case 'bar_chart':
+          currentView = 'bar-chart';
+          var data_ = _.map(
+            _.filter(_.pluck(this.data, this.attributes.attr_id), function(d) {
+              return d !== 'NA';
+            }), function(d) {
+              return parseFloat(d);
+            });
+          options.min = d3.min(data_);
+          options.max = d3.max(data_);
+          break;
+      }
+      return {
+        currentView: currentView,
+        options: options,
+      }
+    },
+    watch: {
+      'attributes.show': function(newVal) {
+        if (!newVal)
+          this.$dispatch('update-grid')
+        $("#study-view-add-chart").trigger("chosen:updated");
+      }
+    },
+    events: {
+      'close': function() {
+        this.attributes.show = false;
+      }
     }
-    $('#main-bridge').append(
-      '<div class="grid-item" id="' + type +'_'+id+ '_id_chart_div">' +
-      '<div class="dc-chart dc-pie-chart" id="' + type +'_'+id+ '_id_chart"></div>' +
-      "</div>"
-    );
-    var _chartInvisible = dc.pieChart('#' + type +'_'+id+ '_id_chart', type +'-'+id);
-    _chartInvisible.width(settings.pieChart.width)
-      .height(settings.pieChart.height)
-      .dimension(dimHide)
-      .group(countPerFuncHide)
-      .innerRadius(settings.pieChart.innerRadius);
-    return _chartInvisible;
-  }
-  return iViz.bridgeChart;
-}(window.$, window.dc));
+  });
+})(window.Vue, window.dc, window.iViz,
+  window.$ || window.jQuery);

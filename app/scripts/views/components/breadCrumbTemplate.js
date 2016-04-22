@@ -29,39 +29,32 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
- * @author suny1@mskcc.org on 3/15/16.
- *
- * Invisible charts functioning as bridges between different chart groups
- * Each chart group has its own invisible chart, consisting of sample/patient ids
- *
+ * Created by Karthik Kalletla on 4/18/16.
  */
-
 'use strict';
-(function($, dc) {
-  iViz.bridgeChart = {};
-  iViz.bridgeChart.init = function(ndx, settings, type,id) {
-    var dimHide, countPerFuncHide;
-    if (type === 'patient') {
-      dimHide = ndx.dimension(function (d) { return d.patient_id; }),
-        countPerFuncHide = dimHide.group().reduceCount();
-    } else if (type === 'sample') {
-      dimHide = ndx.dimension(function (d) { return d.sample_id; }),
-        countPerFuncHide = dimHide.group().reduceCount();
+(function(Vue) {
+  Vue.component('breadCrumb', {
+    template: '<div class="breadcrumb_container" v-if="attributes.filter.length > 0">' +
+    '<span>{{attributes.attr_id}}&nbsp;&nbsp;:&nbsp;&nbsp;</span><div class="breadcrumd_items">' +
+    '<div v-if="filters.filterType === \'RangedFilter\'"><span class="breadcrumb_item">{{filters[0]}}-{{filters[0]}}</span>' +
+    '<img class="breadcrumb_remove" src="../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)"></div><div' +
+    ' v-else>' +
+    '<div v-for="filter in filters" style="display:inline-block;">' +
+    '<span class="breadcrumb_item">{{filter}}</span>' +
+    '<img class="breadcrumb_remove" src="../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">' +
+    '</div></div></div></div>',
+    props: [
+      'filters', 'attributes'
+    ],
+    methods: {
+      removeFilter: function(val) {
+        if (this.attributes.view_type === 'bar_chart') {
+          this.filters = []
+        } else {
+          this.filters.$remove(val)
+        }
+      }
     }
-    $('#main-bridge').append(
-      '<div class="grid-item" id="' + type +'_'+id+ '_id_chart_div">' +
-      '<div class="dc-chart dc-pie-chart" id="' + type +'_'+id+ '_id_chart"></div>' +
-      "</div>"
-    );
-    var _chartInvisible = dc.pieChart('#' + type +'_'+id+ '_id_chart', type +'-'+id);
-    _chartInvisible.width(settings.pieChart.width)
-      .height(settings.pieChart.height)
-      .dimension(dimHide)
-      .group(countPerFuncHide)
-      .innerRadius(settings.pieChart.innerRadius);
-    return _chartInvisible;
-  }
-  return iViz.bridgeChart;
-}(window.$, window.dc));
+  });
+})(window.Vue);

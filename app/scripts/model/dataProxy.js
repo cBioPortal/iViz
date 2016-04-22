@@ -39,22 +39,22 @@
 
 'use strict';
 (function (iViz, $) {
-  
+
   iViz.data = {};
-  
+
   iViz.data.init = function (_studyIdArr, _callbackFunc, _inputSampleList, _inputPatientList) {
-    
+
     var _result = {};
     //var PORTAL_INST_URL = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1];
     var PORTAL_INST_URL = "http://localhost:8080/cbioportal";
-    
+
     // ---- ajax cascade ----
     var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
       _ajaxSampleData = [], _ajaxPatientData = [],
       _ajaxPatient2SampleIdMappingObj = {}, _ajaxSample2PatientIdMappingObj = {},
       _ajaxMutationCountData = {}, _ajaxCnaFractionData = {},
       _ajaxGeneticProfiles = {}, _ajaxCnaData = {}, _ajaxMutGenesData = {};
-    
+
     // patient clinical attribute meta
     $.when.apply($, _studyIdArr.map(function (_studyId) {
       return $.ajax({
@@ -63,7 +63,7 @@
         data: {study_id: _studyId}
       });
     })).done(function () {
-      
+
       // add in study id as an attribute
       _ajaxPatientMeta.push({
         "datatype": "STRING",
@@ -72,13 +72,13 @@
         "attr_id": "study_id",
         "view_type": "pie_chart"
       });
-      
+
       var _results = [];
       for (var i = 0; i < arguments.length; i++) {
         _results = _results.concat(arguments[i][0]);
       }
       _ajaxPatientMeta = _ajaxPatientMeta.concat(_.uniq(_results, 'attr_id'));
-      
+
       // sample clinical attribute meta
       $.when.apply($, _studyIdArr.map(function (_studyId) {
         return $.ajax({
@@ -92,14 +92,10 @@
           _results = _results.concat(arguments[i][0]);
         }
         _ajaxSampleMeta = _.uniq(_results, 'attr_id');
-        
+
         // patient clinical data
         $.when.apply($, _studyIdArr.map(function (_studyId) {
-          
-          // Only store less than 32 attributes (due to limitation of crossfilter)
-          // TODO: set priority for attributes
-          _ajaxPatientMeta = _ajaxPatientMeta.splice(0, 31);
-          
+
           return $.ajax({
             method: "POST",
             url: PORTAL_INST_URL + '/api/clinicaldata/patients',
@@ -111,13 +107,10 @@
             _results = _results.concat(arguments[i][0]);
           }
           _ajaxPatientData = _results;
-          
+
           // sample clinical data
           $.when.apply($, _studyIdArr.map(function (_studyId) {
-            
-            // Only store less than 32 attributes (due to limitation of crossfilter)
-            // TODO: set priority for attributes
-            _ajaxSampleMeta = _ajaxSampleMeta.splice(0, 31);
+
             return $.ajax({
               method: "POST",
               url: PORTAL_INST_URL + '/api/clinicaldata/samples',
@@ -129,7 +122,7 @@
               _results = _results.concat(arguments[i][0]);
             }
             _ajaxSampleData = _results;
-            
+
             // id mapping
             $.when.apply($, _studyIdArr.map(function (_studyId) {
               return $.ajax({
@@ -141,10 +134,10 @@
               for (var i = 0; i < arguments.length; i++) {
                 _ajaxPatient2SampleIdMappingObj = $.extend({}, JSON.parse(arguments[i][0]), _ajaxPatient2SampleIdMappingObj);
               }
-              
+
               // get all genetic profiles for queried studies
               $.when.apply($, _studyIdArr.map(function (_studyId) {
-                
+
                 return $.ajax({
                   method: "POST",
                   url: PORTAL_INST_URL + '/api/geneticprofiles',
@@ -156,7 +149,7 @@
                   _results = _results.concat(arguments[i][0]);
                 }
                 _ajaxGeneticProfiles = _results;
-                
+
                 // mutation count
                 var _mutCountStudyIdArr = _.filter(_studyIdArr, function (_studyId) {
                   return $.inArray(_studyId + '_mutations', _.pluck(_ajaxGeneticProfiles, 'id')) !== -1;
@@ -171,7 +164,7 @@
                   for (var i = 0; i < arguments.length; i++) {
                     _ajaxMutationCountData = $.extend({}, arguments[i][0], _ajaxMutationCountData);
                   }
-                  
+
                   // mutation data
                   var _mutDataStudyIdArr = _.filter(_studyIdArr, function (_studyId) {
                     return $.inArray(_studyId + '_mutations', _.pluck(_ajaxGeneticProfiles, 'id')) !== -1;
@@ -187,7 +180,7 @@
                       _results = _results.concat(arguments[i][0]);
                     }
                     _ajaxMutGenesData = _results;
-                    
+
                     // cna fraction data
                     $.when.apply($, _studyIdArr.map(function (_studyId) {
                       return $.ajax({
@@ -199,7 +192,7 @@
                       for (var i = 0; i < arguments.length; i++) {
                         _ajaxCnaFractionData = $.extend({}, arguments[i][0], _ajaxCnaFractionData);
                       }
-                      
+
                       // cna table data
                       var _gisticStudyIdArr = _.filter(_studyIdArr, function (_studyId) {
                         return $.inArray(_studyId + '_gistic', _.pluck(_ajaxGeneticProfiles, 'id')) !== -1;
@@ -223,8 +216,8 @@
                           _ajaxCnaData.alter = _ajaxCnaData.alter.concat(arguments[i][0].alter);
                           _ajaxCnaData.caseIds = _ajaxCnaData.caseIds.concat(arguments[i][0].caseIds);
                         }
-                        
-                        // --- web API results converting ---- 
+
+                        // --- web API results converting ----
                         var _patientData = [], _sampleData = [];
                         var _patientIds = _.uniq(_.pluck(_ajaxPatientData, 'patient_id'));
                         var _sampleIds = _.uniq(_.pluck(_ajaxSampleData, 'sample_id'));
@@ -245,7 +238,7 @@
                             var _sampleIdArr = _ajaxPatient2SampleIdMappingObj[_tmpPatientId];
                             _.each(_sampleIdArr, function (_tmpSampleId) {
                               if (_tmpSampleId === _sampleId) {
-                                _ajaxSample2PatientIdMappingObj[_sampleId] = _tmpPatientId;
+                                _ajaxSample2PatientIdMappingObj[_sampleId] = new Array(_tmpPatientId);
                               }
                             });
                           });
@@ -314,7 +307,7 @@
                           // final push
                           _sampleData.push(_datum);
                         });
-                        
+
                         // construct attr meta for cna details
                         if (_gisticStudyIdArr.length !== 0) {
                           var _cnaAttrMeta = {};
@@ -325,7 +318,7 @@
                           _cnaAttrMeta.gene_list = _storedCnaGeneInventory;
                           _ajaxSampleMeta.push(_cnaAttrMeta);
                         }
-                        
+
                         // construct attr meta for gene mutation info
                         if (_mutDataStudyIdArr.length !== 0) {
                           var _mutDataAttrMeta = {};
@@ -336,7 +329,7 @@
                           _mutDataAttrMeta.gene_list = _storedMutGeneInventory;
                           _ajaxSampleMeta.push(_mutDataAttrMeta);
                         }
-                        
+
                         var _indexPatient = 0, _patientDataIndicesObj = {};
                         _.each(_patientIds, function (_patientId) {
                           var _datum = {};
@@ -351,23 +344,34 @@
                           _indexPatient += 1;
                           _patientData.push(_datum);
                         });
-                        
+
+                        // TODO : temporary fix to show/hide charts
+                        var tempCount = 0;
                         // define view type from data type
                         _.each(_ajaxSampleMeta, function (_metaObj) {
+                          _metaObj.filter = [];
+                          if (tempCount < 10) _metaObj.show = true;
+                          else _metaObj.show = false;
                           if (_metaObj.datatype === "NUMBER") {
                             _metaObj.view_type = 'bar_chart';
                           } else if (_metaObj.datatype === "STRING") {
                             _metaObj.view_type = 'pie_chart';
                           }
+                          tempCount++;
                         });
+                        tempCount = 0;
                         _.each(_ajaxPatientMeta, function (_metaObj) {
+                          _metaObj.filter = [];
+                          if (tempCount < 10) _metaObj.show = true;
+                          else _metaObj.show = false;
                           if (_metaObj.datatype === "NUMBER") {
                             _metaObj.view_type = 'bar_chart';
                           } else if (_metaObj.datatype === "STRING") {
                             _metaObj.view_type = 'pie_chart';
                           }
+                          tempCount++;
                         });
-                        
+
                         _result.groups = {};
                         _result.groups.patient = {};
                         _result.groups.sample = {};
@@ -384,9 +388,9 @@
                         _result.groups.group_mapping.patient = {};
                         _result.groups.group_mapping.sample.patient = _ajaxSample2PatientIdMappingObj;
                         _result.groups.group_mapping.patient.sample = _ajaxPatient2SampleIdMappingObj;
-                        
+
                         _callbackFunc(_result, _inputSampleList, _inputPatientList);
-                        
+
                       });
                     });
                   });
@@ -397,6 +401,6 @@
         });
       });
     });
-    
+
   }
 }(window.iViz, window.$));

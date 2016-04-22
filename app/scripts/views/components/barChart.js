@@ -124,7 +124,7 @@
       });
 
       chartInst_.xAxis().tickValues(opts_.xDomain);
-      chartInst_.xAxisLabel(data_.displayName);
+      //chartInst_.xAxisLabel(data_.displayName);
       chartInst_.xUnits(function() {
         return opts_.xDomain.length * 1.3 <= 5 ? 5 : opts_.xDomain.length * 1.3;
       });
@@ -138,21 +138,27 @@
       // TODO: Should include the log scale initialize function from study-view.
     };
 
-    content.init = function(ndx, data, attrObj, settings, chartId, type) {
+    content.init = function(ndx, data, attrObj, settings, chartId, groupid, type) {
+      if(data.min == undefined){
       data_.meta = _.map(_.filter(_.pluck(data, attrObj.attr_id), function(d) {
         return d !== 'NA';
       }), function(d) {
         return parseFloat(d);
       });
-      data_.attrId = attrObj.attr_id;
-      data_.displayName = attrObj.display_name;
       data_.min = d3.min(data_.meta);
       data_.max = d3.min(data_.meta);
-
       opts_ = iViz.util.barChart.getDcConfig({
         min: d3.min(data_.meta),
         max: d3.max(data_.meta)
       });
+      }else{
+        opts_ = iViz.util.barChart.getDcConfig({
+          min: data.min,
+          max: data.max
+        });
+      }
+      data_.attrId = attrObj.attr_id;
+      data_.displayName = attrObj.display_name;
       opts_.width = settings.barChart.width;
       opts_.height = settings.barChart.height;
 
@@ -160,7 +166,7 @@
 
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
-      chartInst_ = dc.barChart('#' + chartId);
+      chartInst_ = dc.barChart('#' + chartId, groupid);
 
       if (type === 'log') {
         logDc_(chartInst_, ndx_, colors_);
