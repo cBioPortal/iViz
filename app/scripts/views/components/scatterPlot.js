@@ -29,26 +29,40 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 /**
  * Created by Yichao Sun on 5/11/16.
  */
+
 'use strict';
-(function (iViz, dc, _, $, d3) {
+(function (iViz, _, d3) {
   iViz.view.component.scatterPlot = function () {
     var content = {};
-    content.init = function (_data, chartId) {
-      Plotly.plot(document.getElementById(chartId), [{
-        x: [1, 2, 3, 4, 5],
-        y: [1, 2, 4, 8, 16] }], {
-        margin: { t: 0 } } 
-      );
+    content.init = function (_data, _chartId) {
+      var _xArr = _.pluck(_data, "cna_fraction"),
+          _yArr = _.pluck(_data, "mutation_count");
+      var trace = {
+        x: _xArr,
+        y: _yArr,
+        mode: 'markers',
+        type: 'scatter',
+        marker: {size: 5}
+      };
+      var data = [trace];
+      var layout = {
+        xaxis: {
+          title: 'Fraction of copy number altered genome',
+          range: [ d3.min(_xArr), d3.max(_xArr) ]
+        },
+        yaxis: {
+          title: '# of mutations',
+          range: [ d3.min(_yArr), d3.max(_yArr) ]
+        },
+      };
+      Plotly.plot(document.getElementById(_chartId), data, layout);
     };
     return content;
   };
   iViz.util.scatterPlot = (function () {
   })();
-})(window.iViz,
-  window.dc,
-  window._,
-  window.$ || window.jQuery,
-  window.d3);
+})(window.iViz, window._, window.d3);
