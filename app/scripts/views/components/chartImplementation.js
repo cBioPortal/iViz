@@ -64,6 +64,9 @@
         case 'scatter_plot':
           currentView = 'scatter-plot';
           break;
+        case 'survival':
+          currentView = 'survival';
+          break;
       }
       return {
         currentView: currentView,

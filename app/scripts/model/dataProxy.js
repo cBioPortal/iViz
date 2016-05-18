@@ -64,8 +64,6 @@
       });
     })).done(function () {
 
-
-
       var _results = [];
       for (var i = 0; i < arguments.length; i++) {
         _results = _results.concat(arguments[i][0]);
@@ -300,17 +298,8 @@
                           // final push
                           _sampleData.push(_datum);
                         });
-
-                        // add in study id as an attribute
-                        _ajaxPatientMeta.unshift({
-                          "datatype": "STRING",
-                          "description": "Cancer Types",
-                          "display_name": "Cancer Types",
-                          "attr_id": "study_id",
-                          "view_type": "pie_chart"
-                        });
                         
-                        // construct attr meta for cna details
+                        // add CNA details
                         if (_gisticStudyIdArr.length !== 0) {
                           var _cnaAttrMeta = {};
                           _cnaAttrMeta.type = 'TABLE';
@@ -321,7 +310,7 @@
                           _ajaxSampleMeta.unshift(_cnaAttrMeta);
                         }
 
-                        // construct attr meta for gene mutation info
+                        // add Gene Mutation Info
                         if (_mutDataStudyIdArr.length !== 0) {
                           var _mutDataAttrMeta = {};
                           _mutDataAttrMeta.type = 'TABLE';
@@ -332,7 +321,7 @@
                           _ajaxSampleMeta.unshift(_mutDataAttrMeta);
                         }
                         
-                        // construct attr meta for mutation count
+                        // add Mutation count vs. CNA fraction
                         var _mutCntAttrMeta = {};
                         _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
                         _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
@@ -340,7 +329,34 @@
                         _mutCntAttrMeta.description = 'Mutation Count vs. CNA';
                         _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
                         _ajaxSampleMeta.unshift(_mutCntAttrMeta);
-  
+
+                        // add DFS survival
+                        var _dfsSurvivalAttrMeta = {};
+                        _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
+                        _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
+                        _dfsSurvivalAttrMeta.view_type = 'survival';
+                        _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
+                        _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
+                        _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
+
+                        // add OS survival
+                        var _osSurvivalAttrMeta = {};
+                        _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
+                        _osSurvivalAttrMeta.datatype = 'SURVIVAL';
+                        _osSurvivalAttrMeta.view_type = 'survival';
+                        _osSurvivalAttrMeta.description = 'Overall Survival';
+                        _osSurvivalAttrMeta.display_name = 'Overall Survival';
+                        _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
+
+                        // add Cancer Study
+                        _ajaxPatientMeta.unshift({
+                          "datatype": "STRING",
+                          "description": "Cancer Types",
+                          "display_name": "Cancer Types",
+                          "attr_id": "study_id",
+                          "view_type": "pie_chart"
+                        });
+
                         var _indexPatient = 0, _patientDataIndicesObj = {};
                         _.each(_patientIds, function (_patientId) {
                           var _datum = {};

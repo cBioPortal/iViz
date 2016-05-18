@@ -30,15 +30,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * @author Yichao Sun on 5/11/16.
+ * @author Yichao Sun on 5/18/16.
  */
 'use strict';
-(function(Vue, dc, iViz) {
-  Vue.component('scatterPlot', {
+(function(Vue, dc, iViz, $) {
+  Vue.component('survival', {
     template: '<div id={{chartDivId}} class="grid-item grid-item--height2 grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-      '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
-      '<p class="text-center">{{displayName}}</p><div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
-      '</div>',
+    '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
+    '<p class="text-center">{{displayName}}</p><div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
+    '</div>',
     props: [
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
@@ -67,8 +67,8 @@
       }
     },
     ready: function() {
-      var _scatterPlot = new iViz.view.component.scatterPlot();
-      _scatterPlot.init(this.data, this.chartId);
+      var _survivalChart = new iViz.view.component.survival();
+      _survivalChart.init(this.data, this.chartId);
     }
   });
 })(window.Vue, window.dc, window.iViz,
