@@ -28,59 +28,47 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
  */
 /**
- * Created by Karthik Kalletla on 4/6/16.
+ * @author Yichao Sun on 5/11/16.
  */
 'use strict';
 (function(Vue, dc, iViz, $) {
-  Vue.component('chartImplementation', {
-    template: '<div v-if="attributes.show">' +
-    '<component :is="currentView" :groupid="groupid"' +
-    ' :filters.sync="attributes.filter" v-if="attributes.show" :options="options" :ndx="ndx" :attributes.sync="attributes" :data="data"></component>' +
-    '</div>',
+  Vue.component('scatterPlot', {
+    template: '<div id={{chartDivId}} class="grid-item grid-item--height2 grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+      '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
+      '<p class="text-center">{{displayName}}</p><div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
+      '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'groupid'
+      'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
+    created: function() {
+    },
     data: function() {
-      var options = {};
-      var currentView = '';
-      switch (this.attributes.view_type) {
-        case 'pie_chart':
-          currentView = 'pie-chart';
-          break;
-        case 'bar_chart':
-          currentView = 'bar-chart';
-          var data_ = _.map(
-            _.filter(_.pluck(this.data, this.attributes.attr_id), function(d) {
-              return d !== 'NA';
-            }), function(d) {
-              return parseFloat(d);
-            });
-          options.min = d3.min(data_);
-          options.max = d3.max(data_);
-          break;
-        case 'scatter_plot':
-          currentView = 'scatter-plot';
-          break;
-      }
       return {
-        currentView: currentView,
-        options: options,
-      }
+        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
+        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
+        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
+        displayName: this.attributes.display_name,
+        chartInst: '',
+        showOperations: false,
+        fromWatch: false,
+        fromFilter: false,
+      };
     },
     watch: {
-      'attributes.show': function(newVal) {
-        if (!newVal)
-          this.$dispatch('update-grid')
-        $("#study-view-add-chart").trigger("chosen:updated");
+    },
+    events: {},
+    methods: {
+      mouseEnter: function() {
+        this.showOperations = true;
+      }, mouseLeave: function() {
+        this.showOperations = false;
       }
     },
-    events: {
-      'close': function() {
-        this.attributes.show = false;
-      }
+    ready: function() {
+      var _scatterPlot = new iViz.view.component.scatterPlot();
+      _scatterPlot.init(this.data, this.chartId);
     }
   });
 })(window.Vue, window.dc, window.iViz,

@@ -66,7 +66,7 @@
             }
           }, methods: {
             initialize: function() {
-              this.groups = [],
+                this.groups = [],
                 this.selectedsamples = [],
                 this.selectedpatients = [],
                 this.patientmap = [],
@@ -138,7 +138,7 @@
       getInstance: function() {
         if (typeof vmInstance_ === 'undefined') {
           this.init();
-        }
+        }8
         return vmInstance_;
       }
     };

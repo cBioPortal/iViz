@@ -37,7 +37,7 @@
   Vue.component('topChartMainTemplate', {
     template: ' <abstract-chart :data.sync="group.data" :id="group.id" :type.sync="group.type" :mappedpatients.sync="patientsync"' +
     ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes"' +
-    ' v-for="group in     groups"></abstract-chart> ',
+    ' v-for="group in groups"></abstract-chart> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap'
     ], data: function() {

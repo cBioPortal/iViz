@@ -35,9 +35,10 @@
   <script src="/bower_components/vue/dist/vue.js"></script>
   <script src="/bower_components/notifyjs/dist/notify.js"></script>
   <script src="/bower_components/clipboard/dist/clipboard.js"></script>
+  <script src="/bower_components/plotly.js/dist/plotly.min.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
-  
+
   <!-- build:css(.) styles/vendor.css -->
   <!-- bower:css -->
   <link rel="stylesheet" href="/bower_components/chosen/chosen.min.css" />
@@ -47,9 +48,9 @@
   <link rel="stylesheet" href="/bower_components/components-font-awesome/css/font-awesome.css" />
   <!-- endbower -->
   <!-- endbuild -->
-  
+
   <!-- build:css(.tmp) styles/main.css -->
-  <link rel="stylesheet" href="styles/main.css" />
+  <link rel="stylesheet" href="styles/main.css"/>
   <!-- endbuild -->
 
   <!-- build:js scripts/scripts.js -->
@@ -78,6 +79,8 @@
   <script src="scripts/model/sessionServices.js"></script>
   <script src="scripts/model/dataProxy.js"></script>
   <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
+  <script src="scripts/views/components/scatterPlot.js"></script>
+  <script src="scripts/views/components/scatterPlotTemplate.js"></script>
   <!-- endbuild -->
 
 </head>
@@ -90,29 +93,27 @@
         <button type='button' class='btn btn-default'>Reset All</button>
       </a>
       <!--<button type='button' class='btn btn-default'-->
-              <!--@click="addNewVC = true"-->
-              <!--id="save_cohort_btn">Save-->
-        <!--Cohort-->
+      <!--@click="addNewVC = true"-->
+      <!--id="save_cohort_btn">Save-->
+      <!--Cohort-->
       <!--</button>-->
       <!--<button type='button' class="btn btn-default"-->
-              <!--@click="showVCList = true">-->
-        <!--<i class="fa fa-bars"></i>-->
-        </button><span id="stat">
+      <!--@click="showVCList = true">-->
+      <!--<i class="fa fa-bars"></i>-->
+      </button><span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
           Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
         </span>
       <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
-              <!--:selected-samples-num="selectedSamplesNum"-->
-              <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
+      <!--:selected-samples-num="selectedSamplesNum"-->
+      <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
       <select id="study-view-add-chart" class="chosen-select"
-              v-select :groups="groups"><option id='' value="">Add Chart</option>
+              v-select :groups="groups">
+        <option id='' value="">Add Chart</option>
         <!--<option v-for="attributes in groups[0].attributes"></option>-->
         <option is="manage-charts" :data.sync="group"
                 v-for="(index,group) in groups" :parent="index"></option>
       </select>
-
-
-
       <div id="breadcrubs-container">
         <div v-for="group in groups">
           <div v-for="(index1, item) in group.attributes">
@@ -122,38 +123,38 @@
         </div>
       </div>
 
-        <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
-        <!--<div slot="header">-->
-        <!--<h4 class="modal-title">Virtual Cohorts</h4>-->
-        <!--</div>-->
-        <!--<div slot="body">-->
-          <!--<table class="table table-bordered table-hover table-condensed">-->
-            <!--<thead>-->
-            <!--<tr style="font-weight: bold">-->
-              <!--<td style="width:20%">Name</td>-->
-              <!--<td style="width:40%">Description</td>-->
-              <!--<td style="width:10%">Patients</td>-->
-              <!--<td style="width:10%">Samples</td>-->
-              <!--<td style="width:20%">Operations</td>-->
-            <!--</tr>-->
-            <!--</thead>-->
-            <!--<tr is="editable-row" :data="virtualCohort" :showmodal.sync="showVCList" v-for="virtualCohort in virtualCohorts">-->
-            <!--</tr>-->
-          <!--</table>-->
-        <!--</div>-->
+      <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
+      <!--<div slot="header">-->
+      <!--<h4 class="modal-title">Virtual Cohorts</h4>-->
+      <!--</div>-->
+      <!--<div slot="body">-->
+      <!--<table class="table table-bordered table-hover table-condensed">-->
+      <!--<thead>-->
+      <!--<tr style="font-weight: bold">-->
+      <!--<td style="width:20%">Name</td>-->
+      <!--<td style="width:40%">Description</td>-->
+      <!--<td style="width:10%">Patients</td>-->
+      <!--<td style="width:10%">Samples</td>-->
+      <!--<td style="width:20%">Operations</td>-->
+      <!--</tr>-->
+      <!--</thead>-->
+      <!--<tr is="editable-row" :data="virtualCohort" :showmodal.sync="showVCList" v-for="virtualCohort in virtualCohorts">-->
+      <!--</tr>-->
+      <!--</table>-->
+      <!--</div>-->
 
-        <!--<div slot="footer">-->
-          <!--&lt;!&ndash;<button type="button" class="btn btn-default"&ndash;&gt;-->
-                  <!--&lt;!&ndash;onclick="window.location.href='/index.html'">Add new</button>&ndash;&gt;-->
-        <!--</div>-->
+      <!--<div slot="footer">-->
+      <!--&lt;!&ndash;<button type="button" class="btn btn-default"&ndash;&gt;-->
+      <!--&lt;!&ndash;onclick="window.location.href='/index.html'">Add new</button>&ndash;&gt;-->
+      <!--</div>-->
       <!--</modaltemplate>-->
     </div>
   </nav>
-    <div class="grid" id="main-grid" :class="{loading:isloading}">
-      <top-chart-main-template :groups.sync="groups"
+  <div class="grid" id="main-grid" :class="{loading:isloading}">
+    <top-chart-main-template :groups.sync="groups"
                              :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
-                             :selectedsamples.sync="selectedsamples"  ></top-chart-main-template>
-    </div>
+                             :selectedsamples.sync="selectedsamples"></top-chart-main-template>
+  </div>
   <div id="main-bridge" style="display: none;"></div>
 
 
@@ -161,7 +162,7 @@
 
 </body>
 <script>
-  $( document ).ready(function() {
+  $(document).ready(function () {
     URL = "http://localhost:8081/api/sessions/";
     var vcId_ = location.search.split('vc_id=')[1];
     iViz.session.manage.init();

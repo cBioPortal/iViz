@@ -37,7 +37,9 @@ var iViz = (function(_, $) {
   var grid_;
   
   return {
+    
     init: function(_studyIdArr, _inputSampleList, _inputPatientList) {
+      
       vm_ = iViz.session.manage.getInstance();
       iViz.data.init(_studyIdArr, dataInitCallbackFunc_, _inputSampleList, _inputPatientList);
       
@@ -46,7 +48,6 @@ var iViz = (function(_, $) {
         vm_.isloading = false;
         data_ = _data;
         
-        // TODO: should filter with setter/getter
         if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
           var _sampleData = _.filter(_data.groups.sample.data, function (_dataObj) {
             return $.inArray(_dataObj['sample_id'], _inputSampleList) !== -1
@@ -90,11 +91,11 @@ var iViz = (function(_, $) {
 
         var groups = [];
         var id_= 1;
-        for(var count=0;count<Math.ceil(data_.groups.patient.attr_meta.length/31);count++){
+        for(var count = 0; count < Math.ceil(data_.groups.patient.attr_meta.length / 31); count++){
           var group = {};
-          var lowerLimit = count+(count*31);
-          var upperLimit = lowerLimit +31;
-          group.attributes = data_.groups.patient.attr_meta.slice(lowerLimit,upperLimit);
+          var lowerLimit = count + (count * 31);
+          var upperLimit = lowerLimit + 31;
+          group.attributes = data_.groups.patient.attr_meta.slice(lowerLimit, upperLimit);
           group.data = data_.groups.patient.data;
           group.type = 'patient';
           group.id=id_;
@@ -102,10 +103,10 @@ var iViz = (function(_, $) {
           id_++;
         }
         id_= 1;
-        for(var count=0;count<Math.ceil(data_.groups.sample.attr_meta.length/31);count++){
+        for(var count = 0; count < Math.ceil(data_.groups.sample.attr_meta.length / 31); count++){
+          var lowerLimit = count + (count * 31);
+          var upperLimit = lowerLimit + 31;
           var group = {};
-          var lowerLimit = count+(count*31);
-          var upperLimit = lowerLimit +31;
           group.attributes = data_.groups.sample.attr_meta.slice(lowerLimit,upperLimit);
           group.data = data_.groups.sample.data;
           group.type = 'sample';
@@ -113,6 +114,7 @@ var iViz = (function(_, $) {
           groups.push(group);
           id_++;
         }
+        
         vm_.selectedsamples = _sampleIds;
         vm_.selectedpatients = _patientIds;
         vm_.patientmap = data_.groups.group_mapping.patient.sample;
@@ -150,8 +152,6 @@ var iViz = (function(_, $) {
         });
         
       });
-      var patientChartsFilters_ = [];
-      var sampleChartsFilters_ = [];
       _result.filters['patients'] =[];
       _result.filters['samples'] = [];
       _.each(vm_.groups, function(group) {

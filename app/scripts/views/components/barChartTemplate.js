@@ -28,9 +28,6 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * '<div class="dc-chart"  id={{chartId}} class="dc-pie-chart"></div>' +
-
  */
 /**
  * Created by Karthik Kalletla on 4/6/16.
@@ -59,7 +56,6 @@
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
     data: function() {
-      var isBarChart = this.attributes.view_type === 'bar_chart' ? true : false;
       return {
         charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
         '-div',

@@ -64,14 +64,7 @@
       });
     })).done(function () {
 
-      // add in study id as an attribute
-      _ajaxPatientMeta.push({
-        "datatype": "STRING",
-        "description": "Cancer Types",
-        "display_name": "Cancer Types",
-        "attr_id": "study_id",
-        "view_type": "pie_chart"
-      });
+
 
       var _results = [];
       for (var i = 0; i < arguments.length; i++) {
@@ -308,6 +301,15 @@
                           _sampleData.push(_datum);
                         });
 
+                        // add in study id as an attribute
+                        _ajaxPatientMeta.unshift({
+                          "datatype": "STRING",
+                          "description": "Cancer Types",
+                          "display_name": "Cancer Types",
+                          "attr_id": "study_id",
+                          "view_type": "pie_chart"
+                        });
+                        
                         // construct attr meta for cna details
                         if (_gisticStudyIdArr.length !== 0) {
                           var _cnaAttrMeta = {};
@@ -316,7 +318,7 @@
                           _cnaAttrMeta.display_name = 'Copy Number Alterations';
                           _cnaAttrMeta.description = 'Copy Number Alterations';
                           _cnaAttrMeta.gene_list = _storedCnaGeneInventory;
-                          _ajaxSampleMeta.push(_cnaAttrMeta);
+                          _ajaxSampleMeta.unshift(_cnaAttrMeta);
                         }
 
                         // construct attr meta for gene mutation info
@@ -327,9 +329,18 @@
                           _mutDataAttrMeta.display_name = 'Mutated Genes';
                           _mutDataAttrMeta.description = 'Mutated Genes';
                           _mutDataAttrMeta.gene_list = _storedMutGeneInventory;
-                          _ajaxSampleMeta.push(_mutDataAttrMeta);
+                          _ajaxSampleMeta.unshift(_mutDataAttrMeta);
                         }
-
+                        
+                        // construct attr meta for mutation count
+                        var _mutCntAttrMeta = {};
+                        _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
+                        _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
+                        _mutCntAttrMeta.view_type = 'scatter_plot';
+                        _mutCntAttrMeta.description = 'Mutation Count vs. CNA';
+                        _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
+                        _ajaxSampleMeta.unshift(_mutCntAttrMeta);
+  
                         var _indexPatient = 0, _patientDataIndicesObj = {};
                         _.each(_patientIds, function (_patientId) {
                           var _datum = {};
