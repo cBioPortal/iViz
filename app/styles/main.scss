@@ -38,12 +38,12 @@ body {
   border-color:lightgrey;
   border-style:solid;
 }
-.grid-item--width2 { width: 500px; }
-.grid-item--height2 { height: 500px; }
+.grid-item--width2 { width: 505px; }
+.grid-item--height2 { height: 505px; }
 
 .grid-item:hover {
   border-color: grey;
-  background: #F8F9F9;
+  //background: #F8F9F9;
   cursor: move;
 }
 .navbar button {
@@ -51,21 +51,29 @@ body {
   margin-left: 5px;
 }
 .dc-bar-chart {
-  margin-left: 45px;
-  margin-top: 30px;
-
+  margin-left: 15px;
+  margin-top: -10px;
 }
 .dc-pie-chart {
-  margin-left: 45px;
-  margin-top: 35px;
+  margin-left: 15px;
+  margin-top: 25px;
+}
+.dc-scatter-plot {
+  width: 450px;
+  height: 450px;
+  margin-left: 20px;
+  margin-top: -10px;
+}
+.dc-survival-chart {
+  margin-left: 5px;
+  margin-top: -10px;
 }
 .dc-chart-drag {
   color: grey;
   font-size: 12px;
 }
-
 .view {
-  display: none;
+  visibility: hidden;
 }
 
 .modal-mask {

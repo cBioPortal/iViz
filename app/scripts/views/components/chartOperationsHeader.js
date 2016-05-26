@@ -35,12 +35,19 @@
 'use strict';
 (function(Vue, iViz, $) {
   Vue.component('chartOperations', {
-    template: '<div class="chart-header"' +
-    ' :class="{view:!showOperations}"><table id="tab"><tr><td><i class="fa' +
-    ' fa-refresh dc-chart-pointer" aria-hidden="true"' +
-    ' @click="reset()"></i></td><td><i style="margin-left:2px;" class="fa' +
-    ' fa-arrows dc-chart-drag"></i></td><td><i class="fa fa-times' +
-    ' dc-chart-pointer" @click="close()"></i></td></tr></table>' +
+    template: '<div class="chart-header" :class="{view:!showOperations}">' +
+    '<table id="tab"><tr>' +
+    '<td>' +
+    '<i class="fa fa-refresh dc-chart-pointer" aria-hidden="true" @click="reset()"></i>' +
+    '</td>' +
+    '<td>' +
+    '<i style="margin-left:2px;" class="fa fa-arrows dc-chart-drag"></i>' +
+    '</td>' +
+    '<td>' +
+    '<i class="fa fa-times dc-chart-pointer" @click="close()"></i>' +
+    '</td>' +
+    '</tr>' +
+    '</table>' +
     '</div>',
     props: [
       'showOperations', 'resetBtnId', 'chart', 'groupid'

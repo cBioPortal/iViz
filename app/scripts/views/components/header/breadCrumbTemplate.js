@@ -38,11 +38,11 @@
     template: '<div class="breadcrumb_container" v-if="attributes.filter.length > 0">' +
     '<span>{{attributes.attr_id}}&nbsp;&nbsp;:&nbsp;&nbsp;</span><div class="breadcrumd_items">' +
     '<div v-if="filters.filterType === \'RangedFilter\'"><span class="breadcrumb_item">{{filters[0]}}-{{filters[0]}}</span>' +
-    '<img class="breadcrumb_remove" src="../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)"></div><div' +
+    '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)"></div><div' +
     ' v-else>' +
     '<div v-for="filter in filters" style="display:inline-block;">' +
     '<span class="breadcrumb_item">{{filter}}</span>' +
-    '<img class="breadcrumb_remove" src="../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">' +
+    '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">' +
     '</div></div></div></div>',
     props: [
       'filters', 'attributes'
