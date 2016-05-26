@@ -31,8 +31,8 @@
  */
 
 'use strict';
-(function(iViz, _) {
-  iViz.util = (function() {
+(function (iViz, _) {
+  iViz.util = (function () {
     var content = {};
 
     /**
@@ -42,7 +42,7 @@
      * @param {number} threshold The upper bound threshold.
      * @return {number} Converted number.
      */
-    content.toPrecision = function(number, precision, threshold) {
+    content.toPrecision = function (number, precision, threshold) {
       if (number >= 0.000001 && number < threshold) {
         return number.toExponential(precision);
       }
@@ -53,7 +53,7 @@
      * iViz color schema.
      * @return {string[]} Color array.
      */
-    content.getColors = function() {
+    content.getColors = function () {
       return [
         '#2986e2', '#dc3912', '#f88508', '#109618',
         '#990099', '#0099c6', '#dd4477', '#66aa00',
@@ -111,29 +111,42 @@
       ];
     };
 
-    content.idMapping = function(mappingObj, inputCases) {
+    content.idMapping = function (mappingObj, inputCases) {
       var _selectedMappingCases = [];
       _selectedMappingCases.length = 0;
-      _.each(inputCases, function(_case) {
+      _.each(inputCases, function (_case) {
         if (Array.isArray(mappingObj[_case])) {
-          _.each(mappingObj[_case], function(_id) {
+          _.each(mappingObj[_case], function (_id) {
             _selectedMappingCases.push(_id);
           });
         } else {
           _selectedMappingCases.push(mappingObj[_case]);
-  
+
         }
       });
       return _.uniq(_selectedMappingCases);
     };
 
-    content.isRangeFilter = function(filterObj) {
+    content.isRangeFilter = function (filterObj) {
       if (filterObj.filterType !== undefined) {
         if (filterObj.filterType === 'RangedFilter') {
           return true;
         }
       }
       return false;
+    };
+
+    content.sortByAttribute = function (objs, attrName) {
+      function compare(a, b) {
+        if (a[attrName] < b[attrName])
+          return -1;
+        if (a[attrName] > b[attrName])
+          return 1;
+        return 0;
+      }
+
+      objs.sort(compare);
+      return objs;
     };
 
     return content;

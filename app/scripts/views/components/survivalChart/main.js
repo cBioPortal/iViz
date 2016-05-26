@@ -35,14 +35,17 @@
  */
 
 'use strict';
-(function (iViz, _, d3) {
+(function (iViz) {
   iViz.view.component.survival = function () {
-    var content = {};
-    content.init = function (_data, _chartId) {
-      $("#" + _chartId).append("something");
+    var content_ = {}, data_= {};
+    content_.init = function (_data, _chartId, _attrId) { //_attrId here indicates chart type (OS or DFS)
+      data_ = _data;
+      var dataProxy_ = new survivalChartProxy(_data, _attrId);
+      var _curveOpts = jQuery.extend(true, {}, survivalBroilerPlate.subGroupSettings);
+      new survivalCurve(_chartId, dataProxy_.get(), _curveOpts);
     };
-    return content;
+    return content_;
   };
   iViz.util.scatterPlot = (function () {
   })();
-})(window.iViz, window._, window.d3);
+})(window.iViz);

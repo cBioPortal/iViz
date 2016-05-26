@@ -68,7 +68,7 @@
     },
     ready: function() {
       var _survivalChart = new iViz.view.component.survival();
-      _survivalChart.init(this.data, this.chartId);
+      _survivalChart.init(this.data, this.chartId, this.attributes.attr_id);
     }
   });
 })(window.Vue, window.dc, window.iViz,

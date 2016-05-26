@@ -68,7 +68,7 @@
     },
     ready: function() {
       var _scatterPlot = new iViz.view.component.scatterPlot();
-      _scatterPlot.init(this.data, this.chartId);
+      _scatterPlot.init(this.data, this.chartId, this.charDivId);
     }
   });
 })(window.Vue, window.dc, window.iViz,
