@@ -76,6 +76,11 @@ body {
   visibility: hidden;
 }
 
+.chart-header {
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
 .modal-mask {
   position: fixed;
   z-index: 9998;
@@ -245,7 +250,8 @@ body {
 }
 
 .loading{
-  padding:400px;
+  //padding:400px;
+  margin: 400px;
   background-image: url('../images/ajax-loader.gif') ;
   background-repeat:no-repeat;
   background-size: 100px 100px;

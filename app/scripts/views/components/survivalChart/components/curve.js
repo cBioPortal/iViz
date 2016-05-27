@@ -135,24 +135,72 @@ var survivalCurve = function (_divId, _data) {
     .style('stroke', '#006bb3');
 
   // append axis title
-  elem_.svg.append("text")
-    .attr("class", "label")
-    .attr("x", 250)
-    .attr("y", 420)
-    .style("text-anchor", "middle")
-    .style("font-size", "11px")
-    .style("font-weight","bold")
-    .text("Months Survival");
-  elem_.svg.append("text")
-    .attr("class", "label")
-    .attr("transform", "rotate(-90)")
-    .attr("x", -200)
-    .attr("y", 30)
-    .style("text-anchor", "middle")
-    .style("font-size", "11px")
-    .style("font-weight","bold")
-    .text("Surviving");
+  elem_.svg.append('text')
+    .attr('class', 'label')
+    .attr('x', 250)
+    .attr('y', 420)
+    .style('text-anchor', 'middle')
+    .style('font-size', '11px')
+    .style('font-weight','bold')
+    .text('Months Survival');
+  elem_.svg.append('text')
+    .attr('class', 'label')
+    .attr('transform', 'rotate(-90)')
+    .attr('x', -200)
+    .attr('y', 30)
+    .style('text-anchor', 'middle')
+    .style('font-size', '11px')
+    .style('font-weight','bold')
+    .text('Surviving');
   
-  return {};
-
+  // draw invisible dots
+  elem_.dots = elem_.svg.append("g");
+  elem_.dots.selectAll('path')
+    .data(_data)
+    .enter()
+    .append('svg:path')
+    .attr('d', d3.svg.symbol()
+      .size(400)
+      .type('circle'))
+    .attr('transform', function(d){
+      return 'translate(' + elem_.xScale(d.time) + ', ' + elem_.yScale(d.survival_rate) + ')';
+    })
+    .attr('fill', '#5DADE2')
+    .style('opacity', 0);
+  
+  // add mouse over
+  var mouseOn = function(d) {
+    var dot = d3.select(this);
+    dot.transition()
+      .duration(300)
+      .style('opacity', .7);
+    if(! $(this).data('qtip')) {
+      var content = 
+        'Survival Rate: ' + '<strong>' + d.survival_rate + '</strong>' + '<br>' + 
+        'Months: ' + '<strong>' + d.time + '</strong>' + '<br>' + 
+        'Patient ID: ' + '<strong>' + d.patient_id + '</strong>' + '<br>' + 
+        'Study: ' + '<strong>' + d.study_id + '</strong>';
+      $(this).qtip(
+        {
+          content: {text: content},
+          style: { classes: 'qtip-light qtip-rounded qtip-shadow qtip-lightyellow qtip-wide'},
+          show: {
+            event: 'mouseover',
+            ready: true
+          },
+          hide: {fixed:true, delay: 100, event: 'mouseout'},
+          position: {my:'left bottom',at:'top right'}
+        }
+      );
+    }
+  };
+  var mouseOff = function() {
+    var dot = d3.select(this);
+    dot.transition()
+      .duration(400)
+      .style('opacity', 0);
+  };
+  elem_.dots.selectAll('path').on('mouseover', mouseOn);
+  elem_.dots.selectAll('path').on('mouseout', mouseOff);
+  
 };
