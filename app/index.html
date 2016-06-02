@@ -56,29 +56,25 @@
   <!-- build:js scripts/scripts.js -->
   <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
   <script src="scripts/main.js"></script>
+  <script src="scripts/vueCore.js"></script>
   <script src="scripts/controller/util.js"></script>
   <script src="scripts/controller/sync.js"></script>
   <script src="scripts/controller/event.js"></script>
-  <script src="scripts/views/components/bridgeChart/bridgeChart.js"></script>
-  <script src="scripts/views/components/pieChart/pieChart.js"></script>
-  <script src="scripts/views/components/barChart/barChart.js"></script>
-  <script src="scripts/vueCore.js"></script>
   <script src="scripts/controller/sessionEvent.js"></script>
   <script src="scripts/controller/sessionUtil.js"></script>
-  <script src="scripts/views/components/vc/editableFieldComponent.js"></script>
-  <script src="scripts/views/components/vc/editableRowComponent.js"></script>
-  <script src="scripts/views/topChartMainTemplate.js"></script>
-  <script src="scripts/views/components/bridgeChart/bridgeChartTemplate.js"></script>
-  <script src="scripts/views/components/chartOperationsHeader.js"></script>
-  <script src="scripts/views/components/header/manageCharts.js"></script>
-  <script src="scripts/views/components/pieChart/pieChartTemplate.js"></script>
-  <script src="scripts/views/components/barChart/barChartTemplate.js"></script>
-  <script src="scripts/views/chartImplementation.js"></script>
-  <script src="scripts/views/components/header/breadCrumbTemplate.js"></script>
-  <script src="scripts/views/components/vc/modalTemplate.js"></script>
-  <script src="scripts/views/components/vc/addVCPopup.js"></script>
   <script src="scripts/model/sessionServices.js"></script>
   <script src="scripts/model/dataProxy.js"></script>
+  <script src="scripts/views/mainTemplate.js"></script>
+  <script src="scripts/views/chartGroupTemplate.js"></script>
+  <script src="scripts/views/individualChartTemplate.js"></script>
+  <script src="scripts/views/components/chartOperationsHeader.js"></script>
+  <script src="scripts/views/components/bridgeChart/bridgeChart.js"></script>
+  <script src="scripts/views/components/header/manageCharts.js"></script>
+  <script src="scripts/views/components/header/breadCrumbTemplate.js"></script>
+  <script src="scripts/views/components/pieChart/pieChart.js"></script>
+  <script src="scripts/views/components/pieChart/pieChartTemplate.js"></script>
+  <script src="scripts/views/components/barChart/barChart.js"></script>
+  <script src="scripts/views/components/barChart/barChartTemplate.js"></script>
   <script src="scripts/views/components/scatterPlot/scatterPlot.js"></script>
   <script src="scripts/views/components/scatterPlot/scatterPlotTemplate.js"></script>
   <script src="scripts/views/components/survivalChart/main.js"></script>
@@ -88,6 +84,10 @@
   <script src="scripts/views/components/survivalChart/components/curve.js"></script>
   <script src="scripts/views/components/survivalChart/components/kmEstimator.js"></script>
   <script src="scripts/views/components/survivalChart/components/logRankTest.js"></script>
+  <script src="scripts/views/components/vc/editableFieldComponent.js"></script>
+  <script src="scripts/views/components/vc/editableRowComponent.js"></script>
+  <script src="scripts/views/components/vc/modalTemplate.js"></script>
+  <script src="scripts/views/components/vc/addVCPopup.js"></script>
   <!-- endbuild -->
 
 </head>
@@ -158,9 +158,9 @@
     </div>
   </nav>
   <div class="grid" id="main-grid" :class="{loading:isloading}">
-    <top-chart-main-template :groups.sync="groups"
+    <main-template :groups.sync="groups"
                              :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
-                             :selectedsamples.sync="selectedsamples"></top-chart-main-template>
+                             :selectedsamples.sync="selectedsamples"></main-template>
   </div>
   <div id="main-bridge" style="display: none;"></div>
 

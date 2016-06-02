@@ -46,8 +46,8 @@
     },
     transitionDuration: iViz.opts.dc.transitionDuration
   };
-  Vue.component('abstractChart', {
-    template: ' <div is="chart-implementation"' +
+  Vue.component('chartGroup', {
+    template: ' <div is="individual-chart"' +
     ' :ndx="ndx" :data="data"  :groupid="groupid"' +
     '  :attributes.sync="attribute" v-for="attribute in attributes"></div>   ',
     props: [

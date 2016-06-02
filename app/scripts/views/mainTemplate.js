@@ -34,10 +34,10 @@
  */
 'use strict';
 (function(Vue, dc, iViz, $) {
-  Vue.component('topChartMainTemplate', {
-    template: ' <abstract-chart :data.sync="group.data" :id="group.id" :type.sync="group.type" :mappedpatients.sync="patientsync"' +
+  Vue.component('mainTemplate', {
+    template: ' <chart-group :data.sync="group.data" :id="group.id" :type.sync="group.type" :mappedpatients.sync="patientsync"' +
     ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes"' +
-    ' v-for="group in groups"></abstract-chart> ',
+    ' v-for="group in groups"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap'
     ], data: function() {
