@@ -49,7 +49,7 @@
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
     ' :ndx="ndx" :data="data"  :groupid="groupid"' +
-    '  :attributes.sync="attribute" v-for="attribute in attributes"></div>   ',
+    ' :attributes.sync="attribute" v-for="attribute in attributes" ></div>',
     props: [
       'data', 'attributes', 'type', 'mappedsamples', 'id',
       'mappedpatients', 'groupid'
@@ -74,6 +74,8 @@
     },
     watch: {
       'mappedsamples': function(val) {
+        console.log("in mappedsamples watch");
+        console.log(this.type);
         if (this.syncSample) {
           if (this.type === 'sample') {
             this.updateInvisibleChart(val)
@@ -97,6 +99,9 @@
         this.syncPatient = false;
         this.syncSample = false;
         this.$dispatch('update-all-filters', this.type)
+      },
+      'update-samples': function(_sampleIds) {
+        this.mappedsamples = _sampleIds;
       }
     },
     methods: {

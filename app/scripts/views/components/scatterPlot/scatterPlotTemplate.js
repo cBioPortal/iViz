@@ -54,11 +54,7 @@
         selectedSamples: []
       };
     },
-    watch: {
-      'selectedSamples': function() {
-        console.log(this.selectedSamples);
-      }
-    },
+    watch: {},
     events: {},
     methods: {
       mouseEnter: function() {
@@ -83,6 +79,7 @@
             });
           });
           _self.selectedSamples = _.pluck(_selectedData, "sample_id");
+          _self.$dispatch('update-samples', _self.selectedSamples);
         }
       });
     }

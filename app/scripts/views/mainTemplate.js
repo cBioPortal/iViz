@@ -36,7 +36,7 @@
 (function(Vue, dc, iViz, $) {
   Vue.component('mainTemplate', {
     template: ' <chart-group :data.sync="group.data" :id="group.id" :type.sync="group.type" :mappedpatients.sync="patientsync"' +
-    ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes"' +
+    ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes" ' +
     ' v-for="group in groups"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap'
@@ -50,7 +50,7 @@
     }, watch: {
       'groups': {
         handler: function(val) {
-          console.log("Came to Watch groups")
+          //console.log("Came to Watch groups");
         },
         deep: true
       },

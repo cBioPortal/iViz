@@ -52,10 +52,8 @@
     data: function() {
       return {
         v: {},
-        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
-        '-div',
-        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
-        '-reset',
+        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
+        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
         chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
