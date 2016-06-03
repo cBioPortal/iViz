@@ -50,13 +50,14 @@
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
-        chartInst: '',
         showOperations: false,
-        fromWatch: false,
-        fromFilter: false,
+        selectedSamples: []
       };
     },
     watch: {
+      'selectedSamples': function() {
+        console.log(this.selectedSamples);
+      }
     },
     events: {},
     methods: {
@@ -67,8 +68,23 @@
       }
     },
     ready: function() {
+      var _self = this;
       var _scatterPlot = new iViz.view.component.scatterPlot();
       _scatterPlot.init(this.data, this.chartId, this.charDivId);
+      document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
+        if (typeof _eventData !== 'undefined') {
+          var _selectedData = [];
+          _.each(_eventData.points, function(_pointObj) {
+            _.each(_self.data, function(_dataObj) {
+              if (_dataObj['cna_fraction'] === _pointObj.x &&
+                  _dataObj['mutation_count'] === _pointObj.y) {
+                _selectedData.push(_dataObj);
+              }
+            });
+          });
+          _self.selectedSamples = _.pluck(_selectedData, "sample_id");
+        }
+      });
     }
   });
 })(window.Vue, window.dc, window.iViz,
