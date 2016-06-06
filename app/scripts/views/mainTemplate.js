@@ -83,23 +83,22 @@
     },
     events: {
       'update-grid': function() {
-        this.updateGrid()
+        this.updateGrid();
       },
       'data-loaded': function(msg) {
         // TODO:check for all charts loaded
-        this.messages.push(msg)
+        this.messages.push(msg);
       },
       'update-all-filters': function(updateType) {
         var _selectedPatientsByFiltersOnly = _.keys(this.patientmap);
         var _selectedSamplesByFiltersOnly = _.keys(this.samplemap);
         _.each(this.groups, function(group) {
-          var filters_ = []
+          var filters_ = [];
           _.each(group.attributes, function(attributes) {
             if (attributes.filter.length > 0)
               filters_[attributes.attr_id] = attributes.filter;
           });
-          var _selectedCases = iViz.sync.selectByFilters(filters_,
-            group.data, group.type);
+          var _selectedCases = iViz.sync.selectByFilters(filters_, group.data, group.type);
           if (group.type === 'sample') {
             _selectedSamplesByFiltersOnly =
               _.intersection(_selectedSamplesByFiltersOnly, _selectedCases);
@@ -126,7 +125,43 @@
         }
         this.selectedsamples = resultSelectedSamples;
         this.selectedpatients = resultSelectedPatients;
-
+      },
+      'update-by-samples': function(_updateType, _selectedSamplesInScatterPlot) {
+        var _selectedPatientsByFiltersOnly = _.keys(this.patientmap);
+        var _selectedSamplesByFiltersOnly = _.keys(this.samplemap);
+        _.each(this.groups, function(group) {
+          var filters_ = [];
+          _.each(group.attributes, function(attributes) {
+            if (attributes.filter.length > 0) {
+              filters_[attributes.attr_id] = attributes.filter;
+            }
+          });
+          var _selectedCases = iViz.sync.selectByFilters(filters_, group.data, group.type);
+          if (group.type === 'sample') {
+            _selectedSamplesByFiltersOnly = _.intersection(_selectedSamplesByFiltersOnly, _selectedCases);
+            _selectedSamplesByFiltersOnly = _.intersection(_selectedSamplesByFiltersOnly, _selectedSamplesInScatterPlot)
+          }
+          if (group.type === 'patient') {
+            _selectedPatientsByFiltersOnly = _.intersection(_selectedPatientsByFiltersOnly, _selectedCases);
+          }
+        });
+        var mappedSelectedSamples = iViz.util.idMapping(this.patientmap,
+          _selectedPatientsByFiltersOnly);
+        var resultSelectedSamples = _.intersection(mappedSelectedSamples,
+          _selectedSamplesByFiltersOnly);
+        var resultSelectedPatients = iViz.util.idMapping(this.samplemap,
+          resultSelectedSamples);
+        if (_updateType === 'patient') {
+          this.patientsync = resultSelectedPatients;
+          this.samplesync = iViz.util.idMapping(this.patientmap,
+            _selectedPatientsByFiltersOnly)
+        } else {
+          this.patientsync = iViz.util.idMapping(this.samplemap,
+            _selectedSamplesByFiltersOnly)
+          this.samplesync = resultSelectedSamples;
+        }
+        this.selectedsamples = resultSelectedSamples;
+        this.selectedpatients = resultSelectedPatients;
       }
     }
   });

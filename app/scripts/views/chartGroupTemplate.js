@@ -74,8 +74,6 @@
     },
     watch: {
       'mappedsamples': function(val) {
-        console.log("in mappedsamples watch");
-        console.log(this.type);
         if (this.syncSample) {
           if (this.type === 'sample') {
             this.updateInvisibleChart(val)
@@ -98,10 +96,11 @@
       'update-filters': function() {
         this.syncPatient = false;
         this.syncSample = false;
-        this.$dispatch('update-all-filters', this.type)
+        this.$dispatch('update-all-filters', this.type);
       },
       'update-samples': function(_sampleIds) {
         this.mappedsamples = _sampleIds;
+        this.$dispatch('update-by-samples', this.type, _sampleIds);
       }
     },
     methods: {
