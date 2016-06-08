@@ -44,14 +44,24 @@
     content.init = function (_data, _chartId) {
       chartId_ = _chartId;
       data_ = _data;
-      var _xArr = _.pluck(_data, 'cna_fraction'),
-          _yArr = _.pluck(_data, 'mutation_count');
+      var _xArr = _.pluck(data_, 'cna_fraction'),
+          _yArr = _.pluck(data_, 'mutation_count');
+      var _qtips = [];
+      _.each(data_, function(_dataObj) {
+        _qtips.push("Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+      });
       var trace = {
         x: _xArr,
         y: _yArr,
+        text: _qtips,
         mode: 'markers',
         type: 'scatter',
-        marker: {size: 5, color: '#006bb3'}
+        hoverinfo: 'text',
+        marker: {
+          size: 7,
+          color: '#006bb3',
+          line: {color: 'white'}
+        }
       };
       var data = [trace];
       var layout = {
@@ -66,8 +76,15 @@
         },
         hovermode: 'closest',
         showlegend: false,
-        width: 450,
-        height: 450,
+        width: 470,
+        height: 430,
+        margin: {
+          l: 50,
+          r: 50,
+          b: 50,
+          t: 50,
+          pad: 0
+        },
       };
       Plotly.plot(document.getElementById(_chartId), data, layout);
     };
@@ -76,19 +93,38 @@
       var _selectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.sample_id, _sampleIds) !== -1 ;});
       var _unselectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.sample_id, _sampleIds) === -1 ;});
       document.getElementById(chartId_).data = [];
+      var _unselectedDataQtips = [], _selectedDataQtips = [];
+      _.each(_unselectedData, function(_dataObj) {
+        _unselectedDataQtips.push("Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+      });
+      _.each(_selectedData, function(_dataObj) {
+        _selectedDataQtips.push("Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+      });
       document.getElementById(chartId_).data[0] = {
         x: _.pluck(_unselectedData, 'cna_fraction'),
         y: _.pluck(_unselectedData, 'mutation_count'),
+        text: _unselectedDataQtips,
         mode: 'markers',
         type: 'scatter',
-        marker: {size: 5, color: '#006bb3'}
+        hoverinfo: "text",
+        marker: {
+          size: 7,
+          color: '#006bb3',
+          line: {color: 'white'}
+        }
       };
       document.getElementById(chartId_).data[1] = {
         x: _.pluck(_selectedData, 'cna_fraction'),
         y: _.pluck(_selectedData, 'mutation_count'),
+        text: _selectedDataQtips,
         mode: 'markers',
         type: 'scatter',
-        marker: {size: 5, color: 'red'}
+        hoverinfo: "text",
+        marker: {
+          size: 7, 
+          color: 'red',
+          line: {color: 'white'}
+        }
       };
       Plotly.redraw(document.getElementById(chartId_));
     }
