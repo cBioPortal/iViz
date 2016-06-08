@@ -51,7 +51,8 @@
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
         showOperations: false,
-        selectedSamples: []
+        selectedSamples: [],
+        chartInst: {}
       };
     },
     watch: {},
@@ -65,8 +66,8 @@
     },
     ready: function() {
       var _self = this;
-      var _scatterPlot = new iViz.view.component.scatterPlot();
-      _scatterPlot.init(this.data, this.chartId, this.charDivId);
+      _self.chartInst = new iViz.view.component.scatterPlot();
+      _self.chartInst.init(this.data, this.chartId, this.charDivId);
       document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];
@@ -80,6 +81,11 @@
           });
           _self.selectedSamples = _.pluck(_selectedData, "sample_id");
           _self.$dispatch('update-samples', _self.selectedSamples);
+        }
+      });
+      _self.$on('scatter-plot-sample-update', function(_selectedSamples) {
+        if (_selectedSamples.length !== _self.data.length) {
+          _self.chartInst.update(_selectedSamples);
         }
       });
     }

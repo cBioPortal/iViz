@@ -37,8 +37,13 @@
 'use strict';
 (function (iViz, _, d3) {
   iViz.view.component.scatterPlot = function () {
+    
     var content = {};
+    var chartId_ , data_;
+
     content.init = function (_data, _chartId) {
+      chartId_ = _chartId;
+      data_ = _data;
       var _xArr = _.pluck(_data, "cna_fraction"),
           _yArr = _.pluck(_data, "mutation_count");
       var trace = {
@@ -58,9 +63,38 @@
           title: '# of mutations',
           range: [ d3.min(_yArr), d3.max(_yArr) ]
         },
+        hovermode: 'closest',
+        showlegend: false
       };
       Plotly.plot(document.getElementById(_chartId), data, layout);
     };
+    
+    content.update = function(_sampleIds) { // update selected samples (change color)
+      
+      Plotly.deleteTraces(document.getElementById(chartId_), 0);
+      var _selectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.sample_id, _sampleIds) !== -1 ;});
+      var _unselectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.sample_id, _sampleIds) === -1 ;});
+
+      var _traceSelected = {
+        x: _.pluck(_selectedData, "cna_fraction"),
+        y: _.pluck(_selectedData, "mutation_count"),
+        mode: 'markers',
+        type: 'scatter',
+        marker: {size: 5, color: 'red'}
+      };
+
+      var _traceUnselected = {
+        x: _.pluck(_unselectedData, "cna_fraction"),
+        y: _.pluck(_unselectedData, "mutation_count"),
+        mode: 'markers',
+        type: 'scatter',
+        marker: {size: 5}
+      };
+      
+      Plotly.addTraces(document.getElementById(chartId_), [_traceUnselected, _traceSelected]);
+      
+    }
+    
     return content;
   };
   iViz.util.scatterPlot = (function () {

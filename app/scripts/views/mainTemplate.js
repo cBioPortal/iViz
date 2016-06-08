@@ -59,6 +59,9 @@
           dc.renderAll(group.type + '-' + group.id);
         });
         this.updateGrid();
+      },
+      'selectedsamples': function(val) {
+        this.$broadcast('scatter-plot-sample-update', val);
       }
     }, methods: {
       updateGrid: function() {
