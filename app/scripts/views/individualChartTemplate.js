@@ -36,10 +36,11 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('individualChart', {
-    template: '<div v-if="attributes.show">' +
-    '<component :is="currentView" :groupid="groupid"' +
-    ' :filters.sync="attributes.filter" v-if="attributes.show" :options="options" :ndx="ndx" :attributes.sync="attributes" :data="data"></component>' +
-    '</div>',
+    template: /*'<div v-if="attributes.show">' +*/
+    '<component :is="currentView" :groupid="groupid"  v-if="attributes.show"' +
+    ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
+    ':options="options" :ndx="ndx" :attributes.sync="attributes" :data="data"></component>'
+    /*'</div>'*/,
     props: [
       'data', 'ndx', 'attributes', 'groupid'
     ],
@@ -76,14 +77,17 @@
     watch: {
       'attributes.show': function(newVal) {
         if (!newVal)
-          this.$dispatch('update-grid')
+          this.$dispatch('update-grid',true)
         $("#study-view-add-chart").trigger("chosen:updated");
       }
     },
     events: {
       'close': function() {
         this.attributes.show = false;
-      }
+      }/*,
+      'update-grid':function(){
+        this.$dispatch('update-grid')
+      }*/
     }
   });
 })(window.Vue, window.dc, window.iViz,

@@ -67,8 +67,8 @@
         }
         this.grid_ = new Packery(document.querySelector('.grid'), {
           itemSelector: '.grid-item',
-          columnWidth: 250,
-          rowHeight: 250,
+          columnWidth: 190,
+          rowHeight: 170,
           gutter: 5
         });
         var self_ = this;
@@ -82,8 +82,12 @@
       }
     },
     events: {
-      'update-grid': function() {
-        this.updateGrid()
+      'update-grid': function(reload) {
+        if(reload){
+          this.updateGrid()
+        }else{
+          this.grid_.layout();
+        }
       },
       'data-loaded': function(msg) {
         // TODO:check for all charts loaded

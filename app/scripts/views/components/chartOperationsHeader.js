@@ -35,22 +35,31 @@
 'use strict';
 (function(Vue, iViz, $) {
   Vue.component('chartOperations', {
-    template: '<div class="chart-header" :class="{view:!showOperations}">' +
+    template: '<div style="height: 16px; width: 100%; float: left; text-align: center;">' +
+    '<div style="height:16px;float:right;" :class="{view:!showOperations}">'+
     '<table id="tab"><tr>' +
-    '<td>' +
-    '<i class="fa fa-refresh dc-chart-pointer" aria-hidden="true" @click="reset()"></i>' +
+    '<td v-if="isPieChart&&showTable">' +
+    '<img src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
+    '</td>' +
+    '<td v-if="isPieChart&&!showTable">' +
+    '<img src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
     '</td>' +
     '<td>' +
-    '<i style="margin-left:2px;" class="fa fa-arrows dc-chart-drag"></i>' +
+    '<img src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>'+
     '</td>' +
     '<td>' +
-    '<i class="fa fa-times dc-chart-pointer" @click="close()"></i>' +
+    '<img src="images/move.svg" class="fa fa-arrows dc-chart-drag" class="study-view-title-icon"/>'+
+    /*'<i style="margin-left:2px;" class="fa fa-arrows dc-chart-drag"></i>' +*/
+    '</td>' +
+    '<td>' +
+    '<i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:-2px;" @click="close()"></i>' +
     '</td>' +
     '</tr>' +
     '</table>' +
+    '</div><div><chartTitleH4 :class="{chartTitleH4hover:showOperations}" v-if="isPieChart&&showTable">{{displayName}}</chartTitleH4></div>'+
     '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'groupid'
+      'showOperations', 'resetBtnId', 'chart', 'groupid', 'isPieChart', 'showTable','displayName'
     ],
     methods: {
       reset: function() {
@@ -61,7 +70,11 @@
           iViz.shared.resetAll(this.chart, this.groupid)
         }
         dc.deregisterChart(this.chart, this.groupid);
-        this.$dispatch('close')
+        this.$dispatch('closeChart')
+      },
+      changeView:function(){
+        this.showTable = !this.showTable;
+        this.$dispatch('toTableView');
       }
     }
   });
