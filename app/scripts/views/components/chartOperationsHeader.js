@@ -38,9 +38,6 @@
     template: '<div class="chart-header" :class="{view:!showOperations}">' +
     '<table id="tab"><tr>' +
     '<td>' +
-    '<i class="fa fa-refresh dc-chart-pointer" aria-hidden="true" @click="reset()"></i>' +
-    '</td>' +
-    '<td>' +
     '<i style="margin-left:2px;" class="fa fa-arrows dc-chart-drag"></i>' +
     '</td>' +
     '<td>' +
@@ -50,12 +47,9 @@
     '</table>' +
     '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'groupid'
+      'showOperations', 'resetBtnId', 'chart', 'groupid', 'attributes'
     ],
     methods: {
-      reset: function() {
-        iViz.shared.resetAll(this.chart, this.groupid)
-      },
       close: function() {
         if (this.chart.hasFilter()) {
           iViz.shared.resetAll(this.chart, this.groupid)

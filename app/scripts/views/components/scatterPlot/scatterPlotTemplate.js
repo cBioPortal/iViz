@@ -36,7 +36,7 @@
 (function(Vue, dc, iViz) {
   Vue.component('scatterPlot', {
     template: '<div id={{chartDivId}} class="grid-item grid-item--height2 grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-      '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
+      '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes"></chart-operations>' +
       '<p class="text-center">{{displayName}}</p><div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
       '</div>',
     props: [
@@ -65,9 +65,12 @@
       }
     },
     ready: function() {
+      
       var _self = this;
+      
       _self.chartInst = new iViz.view.component.scatterPlot();
       _self.chartInst.init(this.data, this.chartId, this.charDivId);
+      
       document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];
@@ -83,11 +86,15 @@
           _self.$dispatch('update-samples', _self.selectedSamples);
         }
       });
+      
       _self.$on('scatter-plot-sample-update', function(_selectedSamples) {
         if (_selectedSamples.length !== _self.data.length) {
           _self.chartInst.update(_selectedSamples);
+        } else {
+          _self.chartInst.update([]);
         }
       });
+    
     }
   });
 })(window.Vue, window.dc, window.iViz,

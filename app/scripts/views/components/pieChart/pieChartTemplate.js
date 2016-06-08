@@ -41,7 +41,7 @@
   var NAIndex = -1;
   Vue.component('pieChart', {
     template: '<div id={{charDivId}} class="grid-item" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-    '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
+    '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes"></chart-operations>' +
     '<div class="dc-chart dc-pie-chart" align="center" style="float:none' +
     ' !important;" id={{chartId}} ><p' +
     ' class="text-center">{{displayName}}</p></div>' +

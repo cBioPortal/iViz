@@ -62,7 +62,7 @@
       },
       'selectedsamples': function(val) {
         this.$broadcast('scatter-plot-sample-update', val);
-      }
+      },
     }, methods: {
       updateGrid: function() {
         if (this.grid_ !== '') {
