@@ -35,38 +35,29 @@
 'use strict';
 (function(Vue, iViz, $) {
   Vue.component('chartOperations', {
-    template: '<div style="height: 16px; width: 100%; float: left; text-align: center;">' +
-    '<div style="height:16px;float:right;" :class="{view:!showOperations}">'+
-    '<table id="tab"><tr>' +
-    '<td v-show="isPieChart&&showTable">' +
-    '<img src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
-    '</td>' +
-    '<td v-show="isPieChart&&!showTable">' +
-    '<img src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
-    '</td>' +
-    '<td>' +
+    template:'<div class="study-view-chart-header">' +
+    '<div class="chart-title"  :class="[showOperations?chartTitleActive:chartTitle]"><span class="chart-title-span" id="{{chartId}}-title" v-show="isPieChart&&showTable">{{displayName}}</span></div>' +
+    '<div :class="[showOperations?chartOperationsActive:chartOperations]">'+
+    '<img v-show="isPieChart&&showTable" src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
+    '<img v-show="isPieChart&&!showTable" src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
     '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>'+
-    '</td>' +
-    '<td><div id="{{chartId}}-download-icon-wrapper">' +
+    '<div id="{{chartId}}-download-icon-wrapper" class="study-view-download-icon">' +
     '<img src="images/in.svg" class="study-view-title-icon hover" id="{{chartId}}-download"/>'+
-    '</div></td>' +
-    '<td>' +
-    '<img src="images/move.svg" class="dc-chart-drag" class="study-view-title-icon"/>'+
-    /*'<i style="margin-left:2px;" class="fa fa-arrows dc-chart-drag"></i>' +*/
-    '</td>' +
-    '<td>' +
-    '<i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:-2px;" @click="close()"></i>' +
-    '</td>' +
-    '</tr>' +
-    '</table>' +
-    '</div><div><chartTitleH4  id="{{chartId}}-title" :class="{chartTitleH4hover:showOperations}" v-show="isPieChart&&showTable">{{displayName}}</chartTitleH4></div>'+
+    '</div>'+
+    '<img src="images/move.svg" class="dc-chart-drag study-view-title-icon" class="study-view-title-icon"/>'+
+    '<div style="float:right"><i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>'+
+    '</div>' +
     '</div>',
     props: [
       'showOperations', 'resetBtnId', 'chart', 'groupid', 'isPieChart', 'showTable','displayName', 'chartId'
     ],
     data:function () {
       return {
-        hasFilters : false
+        hasFilters : false,
+        chartOperationsActive:'chart-operations-active',
+        chartOperations:'chart-operations',
+        chartTitle:'chart-title',
+        chartTitleActive:'chart-title-active'
       }
     },
     watch:{
