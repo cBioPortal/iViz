@@ -262,12 +262,15 @@ body {
   position: relative;
 }
 
-
 #breadcrumbs_container{
-  padding: 5px 10px 0 0;
+  margin-top: 10px;
+  padding-bottom: 10px;
+  font-size: 10px;
 }
 .breadcrumb_container{
-  display:inline-block;
+  display:inline;
+  float:left;
+  margin-left: 10px;
 }
 .breadcrumb_remove{
   vertical-align: middle;
@@ -277,7 +280,10 @@ body {
 .breadcrumb_remove:hover{
   cursor: pointer;
 }
+.breadcrumb_items {
+  display: inline;
+}
 .breadcrumb_item{
-  padding: 0px 5px;
+  padding: 0px 2px;
   font-weight: bold;
 }

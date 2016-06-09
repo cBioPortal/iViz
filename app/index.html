@@ -121,7 +121,7 @@
         <option is="manage-charts" :data.sync="group"
                 v-for="(index,group) in groups" :parent="index"></option>
       </select>
-      <div id="breadcrubs-container">
+      <div id="breadcrumbs_container">
         <div v-for="group in groups">
           <div v-for="(index1, item) in group.attributes">
             <bread-crumb :attributes.sync="item"
