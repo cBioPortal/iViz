@@ -97,7 +97,7 @@
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header">
       <a href='javascript:iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"]);' class='reset'>
-        <button type='button' class='btn btn-default'>Reset All</button>
+        <button type='button' class='btn btn-default' style='margin-top: -5px;'>Reset All</button>
       </a>
       <!--<button type='button' class='btn btn-default'-->
       <!--@click="addNewVC = true"-->
@@ -107,10 +107,11 @@
       <!--<button type='button' class="btn btn-default"-->
       <!--@click="showVCList = true">-->
       <!--<i class="fa fa-bars"></i>-->
-      </button><span id="stat">
+      <!--</button>-->
+      <span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
           Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
-        </span>
+      </span>
       <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
       <!--:selected-samples-num="selectedSamplesNum"-->
       <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->

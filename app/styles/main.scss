@@ -12,13 +12,15 @@ body {
 #main-header {
   margin-left: 25px;
   margin-bottom: 15px;
-  margin-top: 5px;
-}
-
-#main-header #stat {
+  margin-top: 10px;
   bottom: -5px;
   left: 10px;
   position: relative;
+}
+
+#stat {
+  margin-left: 10px;
+  margin-top: 10px;
 }
 
 .grid {
@@ -263,13 +265,13 @@ body {
 }
 
 #breadcrumbs_container{
-  margin-top: 10px;
-  padding-bottom: 10px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .breadcrumb_container{
   display:inline;
   float:left;
+  margin-top: 10px;
+  padding-bottom: 20px;
   margin-left: 10px;
 }
 .breadcrumb_remove{
