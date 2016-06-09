@@ -157,13 +157,13 @@
         }else{
           updateReactTable();
         }
-        $("#"+v.opts.charDivId).animate({height: '340px', width: '375px', duration: 300, queue: false}, 300, function() {
+        $("#"+v.opts.charDivId).animate({height: '505px', width: '505px', duration: 300, queue: false}, 300, function() {
           vm.$dispatch('update-grid');
           $("#"+v.opts.charDivId).css('z-index', '');
         });
       }else{
 
-        $("#"+v.opts.charDivId).animate({height: "165px", width: "180px", duration: 300, queue: false}, 300, function() {
+        $("#"+v.opts.charDivId).animate({height: "250px", width: "250px", duration: 300, queue: false}, 300, function() {
           vm.$dispatch('update-grid');
           $("#"+v.opts.charDivId).css('z-index', '1');
         });
@@ -173,7 +173,7 @@
 
     content.initMainDivQtip = function(){
       $('#' +v.opts.charDivId).qtip({
-        id: v.opts.charDivId,
+        id: v.opts.charDivId+'-qtip',
         style: {
           classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width study-view-qtip study-view-pie-label-qtip'
         },

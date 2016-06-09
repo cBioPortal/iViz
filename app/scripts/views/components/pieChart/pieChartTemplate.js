@@ -37,10 +37,11 @@
 
   Vue.component('pieChart', {
     template: '<div id={{charDivId}} class="grid-item" class="study-view-dc-chart study-view-pie-main" ' +
-    '@mouseenter="mouseEnter" @mouseleave="mouseLeave" ' +
-    '@mouseover="mouseOver" ' +
-    'style="height: 165px; width: 180px;">' +
-    '<chart-operations :is-pie-chart="isPieChart" :display-name="displayName":show-table.sync="showTable" :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
+    '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)" ' +
+    '>' +
+    '<chart-operations :is-pie-chart="isPieChart" :display-name="displayName":show-table.sync="showTable" ' +
+    ':chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
+    ':reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
     '<div class="dc-chart dc-pie-chart" :class="{view: !showTable}" align="center" style="float:none' +
     ' !important;" id={{chartId}} >' +
     /*'<p class="text-center">{{displayName}}</p>*/
@@ -97,17 +98,21 @@
         this._piechart.changeView(this,!this.showTable);
       },
       'closeChart':function(){
-        $('#' +this.charDivId).qtip('destroy', true);
+        $('#' +this.charDivId).qtip('destroy');
         this.$dispatch('close');
       }
     },
     methods: {
-      mouseEnter: function() {
+      mouseEnter: function(event) {
         this.showOperations = true;
-      }, mouseLeave: function() {
-        this.showOperations = false;
-      },mouseOver : function(){
         this.$emit('initMainDivQtip');
+      }, mouseLeave: function(event) {
+        if(event.relatedTarget===null){
+          this.showOperations = false;
+        }
+        if((event.relatedTarget!==null)&&(event.relatedTarget.nodeName!=='CANVAS')){
+          this.showOperations = false;
+        }
       },initMainDivQtip : function(){
         this._piechart.initMainDivQtip();
       }

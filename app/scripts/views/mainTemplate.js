@@ -67,8 +67,8 @@
         }
         this.grid_ = new Packery(document.querySelector('.grid'), {
           itemSelector: '.grid-item',
-          columnWidth: 190,
-          rowHeight: 170,
+          columnWidth: 250,
+          rowHeight: 250,
           gutter: 5
         });
         var self_ = this;
