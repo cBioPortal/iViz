@@ -49,6 +49,10 @@
     props: [
       'filters', 'attributes'
     ],
+    watch: {
+      'filters': function(val) {
+      }
+    },
     methods: {
       removeFilter: function(val) {
         if (this.attributes.view_type === 'bar_chart') {

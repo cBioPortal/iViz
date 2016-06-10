@@ -86,6 +86,10 @@
         if (this.syncPatient) {
           if (this.type === 'patient') {
             this.updateInvisibleChart(val)
+            // dc.filterAll([this.groupid]);
+            // this.chartInvisible.filter(null);
+            // this.chartInvisible.filter([val]);
+            // dc.redrawAll([this.groupid]);
           }
         } else {
           this.syncPatient = true;
@@ -99,8 +103,11 @@
         this.$dispatch('update-all-filters', this.type);
       },
       'update-samples': function(_sampleIds) {
-        this.mappedsamples = _sampleIds;
-        this.$dispatch('update-by-samples', this.type, _sampleIds);
+        dc.filterAll([this.groupid]);
+        this.chartInvisible.filter(null);
+        this.chartInvisible.filter([_sampleIds]);
+        dc.redrawAll([this.groupid]);
+        this.$dispatch('update-by-samples', _sampleIds);
       }
     },
     methods: {

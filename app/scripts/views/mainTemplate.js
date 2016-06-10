@@ -61,6 +61,7 @@
         this.updateGrid();
       },
       'selectedsamples': function(val) {
+        console.log('watch selected samples');
         this.$broadcast('scatter-plot-sample-update', val);
       },
     }, methods: {
@@ -129,42 +130,18 @@
         this.selectedsamples = resultSelectedSamples;
         this.selectedpatients = resultSelectedPatients;
       },
-      'update-by-samples': function(_updateType, _selectedSamplesInScatterPlot) {
-        var _selectedPatientsByFiltersOnly = _.keys(this.patientmap);
-        var _selectedSamplesByFiltersOnly = _.keys(this.samplemap);
-        _.each(this.groups, function(group) {
-          var filters_ = [];
-          _.each(group.attributes, function(attributes) {
-            if (attributes.filter.length > 0) {
-              filters_[attributes.attr_id] = attributes.filter;
+      'update-by-samples': function(_selectedSamplesInScatterPlots) {
+        _.each(this.groups, function(_group) {
+          _.each(_group.attributes, function(_attribute) {
+            if (_attribute.filter.length > 0) {
+              _attribute.filter = [];
             }
           });
-          var _selectedCases = iViz.sync.selectByFilters(filters_, group.data, group.type);
-          if (group.type === 'sample') {
-            _selectedSamplesByFiltersOnly = _.intersection(_selectedSamplesByFiltersOnly, _selectedCases);
-            _selectedSamplesByFiltersOnly = _.intersection(_selectedSamplesByFiltersOnly, _selectedSamplesInScatterPlot)
-          }
-          if (group.type === 'patient') {
-            _selectedPatientsByFiltersOnly = _.intersection(_selectedPatientsByFiltersOnly, _selectedCases);
-          }
         });
-        var mappedSelectedSamples = iViz.util.idMapping(this.patientmap,
-          _selectedPatientsByFiltersOnly);
-        var resultSelectedSamples = _.intersection(mappedSelectedSamples,
-          _selectedSamplesByFiltersOnly);
-        var resultSelectedPatients = iViz.util.idMapping(this.samplemap,
-          resultSelectedSamples);
-        if (_updateType === 'patient') {
-          this.patientsync = resultSelectedPatients;
-          this.samplesync = iViz.util.idMapping(this.patientmap,
-            _selectedPatientsByFiltersOnly)
-        } else {
-          this.patientsync = iViz.util.idMapping(this.samplemap,
-            _selectedSamplesByFiltersOnly)
-          this.samplesync = resultSelectedSamples;
-        }
-        this.selectedsamples = resultSelectedSamples;
-        this.selectedpatients = resultSelectedPatients;
+        this.patientsync = iViz.util.idMapping(this.samplemap, _selectedSamplesInScatterPlots);
+        this.samplesync = _selectedSamplesInScatterPlots;
+        this.selectedsamples = _selectedSamplesInScatterPlots;
+        this.selectedpatients = iViz.util.idMapping(this.samplemap, _selectedSamplesInScatterPlots);
       }
     }
   });
