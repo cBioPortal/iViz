@@ -65,8 +65,12 @@
     })).done(function () {
 
       var _results = [];
-      for (var i = 0; i < arguments.length; i++) {
-        _results = _results.concat(arguments[i][0]);
+      if(_studyIdArr.length==1){
+        _results = _results.concat(arguments[0]);
+      }else{
+        for (var i = 0; i < arguments.length; i++) {
+          _results = _results.concat(arguments[i][0]);
+        }
       }
       _ajaxPatientMeta = _ajaxPatientMeta.concat(_.uniq(_results, 'attr_id'));
 
@@ -79,8 +83,12 @@
         });
       })).done(function () {
         var _results = [];
-        for (var i = 0; i < arguments.length; i++) {
-          _results = _results.concat(arguments[i][0]);
+        if(_studyIdArr.length==1){
+          _results = _results.concat(arguments[0]);
+        }else{
+          for (var i = 0; i < arguments.length; i++) {
+            _results = _results.concat(arguments[i][0]);
+          }
         }
         _ajaxSampleMeta = _.uniq(_results, 'attr_id');
 
@@ -94,8 +102,12 @@
           });
         })).done(function () {
           var _results = [];
-          for (var i = 0; i < arguments.length; i++) {
-            _results = _results.concat(arguments[i][0]);
+          if(_studyIdArr.length==1){
+            _results = _results.concat(arguments[0]);
+          }else{
+            for (var i = 0; i < arguments.length; i++) {
+              _results = _results.concat(arguments[i][0]);
+            }
           }
           _ajaxPatientData = _results;
 
@@ -109,8 +121,12 @@
             });
           })).done(function () {
             var _results = [];
-            for (var i = 0; i < arguments.length; i++) {
-              _results = _results.concat(arguments[i][0]);
+            if(_studyIdArr.length==1){
+              _results = _results.concat(arguments[0]);
+            }else{
+              for (var i = 0; i < arguments.length; i++) {
+                _results = _results.concat(arguments[i][0]);
+              }
             }
             _ajaxSampleData = _results;
 
@@ -122,8 +138,12 @@
                 data: {cmd: 'getPatientSampleMapping', cancer_study_id: _studyId, case_set_id: _studyId + '_all'}
               });
             })).done(function () {
-              for (var i = 0; i < arguments.length; i++) {
-                _ajaxPatient2SampleIdMappingObj = $.extend({}, JSON.parse(arguments[i][0]), _ajaxPatient2SampleIdMappingObj);
+              if(_studyIdArr.length==1){
+                _ajaxPatient2SampleIdMappingObj = $.extend({}, JSON.parse(arguments[0]), _ajaxPatient2SampleIdMappingObj);
+              }else{
+                for (var i = 0; i < arguments.length; i++) {
+                  _ajaxPatient2SampleIdMappingObj = $.extend({}, JSON.parse(arguments[i][0]), _ajaxPatient2SampleIdMappingObj);
+                }
               }
 
               // get all genetic profiles for queried studies
@@ -136,8 +156,12 @@
                 });
               })).done(function () {
                 var _results = [];
-                for (var i = 0; i < arguments.length; i++) {
-                  _results = _results.concat(arguments[i][0]);
+                if(_studyIdArr.length==1){
+                  _results = _results.concat(arguments[0]);
+                }else{
+                  for (var i = 0; i < arguments.length; i++) {
+                    _results = _results.concat(arguments[i][0]);
+                  }
                 }
                 _ajaxGeneticProfiles = _results;
 
@@ -152,8 +176,12 @@
                     data: {cmd: 'count_mutations', mutation_profile: _studyId + '_mutations'}
                   });
                 })).done(function () {
-                  for (var i = 0; i < arguments.length; i++) {
-                    _ajaxMutationCountData = $.extend({}, arguments[i][0], _ajaxMutationCountData);
+                  if(_mutCountStudyIdArr.length==1){
+                    _ajaxMutationCountData = $.extend({}, arguments[0], _ajaxMutationCountData);
+                  }else{
+                    for (var i = 0; i < arguments.length; i++) {
+                      _ajaxMutationCountData = $.extend({}, arguments[i][0], _ajaxMutationCountData);
+                    }
                   }
 
                   // mutation data
@@ -167,8 +195,12 @@
                       data: {cmd: 'get_smg', mutation_profile: _studyId + '_mutations'}
                     });
                   })).done(function () {
-                    for (var i = 0; i < arguments.length; i++) {
-                      _results = _results.concat(arguments[i][0]);
+                    if(_mutDataStudyIdArr.length==1){
+                      _results = _results.concat(arguments[0]);
+                    }else{
+                      for (var i = 0; i < arguments.length; i++) {
+                        _results = _results.concat(arguments[i][0]);
+                      }
                     }
                     _ajaxMutGenesData = _results;
 
@@ -180,8 +212,12 @@
                         data: {cmd: 'get_cna_fraction', cancer_study_id: _studyId}
                       });
                     })).done(function () {
-                      for (var i = 0; i < arguments.length; i++) {
-                        _ajaxCnaFractionData = $.extend({}, arguments[i][0], _ajaxCnaFractionData);
+                      if(_studyIdArr.length==1){
+                        _ajaxCnaFractionData = $.extend({}, arguments[0], _ajaxCnaFractionData);
+                      }else{
+                        for (var i = 0; i < arguments.length; i++) {
+                          _ajaxCnaFractionData = $.extend({}, arguments[i][0], _ajaxCnaFractionData);
+                        }
                       }
 
                       // cna table data
@@ -200,12 +236,20 @@
                         _ajaxCnaData.cytoband = [];
                         _ajaxCnaData.alter = [];
                         _ajaxCnaData.caseIds = [];
-                        for (var i = 0; i < arguments.length; i++) {
-                          _ajaxCnaData.gene = _ajaxCnaData.gene.concat(arguments[i][0].gene);
-                          _ajaxCnaData.gistic = _ajaxCnaData.gistic.concat(arguments[i][0].gistic);
-                          _ajaxCnaData.cytoband = _ajaxCnaData.cytoband.concat(arguments[i][0].cytoband);
-                          _ajaxCnaData.alter = _ajaxCnaData.alter.concat(arguments[i][0].alter);
-                          _ajaxCnaData.caseIds = _ajaxCnaData.caseIds.concat(arguments[i][0].caseIds);
+                        if(_studyIdArr.length==1){
+                          _ajaxCnaData.gene = _ajaxCnaData.gene.concat(arguments[0].gene);
+                          _ajaxCnaData.gistic = _ajaxCnaData.gistic.concat(arguments[0].gistic);
+                          _ajaxCnaData.cytoband = _ajaxCnaData.cytoband.concat(arguments[0].cytoband);
+                          _ajaxCnaData.alter = _ajaxCnaData.alter.concat(arguments[0].alter);
+                          _ajaxCnaData.caseIds = _ajaxCnaData.caseIds.concat(arguments[0].caseIds);
+                        }else{
+                          for (var i = 0; i < arguments.length; i++) {
+                            _ajaxCnaData.gene = _ajaxCnaData.gene.concat(arguments[i][0].gene);
+                            _ajaxCnaData.gistic = _ajaxCnaData.gistic.concat(arguments[i][0].gistic);
+                            _ajaxCnaData.cytoband = _ajaxCnaData.cytoband.concat(arguments[i][0].cytoband);
+                            _ajaxCnaData.alter = _ajaxCnaData.alter.concat(arguments[i][0].alter);
+                            _ajaxCnaData.caseIds = _ajaxCnaData.caseIds.concat(arguments[i][0].caseIds);
+                          }
                         }
 
                         // --- web API results converting ----

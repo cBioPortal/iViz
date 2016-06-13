@@ -17,7 +17,9 @@
     "notifyjs": "^0.4.0",
     "bootstrap-sass": "^3.3.6",
     "clipboard": "^1.5.9",
-    "plotly.js": "^1.11.0"
+    "plotly.js": "^1.11.0",
+    "react": "^15.1.0",
+    "fixed-data-table": "^0.6.0"
   },
   "overrides": {
     "bootstrap-sass": {
@@ -49,6 +51,12 @@
         "jquery.qtip.js",
         "basic/jquery.qtip.js",
         "jquery.qtip.css"
+      ]
+    },
+    "fixed-data-table": {
+      "main":[
+        "fixed-data-table.js",
+        "dist/fixed-data-table.min.css"
       ]
     }
   },
