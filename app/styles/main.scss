@@ -277,7 +277,6 @@ body {
 .breadcrumb_remove{
   vertical-align: middle;
   margin-top: -2px;
-  padding-right: 10px;
 }
 .breadcrumb_remove:hover{
   cursor: pointer;
@@ -286,6 +285,6 @@ body {
   display: inline;
 }
 .breadcrumb_item{
-  padding: 0px 2px;
   font-weight: bold;
+  margin-left: 5px;
 }

@@ -84,6 +84,7 @@
           });
           _self.selectedSamples = _.pluck(_selectedData, "sample_id");
           _self.chartInst.update(_self.selectedSamples);
+          _self.filters = _self.selectedSamples;
           _self.$dispatch('update-samples', _self.selectedSamples);
         }
       });
