@@ -49,7 +49,7 @@
 
   Vue.component('barChart', {
     template: '<div id={{charDivId}} class="grid-item grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-    '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes"></chart-operations>' +
+    '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes" :chart-id="chartId"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ><p class="text-center">{{displayName}}</p></div>' +
     '</div>',
     props: [
@@ -81,9 +81,9 @@
         }
       },
     },events: {
-     /* 'close': function() {
-        this.attributes.show = false;
-      }*/
+      'closeChart':function(){
+        this.$dispatch('close');
+      }
     },
     methods: {
       mouseEnter: function() {

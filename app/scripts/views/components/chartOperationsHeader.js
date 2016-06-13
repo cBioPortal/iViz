@@ -35,28 +35,120 @@
 'use strict';
 (function(Vue, iViz, $) {
   Vue.component('chartOperations', {
-    template: '<div class="chart-header" :class="{view:!showOperations}">' +
+    template: '<div style="height: 16px; width: 100%; float: left; text-align: center;">' +
+    '<div style="height:16px;float:right;" :class="{view:!showOperations}">'+
     '<table id="tab"><tr>' +
-    '<td>' +
-    '<i style="margin-left:2px;" class="fa fa-arrows dc-chart-drag"></i>' +
+    '<td v-show="isPieChart&&showTable">' +
+    '<img src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
+    '</td>' +
+    '<td v-show="isPieChart&&!showTable">' +
+    '<img src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
     '</td>' +
     '<td>' +
-    '<i class="fa fa-times dc-chart-pointer" @click="close()"></i>' +
+    '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>'+
+    '</td>' +
+    '<td><div id="{{chartId}}-download-icon-wrapper">' +
+    '<img src="images/in.svg" class="study-view-title-icon hover" id="{{chartId}}-download"/>'+
+    '</div></td>' +
+    '<td>' +
+    '<img src="images/move.svg" class="dc-chart-drag" class="study-view-title-icon"/>'+
+    '</td>' +
+    '<td>' +
+    '<i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:-2px;" @click="close()"></i>' +
     '</td>' +
     '</tr>' +
     '</table>' +
+    '</div><div><chartTitleH4  id="{{chartId}}-title" :class="{chartTitleH4hover:showOperations}" v-show="isPieChart&&showTable">{{displayName}}</chartTitleH4></div>'+
     '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'groupid', 'attributes'
+      'showOperations', 'resetBtnId', 'chart', 'groupid', 'isPieChart', 'showTable','displayName', 'chartId'
     ],
+    data:function () {
+      return {
+        hasFilters : false
+      }
+    },
+    watch:{
+      showOperations:function(){
+          if(this.chart!==""&&this.chart.filters().length>0){
+            this.hasFilters=true;
+          }else{
+            this.hasFilters=false;
+          }
+      }
+    },
     methods: {
       close: function() {
         if (this.chart.hasFilter()) {
           iViz.shared.resetAll(this.chart, this.groupid)
         }
         dc.deregisterChart(this.chart, this.groupid);
-        this.$dispatch('close')
+        this.$dispatch('closeChart')
+      },
+      changeView:function(){
+        this.showTable = !this.showTable;
+        this.$dispatch('toTableView');
       }
+    },ready:function(){
+      $('#' + this.chartId + '-download').qtip('destroy', true);
+      $('#' +this.chartId + '-download-icon-wrapper').qtip('destroy', true);
+      var chartId = this.chartId;
+
+      $('#' +this.chartId + '-title').qtip({
+        id: '#' + this.chartId + "-title-qtip",
+        content:{text: this.displayName},
+        style: { classes: 'qtip-light qtip-rounded qtip-shadow'  },
+        show: {event: "mouseover"},
+        hide: {fixed:true, delay: 100, event: "mouseout"},
+        position: {my:'right bottom',at:'top left', viewport: $(window)}
+      });
+
+      $('#' +this.chartId + '-download-icon-wrapper').qtip({
+        style: { classes: 'qtip-light qtip-rounded qtip-shadow'  },
+        show: {event: "mouseover", delay: 0},
+        hide: {fixed:true, delay: 300, event: "mouseout"},
+        position: {my:'bottom left',at:'top right', viewport: $(window)},
+        content: {
+          text:   "Download"
+        }
+      });
+
+      $('#' + this.chartId+'-download').qtip({
+        id: '#' + this.chartId + "-download-qtip",
+        style: { classes: 'qtip-light qtip-rounded qtip-shadow'  },
+        show: {event: "click", delay: 0},
+        hide: {fixed:true, delay: 300, event: "mouseout"},
+        position: {my:'top center',at:'bottom center', viewport: $(window)},
+        content: {
+          text:
+          "<div style='display:inline-block;'>"+
+          "<button id='"+this.chartId+"-pdf' style=\"width:50px\">PDF</button>"+
+          "</div>"+
+          "<br>"+
+          "<div style='display:inline-block;'>"+
+          "<button id='"+this.chartId+"-svg' style=\"width:50px\">SVG</button>"+
+          "</div>"+
+          "<br>"+
+          "<div style='display:inline-block;'>"+
+          "<button id='"+this.chartId+"-tsv' style=\"width:50px\">TXT</button>"+
+          "</div>"
+        },events: {
+          show: function() {
+            $('#' + chartId + '-download-icon-wrapper').qtip('api').hide();
+          },
+          render: function(event, api) {
+            $("#"+chartId+"-pdf", api.elements.tooltip).click(function(){
+              console.log('download pdf')
+            });
+            $("#"+chartId+"-svg", api.elements.tooltip).click(function(){
+              console.log('download svg')
+            });
+            $("#"+chartId+"-tsv").click(function(){
+              console.log('download tsv')
+            });
+          }
+        }
+      });
     }
   });
 })(window.Vue, window.iViz,

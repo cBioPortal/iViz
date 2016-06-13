@@ -88,8 +88,12 @@
       }
     },
     events: {
-      'update-grid': function() {
-        this.updateGrid();
+      'update-grid': function(reload) {
+        if(reload){
+          this.updateGrid()
+        }else{
+          this.grid_.layout();
+        }
       },
       'data-loaded': function(msg) {
         // TODO:check for all charts loaded

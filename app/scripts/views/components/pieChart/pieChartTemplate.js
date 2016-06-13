@@ -35,19 +35,22 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
 
-  var width = 130;
-  var height = 150;
-  var radius = (width - 20) / 2;
-  var NAIndex = -1;
   Vue.component('pieChart', {
-    template: '<div id={{charDivId}} class="grid-item" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-    '<chart-operations :show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes"></chart-operations>' +
-    '<div class="dc-chart dc-pie-chart" align="center" style="float:none' +
-    ' !important;" id={{chartId}} ><p' +
-    ' class="text-center">{{displayName}}</p></div>' +
-    '</div>',
+    template: '<div id={{charDivId}} class="grid-item" class="study-view-dc-chart study-view-pie-main" ' +
+              '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
+              '<chart-operations ' +
+              ':is-pie-chart="isPieChart" :display-name="displayName":show-table.sync="showTable" ' +
+              ':chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
+              ':reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes">' +
+              '</chart-operations>' +
+              '<div class="dc-chart dc-pie-chart" ' +
+              ':class="{view: !showTable}" align="center" style="float:none' +
+              ' !important;" id={{chartId}} >' +
+              '</div>' +
+              '<div id={{chartTableId}} :class="{view: showTable}"></div>'+
+              '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid'
+      'ndx', 'attributes', 'filters', 'groupid','data','options'
     ],
     data: function() {
       return {
@@ -55,25 +58,30 @@
         charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
         chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
+        chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
         showOperations: false,
         fromWatch: false,
         fromFilter: false,
-        cluster: ''
+        cluster: '',
+        _piechart:'',
+        isPieChart:true,
+        showTable:true
+
       }
     },
     watch: {
       'filters': function(newVal, oldVal) {
         if (!this.fromFilter) {
-          this.fromWatch = true
+          this.fromWatch = true;
           if (newVal.length === oldVal.length) {
             if (newVal.length == 0) {
               this.chartInst.filterAll();
               dc.redrawAll(this.groupid)
             } else {
-              var newFilters = $.extend(true, [], newVal)
-              var exisitngFilters = $.extend(true, [], this.chartInst.filters())
+              var newFilters = $.extend(true, [], newVal);
+              var exisitngFilters = $.extend(true, [], this.chartInst.filters());
               var temp = _.difference(exisitngFilters, newFilters);
               this.chartInst.filter(temp);
               dc.redrawAll(this.groupid)
@@ -82,63 +90,49 @@
         } else {
           this.fromFilter = false;
         }
-      },
+      }
     },
-    destroyed: function() {
-      this.cluster.dispose();
+    events: {
+      'toTableView': function() {
+        this._piechart.changeView(this,!this.showTable);
+      },
+      'closeChart':function(){
+        $('#' +this.charDivId).qtip('destroy');
+        this.$dispatch('close');
+      }
     },
     methods: {
-      mouseEnter: function() {
+      mouseEnter: function(event) {
         this.showOperations = true;
-      }, mouseLeave: function() {
-        this.showOperations = false;
+        this.$emit('initMainDivQtip');
+      }, mouseLeave: function(event) {
+        if(event.relatedTarget===null){
+          this.showOperations = false;
+        }
+        if((event.relatedTarget!==null)&&(event.relatedTarget.nodeName!=='CANVAS')){
+          this.showOperations = false;
+        }
+      },initMainDivQtip : function(){
+        this._piechart.initMainDivQtip();
       }
     },
     ready: function() {
-      this.v.data = $.extend(true, {}, this.attributes);
-      this.v.data = {
-        color: $.extend(true, [], iViz.util.getColors()),
-        category: ''
+      this.$once('initMainDivQtip',this.initMainDivQtip);
+      var opts = {
+        chartId : this.chartId,
+        charDivId : this.charDivId,
+        groupid : this.groupid,
+        chartTableId : this.chartTableId,
+        transitionDuration : iViz.opts.dc.transitionDuration,
+        width:130,
+        height:130
       };
-      var color = $.extend(true, [], this.v.data.color);
-      var attr = this.attributes.attr_id;
-      this.cluster = this.ndx.dimension(function(d) {
-        return d[attr];
-      });
-      this.chartInst = dc.pieChart('#' + this.chartId, this.groupid);
-      this.v.data.attrKeys = this.cluster.group().all().map(function(d) {
-        return d.key;
-      });
-      this.v.data.category =
-        iViz.util.pieChart.getCategory(this.attributes.attr,
-          this.v.data.attrKeys);
-
-      this.v.data.attrKeys.sort(function(a, b) {
-        return a < b ? -1 : 1;
-      });
-
-      NAIndex = this.v.data.attrKeys.indexOf('NA');
-      if (NAIndex !== -1) {
-        color.splice(NAIndex, 0, '#CCCCCC');
-      }
-      this.chartInst
-        .width(width)
-        .height(height)
-        .radius(radius)
-        .dimension(this.cluster)
-        .group(this.cluster.group())
-        .transitionDuration(400)
-        .ordinalColors(color)
-        .label(function(d) {
-          return d.value;
-        })
-        .ordering(function(d) {
-          return d.key;
-        });
+      this._piechart = new iViz.view.component.pieChart();
+      this.chartInst = this._piechart.init(this.ndx, this.attributes, opts);
       var self_ = this;
       this.chartInst.on('filtered', function(_chartInst, _filter) {
         if (!self_.fromWatch) {
-          self_.fromFilter = true
+          self_.fromFilter = true;
           var tempFilters_ = $.extend(true, [], self_.filters);
           tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
             self_.attributes.attr_id, self_.attributes.view_type);
