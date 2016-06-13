@@ -36,7 +36,7 @@
 (function(Vue, dc, iViz, $) {
   Vue.component('mainTemplate', {
     template: ' <chart-group :data.sync="group.data" :id="group.id" :type.sync="group.type" :mappedpatients.sync="patientsync"' +
-    ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes"' +
+    ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes" :plotsfiltered="plotsfiltered"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap'
@@ -45,12 +45,12 @@
         messages: [],
         patientsync: [],
         samplesync: [],
-        grid_: ''
+        grid_: '',
+        plotsfiltered: false
       }
     }, watch: {
       'groups': {
         handler: function(val) {
-          console.log("Came to Watch groups")
         },
         deep: true
       },
@@ -59,6 +59,12 @@
           dc.renderAll(group.type + '-' + group.id);
         });
         this.updateGrid();
+      },
+      'selectedsamples': function(val) {
+        this.$broadcast('scatter-plot-sample-update', val);
+      },
+      'selectedpatients': function(val) {
+        this.$broadcast('survival-update', val);
       }
     }, methods: {
       updateGrid: function() {
@@ -91,19 +97,26 @@
       },
       'data-loaded': function(msg) {
         // TODO:check for all charts loaded
-        this.messages.push(msg)
+        this.messages.push(msg);
       },
       'update-all-filters': function(updateType) {
         var _selectedPatientsByFiltersOnly = _.keys(this.patientmap);
         var _selectedSamplesByFiltersOnly = _.keys(this.samplemap);
         _.each(this.groups, function(group) {
-          var filters_ = []
+          var filters_ = [], _scatterPlotSel = [];
           _.each(group.attributes, function(attributes) {
-            if (attributes.filter.length > 0)
-              filters_[attributes.attr_id] = attributes.filter;
+            if (attributes.filter.length > 0) {
+              if (attributes.view_type !== 'scatter_plot') {
+                filters_[attributes.attr_id] = attributes.filter;
+              } else {
+                _scatterPlotSel = attributes.filter;
+              }
+            } 
           });
-          var _selectedCases = iViz.sync.selectByFilters(filters_,
-            group.data, group.type);
+          var  _selectedCases = iViz.sync.selectByFilters(filters_, group.data, group.type);
+          if (_scatterPlotSel.length !== 0 && filters_.length !== 0) {
+            console.log(_scatterPlotSel.length);
+          }
           if (group.type === 'sample') {
             _selectedSamplesByFiltersOnly =
               _.intersection(_selectedSamplesByFiltersOnly, _selectedCases);
@@ -122,15 +135,32 @@
         if (updateType === 'patient') {
           this.patientsync = resultSelectedPatients;
           this.samplesync = iViz.util.idMapping(this.patientmap,
-            _selectedPatientsByFiltersOnly)
+            _selectedPatientsByFiltersOnly);
         } else {
           this.patientsync = iViz.util.idMapping(this.samplemap,
-            _selectedSamplesByFiltersOnly)
+            _selectedSamplesByFiltersOnly);
           this.samplesync = resultSelectedSamples;
         }
         this.selectedsamples = resultSelectedSamples;
         this.selectedpatients = resultSelectedPatients;
-
+      },
+      'update-by-samples': function(_selectedSamplesInScatterPlots) {
+        // var _self = this;
+        // _.each(_self.groups, function(_group) {
+        //   _.each(_group.attributes, function(_attribute) {
+        //     if (_attribute.filter.length > 0) {
+        //       if (_attribute.view_type !== 'scatter_plot') {
+        //         _attribute.filter = []; // clear breadcrumb
+        //       } else {
+        //         _self.plotsfiltered = true; 
+        //       }              
+        //     }
+        //   });
+        // });
+        this.patientsync = iViz.util.idMapping(this.samplemap, _selectedSamplesInScatterPlots);
+        this.samplesync = _selectedSamplesInScatterPlots;
+        this.selectedsamples = _selectedSamplesInScatterPlots;
+        this.selectedpatients = iViz.util.idMapping(this.samplemap, _selectedSamplesInScatterPlots);
       }
     }
   });

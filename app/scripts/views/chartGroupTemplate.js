@@ -49,10 +49,10 @@
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
     ' :ndx="ndx" :data="data"  :groupid="groupid"' +
-    '  :attributes.sync="attribute" v-for="attribute in attributes"></div>   ',
+    ' :attributes.sync="attribute" v-for="attribute in attributes" ></div>',
     props: [
       'data', 'attributes', 'type', 'mappedsamples', 'id',
-      'mappedpatients', 'groupid'
+      'mappedpatients', 'groupid', 'plotsfiltered'
     ], created: function() {
       var ndx_ = crossfilter(this.data);
       var invisibleBridgeChart_ = iViz.bridgeChart.init(ndx_, settings_,
@@ -76,19 +76,27 @@
       'mappedsamples': function(val) {
         if (this.syncSample) {
           if (this.type === 'sample') {
-            this.updateInvisibleChart(val)
+            this.updateInvisibleChart(val);
           }
         } else {
           this.syncSample = true;
         }
       },
       'mappedpatients': function(val) {
-        if (this.syncPatient) {
-          if (this.type === 'patient') {
-            this.updateInvisibleChart(val)
+        var _self = this;
+        if (_self.syncPatient) {
+          if (_self.type === 'patient') {
+            if (_self.plotsfiltered) {
+              dc.filterAll([_self.groupid]);
+              _self.chartInvisible.filter(null);
+              _self.chartInvisible.filter([val]);
+              dc.redrawAll([_self.groupid]);       
+            } else {
+              _self.updateInvisibleChart(val);
+            }
           }
         } else {
-          this.syncPatient = true;
+          _self.syncPatient = true;
         }
       }
     },
@@ -96,7 +104,14 @@
       'update-filters': function() {
         this.syncPatient = false;
         this.syncSample = false;
-        this.$dispatch('update-all-filters', this.type)
+        this.$dispatch('update-all-filters', this.type);
+      },
+      'update-samples': function(_sampleIds) {
+        dc.filterAll([this.groupid]);
+        this.chartInvisible.filter(null);
+        this.chartInvisible.filter([_sampleIds]);
+        dc.redrawAll([this.groupid]);
+        this.$dispatch('update-by-samples', _sampleIds);
       }
     },
     methods: {

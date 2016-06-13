@@ -36,7 +36,7 @@
 (function(Vue, dc, iViz) {
   Vue.component('scatterPlot', {
     template: '<div id={{chartDivId}} class="grid-item grid-item--height2 grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-      '<chart-operations :show-operations="showOperations" :display-name="displayName" :has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId"></chart-operations>' +
+      '<chart-operations :show-operations="showOperations" :display-name="displayName" :has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
       '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
       '</div>',
     props: [
@@ -50,14 +50,12 @@
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
-        chartInst: '',
         showOperations: false,
-        fromWatch: false,
-        fromFilter: false,
+        selectedSamples: [],
+        chartInst: {}
       };
     },
-    watch: {
-    },
+    watch: {},
     events: {},
     methods: {
       mouseEnter: function() {
@@ -67,8 +65,38 @@
       }
     },
     ready: function() {
-      var _scatterPlot = new iViz.view.component.scatterPlot();
-      _scatterPlot.init(this.data, this.chartId, this.charDivId);
+      
+      var _self = this;
+      
+      _self.chartInst = new iViz.view.component.scatterPlot();
+      _self.chartInst.init(this.data, this.chartId, this.charDivId);
+      
+      document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
+        if (typeof _eventData !== 'undefined') {
+          var _selectedData = [];
+          _.each(_eventData.points, function(_pointObj) {
+            _.each(_self.data, function(_dataObj) {
+              if (_dataObj['cna_fraction'] === _pointObj.x &&
+                  _dataObj['mutation_count'] === _pointObj.y) {
+                _selectedData.push(_dataObj);
+              }
+            });
+          });
+          _self.selectedSamples = _.pluck(_selectedData, "sample_id");
+          _self.chartInst.update(_self.selectedSamples);
+          _self.filters = _self.selectedSamples;
+          _self.$dispatch('update-samples', _self.selectedSamples);
+        }
+      });
+      
+      _self.$on('scatter-plot-sample-update', function(_selectedSamples) {
+        if (_selectedSamples.length !== _self.data.length) {
+          _self.chartInst.update(_selectedSamples);
+        } else {
+          _self.chartInst.update([]);
+        }
+      });
+    
     }
   });
 })(window.Vue, window.dc, window.iViz,

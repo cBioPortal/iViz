@@ -32,110 +32,76 @@
 
 var survivalCurve = function (_divId, _data) {
 
-  var elem_ = '';
+  var _self = this;
+
+  _self.elem_ = '';
+  _self.divId_ = _divId;
+  _self.data_ = _data;
   var formatAsPercentage_ = d3.format('%');
 
-  // init canvas
-  $('#' + _divId).empty();
-  elem_ = d3.select('#' + _divId);
-  elem_.svg = elem_.append('svg')
+  _self.elem_ = d3.select('#' + _self.divId_);
+  _self.elem_.svg = _self.elem_.append('svg')
     .attr('width', 500)
     .attr('height', 500);
-  elem_.curve = elem_.svg.append('g');
+  _self.elem_.curve = _self.elem_.svg.append('g');
 
   // init axis
-  elem_.xScale = d3.scale.linear()
-    .domain([0, d3.max(_.pluck(_data, 'time'))])
+  _self.elem_.xScale = d3.scale.linear()
+    .domain([0, d3.max(_.pluck(_self.data_, 'time'))])
     .range([70, 420]);
-  elem_.yScale = d3.scale.linear()
+  _self.elem_.yScale = d3.scale.linear()
     .domain([-0.03, 1.05]) //fixed to be 0-1
     .range([380, 30]);
-  elem_.xAxis = d3.svg.axis()
-    .scale(elem_.xScale)
+  _self.elem_.xAxis = d3.svg.axis()
+    .scale(_self.elem_.xScale)
     .orient('bottom')
     .tickSize(6, 0, 0);
-  elem_.yAxis = d3.svg.axis()
-    .scale(elem_.yScale)
+  _self.elem_.yAxis = d3.svg.axis()
+    .scale(_self.elem_.yScale)
     .tickFormat(formatAsPercentage_)
     .orient('left')
     .tickSize(6, 0, 0);
 
-  // init lines
-  elem_.line = d3.svg.line()
-    .interpolate('step-after')
-    .x(function (d) {
-      return elem_.xScale(d.time);
-    })
-    .y(function (d) {
-      return elem_.yScale(d.survival_rate);
-    });
-
-  // draw lines
-  if (_data !== null && _data.length > 0) {
-    elem_.curve = elem_.svg.append('path')
-      .attr('id', _divId + '-line')
-      .attr('d', elem_.line(_data))
-      .style('fill', 'none')
-      .style('stroke', '#006bb3');
-  }
-
   // draw axis
-  elem_.svg.append('g')
+  _self.elem_.svg.append('g')
     .style('stroke-width', 1)
     .style('fill', 'none')
     .style('stroke', 'black')
     .attr('class', 'survival-curve-x-axis-class')
     .style('shape-rendering', 'crispEdges')
     .attr('transform', 'translate(0, 380)')
-    .call(elem_.xAxis);
-  elem_.svg.append('g')
+    .call(_self.elem_.xAxis);
+  _self.elem_.svg.append('g')
     .style('stroke-width', 1)
     .style('fill', 'none')
     .style('stroke', 'black')
     .style('shape-rendering', 'crispEdges')
     .attr('transform', 'translate(0, 30)')
-    .call(elem_.xAxis.orient('bottom').ticks(0));
-  elem_.svg.append('g')
+    .call(_self.elem_.xAxis.orient('bottom').ticks(0));
+  _self.elem_.svg.append('g')
     .style('stroke-width', 1)
     .style('fill', 'none')
     .style('stroke', 'black')
     .attr('class', 'survival-curve-y-axis-class')
     .style('shape-rendering', 'crispEdges')
     .attr('transform', 'translate(70, 0)')
-    .call(elem_.yAxis);
-  elem_.svg.append('g')
+    .call(_self.elem_.yAxis);
+  _self.elem_.svg.append('g')
     .style('stroke-width', 1)
     .style('fill', 'none')
     .style('stroke', 'black')
     .style('shape-rendering', 'crispEdges')
     .attr('transform', 'translate(420, 0)')
-    .call(elem_.yAxis.orient('left').ticks(0));
-  elem_.svg.selectAll('text')
+    .call(_self.elem_.yAxis.orient('left').ticks(0));
+  _self.elem_.svg.selectAll('text')
     .style('font-family', 'sans-serif')
     .style('font-size', '11px')
     .style('stroke-width', 0.5)
     .style('stroke', 'black')
     .style('fill', 'black');
 
-  // draw censored dots
-  // crossDots specifically for the curve for easier deletion
-  // changed two separate lines to a single cross symbol
-  elem_.svg.selectAll('path')
-    .data(_data)
-    .enter()
-    .append('line')
-    .filter(function (d) {
-      return d.status === 0;
-    })
-    .attr('x1', function(d) { return elem_.xScale(d.time); })  
-    .attr('y1', function(d) { return elem_.yScale(d.survival_rate) - 5; })
-    .attr('x2', function(d) { return elem_.xScale(d.time); })  
-    .attr('y2', function(d) { return elem_.yScale(d.survival_rate) + 5 ; })
-    .style('stroke-width', 1)
-    .style('stroke', '#006bb3');
-
   // append axis title
-  elem_.svg.append('text')
+  _self.elem_.svg.append('text')
     .attr('class', 'label')
     .attr('x', 250)
     .attr('y', 420)
@@ -143,7 +109,7 @@ var survivalCurve = function (_divId, _data) {
     .style('font-size', '11px')
     .style('font-weight','bold')
     .text('Months Survival');
-  elem_.svg.append('text')
+  _self.elem_.svg.append('text')
     .attr('class', 'label')
     .attr('transform', 'rotate(-90)')
     .attr('x', -200)
@@ -153,9 +119,53 @@ var survivalCurve = function (_divId, _data) {
     .style('font-weight','bold')
     .text('Surviving');
   
+};
+
+survivalCurve.prototype.addCurve = function(_data, _opts) {
+  
+  var _self = this;
+  
+  // init line elem
+  _self.elem_.additionalLine = d3.svg.line()
+    .interpolate('step-after')
+    .x(function (d) {
+      return _self.elem_.xScale(d.time);
+    })
+    .y(function (d) {
+      return _self.elem_.yScale(d.survival_rate);
+    });
+  
+  // draw line
+  if (_data !== null && _data.length > 0) {
+    _self.elem_.svg.append('path')
+      .attr('id', _self.divId_ + '-line')
+      .attr('d', _self.elem_.additionalLine(_data))
+      .attr('class', 'curve')
+      .style('fill', 'none')
+      .style('stroke', _opts.line_color);
+  }
+
+  // draw censored dots
+  // crossDots specifically for the curve for easier deletion
+  // changed two separate lines to a single cross symbol
+  _self.elem_.svg.selectAll('path')
+    .data(_data)
+    .enter()
+    .append('line')
+    .filter(function (d) {
+      return d.status === 0;
+    })
+    .attr('x1', function(d) { return _self.elem_.xScale(d.time); })
+    .attr('y1', function(d) { return _self.elem_.yScale(d.survival_rate) - 5; })
+    .attr('x2', function(d) { return _self.elem_.xScale(d.time); })
+    .attr('y2', function(d) { return _self.elem_.yScale(d.survival_rate) + 5 ; })
+    .attr('class', 'curve')
+    .style('stroke-width', 1)
+    .style('stroke', _opts.line_color);
+
   // draw invisible dots
-  elem_.dots = elem_.svg.append("g");
-  elem_.dots.selectAll('path')
+  _self.elem_.dots = _self.elem_.svg.append("g");
+  _self.elem_.dots.selectAll('path')
     .data(_data)
     .enter()
     .append('svg:path')
@@ -163,11 +173,12 @@ var survivalCurve = function (_divId, _data) {
       .size(400)
       .type('circle'))
     .attr('transform', function(d){
-      return 'translate(' + elem_.xScale(d.time) + ', ' + elem_.yScale(d.survival_rate) + ')';
+      return 'translate(' + _self.elem_.xScale(d.time) + ', ' + _self.elem_.yScale(d.survival_rate) + ')';
     })
-    .attr('fill', '#5DADE2')
-    .style('opacity', 0);
-  
+    .attr('fill', _opts.line_color)
+    .style('opacity', 0)
+    .attr('class', 'curve');
+
   // add mouse over
   var mouseOn = function(d) {
     var dot = d3.select(this);
@@ -175,10 +186,10 @@ var survivalCurve = function (_divId, _data) {
       .duration(300)
       .style('opacity', .7);
     if(! $(this).data('qtip')) {
-      var content = 
-        'Survival Rate: ' + '<strong>' + d.survival_rate + '</strong>' + '<br>' + 
-        'Months: ' + '<strong>' + d.time + '</strong>' + '<br>' + 
-        'Patient ID: ' + '<strong>' + d.patient_id + '</strong>' + '<br>' + 
+      var content =
+        'Survival Rate: ' + '<strong>' + d.survival_rate + '</strong>' + '<br>' +
+        'Months: ' + '<strong>' + d.time + '</strong>' + '<br>' +
+        'Patient ID: ' + '<strong>' + d.patient_id + '</strong>' + '<br>' +
         'Study: ' + '<strong>' + d.study_id + '</strong>';
       $(this).qtip(
         {
@@ -200,7 +211,12 @@ var survivalCurve = function (_divId, _data) {
       .duration(400)
       .style('opacity', 0);
   };
-  elem_.dots.selectAll('path').on('mouseover', mouseOn);
-  elem_.dots.selectAll('path').on('mouseout', mouseOff);
+  _self.elem_.dots.selectAll('path').on('mouseover', mouseOn);
+  _self.elem_.dots.selectAll('path').on('mouseout', mouseOff);
   
-};
+}
+
+survivalCurve.prototype.removeCurves = function() {
+  var _self = this;
+  _self.elem_.svg.selectAll(".curve").remove();
+}

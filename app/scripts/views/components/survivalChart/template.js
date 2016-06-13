@@ -36,9 +36,10 @@
 (function(Vue, dc, iViz, $) {
   Vue.component('survival', {
     template: '<div id={{chartDivId}} class="grid-item grid-item--height2 grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-    '<chart-operations :show-operations="showOperations" :has-chart-title="hasChartTitle" :display-name="displayName" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId"></chart-operations>' +
-    '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
-    '</div>',
+              '<chart-operations :show-operations="showOperations" :has-chart-title="hasChartTitle" :display-name="displayName" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
+              '<p class="text-center">{{displayName}}</p><div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
+              '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
+              '</div>',
     props: [
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
@@ -46,7 +47,7 @@
     },
     data: function() {
       return {
-        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
+        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
@@ -58,6 +59,9 @@
       };
     },
     watch: {
+      'mappedsamples': function(val) {
+        
+      }
     },
     events: {},
     methods: {
@@ -68,8 +72,12 @@
       }
     },
     ready: function() {
-      var _survivalChart = new iViz.view.component.survival();
-      _survivalChart.init(this.data, this.chartId, this.attributes.attr_id);
+      var _self = this;
+      _self.chartInst = new iViz.view.component.survival();
+      _self.chartInst.init(this.data, this.chartId, this.attributes.attr_id);
+      _self.$on('survival-update', function(_selectedPatients) {
+        _self.chartInst.update(_selectedPatients, _self.chartId, _self.attributes.attr_id);
+      });
     }
   });
 })(window.Vue, window.dc, window.iViz,

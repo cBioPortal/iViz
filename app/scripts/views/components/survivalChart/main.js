@@ -37,13 +37,30 @@
 'use strict';
 (function (iViz) {
   iViz.view.component.survival = function () {
-    var content_ = {}, data_= {};
+    var content_ = {}, data_= {}, chartInst_ = {};
     content_.init = function (_data, _chartId, _attrId) { //_attrId here indicates chart type (OS or DFS)
+      $('#' + _chartId).empty();
       data_ = _data;
-      var dataProxy_ = new survivalChartProxy(_data, _attrId);
-      var _curveOpts = jQuery.extend(true, {}, survivalBroilerPlate.subGroupSettings);
-      new survivalCurve(_chartId, dataProxy_.get(), _curveOpts);
+      var _dataProxy = new survivalChartProxy(_data, _attrId);
+      this.chartInst_ = new survivalCurve(_chartId, _dataProxy.get());
     };
+    content_.update = function(_selectedPatients, _chartId, _attrId) {
+      // remove previous curves
+      this.chartInst_.removeCurves();
+      // settings for selected samples curve
+      var _selectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.patient_id, _selectedPatients) !== -1; });
+      var _selectedDateProxy = new survivalChartProxy(_selectedData, _attrId);
+      var _curveOptsSelected = jQuery.extend(true, {}, survivalBroilerPlate.subGroupSettings);
+      _curveOptsSelected.line_color = "red";
+      // settings for unselected samples curve
+      var _unselectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.patient_id, _selectedPatients) === -1; });
+      var _unselectedDataProxy = new survivalChartProxy(_unselectedData, _attrId);
+      var _curveOptsUnselected = jQuery.extend(true, {}, survivalBroilerPlate.subGroupSettings);
+      _curveOptsUnselected.line_color = "#006bb3";
+      // add curves
+      this.chartInst_.addCurve(_selectedDateProxy.get(), _curveOptsSelected);
+      this.chartInst_.addCurve(_unselectedDataProxy.get(), _curveOptsUnselected);
+    }
     return content_;
   };
   iViz.util.scatterPlot = (function () {

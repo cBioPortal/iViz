@@ -37,24 +37,22 @@
 
   Vue.component('pieChart', {
     template: '<div id={{charDivId}} class="grid-item" class="study-view-dc-chart study-view-pie-main" ' +
-    '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
-    '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
-    ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
-    ':reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
-    '<div class="dc-chart dc-pie-chart" :class="{view: showPieIcon}" align="center" style="float:none' +
-    ' !important;" id={{chartId}} ></div>' +
-    '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
-    '</div>',
+              '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
+              '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
+              ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
+              ':reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes"></chart-operations>' +
+              '<div class="dc-chart dc-pie-chart" :class="{view: showPieIcon}" align="center" style="float:none' +
+              ' !important;" id={{chartId}} ></div>' +
+              '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
+              '</div>',
     props: [
       'ndx', 'attributes', 'filters', 'groupid','data','options'
     ],
     data: function() {
       return {
         v: {},
-        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
-        '-div',
-        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
-        '-reset',
+        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
+        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
         chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
         chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,

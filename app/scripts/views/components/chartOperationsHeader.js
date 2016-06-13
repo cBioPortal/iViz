@@ -33,29 +33,29 @@
  * Created by Karthik Kalletla on 4/14/16.
  */
 'use strict';
-(function(Vue, iViz, $) {
+(function (Vue, iViz, $) {
   Vue.component('chartOperations', {
     template:'<div class="study-view-chart-header">' +
-    '<div class="chart-title"  :class="[showOperations?chartTitleActive:chartTitle]" v-if="hasChartTitle&&((showTableIcon===undefined)||showTableIcon)"><span class="chart-title-span" id="{{chartId}}-title">{{displayName}}</span></div>' +
-    '<div :class="[showOperations?chartOperationsActive:chartOperations]">'+
-    '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>'+
-    '<div style="float:left" v-if="showLogScale"></input style="float:left"><input type="checkbox" value="" id="" ' +
-    'class="study-view-bar-x-log">' +
-    '<span id="scale-span-{{chartId}}" style="float:left; font-size:10px; margin-right: 15px; color: grey">Log Scale X</span></div>'+
-    '<img v-if="showTableIcon" src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
-    '<img v-if="showPieIcon" src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
-    '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" class="study-view-title-icon hover"/>' +
-    '<div id="{{chartId}}-download-icon-wrapper" class="study-view-download-icon">' +
-    '<img src="images/in.svg" class="study-view-title-icon hover" id="{{chartId}}-download"/>'+
-    '</div>'+
-    '<img src="images/move.svg" class="dc-chart-drag study-view-title-icon" class="study-view-title-icon"/>'+
-    '<div style="float:right"><i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>' +
-    '</div>' +
-    '</div>',
+            '<div class="chart-title"  :class="[showOperations?chartTitleActive:chartTitle]" v-if="hasChartTitle&&((showTableIcon===undefined)||showTableIcon)"><span class="chart-title-span" id="{{chartId}}-title">{{displayName}}</span></div>' +
+            '<div :class="[showOperations?chartOperationsActive:chartOperations]">'+
+            '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>'+
+            '<div style="float:left" v-if="showLogScale"></input style="float:left"><input type="checkbox" value="" id="" ' +
+            'class="study-view-bar-x-log">' +
+            '<span id="scale-span-{{chartId}}" style="float:left; font-size:10px; margin-right: 15px; color: grey">Log Scale X</span></div>'+
+            '<img v-if="showTableIcon" src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
+            '<img v-if="showPieIcon" src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
+            '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" class="study-view-title-icon hover"/>' +
+            '<div id="{{chartId}}-download-icon-wrapper" class="study-view-download-icon">' +
+            '<img src="images/in.svg" class="study-view-title-icon hover" id="{{chartId}}-download"/>'+
+            '</div>'+
+            '<img src="images/move.svg" class="dc-chart-drag study-view-title-icon" class="study-view-title-icon"/>'+
+            '<div style="float:right"><i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>' +
+            '</div>' +
+            '</div>',
     props: [
       'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon'
     ],
-    data:function () {
+    data: function () {
       return {
         hasFilters : false,
         chartOperationsActive:'chart-operations-active',
@@ -64,20 +64,20 @@
         chartTitleActive:'chart-title-active'
       }
     },
-    watch:{
-      showOperations:function(){
-          if(this.chart!==""&&this.chart.filters().length>0){
-            this.hasFilters=true;
-          }else{
-            this.hasFilters=false;
+    watch: {
+      showOperations: function () {
+        if (typeof this.chart !== 'undefined' && 
+            this.chart !== '') {
+          if (typeof this.chart.filters !== 'undefined' && this.chart.filters.length > 0) {
+            this.hasFilters = true;
+          } else {
+            this.hasFilters = false;
           }
+        }
       }
     },
     methods: {
-      reset: function() {
-        iViz.shared.resetAll(this.chart, this.groupid)
-      },
-      close: function() {
+      close: function () {
         if (this.chart.hasFilter()) {
           iViz.shared.resetAll(this.chart, this.groupid)
         }
@@ -89,61 +89,62 @@
         this.showPieIcon = !this.showPieIcon;
         this.$dispatch('toTableView');
       }
-    },ready:function(){
+    }, 
+  ready: function () {
+    
       $('#' + this.chartId + '-download').qtip('destroy', true);
-      $('#' +this.chartId + '-download-icon-wrapper').qtip('destroy', true);
+      $('#' + this.chartId + '-download-icon-wrapper').qtip('destroy', true);
       var chartId = this.chartId;
 
-      $('#' +this.chartId + '-title').qtip({
+      $('#' + this.chartId + '-title').qtip({
         id: '#' + this.chartId + "-title-qtip",
-        content:{text: this.displayName},
-        style: { classes: 'qtip-light qtip-rounded qtip-shadow'  },
+        content: {text: this.displayName},
+        style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
         show: {event: "mouseover"},
-        hide: {fixed:true, delay: 100, event: "mouseout"},
-        position: {my:'right bottom',at:'top left', viewport: $(window)}
+        hide: {fixed: true, delay: 100, event: "mouseout"},
+        position: {my: 'right bottom', at: 'top left', viewport: $(window)}
       });
 
-      $('#' +this.chartId + '-download-icon-wrapper').qtip({
-        style: { classes: 'qtip-light qtip-rounded qtip-shadow'  },
+      $('#' + this.chartId + '-download-icon-wrapper').qtip({
+        style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
         show: {event: "mouseover", delay: 0},
-        hide: {fixed:true, delay: 300, event: "mouseout"},
-        position: {my:'bottom left',at:'top right', viewport: $(window)},
+        hide: {fixed: true, delay: 300, event: "mouseout"},
+        position: {my: 'bottom left', at: 'top right', viewport: $(window)},
         content: {
-          text:   "Download"
+          text: "Download"
         }
       });
 
-      $('#' + this.chartId+'-download').qtip({
+      $('#' + this.chartId + '-download').qtip({
         id: '#' + this.chartId + "-download-qtip",
-        style: { classes: 'qtip-light qtip-rounded qtip-shadow'  },
+        style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
         show: {event: "click", delay: 0},
-        hide: {fixed:true, delay: 300, event: "mouseout"},
-        position: {my:'top center',at:'bottom center', viewport: $(window)},
+        hide: {fixed: true, delay: 300, event: "mouseout"},
+        position: {my: 'top center', at: 'bottom center', viewport: $(window)},
         content: {
-          text:
-          "<div style='display:inline-block;'>"+
-          "<button id='"+this.chartId+"-pdf' style=\"width:50px\">PDF</button>"+
-          "</div>"+
-          "<br>"+
-          "<div style='display:inline-block;'>"+
-          "<button id='"+this.chartId+"-svg' style=\"width:50px\">SVG</button>"+
-          "</div>"+
-          "<br>"+
-          "<div style='display:inline-block;'>"+
-          "<button id='"+this.chartId+"-tsv' style=\"width:50px\">TXT</button>"+
+          text: "<div style='display:inline-block;'>" +
+          "<button id='" + this.chartId + "-pdf' style=\"width:50px\">PDF</button>" +
+          "</div>" +
+          "<br>" +
+          "<div style='display:inline-block;'>" +
+          "<button id='" + this.chartId + "-svg' style=\"width:50px\">SVG</button>" +
+          "</div>" +
+          "<br>" +
+          "<div style='display:inline-block;'>" +
+          "<button id='" + this.chartId + "-tsv' style=\"width:50px\">TXT</button>" +
           "</div>"
-        },events: {
-          show: function() {
+        }, events: {
+          show: function () {
             $('#' + chartId + '-download-icon-wrapper').qtip('api').hide();
           },
-          render: function(event, api) {
-            $("#"+chartId+"-pdf", api.elements.tooltip).click(function(){
+          render: function (event, api) {
+            $("#" + chartId + "-pdf", api.elements.tooltip).click(function () {
               console.log('download pdf')
             });
-            $("#"+chartId+"-svg", api.elements.tooltip).click(function(){
+            $("#" + chartId + "-svg", api.elements.tooltip).click(function () {
               console.log('download svg')
             });
-            $("#"+chartId+"-tsv").click(function(){
+            $("#" + chartId + "-tsv").click(function () {
               console.log('download tsv')
             });
           }

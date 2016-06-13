@@ -35,18 +35,33 @@
 'use strict';
 (function(Vue) {
   Vue.component('breadCrumb', {
-    template: '<div class="breadcrumb_container" v-if="attributes.filter.length > 0">' +
-    '<span>{{attributes.attr_id}}&nbsp;&nbsp;:&nbsp;&nbsp;</span><div class="breadcrumd_items">' +
-    '<div v-if="filters.filterType === \'RangedFilter\'"><span class="breadcrumb_item">{{filters[0]}}-{{filters[0]}}</span>' +
-    '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)"></div><div' +
-    ' v-else>' +
-    '<div v-for="filter in filters" style="display:inline-block;">' +
-    '<span class="breadcrumb_item">{{filter}}</span>' +
-    '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">' +
-    '</div></div></div></div>',
+    template: 
+      '<span class="breadcrumb_container" v-if="attributes.filter.length > 0">' +
+        '<span v-if="attributes.attr_id !== \'MUT_CNT_VS_CNA\'" >{{attributes.display_name}}:</span>' +
+        '<span v-else>{{attributes.display_name}}</span>' +
+        '<span v-if="attributes.attr_id !== \'MUT_CNT_VS_CNA\'" class="breadcrumb_items">' +
+          '<span v-if="filters.filterType === \'RangedFilter\'">' +
+            '<span class="breadcrumb_item">{{filters[0]}} -- {{filters[1]}}</span>' +
+            '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)">' +
+          '</span>' +
+          '<span v-else>' +
+            '<span v-for="filter in filters" style="display:inline-block;">' +
+              '<span class="breadcrumb_item">{{filter}}</span>' +
+              '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">' +
+            '</span>' +
+          '</span>' +
+        '</span>' +
+        '<span v-else>' +
+          '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">' +
+        '</span>' +
+      '</span>',
     props: [
       'filters', 'attributes'
     ],
+    watch: {
+      'filters': function(val) {
+      }
+    },
     methods: {
       removeFilter: function(val) {
         if (this.attributes.view_type === 'bar_chart') {
