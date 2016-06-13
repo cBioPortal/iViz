@@ -37,16 +37,13 @@
 
   Vue.component('pieChart', {
     template: '<div id={{charDivId}} class="grid-item" class="study-view-dc-chart study-view-pie-main" ' +
-    '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)" ' +
-    '>' +
-    '<chart-operations :is-pie-chart="isPieChart" :display-name="displayName":show-table.sync="showTable" ' +
-    ':chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
+    '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
+    '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
+    ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
     ':reset-btn-id="resetBtnId" :chart="chartInst"></chart-operations>' +
-    '<div class="dc-chart dc-pie-chart" :class="{view: !showTable}" align="center" style="float:none' +
-    ' !important;" id={{chartId}} >' +
-    /*'<p class="text-center">{{displayName}}</p>*/
-    '</div>' +
-    '<div id={{chartTableId}} :class="{view: showTable}"></div>'+
+    '<div class="dc-chart dc-pie-chart" :class="{view: showPieIcon}" align="center" style="float:none' +
+    ' !important;" id={{chartId}} ></div>' +
+    '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
     '</div>',
     props: [
       'ndx', 'attributes', 'filters', 'groupid','data','options'
@@ -67,9 +64,9 @@
         fromFilter: false,
         cluster: '',
         _piechart:'',
-        isPieChart:true,
-        showTable:true
-
+        hasChartTitle:true,
+        showTableIcon:true,
+        showPieIcon:false
       }
     },
     watch: {
@@ -95,7 +92,7 @@
     },
     events: {
       'toTableView': function() {
-        this._piechart.changeView(this,!this.showTable);
+        this._piechart.changeView(this,!this.showTableIcon);
       },
       'closeChart':function(){
         $('#' +this.charDivId).qtip('destroy');

@@ -62,7 +62,7 @@ body {
   width: 450px;
   height: 450px;
   margin-left: 20px;
-  margin-top: -10px;
+  //margin-top: -10px;
 }
 .dc-survival-chart {
   margin-left: 5px;
@@ -73,6 +73,10 @@ body {
   font-size: 12px;
 }
 .view {
+  display: none;
+}
+
+.hide-content{
   display: none;
 }
 
