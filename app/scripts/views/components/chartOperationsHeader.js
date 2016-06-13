@@ -35,37 +35,33 @@
 'use strict';
 (function (Vue, iViz, $) {
   Vue.component('chartOperations', {
-    template: '<div style="height: 16px; width: 100%; float: left; text-align: center;">' +
-              '<div style="height:16px;float:right;" :class="{view:!showOperations}">' +
-              '<table id="tab"><tr>' +
-              '<td v-show="isPieChart&&showTable">' +
-              '<img src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
-              '</td>' +
-              '<td v-show="isPieChart&&!showTable">' +
-              '<img src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
-              '</td>' +
-              '<td>' +
-              '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>' +
-              '</td>' +
-              '<td><div id="{{chartId}}-download-icon-wrapper">' +
-              '<img src="images/in.svg" class="study-view-title-icon hover" id="{{chartId}}-download"/>' +
-              '</div></td>' +
-              '<td>' +
-              '<img src="images/move.svg" class="dc-chart-drag" class="study-view-title-icon"/>' +
-              '</td>' +
-              '<td>' +
-              '<i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:-2px;" @click="close()"></i>' +
-              '</td>' +
-              '</tr>' +
-              '</table>' +
-              '</div><div><chartTitleH4  id="{{chartId}}-title" :class="{chartTitleH4hover:showOperations}" v-show="isPieChart&&showTable">{{displayName}}</chartTitleH4></div>' +
-              '</div>',
+    template:'<div class="study-view-chart-header">' +
+            '<div class="chart-title"  :class="[showOperations?chartTitleActive:chartTitle]" v-if="hasChartTitle&&((showTableIcon===undefined)||showTableIcon)"><span class="chart-title-span" id="{{chartId}}-title">{{displayName}}</span></div>' +
+            '<div :class="[showOperations?chartOperationsActive:chartOperations]">'+
+            '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>'+
+            '<div style="float:left" v-if="showLogScale"></input style="float:left"><input type="checkbox" value="" id="" ' +
+            'class="study-view-bar-x-log">' +
+            '<span id="scale-span-{{chartId}}" style="float:left; font-size:10px; margin-right: 15px; color: grey">Log Scale X</span></div>'+
+            '<img v-if="showTableIcon" src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
+            '<img v-if="showPieIcon" src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
+            '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" class="study-view-title-icon hover"/>' +
+            '<div id="{{chartId}}-download-icon-wrapper" class="study-view-download-icon">' +
+            '<img src="images/in.svg" class="study-view-title-icon hover" id="{{chartId}}-download"/>'+
+            '</div>'+
+            '<img src="images/move.svg" class="dc-chart-drag study-view-title-icon" class="study-view-title-icon"/>'+
+            '<div style="float:right"><i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>' +
+            '</div>' +
+            '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'groupid', 'isPieChart', 'showTable', 'displayName', 'chartId'
+      'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon'
     ],
     data: function () {
       return {
-        hasFilters: false
+        hasFilters : false,
+        chartOperationsActive:'chart-operations-active',
+        chartOperations:'chart-operations',
+        chartTitle:'chart-title',
+        chartTitleActive:'chart-title-active'
       }
     },
     watch: {
@@ -88,11 +84,14 @@
         dc.deregisterChart(this.chart, this.groupid);
         this.$dispatch('closeChart')
       },
-      changeView: function () {
-        this.showTable = !this.showTable;
+      changeView:function(){
+        this.showTableIcon = !this.showTableIcon;
+        this.showPieIcon = !this.showPieIcon;
         this.$dispatch('toTableView');
       }
-    }, ready: function () {
+    }, 
+  ready: function () {
+    
       $('#' + this.chartId + '-download').qtip('destroy', true);
       $('#' + this.chartId + '-download-icon-wrapper').qtip('destroy', true);
       var chartId = this.chartId;

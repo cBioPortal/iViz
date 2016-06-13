@@ -52,6 +52,12 @@
         "basic/jquery.qtip.js",
         "jquery.qtip.css"
       ]
+    },
+    "fixed-data-table": {
+      "main":[
+        "fixed-data-table.js",
+        "dist/fixed-data-table.min.css"
+      ]
     }
   },
   "devDependencies": {
