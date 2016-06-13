@@ -63,6 +63,9 @@
       'selectedsamples': function(val) {
         this.$broadcast('scatter-plot-sample-update', val);
       },
+      'selectedpatients': function(val) {
+        this.$broadcast('survival-update', val);
+      }
     }, methods: {
       updateGrid: function() {
         if (this.grid_ !== '') {

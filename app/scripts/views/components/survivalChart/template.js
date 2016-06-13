@@ -70,8 +70,12 @@
       }
     },
     ready: function() {
-      var _survivalChart = new iViz.view.component.survival();
-      _survivalChart.init(this.data, this.chartId, this.attributes.attr_id);
+      var _self = this;
+      _self.chartInst = new iViz.view.component.survival();
+      _self.chartInst.init(this.data, this.chartId, this.attributes.attr_id);
+      _self.$on('survival-update', function(_selectedPatients) {
+        _self.chartInst.update(_selectedPatients, _self.chartId, _self.attributes.attr_id);
+      });
     }
   });
 })(window.Vue, window.dc, window.iViz,
