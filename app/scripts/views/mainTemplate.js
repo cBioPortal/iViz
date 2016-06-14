@@ -109,13 +109,18 @@
               if (attributes.view_type !== 'scatter_plot') {
                 filters_[attributes.attr_id] = attributes.filter;
               } else {
-                _scatterPlotSel = attributes.filter;
+                if(_scatterPlotSel.length !== 0){
+                  _scatterPlotSel = _.intersection(_scatterPlotSel,attributes.filter);
+                }else{
+                  _scatterPlotSel =attributes.filter;
+                }
               }
             } 
           });
           var  _selectedCases = iViz.sync.selectByFilters(filters_, group.data, group.type);
-          if (_scatterPlotSel.length !== 0 && filters_.length !== 0) {
-            console.log(_scatterPlotSel.length);
+          if (_scatterPlotSel.length !== 0) {
+            _selectedSamplesByFiltersOnly =
+              _.intersection(_selectedSamplesByFiltersOnly, _scatterPlotSel);
           }
           if (group.type === 'sample') {
             _selectedSamplesByFiltersOnly =
@@ -144,7 +149,7 @@
         this.selectedsamples = resultSelectedSamples;
         this.selectedpatients = resultSelectedPatients;
       },
-      'update-by-samples': function(_selectedSamplesInScatterPlots) {
+     /* 'update-by-samples': function(_selectedSamplesInScatterPlots) {
         // var _self = this;
         // _.each(_self.groups, function(_group) {
         //   _.each(_group.attributes, function(_attribute) {
@@ -157,11 +162,12 @@
         //     }
         //   });
         // });
-        this.patientsync = iViz.util.idMapping(this.samplemap, _selectedSamplesInScatterPlots);
-        this.samplesync = _selectedSamplesInScatterPlots;
-        this.selectedsamples = _selectedSamplesInScatterPlots;
-        this.selectedpatients = iViz.util.idMapping(this.samplemap, _selectedSamplesInScatterPlots);
-      }
+        var samples_ = $.extend(true, [], this.selectedsamples);
+        this.selectedsamples = _.intersection(_selectedSamplesInScatterPlots,samples_);
+        this.selectedpatients = iViz.util.idMapping(this.samplemap, this.selectedsamples);
+        this.patientsync = this.selectedpatients;
+        this.samplesync = this.selectedsamples;
+      }*/
     }
   });
 })(window.Vue, window.dc, window.iViz,
