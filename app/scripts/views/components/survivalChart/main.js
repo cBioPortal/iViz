@@ -37,7 +37,7 @@
 'use strict';
 (function (iViz) {
   iViz.view.component.survival = function () {
-    var content_ = {}, data_= {}, chartInst_ = {};
+    var content_ = {}, data_= {};
     content_.init = function (_data, _chartId, _attrId) { //_attrId here indicates chart type (OS or DFS)
       $('#' + _chartId).empty();
       data_ = _data;
@@ -49,17 +49,17 @@
       this.chartInst_.removeCurves();
       // settings for selected samples curve
       var _selectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.patient_id, _selectedPatients) !== -1; });
-      var _selectedDateProxy = new survivalChartProxy(_selectedData, _attrId);
-      var _curveOptsSelected = jQuery.extend(true, {}, survivalBroilerPlate.subGroupSettings);
-      _curveOptsSelected.line_color = "red";
+      var _selectedDataProxy = new survivalChartProxy(_selectedData, _attrId);
       // settings for unselected samples curve
       var _unselectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.patient_id, _selectedPatients) === -1; });
       var _unselectedDataProxy = new survivalChartProxy(_unselectedData, _attrId);
-      var _curveOptsUnselected = jQuery.extend(true, {}, survivalBroilerPlate.subGroupSettings);
-      _curveOptsUnselected.line_color = "#006bb3";
       // add curves
-      this.chartInst_.addCurve(_selectedDateProxy.get(), _curveOptsSelected);
-      this.chartInst_.addCurve(_unselectedDataProxy.get(), _curveOptsUnselected);
+      if (_unselectedDataProxy.get().length === 0) {
+        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, "#006bb3");
+      } else {
+        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, "red");
+        this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, "#006bb3");
+      }
     }
     return content_;
   };

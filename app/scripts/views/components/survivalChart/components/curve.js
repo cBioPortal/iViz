@@ -43,7 +43,6 @@ var survivalCurve = function (_divId, _data) {
   _self.elem_.svg = _self.elem_.append('svg')
     .attr('width', 500)
     .attr('height', 500);
-  _self.elem_.curve = _self.elem_.svg.append('g');
 
   // init axis
   _self.elem_.xScale = d3.scale.linear()
@@ -118,15 +117,27 @@ var survivalCurve = function (_divId, _data) {
     .style('font-size', '11px')
     .style('font-weight','bold')
     .text('Surviving');
-  
+
+  _self.elem_.dots = [];
+  _self.elem_.line = [];
+
 };
 
-survivalCurve.prototype.addCurve = function(_data, _opts) {
+survivalCurve.prototype.addCurve = function(_data, _curveIndex, _lineColor) {
   
   var _self = this;
   
+  // add an empty/zero point so the curve starts from zero time point
+  if (_data[0].time !== 0) {
+    _data.unshift({
+      status: 0,
+      survival_rate: 1,
+      time: 0
+    });
+  }
+  
   // init line elem
-  _self.elem_.additionalLine = d3.svg.line()
+  _self.elem_.line[_curveIndex] = d3.svg.line()
     .interpolate('step-after')
     .x(function (d) {
       return _self.elem_.xScale(d.time);
@@ -139,10 +150,10 @@ survivalCurve.prototype.addCurve = function(_data, _opts) {
   if (_data !== null && _data.length > 0) {
     _self.elem_.svg.append('path')
       .attr('id', _self.divId_ + '-line')
-      .attr('d', _self.elem_.additionalLine(_data))
+      .attr('d', _self.elem_.line[_curveIndex](_data))
       .attr('class', 'curve')
       .style('fill', 'none')
-      .style('stroke', _opts.line_color);
+      .style('stroke', _lineColor);
   }
 
   // draw censored dots
@@ -161,62 +172,67 @@ survivalCurve.prototype.addCurve = function(_data, _opts) {
     .attr('y2', function(d) { return _self.elem_.yScale(d.survival_rate) + 5 ; })
     .attr('class', 'curve')
     .style('stroke-width', 1)
-    .style('stroke', _opts.line_color);
+    .style('stroke', _lineColor);
 
   // draw invisible dots
-  _self.elem_.dots = _self.elem_.svg.append("g");
-  _self.elem_.dots.selectAll('path')
+  _self.elem_.dots[_curveIndex] = _self.elem_.svg.append("g");
+  _self.elem_.dots[_curveIndex].selectAll('path')
     .data(_data)
     .enter()
     .append('svg:path')
+    .on('mouseover', function(d) {
+      var dot = d3.select(this);
+      var _survivalRate = d3.select(this).attr('survival_rate');
+      _survivalRate = parseFloat(_survivalRate).toFixed(2);
+      var _time = d3.select(this).attr('time');
+      _time = parseFloat(_time).toFixed(2);
+      dot.transition()
+        .duration(300)
+        .style('opacity', .5);
+
+        $(this).qtip(
+          {
+            content: {text: function() {
+              var content =
+                'Survival Rate: ' + '<strong>' + _survivalRate + '</strong>' + '<br>' +
+                'Months: ' + '<strong>' + _time + '</strong>' + '<br>' +
+                'Patient ID: ' + '<strong>' + d.patient_id + '</strong>' + '<br>' +
+                'Study: ' + '<strong>' + d.study_id + '</strong>';
+              return content;
+            }},
+            style: { classes: 'qtip-light qtip-rounded qtip-shadow qtip-lightyellow qtip-wide'},
+            show: {
+              event: 'mouseover',
+              ready: true
+            },
+            hide: {fixed:true, delay: 100, event: 'mouseout'},
+            position: {my:'left bottom',at:'top right'}
+          }
+        );
+    })
+    .on('mouseout', function(d) {
+      var dot = d3.select(this);
+      dot.transition()
+        .duration(300)
+        .style('opacity', 0);
+    })
+    .attr('time', function(d) { return d.time; })
+    .attr('survival_rate', function(d) { return d.survival_rate; })
     .attr('d', d3.svg.symbol()
-      .size(400)
+      .size(300)
       .type('circle'))
     .attr('transform', function(d){
       return 'translate(' + _self.elem_.xScale(d.time) + ', ' + _self.elem_.yScale(d.survival_rate) + ')';
     })
-    .attr('fill', _opts.line_color)
+    .attr('fill', _lineColor)
     .style('opacity', 0)
-    .attr('class', 'curve');
-
-  // add mouse over
-  var mouseOn = function(d) {
-    var dot = d3.select(this);
-    dot.transition()
-      .duration(300)
-      .style('opacity', .7);
-    if(! $(this).data('qtip')) {
-      var content =
-        'Survival Rate: ' + '<strong>' + d.survival_rate + '</strong>' + '<br>' +
-        'Months: ' + '<strong>' + d.time + '</strong>' + '<br>' +
-        'Patient ID: ' + '<strong>' + d.patient_id + '</strong>' + '<br>' +
-        'Study: ' + '<strong>' + d.study_id + '</strong>';
-      $(this).qtip(
-        {
-          content: {text: content},
-          style: { classes: 'qtip-light qtip-rounded qtip-shadow qtip-lightyellow qtip-wide'},
-          show: {
-            event: 'mouseover',
-            ready: true
-          },
-          hide: {fixed:true, delay: 100, event: 'mouseout'},
-          position: {my:'left bottom',at:'top right'}
-        }
-      );
-    }
-  };
-  var mouseOff = function() {
-    var dot = d3.select(this);
-    dot.transition()
-      .duration(400)
-      .style('opacity', 0);
-  };
-  _self.elem_.dots.selectAll('path').on('mouseover', mouseOn);
-  _self.elem_.dots.selectAll('path').on('mouseout', mouseOff);
+    .attr('class', 'curve')
+    .attr('class', 'invisible_dots');
   
 }
 
 survivalCurve.prototype.removeCurves = function() {
   var _self = this;
   _self.elem_.svg.selectAll(".curve").remove();
+  _self.elem_.svg.selectAll(".invisible_dots").remove();
 }
