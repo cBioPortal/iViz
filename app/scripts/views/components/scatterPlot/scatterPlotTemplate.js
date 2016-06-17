@@ -55,7 +55,12 @@
         chartInst: {}
       };
     },
-    watch: {},
+    watch: {
+      'filters': function(newVal) {
+        this.chartInst.update(newVal);
+        this.$dispatch('update-samples',newVal);
+      }
+    },
     events: {},
     methods: {
       mouseEnter: function() {
@@ -83,16 +88,18 @@
             });
           });
           _self.selectedSamples = _.pluck(_selectedData, "sample_id");
-          _self.chartInst.update(_self.selectedSamples);
+         // _self.chartInst.update(_self.selectedSamples);
           _self.filters = _self.selectedSamples;
-          _self.$dispatch('update-samples', _self.selectedSamples);
+          //_self.$dispatch('update-samples', _self.selectedSamples);
         }
       });
       
       _self.$on('scatter-plot-sample-update', function(_selectedSamples) {
         if (_selectedSamples.length !== _self.data.length) {
+          _self.selectedSamples=_selectedSamples;
           _self.chartInst.update(_selectedSamples);
         } else {
+          _self.selectedSamples=_selectedSamples;
           _self.chartInst.update([]);
         }
       });

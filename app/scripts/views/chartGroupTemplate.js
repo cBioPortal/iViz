@@ -107,11 +107,10 @@
         this.$dispatch('update-all-filters', this.type);
       },
       'update-samples': function(_sampleIds) {
-        dc.filterAll([this.groupid]);
         this.chartInvisible.filter(null);
         this.chartInvisible.filter([_sampleIds]);
         dc.redrawAll([this.groupid]);
-        this.$dispatch('update-by-samples', _sampleIds);
+        this.$dispatch('update-all-filters', this.type);
       }
     },
     methods: {

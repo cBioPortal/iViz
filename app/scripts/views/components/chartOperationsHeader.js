@@ -68,7 +68,7 @@
       showOperations: function () {
         if (typeof this.chart !== 'undefined' && 
             this.chart !== '') {
-          if (typeof this.chart.filters !== 'undefined' && this.chart.filters.length > 0) {
+          if (typeof this.chart.filters !== 'undefined' && this.chart.filters().length > 0) {
             this.hasFilters = true;
           } else {
             this.hasFilters = false;

@@ -52,7 +52,7 @@
           '</span>' +
         '</span>' +
         '<span v-else>' +
-          '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">' +
+          '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter()">' +
         '</span>' +
       '</span>',
     props: [
@@ -66,8 +66,10 @@
       removeFilter: function(val) {
         if (this.attributes.view_type === 'bar_chart') {
           this.filters = []
-        } else {
+        } else if(this.attributes.view_type === 'pie_chart'){
           this.filters.$remove(val)
+        } else if(this.attributes.view_type === 'scatter_plot'){
+          this.filters = []
         }
       }
     }
