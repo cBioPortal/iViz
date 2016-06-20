@@ -1,19 +1,19 @@
 @import "vars";
 
-.w1 {
+.grid-item-w-1 {
   width: $grid-w-1;
 }
 
-.w2 {
+.grid-item-w-2 {
   width: $grid-w-2;
 }
 
-.h1 {
+.grid-item-h-1 {
   height: $grid-h-1;
 }
 
-.h2 {
-  height: $grid-h-1;
+.grid-item-h-2 {
+  height: $grid-h-2;
 }
 
 .grid {
@@ -29,23 +29,7 @@
 
 .grid-item {
   float: left;
-  width: $grid-w-1;
-  height: $grid-h-1;
   border: 1px;
   border-color: lightgrey;
   border-style: solid;
-}
-
-.grid-item--width2 {
-  width: $grid-w-2;
-}
-
-.grid-item--height2 {
-  height: $grid-h-2;
-}
-
-.grid-item:hover {
-  border-color: grey;
-  //background: #F8F9F9;
-  cursor: move;
 }

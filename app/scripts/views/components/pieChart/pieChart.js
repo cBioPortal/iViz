@@ -356,7 +356,7 @@
             "attr_id": "name",
             "display_name": v.data.display_name,
             "datatype": "STRING",
-            "column_width": 215
+            "column_width": 213
           },
           {
             "attr_id": "color",
@@ -528,7 +528,7 @@
         fixedChoose: false,
         uniqueId: 'uniqueId',
         rowHeight: 25,
-        tableWidth: 375,
+        tableWidth: 373,
         maxHeight: 290,
         headerHeight: 26,
         groupHeaderHeight: 40,

@@ -48,7 +48,7 @@
   };
 
   Vue.component('barChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+    template: '<div id={{charDivId}} class="grid-item grid-item-w-2 grid-item-h-1" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :show-survival-icon="showSurvivalIcon" :show-log-scale="showLogScale"' +
     ':show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><p class="text-center">{{displayName}}</p>' +
