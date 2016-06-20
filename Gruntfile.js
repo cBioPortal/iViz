@@ -53,6 +53,10 @@ module.exports = function(grunt) {
       styles: {
         files: ['<%= config.app %>/styles/{,*/}*.css'],
         tasks: ['newer:copy:styles', 'postcss']
+      },
+      json_to_sass: {
+        files: ['<%= config.app %>/resources/vars.json'],
+        tasks: ['json_to_sass', 'newer:copy:styles', 'postcss']
       }
     },
 
@@ -241,7 +245,7 @@ module.exports = function(grunt) {
         flow: {
           html: {
             steps: {
-              js: ['concat', 'uglifyjs'],
+              js: ['concat'],
               css: ['cssmin']
             },
             post: {}
@@ -270,7 +274,7 @@ module.exports = function(grunt) {
         files: [{
           expand: true,
           cwd: '<%= config.app %>/images',
-          src: '{,*/}*.{gif,jpeg,jpg,png}',
+          src: '{,*/}*.{gif,jpeg,jpg,png,svg}',
           dest: '<%= config.dist %>/images'
         }]
       }
@@ -365,6 +369,12 @@ module.exports = function(grunt) {
           cwd: '.',
           src: 'bower_components/components-font-awesome/fonts/*',
           dest: '<%= config.dist %>'
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '<%= config.app %>',
+          src: 'resources/{,*/}*.*',
+          dest: '<%= config.dist %>'
         }]
       }
     },
@@ -401,6 +411,20 @@ module.exports = function(grunt) {
         'imagemin',
         'svgmin'
       ]
+    },
+
+    // Paser style json file into Sass variabels
+    json_to_sass: {
+      vars: {
+        files: [
+          {
+            src: [
+              '<%= config.app %>/resources/vars.json'
+            ],
+            dest: '<%= config.app %>/styles/partials/_vars.scss'
+          }
+        ]
+      }
     }
   });
 
@@ -414,6 +438,7 @@ module.exports = function(grunt) {
         'clean:server',
         'wiredep',
         'concurrent:server',
+        'json_to_sass:vars',
         'postcss',
         'browserSync:livereload',
         'watch'
@@ -448,7 +473,7 @@ module.exports = function(grunt) {
     'postcss',
     'concat:generated',
     'cssmin:generated',
-    'uglify:generated',
+    // 'uglify:generated',
     'copy:dist',
     'modernizr',
     'filerev',

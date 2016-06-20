@@ -51,7 +51,7 @@
     template: '<div id={{charDivId}} class="grid-item grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :show-survival-icon="showSurvivalIcon" :show-log-scale="showLogScale"' +
     ':show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId"></chart-operations>' +
-    '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ><p class="text-center">{{displayName}}</p></div>' +
+    '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><p class="text-center">{{displayName}}</p>' +
     '</div>',
     props: [
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
@@ -100,6 +100,10 @@
       var data_ = {};
       data_.min = this.options.min;
       data_.max = this.options.max;
+
+      settings_.barChart.width = window.style.vars.barchartWidth || 150;
+      settings_.barChart.height = window.style.vars.barchartHeight || 150;
+      
       this.chartInst =
         _barChart.init(this.ndx, data_, this.attributes, settings_,
           this.chartId, this.groupid);

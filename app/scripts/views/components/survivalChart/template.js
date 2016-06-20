@@ -37,7 +37,7 @@
   Vue.component('survival', {
     template: '<div id={{chartDivId}} class="grid-item grid-item--height2 grid-item--width2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
               '<chart-operations :show-operations="showOperations" :has-chart-title="hasChartTitle" :display-name="displayName" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
-              '<p class="text-center">{{displayName}}</p><div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
+              '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
               '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
               '</div>',
     props: [

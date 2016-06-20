@@ -157,13 +157,12 @@
         }else{
           updateReactTable();
         }
-        $("#"+v.opts.charDivId).animate({height: '505px', width: '505px', duration: 300, queue: false}, 300, function() {
+        animateTable("#"+v.opts.charDivId, 'table', function() {
           vm.$dispatch('update-grid');
           $("#"+v.opts.charDivId).css('z-index', '');
         });
       }else{
-
-        $("#"+v.opts.charDivId).animate({height: "250px", width: "250px", duration: 300, queue: false}, 300, function() {
+        animateTable("#"+v.opts.charDivId, 'pie', function() {
           vm.$dispatch('update-grid');
           $("#"+v.opts.charDivId).css('z-index', '1');
         });
@@ -200,6 +199,26 @@
       });
     };
 
+    function animateTable(target, view, callback) {
+      var width = window.style['grid-w-1'] || '180px';
+      var height = window.style['grid-h-1'] || '165px';
+
+      if (view === 'table') {
+        width = window.style['grid-w-2'] || '375px';
+        height = window.style['grid-h-2'] || '340px';
+      }
+
+      $(target).animate({
+        height: height,
+        width: width,
+        duration: 300,
+        queue: false
+      }, 300, function() {
+        if (_.isFunction(callback)) {
+          callback();
+        }
+      });
+    }
 
     function initLabels() {
       labelMetaData = initLabelInfo();

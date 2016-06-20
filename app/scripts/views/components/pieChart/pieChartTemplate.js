@@ -120,8 +120,8 @@
         groupid : this.groupid,
         chartTableId : this.chartTableId,
         transitionDuration : iViz.opts.dc.transitionDuration,
-        width:130,
-        height:130
+        width: window.style['piechart-svg-width'] | 130,
+        height: window.style['piechart-svg-height'] | 130
       };
       this._piechart = new iViz.view.component.pieChart();
       this.chartInst = this._piechart.init(this.ndx, this.attributes, opts);
