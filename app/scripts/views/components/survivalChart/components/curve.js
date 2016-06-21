@@ -38,6 +38,9 @@ var survivalCurve = function (_divId, _data, _opts) {
   _self.divId_ = _divId;
   _self.data_ = _data;
   var formatAsPercentage_ = d3.format('%');
+  
+  var leftMargin_ = 60, rightMargin_ = 10,
+      topMargin_ = 15, bottomMargin_ = 60;
 
   _self.elem_ = d3.select('#' + _self.divId_);
   _self.elem_.svg = _self.elem_.append('svg')
@@ -47,10 +50,10 @@ var survivalCurve = function (_divId, _data, _opts) {
   // init axis
   _self.elem_.xScale = d3.scale.linear()
     .domain([0, d3.max(_.pluck(_self.data_, 'time'))])
-    .range([70, 420]);
+    .range([leftMargin_,  _opts.width - rightMargin_]);
   _self.elem_.yScale = d3.scale.linear()
     .domain([-0.03, 1.05]) //fixed to be 0-1
-    .range([380, 30]);
+    .range([topMargin_ - bottomMargin_ + _opts.height, topMargin_]);
   _self.elem_.xAxis = d3.svg.axis()
     .scale(_self.elem_.xScale)
     .orient('bottom')
@@ -68,14 +71,14 @@ var survivalCurve = function (_divId, _data, _opts) {
     .style('stroke', 'black')
     .attr('class', 'survival-curve-x-axis-class')
     .style('shape-rendering', 'crispEdges')
-    .attr('transform', 'translate(0, 380)')
+    .attr('transform', 'translate(0, ' + (topMargin_ - bottomMargin_ + _opts.height) + ')')
     .call(_self.elem_.xAxis);
   _self.elem_.svg.append('g')
     .style('stroke-width', 1)
     .style('fill', 'none')
     .style('stroke', 'black')
     .style('shape-rendering', 'crispEdges')
-    .attr('transform', 'translate(0, 30)')
+    .attr('transform', 'translate(0, ' + topMargin_ + ')')
     .call(_self.elem_.xAxis.orient('bottom').ticks(0));
   _self.elem_.svg.append('g')
     .style('stroke-width', 1)
@@ -83,14 +86,14 @@ var survivalCurve = function (_divId, _data, _opts) {
     .style('stroke', 'black')
     .attr('class', 'survival-curve-y-axis-class')
     .style('shape-rendering', 'crispEdges')
-    .attr('transform', 'translate(70, 0)')
+    .attr('transform', 'translate(' + leftMargin_ + ', 0)')
     .call(_self.elem_.yAxis);
   _self.elem_.svg.append('g')
     .style('stroke-width', 1)
     .style('fill', 'none')
     .style('stroke', 'black')
     .style('shape-rendering', 'crispEdges')
-    .attr('transform', 'translate(420, 0)')
+    .attr('transform', 'translate(' + (_opts.width - rightMargin_) + ', 0)')
     .call(_self.elem_.yAxis.orient('left').ticks(0));
   _self.elem_.svg.selectAll('text')
     .style('font-family', 'sans-serif')
@@ -102,8 +105,8 @@ var survivalCurve = function (_divId, _data, _opts) {
   // append axis title
   _self.elem_.svg.append('text')
     .attr('class', 'label')
-    .attr('x', 250)
-    .attr('y', 420)
+    .attr('x', leftMargin_ + (_opts.width - leftMargin_) / 2)
+    .attr('y', (topMargin_ + _opts.height - 25))
     .style('text-anchor', 'middle')
     .style('font-size', '11px')
     .style('font-weight','bold')
@@ -111,8 +114,8 @@ var survivalCurve = function (_divId, _data, _opts) {
   _self.elem_.svg.append('text')
     .attr('class', 'label')
     .attr('transform', 'rotate(-90)')
-    .attr('x', -200)
-    .attr('y', 30)
+    .attr('x', (topMargin_ - _opts.height) /2)
+    .attr('y', leftMargin_ - 45 )
     .style('text-anchor', 'middle')
     .style('font-size', '11px')
     .style('font-weight','bold')

@@ -194,8 +194,8 @@
     $.get('resources/vars.json')
       .then(function(data) {
         window.style.vars = data;
-        window.style.vars.survivalWidth = window.style.vars['grid-w-2'];
-        window.style.vars.survivalHeight = window.style.vars['grid-h-2'];
+        window.style.vars.survivalWidth = 320;
+        window.style.vars.survivalHeight = 320;
         window.style.vars.barchartWidth = 350;
         window.style.vars.barchartHeight = 120;
       })
