@@ -52,12 +52,12 @@
     ' :attributes.sync="attribute" v-for="attribute in attributes" ></div>',
     props: [
       'data', 'attributes', 'type', 'mappedsamples', 'id',
-      'mappedpatients', 'groupid', 'plotsfiltered'
+      'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters'
     ], created: function() {
       var ndx_ = crossfilter(this.data);
       var invisibleBridgeChart_ = iViz.bridgeChart.init(ndx_, settings_,
         this.type, this.id);
-      this.groupid = this.type + '-' + this.id;
+      this.groupid = this.id;
       this.ndx = ndx_;
       this.chartInvisible = invisibleBridgeChart_;
     }, destroyed: function() {
@@ -74,30 +74,30 @@
     },
     watch: {
       'mappedsamples': function(val) {
-        if (this.syncSample) {
-          if (this.type === 'sample') {
+        if (this.type === 'sample') {
+          if (this.syncSample) {
             this.updateInvisibleChart(val);
-          }
-        } else {
-          this.syncSample = true;
-        }
-      },
-      'mappedpatients': function(val) {
-        var _self = this;
-        if (_self.syncPatient) {
-          if (_self.type === 'patient') {
-            if (_self.plotsfiltered) {
-              dc.filterAll([_self.groupid]);
-              _self.chartInvisible.filter(null);
-              _self.chartInvisible.filter([val]);
-              dc.redrawAll([_self.groupid]);       
-            } else {
-              _self.updateInvisibleChart(val);
+          }else {
+            this.syncSample = true;
+            if(!this.hasfilters){
+              this.updateInvisibleChart(val);
             }
           }
-        } else {
-          _self.syncPatient = true;
         }
+        this.redrawgroups.push(true);
+      },
+      'mappedpatients': function(val) {
+        if (this.type === 'patient') {
+          if (this.syncPatient) {
+            this.updateInvisibleChart(val);
+          } else {
+            this.syncPatient = true;
+            if(!this.hasfilters){
+              this.updateInvisibleChart(val);
+            }
+          }
+        }
+        this.redrawgroups.push(true);
       }
     },
     events: {
@@ -107,9 +107,10 @@
         this.$dispatch('update-all-filters', this.type);
       },
       'update-samples': function(_sampleIds) {
+        this.syncPatient = false;
+        this.syncSample = false;
         this.chartInvisible.filter(null);
         this.chartInvisible.filter([_sampleIds]);
-        dc.redrawAll([this.groupid]);
         this.$dispatch('update-all-filters', this.type);
       }
     },
@@ -117,7 +118,6 @@
       updateInvisibleChart: function(val) {
         this.chartInvisible.filter(null);
         this.chartInvisible.filter([val]);
-        dc.redrawAll(this.groupid);
       }
     }
   });

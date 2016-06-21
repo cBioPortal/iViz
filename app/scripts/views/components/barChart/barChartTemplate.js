@@ -66,21 +66,20 @@
         displayName: this.attributes.display_name,
         chartInst: '',
         showOperations: false,
-        fromWatch: false,
-        fromFilter: false,
+        filtersUpdated:false,
         showLogScale:true,
         showSurvivalIcon:true
       }
     }, watch: {
       'filters': function(newVal, oldVal) {
-        if (!this.fromFilter) {
-          this.fromWatch = true
+        if(!this.filtersUpdated) {
+          this.filtersUpdated = true;
           if (newVal.length == 0) {
             this.chartInst.filter(null);
-            dc.redrawAll(this.groupid)
+            this.$dispatch('update-filters');
           }
-        } else {
-          this.fromFilter = false;
+        } else{
+          this.filtersUpdated = false;
         }
       },
     },events: {
@@ -110,23 +109,22 @@
       //dc.registerChart(this.chartInst,this.groupid);
       var self_ = this;
       this.chartInst.on('filtered', function(_chartInst, _filter) {
-        if (!self_.fromWatch) {
-          self_.fromFilter = true;
+        if(!self_.filtersUpdated) {
+          self_.filtersUpdated = true;
           var tempFilters_ = $.extend(true, [], self_.filters);
           tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-            self_.attributes.attr_id, self_.attributes.view_type);
+            self_.attributes.view_type);
           if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
             tempFilters_[0] = tempFilters_[0].toFixed(2);
             tempFilters_[1] = tempFilters_[1].toFixed(2);
           }
           self_.filters = tempFilters_;
-        } else {
-          self_.fromWatch = false;
+          self_.$dispatch('update-filters');
+        }else{
+          self_.filtersUpdated = false;
         }
-        self_.$dispatch('update-filters')
       });
-      this.$dispatch('data-loaded', true)
-
+      this.$dispatch('data-loaded', true);
     }
   });
 })(window.Vue, window.dc, window.iViz,

@@ -98,7 +98,7 @@ var iViz = (function(_, $) {
           group.attributes = data_.groups.patient.attr_meta.slice(lowerLimit, upperLimit);
           group.data = data_.groups.patient.data;
           group.type = 'patient';
-          group.id=id_;
+          group.id=group.type+'_'+id_;
           groups.push(group);
           id_++;
         }
@@ -110,7 +110,7 @@ var iViz = (function(_, $) {
           group.attributes = data_.groups.sample.attr_meta.slice(lowerLimit,upperLimit);
           group.data = data_.groups.sample.data;
           group.type = 'sample';
-          group.id=id_;
+          group.id=group.type+'_'+id_;
           groups.push(group);
           id_++;
         }

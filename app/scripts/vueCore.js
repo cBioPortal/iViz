@@ -34,7 +34,7 @@
  */
 
 'use strict';
-(function(Vue, iViz) {
+(function(Vue, iViz, dc, _) {
   iViz.session = {};
 
   iViz.session.manage = (function() {
@@ -54,17 +54,31 @@
             addNewVC: false,
             selectedPatientsNum: 0,
             selectedSamplesNum: 0,
-            filters: [],
+            hasfilters: false,
             virtualCohorts: [],
-            isloading: true
+            isloading: true,
+            redrawgroups:[]
           }, watch: {
+            'redrawgroups':function(newVal,oldVal){
+              if(newVal.length>0){
+                _.each(this.groups, function(group){
+                  dc.redrawAll(group.id);
+                });
+                this.redrawgroups = [];
+              }
+            },
             'selectedsamples': function(val) {
               this.selectedSamplesNum = val.length;
             },
             'selectedpatients': function(val) {
               this.selectedPatientsNum = val.length;
             }
-          }, methods: {
+          }, events: {
+            'redraw-all-charts':function(){
+              console.log('redraw-all-charts')
+              this.redrawgroups.push(true);
+            }
+          },methods: {
             initialize: function() {
                 this.groups = [],
                 this.selectedsamples = [],
@@ -75,9 +89,12 @@
                 this.addNewVC = false,
                 this.selectedPatientsNum = 0,
                 this.selectedSamplesNum = 0,
-                this.filters = [],
+                this.hasfilters = false,
                 this.virtualCohorts = [],
                 this.isloading = true
+            },
+            clearAll: function(){
+              this.$broadcast('clear-all-filters');
             }
           }, ready: function() {
             this.$watch('showVCList', function() {
@@ -138,9 +155,9 @@
       getInstance: function() {
         if (typeof vmInstance_ === 'undefined') {
           this.init();
-        }8
+        }
         return vmInstance_;
       }
     };
   })();
-})(window.Vue, window.iViz);
+})(window.Vue, window.iViz, window.dc,window._);

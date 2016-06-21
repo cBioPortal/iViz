@@ -66,7 +66,7 @@
     },
     watch: {
       showOperations: function () {
-        if (typeof this.chart !== 'undefined' && 
+        if (typeof this.chart !== 'undefined' &&
             this.chart !== '') {
           if (typeof this.chart.filters !== 'undefined' && this.chart.filters().length > 0) {
             this.hasFilters = true;
@@ -77,6 +77,9 @@
       }
     },
     methods: {
+      reset: function() {
+        iViz.shared.resetAll(this.chart, this.groupid)
+      },
       close: function () {
         if (this.chart.hasFilter()) {
           iViz.shared.resetAll(this.chart, this.groupid)

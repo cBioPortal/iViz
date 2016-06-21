@@ -41,14 +41,14 @@
   iViz.shared = {};
 
   iViz.shared.resetAll = function(_chartInst, _groupid, _attributes) {
-    if (_attributes.view_type === 'scatter_plot') {
+    if ((_attributes !== undefined) && (_attributes.view_type === 'scatter_plot')) {
       _chartInst.reset();
     } else {
       _chartInst.filterAll();
       dc.redrawAll(_groupid);
     }
   }
-  iViz.shared.updateFilters = function(filter, filters, attribute, type) {
+  iViz.shared.updateFilters = function(filter, filters, type) {
     if (filter === null) {
       filters = [];
     } else {

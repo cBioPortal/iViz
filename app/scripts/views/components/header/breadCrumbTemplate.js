@@ -65,11 +65,11 @@
     methods: {
       removeFilter: function(val) {
         if (this.attributes.view_type === 'bar_chart') {
-          this.filters = []
+          this.filters = [];
         } else if(this.attributes.view_type === 'pie_chart'){
-          this.filters.$remove(val)
+          this.filters.$remove(val);
         } else if(this.attributes.view_type === 'scatter_plot'){
-          this.filters = []
+          this.filters = [];
         }
       }
     }

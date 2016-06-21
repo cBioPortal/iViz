@@ -35,18 +35,17 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('mainTemplate', {
-    template: ' <chart-group :data.sync="group.data" :id="group.id" :type.sync="group.type" :mappedpatients.sync="patientsync"' +
-    ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes" :plotsfiltered="plotsfiltered"' +
+    template: ' <chart-group :data.sync="group.data" :hasfilters="hasfilters"  :redrawgroups.sync="redrawgroups"   :id="group.id"   :type.sync="group.type" :mappedpatients.sync="patientsync"' +
+    ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
-      'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap'
+      'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap', 'hasfilters', 'redrawgroups'
     ], data: function() {
       return {
         messages: [],
         patientsync: [],
         samplesync: [],
-        grid_: '',
-        plotsfiltered: false
+        grid_: ''
       }
     }, watch: {
       'groups': {
@@ -56,7 +55,7 @@
       },
       'messages': function(val) {
         _.each(this.groups, function(group) {
-          dc.renderAll(group.type + '-' + group.id);
+          dc.renderAll(group.id);
         });
         this.updateGrid();
       },
@@ -102,10 +101,12 @@
       'update-all-filters': function(updateType) {
         var _selectedPatientsByFiltersOnly = _.keys(this.patientmap);
         var _selectedSamplesByFiltersOnly = _.keys(this.samplemap);
+        var _hasFilters = false;
         _.each(this.groups, function(group) {
           var filters_ = [], _scatterPlotSel = [];
           _.each(group.attributes, function(attributes) {
             if (attributes.filter.length > 0) {
+              _hasFilters = true;
               if (attributes.view_type !== 'scatter_plot') {
                 filters_[attributes.attr_id] = attributes.filter;
               } else {
@@ -131,6 +132,7 @@
               _.intersection(_selectedPatientsByFiltersOnly, _selectedCases);
           }
         });
+        this.hasfilters = _hasFilters;
         var mappedSelectedSamples = iViz.util.idMapping(this.patientmap,
           _selectedPatientsByFiltersOnly);
         var resultSelectedSamples = _.intersection(mappedSelectedSamples,

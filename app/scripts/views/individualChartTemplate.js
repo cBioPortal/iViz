@@ -88,6 +88,13 @@
       'update-grid':function(){
         this.$dispatch('update-grid')
       }*/
+    }, ready: function() {
+      var _self = this;
+      _self.$on('clear-all-filters',function(){
+        if(_self.attributes.filter.length>0){
+          _self.attributes.filter = [];
+        }
+      })
     }
   });
 })(window.Vue, window.dc, window.iViz,

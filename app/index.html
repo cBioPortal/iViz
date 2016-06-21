@@ -102,9 +102,6 @@
 <div class="container-fluid" id="complete-screen">
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header">
-      <a href='javascript:iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub", "lgg_ucsf_2014"]);' class='reset'>
-        <button type='button' class='btn btn-default' style='margin-top: -5px;'>Reset All</button>
-      </a>
       <!--<button type='button' class='btn btn-default'-->
       <!--@click="addNewVC = true"-->
       <!--id="save_cohort_btn">Save-->
@@ -128,13 +125,24 @@
         <option is="manage-charts" :data.sync="group"
                 v-for="(index,group) in groups" :parent="index"></option>
       </select>
-      <div id="breadcrumbs_container">
-        <div v-for="group in groups">
-          <div v-for="(index1, item) in group.attributes">
-            <bread-crumb :attributes.sync="item"
-                         :filters.sync="item.filter"></bread-crumb>
-          </div>
+
+      <div id="breadcrumbs_container" v-if="hasfilters">
+        <div style="float:left;" >
+          <span class="breadcrumb_container">Your selections: </span>
         </div>
+
+          <div style="float:left" v-for="group in groups">
+            <bread-crumb :attributes.sync="item"
+                         :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
+                         v-if="item.filter.length>0" ></bread-crumb>
+            <!--<div v-for="(index1, item) in group.attributes"
+                 v-if="item.filter.length>0">
+              <bread-crumb :attributes.sync="item"
+                           :filters.sync="item.filter"></bread-crumb>
+            </div>-->
+          </div>
+        <div><button type='button' @click="clearAll()">Clear
+          All</button></div>
       </div>
 
       <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
@@ -165,9 +173,10 @@
     </div>
   </nav>
   <div class="grid" id="main-grid" :class="{loading:isloading}">
-    <main-template :groups.sync="groups"
-                             :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
-                             :selectedsamples.sync="selectedsamples"></main-template>
+    <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
+                   :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
+                   :selectedsamples.sync="selectedsamples"
+                   :hasfilters.sync="hasfilters"></main-template>
   </div>
   <div id="main-bridge" style="display: none;"></div>
 
