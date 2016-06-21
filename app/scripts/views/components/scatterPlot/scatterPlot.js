@@ -76,8 +76,8 @@
         },
         hovermode: 'closest',
         showlegend: false,
-        width: 470,
-        height: 430,
+        width: 370,
+        height: 320,
         margin: {
           l: 50,
           r: 50,

@@ -2,330 +2,67 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 // bower:scss
 @import "../../bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 
-* {
-  box-sizing: border-box;
-}
 body {
   font-family: sans-serif;
 }
 
-#main-header {
-  margin-left: 25px;
-  margin-bottom: 15px;
-  margin-top: 10px;
-  bottom: -5px;
-  left: 10px;
-  position: relative;
+#complete-screen {
+  @import "partials/vars";
+  @import "partials/grids";
+
+  * {
+    box-sizing: border-box;
+  }
+
+  #main-header {
+    margin-left: 25px;
+    margin-bottom: 15px;
+    margin-top: 10px;
+    bottom: -5px;
+    left: 10px;
+    position: relative;
+  }
+
+  #stat {
+    margin-left: 10px;
+    margin-top: 10px;
+  }
+
+  .navbar button {
+    margin-top: 10px;
+    margin-left: 5px;
+  }
+  
+  .view {
+    display: none;
+  }
+
+  //not used
+  .hide-content {
+    display: none;
+  }
+
+  //Used in index.html
+  .loading {
+    //padding:400px;
+    margin: 400px;
+    background-image: url('../images/ajax-loader.gif');
+    background-repeat: no-repeat;
+    background-size: 100px 100px;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    content: "";
+    position: relative;
+  }
+
+  @import "components/barchart";
+  @import "components/piechart";
+  @import "components/breadcrumb";
+  @import "components/chart-operations";
+  @import "components/scatterplot";
+  @import "components/survivalplot";
+  @import "components/vc";
 }
 
-#stat {
-  margin-left: 10px;
-  margin-top: 10px;
-}
-
-.grid {
-  max-width: 2200px;
-  top: 130px;
-}
-.grid:after {
-  content: '';
-  display: block;
-  clear: both;
-}
-.grid-item {
-  float:left;
-  width: 250px;
-  height: 250px;
-  border:1px;
-  border-color:lightgrey;
-  border-style:solid;
-}
-.grid-item--width2 { width: 505px; }
-.grid-item--height2 { height: 505px; }
-
-.grid-item:hover {
-  border-color: grey;
-  //background: #F8F9F9;
-  cursor: move;
-}
-.navbar button {
-  margin-top: 10px;
-  margin-left: 5px;
-}
-.dc-bar-chart {
-  margin-left: 15px;
-  margin-top: -10px;
-}
-.dc-pie-chart {
-  margin-left: 15px;
-  margin-top: 25px;
-}
-.dc-scatter-plot {
-  width: 500px;
-  height: 500px;
-  margin-left: 5px;
-  margin-top: -10px;
-}
-.dc-survival-chart {
-  margin-left: 5px;
-  margin-top: -10px;
-}
-.dc-chart-drag {
-  color: grey;
-  font-size: 12px;
-}
-.view {
-  display: none;
-}
-
-.hide-content{
-  display: none;
-}
-
-.chart-header {
-  margin-left: 10px;
-  margin-top: 5px;
-}
-
-.modal-mask {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, .5);
-  display: table;
-  transition: opacity .3s ease;
-}
-
-.modal-wrapper {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.modal-enter, .modal-leave {
-  opacity: 0;
-}
-
-.modal-enter .modal-container,
-.modal-leave .modal-container {
-  -webkit-transform: scale(1.1);
-  transform: scale(1.1);
-}
-
-.modal-list-container {
-  width: 300px;
-  margin: 40px auto 0;
-  background-color: #fff;
-  border-radius: 2px;
-  font-family: Helvetica, Arial, sans-serif;
-  overflow: hidden;
-  overflow-y: auto;
-  max-height: 300px;
-  border: 0 solid transparent !important;
-  box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.2) !important;
-  padding: 12px 0 !important;
-  cursor: default;
-}
-
-.modal-list-container .vc-list-group {
-  margin-bottom: 20px;
-  margin-top: 20px;
-  padding-left: 0;
-}
-
-.modal-list-container .vc-list-group-item {
-  color: #000;
-  background-color: #fff;
-  display: block;
-  padding: 10px 15px;
-  position: relative;
-  list-style: outside none none;
-  white-space: nowrap;
-}
-
-.modal-list-container .vc-list-group-item:hover {
-  background-color: #e5e5e5;
-  position: relative;
-  cursor: pointer;
-}
-
-.vc-list-content {
-  width: 280px;
-  font: normal 15px Arial, sans-serif;
-  height: 32px;
-  line-height: 32px;
-  margin: 0 !important;
-  color: #212121;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.modal-xlg {
-  width: 100% !important;
-}
-
-.input-group input {
-  min-height: 34px;
-  padding: 7px 8px;
-  font-size: 13px;
-  color: #333;
-  vertical-align: middle;
-  background-color: #fff;
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  outline: none;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
-}
-
-.modal-content button{
-  margin-top : 0px !important;
-}
-
-.tooltipped {
-  position: relative
-}
-
-.tooltipped:after {
-  position: absolute;
-  z-index: 1000000;
-  display: none;
-  padding: 5px 8px;
-  font: normal normal 11px/1.5 Helvetica, arial, nimbussansl,
-  liberationsans, freesans, clean, sans-serif, "Segoe UI Emoji",
-  "Segoe UI Symbol";
-  color: #fff;
-  text-align: center;
-  text-decoration: none;
-  text-shadow: none;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: break-word;
-  white-space: pre;
-  pointer-events: none;
-  content: attr(aria-label);
-  background: rgba(0, 0, 0, 0.8);
-  border-radius: 3px;
-  -webkit-font-smoothing: subpixel-antialiased
-}
-
-.tooltipped:before {
-  position: absolute;
-  z-index: 1000001;
-  display: none;
-  width: 0;
-  height: 0;
-  color: rgba(0, 0, 0, 0.8);
-  pointer-events: none;
-  content: "";
-  border: 5px solid transparent
-}
-
-
-.tooltipped:hover:before, .tooltipped:hover:after, .tooltipped:active:before,
-.tooltipped:active:after, .tooltipped:focus:before, .tooltipped:focus:after
-{
-  display: inline-block;
-  text-decoration: none
-}
-
-.tooltipped-s:after {
-  top: 100%;
-  right: 50%;
-  margin-top: 5px;
-  -webkit-transform: translateX(50%);
-  -ms-transform: translateX(50%);
-  transform: translateX(50%)
-}
-
-.tooltipped-s:before {
-  top: auto;
-  right: 50%;
-  bottom: -5px;
-  margin-right: -5px;
-  border-bottom-color: rgba(0, 0, 0, 0.8)
-}
-
-.dc-chart-pointer{
-  font-size:16px;
-  color:grey;
-  cursor: pointer;
-}
-
-.loading{
-  //padding:400px;
-  margin: 400px;
-  background-image: url('../images/ajax-loader.gif') ;
-  background-repeat:no-repeat;
-  background-size: 100px 100px;
-  display: inline-block;
-  width: 100px;
-  height: 100px;
-  content:"";
-  position: relative;
-}
-
-#breadcrumbs_container{
-  font-size: 12px;
-}
-.breadcrumb_container{
-  display:inline;
-  float:left;
-  margin-top: 10px;
-  padding-bottom: 20px;
-  margin-left: 10px;
-}
-.breadcrumb_remove{
-  vertical-align: middle;
-  margin-top: -2px;
-}
-.breadcrumb_remove:hover{
-  cursor: pointer;
-}
-.breadcrumb_items {
-  display: inline;
-}
-.breadcrumb_item{
-  font-weight: bold;
-  margin-left: 5px;
-}
-
-.study-view-chart-header{
-  height: 16px;
-  width: 100%;
-  text-align: center;
-}
-
-.chart-operations {
-  display: none;
-}
-
-.chart-operations-active {
-  display: block;
-  float: right;
-}
-
-.chart-title-span {
-  font-size: 10px;
-  color: black;
-  font-weight: bold;
-  padding-left: 5px;
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  text-align: center;
-}
-
-.chart-title {
-  width: 100%;
-  float: none;
-}
-
-.chart-title-active {
-  width: 60%;
-  float: left;
-}
+@import "vendor/efdt";
