@@ -58,33 +58,34 @@
         displayName: this.attributes.display_name,
         chartInst: '',
         showOperations: false,
-        fromWatch: false,
-        fromFilter: false,
         cluster: '',
         _piechart:'',
         hasChartTitle:true,
         showTableIcon:true,
-        showPieIcon:false
+        showPieIcon:false,
+        filtersUpdated:false
       }
     },
     watch: {
       'filters': function(newVal, oldVal) {
-        if (!this.fromFilter) {
-          this.fromWatch = true;
+        if(!this.filtersUpdated) {
+          this.filtersUpdated = true;
           if (newVal.length === oldVal.length) {
             if (newVal.length == 0) {
               this.chartInst.filterAll();
-              dc.redrawAll(this.groupid)
             } else {
               var newFilters = $.extend(true, [], newVal);
-              var exisitngFilters = $.extend(true, [], this.chartInst.filters());
+              var exisitngFilters = $.extend(true, [],
+                this.chartInst.filters());
               var temp = _.difference(exisitngFilters, newFilters);
               this.chartInst.filter(temp);
-              dc.redrawAll(this.groupid)
             }
+          }else{
+            this.chartInst.filterAll();
           }
-        } else {
-          this.fromFilter = false;
+          this.$dispatch('update-filters');
+        }else{
+          this.filtersUpdated = false;
         }
       }
     },
@@ -127,19 +128,18 @@
       this.chartInst = this._piechart.init(this.ndx, this.attributes, opts);
       var self_ = this;
       this.chartInst.on('filtered', function(_chartInst, _filter) {
-        if (!self_.fromWatch) {
-          self_.fromFilter = true;
+        if(!self_.filtersUpdated) {
+          self_.filtersUpdated = true;
           var tempFilters_ = $.extend(true, [], self_.filters);
           tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-            self_.attributes.attr_id, self_.attributes.view_type);
+            self_.attributes.view_type);
           self_.filters = tempFilters_;
-        } else {
-          self_.fromWatch = false;
+          self_.$dispatch('update-filters');
+        }else{
+          self_.filtersUpdated = false;
         }
-
-        self_.$dispatch('update-filters')
       });
-      this.$dispatch('data-loaded', true)
+      this.$dispatch('data-loaded', true);
     }
   });
 })(window.Vue, window.dc, window.iViz,

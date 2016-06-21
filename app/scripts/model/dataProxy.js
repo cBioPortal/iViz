@@ -46,7 +46,7 @@
 
     var _result = {};
     //var PORTAL_INST_URL = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1];
-    var PORTAL_INST_URL = "http://localhost:8080/cbioportal";
+    var PORTAL_INST_URL = "http://www.cbioportal.org/";
 
     // ---- ajax cascade ----
     var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
@@ -342,7 +342,18 @@
                           // final push
                           _sampleData.push(_datum);
                         });
-                        
+
+                        //add Mutation Count chart
+                        if(_ajaxMutationCountData.length !=0){
+                          var _MutationCountMeta = {};
+                          _MutationCountMeta.datatype = 'NUMBER';
+                          _MutationCountMeta.description = "Mutation Count";
+                          _MutationCountMeta.display_name = "Mutation Count";
+                          _MutationCountMeta.attr_id = "mutation_count";
+                          _MutationCountMeta.view_type = 'bar_chart';
+                          _ajaxSampleMeta.unshift(_MutationCountMeta);
+                        }
+
                         // add CNA details
                         if (_gisticStudyIdArr.length !== 0) {
                           var _cnaAttrMeta = {};

@@ -39,7 +39,7 @@
     template: /*'<div v-if="attributes.show">' +*/
     '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
     ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
-    ':options="options" :ndx="ndx" :attributes.sync="attributes" :data="data"></component>'
+    ':ndx="ndx" :attributes.sync="attributes" :data="data"></component>'
     /*'</div>'*/,
     props: [
       'data', 'ndx', 'attributes', 'groupid'
@@ -53,14 +53,6 @@
           break;
         case 'bar_chart':
           currentView = 'bar-chart';
-          var data_ = _.map(
-            _.filter(_.pluck(this.data, this.attributes.attr_id), function(d) {
-              return d !== 'NA';
-            }), function(d) {
-              return parseFloat(d);
-            });
-          options.min = d3.min(data_);
-          options.max = d3.max(data_);
           break;
         case 'scatter_plot':
           currentView = 'scatter-plot';
@@ -68,10 +60,12 @@
         case 'survival':
           currentView = 'survival';
           break;
+        case 'table':
+         // currentView = 'table';
+          break;
       }
       return {
-        currentView: currentView,
-        options: options,
+        currentView: currentView
       }
     },
     watch: {
@@ -88,6 +82,13 @@
       'update-grid':function(){
         this.$dispatch('update-grid')
       }*/
+    }, ready: function() {
+      var _self = this;
+      _self.$on('clear-all-filters',function(){
+        if(_self.attributes.filter.length>0){
+          _self.attributes.filter = [];
+        }
+      })
     }
   });
 })(window.Vue, window.dc, window.iViz,
