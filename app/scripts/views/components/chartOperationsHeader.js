@@ -40,7 +40,7 @@
             '<div :class="[showOperations?chartOperationsActive:chartOperations]">'+
             '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>'+
             '<div style="float:left" v-if="showLogScale"></input style="float:left"><input type="checkbox" value="" id="" ' +
-            'class="study-view-bar-x-log">' +
+            'class="study-view-bar-x-log" v-model="logChecked">' +
             '<span id="scale-span-{{chartId}}" style="float:left; font-size:10px; margin-right: 15px; color: grey">Log Scale X</span></div>'+
             '<img v-if="showTableIcon" src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
             '<img v-if="showPieIcon" src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
@@ -61,7 +61,8 @@
         chartOperationsActive:'chart-operations-active',
         chartOperations:'chart-operations',
         chartTitle:'chart-title',
-        chartTitleActive:'chart-title-active'
+        chartTitleActive:'chart-title-active',
+        logChecked:true
       }
     },
     watch: {
@@ -74,6 +75,11 @@
             this.hasFilters = false;
           }
         }
+      },
+      logChecked : function(newVal,oldVal){
+        console.log(newVal+'  '+oldVal);
+        this.reset();
+        this.$dispatch('changeLogScale',newVal);
       }
     },
     methods: {
@@ -93,7 +99,7 @@
         this.$dispatch('toTableView');
       }
     }, 
-  ready: function () {
+    ready: function () {
     
       $('#' + this.chartId + '-download').qtip('destroy', true);
       $('#' + this.chartId + '-download-icon-wrapper').qtip('destroy', true);

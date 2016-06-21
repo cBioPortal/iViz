@@ -135,28 +135,132 @@
      * @private
      */
     var logDc_ = function() {
-      // TODO: Should include the log scale initialize function from study-view.
-    };
+      var _domainLength,
+        _maxDomain = 10000;
 
-    content.init = function(ndx, data, attrObj, settings, chartId, groupid, type) {
-      if(data.min == undefined){
+      var emptyValueMapping = "1000";//Will be changed later based on maximum
+      // value
+      var xDomain =[];
+
+      for(var i=0; ;i+=0.5){
+        var _tmpValue = parseInt(Math.pow(10,i));
+
+        xDomain.push(_tmpValue);
+        if(_tmpValue >  data_.max){
+
+          emptyValueMapping = Math.pow(10,i+0.5);
+          xDomain.push(emptyValueMapping);
+          _maxDomain = Math.pow(10,i+1);
+          break;
+        }
+      }
+
+      _domainLength = xDomain.length;
+
+      var tickVal = [];
+      var barColor = {};
+
+      var cluster = ndx_.dimension(function(d) {
+
+        var i, val = Number(d[data_.attrId]);
+
+        if(isNaN(val)){
+          hasEmptyValue_ = true;
+          val = emptyValueMapping;
+        }else{
+          for(i = 1;i < _domainLength; i++){
+            if(d[data_.attrId] < xDomain[i] &&
+              d[data_.attrId] >= xDomain[i-1]){
+
+              val = parseInt( Math.pow(10, i / 2 - 0.25 ));
+            }
+          }
+        }
+
+        if(tickVal.indexOf(val) === -1) {
+          tickVal.push(Number(val));
+        }
+
+        return val;
+      });
+
+      tickVal.sort(function(a, b) {
+        return a < b ? -1 : 1;
+      });
+
+      var tickL = tickVal.length - 1;
+
+      for (var i = 0; i < tickL; i++) {
+        barColor[tickVal[i]] = colors_[i];
+      }
+
+      if (hasEmptyValue_) {
+        barColor.NA = '#CCCCCC';
+      } else {
+        barColor[tickVal[tickL]] = colors_[tickL];
+      }
+
+      chartInst_
+        .width(opts_.width)
+        .height(opts_.height)
+        .margins({top: 10, right: 20, bottom: 30, left: 40})
+        .dimension(cluster)
+        .group(cluster.group())
+        .centerBar(true)
+        .elasticY(true)
+        .elasticX(false)
+        .turnOnControls(true)
+        .mouseZoomable(false)
+        .brushOn(true)
+        .transitionDuration(iViz.opts.transitionDuration || 400)
+        .renderHorizontalGridLines(false)
+        .renderVerticalGridLines(false);
+
+      chartInst_.x(d3.scale.log().nice()
+        .domain([0.7,_maxDomain]));
+
+      chartInst_.yAxis().ticks(6);
+      chartInst_.yAxis().tickFormat(d3.format('d'));
+      chartInst_.xAxis().tickFormat(function(v) {
+        var _returnValue = v;
+        if(v === emptyValueMapping){
+          _returnValue = 'NA';
+        }else{
+          var index = xDomain.indexOf(v);
+          if(index % 2 === 0)
+            return v.toString();
+          else
+            return '';
+        }
+        return _returnValue;
+      });
+
+      chartInst_.xAxis().tickValues(xDomain);
+      //chartInst_.xAxisLabel(data_.displayName);
+      chartInst_.xUnits(function() {
+        return xDomain.length * 1.3 <= 5 ? 5 : xDomain.length * 1.3;
+      });
+    };
+    content.hasLogScale=function(){
+      if(data_!==undefined){
+        if(data_.min!==null && data_.max!==null){
+          return ((data_.max-data_.min)>1000)&&(data_.min>1)?true:false;
+        }
+      }
+      return false;
+    };
+    content.init = function(ndx, data, attrObj, settings, chartId, groupid, logScaleChecked) {
       data_.meta = _.map(_.filter(_.pluck(data, attrObj.attr_id), function(d) {
         return d !== 'NA';
       }), function(d) {
         return parseFloat(d);
       });
       data_.min = d3.min(data_.meta);
-      data_.max = d3.min(data_.meta);
+      data_.max = d3.max(data_.meta);
       opts_ = iViz.util.barChart.getDcConfig({
         min: d3.min(data_.meta),
         max: d3.max(data_.meta)
       });
-      }else{
-        opts_ = iViz.util.barChart.getDcConfig({
-          min: data.min,
-          max: data.max
-        });
-      }
       data_.attrId = attrObj.attr_id;
       data_.displayName = attrObj.display_name;
       opts_.width = settings.barChart.width;
@@ -168,13 +272,30 @@
 
       chartInst_ = dc.barChart('#' + chartId, groupid);
 
-      if (type === 'log') {
-        logDc_(chartInst_, ndx_, colors_);
+      //if (type === 'log') {
+      if(logScaleChecked!==undefined){
+        if(logScaleChecked){
+          logDc_();
+        } else {
+          regularDc_();
+        }
       } else {
-        regularDc_();
+        if (((data_.max - data_.min) > 1000) && (data_.min > 0.1)) {
+          logDc_();
+        } else {
+          regularDc_();
+        }
       }
-
+      chartInst_.render();
       return chartInst_;
+    };
+
+    content.redraw = function(logScaleChecked){
+      if(logScaleChecked){
+        regularDc_();
+      } else {
+        logDc_();
+      }
     };
 
     return content;

@@ -44,8 +44,10 @@
     if ((_attributes !== undefined) && (_attributes.view_type === 'scatter_plot')) {
       _chartInst.reset();
     } else {
-      _chartInst.filterAll();
-      dc.redrawAll(_groupid);
+      if(_chartInst.filters().length>0){
+        _chartInst.filterAll();
+        dc.redrawAll(_groupid);
+      }
     }
   }
   iViz.shared.updateFilters = function(filter, filters, type) {
