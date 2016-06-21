@@ -36,7 +36,7 @@
 (function(Vue, dc, iViz, $) {
 
   Vue.component('pieChart', {
-    template: '<div id={{charDivId}} class="grid-item" class="study-view-dc-chart study-view-pie-main" ' +
+    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" class="study-view-dc-chart study-view-pie-main" ' +
               '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
               '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
               ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
@@ -120,8 +120,8 @@
         groupid : this.groupid,
         chartTableId : this.chartTableId,
         transitionDuration : iViz.opts.dc.transitionDuration,
-        width:130,
-        height:130
+        width: window.style['piechart-svg-width'] | 130,
+        height: window.style['piechart-svg-height'] | 130
       };
       this._piechart = new iViz.view.component.pieChart();
       this.chartInst = this._piechart.init(this.ndx, this.attributes, opts);

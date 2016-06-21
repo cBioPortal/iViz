@@ -1,0 +1,153 @@
+#complete-screen, .study-view-pie-label-qtip {
+  .EFDT-table {
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 12px;
+
+    * {
+      box-sizing: border-box;
+      text-align: left;
+    }
+
+    input[type=checkbox], input[type=radio] {
+      margin: 1px 0 0;
+    }
+
+    .EFDT-top-btn {
+      margin-right: 5px;
+    }
+
+    .EFDT-show-hide, .EFDT-fixed-choose, .EFDT-download {
+      float: left;
+    }
+    .dropdown-checkbox-toggle {
+      color: #333;
+      background-color: #fff;
+      display: inline-block;
+      padding: 6px 12px;
+      margin-bottom: 0;
+      font-size: 14px;
+      font-weight: normal;
+      line-height: 1.42857143;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      -ms-touch-action: manipulation;
+      touch-action: manipulation;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      background-image: none;
+      border: 1px solid #ccc;
+      border-radius: 4px
+    }
+
+    .EFDT-header-filters-reset {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .EFDT-download-btn {
+      float: left;
+    }
+
+    .EFDT-header-filters {
+      margin: 3px 0;
+      input {
+        height: 20px;
+        font-size: 12px;
+        line-height: 12px;
+      }
+    }
+
+    .EFDT-header {
+      text-align: center;
+      vertical-align: middle;
+      .EFDT-header-sort {
+        width: 100%;
+        padding: 3px 8px;
+        display: inline-block;
+        color: black;
+        white-space: nowrap;
+        .EFDT-header-sort-content {
+          float: left;
+        }
+        .EFDT-header-sort-icon {
+          float: right;
+        }
+      }
+      .EFDT-header-sort:hover {
+        cursor: pointer;
+      }
+    }
+    .EFDT-filter {
+      float: left;
+    }
+
+    .EFDT-table-prefix {
+      //Disabled. The special components dont have header.
+      //margin-bottom: 10px;
+    }
+
+    .EFDT-result-info {
+      float: left;
+    }
+
+    .EFDT-result-info-content {
+      display: inline-block;
+      white-space: nowrap;
+      padding: 6px 12px;
+      font-size: 14px;
+      line-height: 1.428571429;
+    }
+    .gene-selected {
+      font-weight: bold;
+    }
+
+    .EFDT-cell {
+      .gene:hover {
+        border: 2px solid #1974b8;
+        cursor: pointer;
+      }
+      .gene.gene-selected {
+        font-weight: bold;
+      }
+      .alt-type-red {
+        font-weight: bold;
+        color: #ff0000;
+      }
+      .alt-type-blue {
+        font-weight: bold;
+        color: #0000ff;
+      }
+      .qval-icon {
+        margin-bottom: 4px;
+        width: 10px;
+      }
+    }
+    .EFDT-cell-full {
+      width: 100%;
+    }
+    .row-selected {
+      background-color: lightgrey;
+    }
+
+    .public_fixedDataTable_header, .public_fixedDataTable_header .public_fixedDataTableCell_main {
+      background-color: white;
+      background-image: none;
+    }
+    .fixedDataTableLayout_main, .fixedDataTableCellLayout_main {
+      border: 0;
+    }
+    .public_fixedDataTableCell_cellContent {
+      line-height: 13px;
+      padding: 6px 5px;
+    }
+  }
+}
+
+#ruler {
+  visibility: hidden;
+  white-space: nowrap;
+}

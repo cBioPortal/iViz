@@ -1,0 +1,55 @@
+.chart-operations {
+  display: none;
+}
+
+.chart-operations-active {
+  display: block;
+  float: right;
+}
+
+.chart-title-span {
+  font-size: 10px;
+  color: black;
+  font-weight: bold;
+  padding-left: 5px;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.chart-title {
+  width: 100%;
+  float: none;
+}
+
+.chart-title-active {
+  width: 60%;
+  float: left;
+}
+
+.dc-chart-pointer {
+  font-size: 16px;
+  color: grey;
+  cursor: pointer;
+}
+
+.chart-header {
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+.study-view-chart-header {
+  height: 16px;
+  width: 100%;
+  text-align: center;
+}
+
+.dc-chart-drag {
+  color: grey;
+  font-size: 12px;
+}
+.dc-chart-drag:hover {
+  cursor: move;
+}

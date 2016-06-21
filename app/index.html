@@ -11,7 +11,7 @@
   <script src="/bower_components/chosen/chosen.jquery.min.js"></script>
   <script src="/bower_components/datatables/media/js/jquery.dataTables.js"></script>
   <script src="/bower_components/d3/d3.js"></script>
-  <script src="/bower_components/crossfilter/crossfilter.js"></script>
+  <script src="/bower_components/crossfilter2/crossfilter.min.js"></script>
   <script src="/bower_components/dcjs/dc.js"></script>
   <script src="/bower_components/classie/classie.js"></script>
   <script src="/bower_components/get-style-property/get-style-property.js"></script>
@@ -177,13 +177,27 @@
 </body>
 <script>
   $(document).ready(function () {
+    //Include style variables
+    window.style = {
+      vars: {}
+    };
+    
+    $.get('resources/vars.json')
+      .then(function(data) {
+        window.style.vars = data;
+        window.style.vars.survivalWidth = window.style.vars['grid-w-2'];
+        window.style.vars.survivalHeight = window.style.vars['grid-h-2']
+        window.style.vars.barchartWidth = 350;
+        window.style.vars.barchartHeight = 120;
+      })
+    
     URL = "http://localhost:8081/api/sessions/";
     var vcId_ = location.search.split('vc_id=')[1];
     iViz.session.manage.init();
     if (typeof vcId_ != 'undefined') {
       iViz.session.model.getVirtualCohortDetails(vcId_);
     } else {
-      iViz.init(["ov_tcga_pub", "ucec_tcga_pub", "blca_tcga_pub"]);
+      iViz.init(["blca_tcga_pub"]);
     }
   });
 </script>

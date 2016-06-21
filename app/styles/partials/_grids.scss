@@ -1,0 +1,35 @@
+@import "vars";
+
+.grid-item-w-1 {
+  width: $grid-w-1;
+}
+
+.grid-item-w-2 {
+  width: $grid-w-2;
+}
+
+.grid-item-h-1 {
+  height: $grid-h-1;
+}
+
+.grid-item-h-2 {
+  height: $grid-h-2;
+}
+
+.grid {
+  max-width: 2200px;
+  top: 130px;
+}
+
+.grid:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+
+.grid-item {
+  float: left;
+  border: 1px;
+  border-color: lightgrey;
+  border-style: solid;
+}
