@@ -38,11 +38,11 @@
 (function (iViz) {
   iViz.view.component.survival = function () {
     var content_ = {}, data_= {};
-    content_.init = function (_data, _chartId, _attrId) { //_attrId here indicates chart type (OS or DFS)
+    content_.init = function (_data, _chartId, _attrId, _opts) { //_attrId here indicates chart type (OS or DFS)
       $('#' + _chartId).empty();
       data_ = _data;
       var _dataProxy = new survivalChartProxy(_data, _attrId);
-      this.chartInst_ = new survivalCurve(_chartId, _dataProxy.get());
+      this.chartInst_ = new survivalCurve(_chartId, _dataProxy.get(), _opts);
     };
     content_.update = function(_selectedPatients, _chartId, _attrId) {
       // remove previous curves

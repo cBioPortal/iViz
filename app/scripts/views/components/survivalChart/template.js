@@ -73,8 +73,9 @@
     },
     ready: function() {
       var _self = this;
+      var _opts = {width: 500, height: 500};
       _self.chartInst = new iViz.view.component.survival();
-      _self.chartInst.init(this.data, this.chartId, this.attributes.attr_id);
+      _self.chartInst.init(this.data, this.chartId, this.attributes.attr_id, _opts);
       _self.$on('survival-update', function(_selectedPatients) {
         _self.chartInst.update(_selectedPatients, _self.chartId, _self.attributes.attr_id);
       });

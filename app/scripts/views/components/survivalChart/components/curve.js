@@ -30,7 +30,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-var survivalCurve = function (_divId, _data) {
+var survivalCurve = function (_divId, _data, _opts) {
 
   var _self = this;
 
@@ -41,8 +41,8 @@ var survivalCurve = function (_divId, _data) {
 
   _self.elem_ = d3.select('#' + _self.divId_);
   _self.elem_.svg = _self.elem_.append('svg')
-    .attr('width', 500)
-    .attr('height', 500);
+    .attr('width', _opts.width)
+    .attr('height', _opts.height);
 
   // init axis
   _self.elem_.xScale = d3.scale.linear()
