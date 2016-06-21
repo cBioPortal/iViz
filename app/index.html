@@ -11,7 +11,7 @@
   <script src="/bower_components/chosen/chosen.jquery.min.js"></script>
   <script src="/bower_components/datatables/media/js/jquery.dataTables.js"></script>
   <script src="/bower_components/d3/d3.js"></script>
-  <script src="/bower_components/crossfilter2/crossfilter.min.js"></script>
+  <script src="/bower_components/crossfilter/crossfilter.js"></script>
   <script src="/bower_components/dcjs/dc.js"></script>
   <script src="/bower_components/classie/classie.js"></script>
   <script src="/bower_components/get-style-property/get-style-property.js"></script>
@@ -186,7 +186,7 @@
       .then(function(data) {
         window.style.vars = data;
         window.style.vars.survivalWidth = window.style.vars['grid-w-2'];
-        window.style.vars.survivalHeight = window.style.vars['grid-h-2']
+        window.style.vars.survivalHeight = window.style.vars['grid-h-2'];
         window.style.vars.barchartWidth = 350;
         window.style.vars.barchartHeight = 120;
       })
