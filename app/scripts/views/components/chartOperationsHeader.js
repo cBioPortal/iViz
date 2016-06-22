@@ -53,7 +53,7 @@
             '</div>' +
             '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon'
+      'showOperations', 'resetBtnId', 'chart', 'component', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon'
     ],
     data: function () {
       return {
@@ -62,7 +62,8 @@
         chartOperations:'chart-operations',
         chartTitle:'chart-title',
         chartTitleActive:'chart-title-active',
-        logChecked:true
+        logChecked:true,
+        component: ''
       }
     },
     watch: {
@@ -104,6 +105,8 @@
       $('#' + this.chartId + '-download').qtip('destroy', true);
       $('#' + this.chartId + '-download-icon-wrapper').qtip('destroy', true);
       var chartId = this.chartId;
+      var self = this;
+      console.log(self.$data);
 
       $('#' + this.chartId + '-title').qtip({
         id: '#' + this.chartId + "-title-qtip",
@@ -146,15 +149,15 @@
           show: function () {
             $('#' + chartId + '-download-icon-wrapper').qtip('api').hide();
           },
-          render: function (event, api) {
-            $("#" + chartId + "-pdf", api.elements.tooltip).click(function () {
-              console.log('download pdf')
+          render: function(event, api) {
+            $('#' + chartId + '-pdf', api.elements.tooltip).click(function() {
+              console.log(self.$parent);
             });
             $("#" + chartId + "-svg", api.elements.tooltip).click(function () {
               console.log('download svg')
             });
             $("#" + chartId + "-tsv").click(function () {
-              console.log('download tsv')
+              iViz.util.download(self.component.getChartType(), 'tsv', self.component.getDownloadData('tsv'));
             });
           }
         }

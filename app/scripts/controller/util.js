@@ -31,7 +31,7 @@
  */
 
 'use strict';
-(function (iViz, _) {
+(function (iViz, _, cbio) {
   iViz.util = (function () {
     var content = {};
 
@@ -149,7 +149,47 @@
       return objs;
     };
 
+    content.download = function(chartType, fileType, content) {
+      switch (chartType) {
+        case 'pieChart':
+          pieChartDownload(fileType, content);
+          break;
+        case 'barChart':
+          barChartDownload(fileType, content);
+          break;
+        default:
+          break;
+      }
+    };
+
+    function pieChartDownload(fileType, content) {
+      switch (fileType) {
+        case 'tsv':
+          csvDownload('test', content);
+          break;
+      }
+    }
+    
+    function csvDownload(fileName, content) {
+      fileName = fileName || 'test';
+      var downloadOpts = {
+//                            filename: cancerStudyName + "_" + selectedAttrDisplay + ".txt",
+        filename: fileName + '.txt',
+        contentType: 'text/plain;charset=utf-8',
+        preProcess: false
+      };
+
+      cbio.download.initDownload(content, downloadOpts);
+    }
+
+    function barChartDownload(fileType) {
+
+    }
+
+    function downloadTextFile(content, delimiter) {
+      
+    }
     return content;
   })();
 })(window.iViz,
-  window._);
+  window._, window.cbio);

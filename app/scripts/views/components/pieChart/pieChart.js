@@ -37,8 +37,8 @@
 'use strict';
 (function(iViz, dc, _, $) {
   // iViz pie chart component. It includes DC pie chart.
-  iViz.view.component.pieChart = function() {
-    var content = {};
+  iViz.view.component.PieChart = function(ndx, attributes, opts) {
+    var content = this;
     var v = {};
 
     v.chart = '';
@@ -51,6 +51,10 @@
     /* HTML options*/
     v.opts = {};
 
+    v.opts = $.extend(true, v.opts, opts);
+    v.data = $.extend(true, v.data, attributes);
+    v.data.ndx = ndx;
+    
     var labels = [];
     var currentSampleSize = 0;
     var reactTableData = {};
@@ -59,6 +63,69 @@
     var labelMetaData = [];
     var maxLabelValue = 0;
     var currentView = 'pie';
+
+    initDCPieChart();
+
+    content.getChart = function() {
+      return v.chart;
+    };
+
+    content.changeView = function(vm,toTableView){
+      currentView = toTableView?'table':'pie';
+      var chartDivDom = $("#"+v.opts.charDivId);
+      chartDivDom.css('z-index', 16000);
+
+      //qtip wont be needed in table view
+      chartDivDom.qtip('destroy', true);
+
+      if(currentView === 'table'){
+        if ( !tableInitialized ) {
+          initReactTable(v.opts.chartTableId, reactTableData);
+          tableInitialized = true;
+        }else{
+          updateReactTable();
+        }
+        animateTable("#"+v.opts.charDivId, 'table', function() {
+          vm.$dispatch('update-grid');
+          $("#"+v.opts.charDivId).css('z-index', '');
+        });
+      }else{
+        animateTable("#"+v.opts.charDivId, 'pie', function() {
+          vm.$dispatch('update-grid');
+          $("#"+v.opts.charDivId).css('z-index', '1');
+        });
+        content.initMainDivQtip();
+      }
+    };
+
+    content.initMainDivQtip = function(){
+      $('#' +v.opts.charDivId).qtip({
+        id: v.opts.charDivId+'-qtip',
+        style: {
+          classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width study-view-qtip study-view-pie-label-qtip'
+        },
+        show: {event: "mouseover", solo: true, delay: 0, ready: true},
+        hide: {fixed:true, delay: 300, event: "mouseleave"},
+        //hide: false,
+        position: {my:'left center',at:'center right', viewport: $(window)},
+        content: '<div id="qtip-' + v.opts.charDivId + '-content-react">Loading....</div>',
+        events: {
+          render: function() {
+            updateCurrentLabels();
+            initReactData();
+            var data = $.extend(true, {}, reactTableData);
+            data.attributes[0].column_width = 140;
+            initReactTable('qtip-' + v.opts.charDivId + '-content-react',
+              data, {
+                tableWidth: 300,
+                pieLabelMouseEnterFunc: pieLabelMouseEnter,
+                pieLabelMouseLeaveFunc: pieLabelMouseLeave
+              });
+            pieLabelTableInitialized = true;
+          }
+        }
+      });
+    };
 
     /**
      * This is the function to initialize dc pie chart instance.
@@ -128,76 +195,18 @@
       }
     }
 
-    content.init = function(ndx, attributes, opts) {
-      v.opts = $.extend(true, v.opts, opts);
-      v.data = $.extend(true, v.data, attributes);
-      v.data.ndx = ndx;
+    function initTsvDownloadData() {
+      var data = '';
 
-      initDCPieChart();
+      data = data + v.data.display_name + '\t' + 'Count';
 
-      return v.chart;
-    };
-
-    content.getChart = function() {
-      return v.chart;
-    };
-
-    content.changeView = function(vm,toTableView){
-      currentView = toTableView?'table':'pie';
-      var chartDivDom = $("#"+v.opts.charDivId);
-      chartDivDom.css('z-index', 16000);
-
-      //qtip wont be needed in table view
-      chartDivDom.qtip('destroy', true);
-
-      if(currentView === 'table'){
-        if ( !tableInitialized ) {
-          initReactTable(v.opts.chartTableId, reactTableData);
-          tableInitialized = true;
-        }else{
-          updateReactTable();
-        }
-        animateTable("#"+v.opts.charDivId, 'table', function() {
-          vm.$dispatch('update-grid');
-          $("#"+v.opts.charDivId).css('z-index', '');
-        });
-      }else{
-        animateTable("#"+v.opts.charDivId, 'pie', function() {
-          vm.$dispatch('update-grid');
-          $("#"+v.opts.charDivId).css('z-index', '1');
-        });
-        content.initMainDivQtip();
+      for (var i = 0; i < labelMetaData.length; i++) {
+        data += '\r\n';
+        data += labelMetaData[i].name + '\t';
+        data += labelMetaData[i].samples;
       }
-    };
-
-    content.initMainDivQtip = function(){
-      $('#' +v.opts.charDivId).qtip({
-        id: v.opts.charDivId+'-qtip',
-        style: {
-          classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width study-view-qtip study-view-pie-label-qtip'
-        },
-        show: {event: "mouseover", solo: true, delay: 0, ready: true},
-        hide: {fixed:true, delay: 300, event: "mouseleave"},
-        //hide: false,
-        position: {my:'left center',at:'center right', viewport: $(window)},
-        content: '<div id="qtip-' + v.opts.charDivId + '-content-react">Loading....</div>',
-        events: {
-          render: function() {
-            updateCurrentLabels();
-            initReactData();
-            var data = $.extend(true, {}, reactTableData);
-            data.attributes[0].column_width = 140;
-            initReactTable('qtip-' + v.opts.charDivId + '-content-react',
-              data, {
-                tableWidth: 300,
-                pieLabelMouseEnterFunc: pieLabelMouseEnter,
-                pieLabelMouseLeaveFunc: pieLabelMouseLeave
-              });
-            pieLabelTableInitialized = true;
-          }
-        }
-      });
-    };
+      content.dataForDownload.tsv = data;
+    }
 
     function animateTable(target, view, callback) {
       var width = window.style['grid-w-1'] || '180px';
@@ -223,6 +232,7 @@
     function initLabels() {
       labelMetaData = initLabelInfo();
       labels = $.extend(true, [] , labelMetaData);
+      initTsvDownloadData();
     }
 
     function initLabelInfo() {
@@ -563,8 +573,11 @@
       });
     }
 
-    return content;
+    // return content;
   };
+
+  iViz.view.component.PieChart.prototype = new iViz.view.component.GeneralChart('pieChart');
+  iViz.view.component.PieChart.constructor = iViz.view.component.pieChart;
 
   // Utils designed for pie chart.
   iViz.util.pieChart = (function() {

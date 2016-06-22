@@ -223,7 +223,7 @@ var iViz = (function(_, $) {
             _selectedStudyIds = _selectedStudyIds.concat(item[1].split(','));
           }
         });
-        $.getJSON(URL + _vcId, function(response) {
+        $.getJSON( iViz.session.URL + _vcId, function(response) {
           _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
           var _selectedPatientIds = [];
           _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function(_patientIds) {
@@ -240,7 +240,7 @@ var iViz = (function(_, $) {
         iViz.init(_selectedStudyIds);
       } else if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") === -1) {
         var _vcId = location.search.split('vc_id=')[1];
-        $.getJSON(URL + _vcId, function(response) {
+        $.getJSON( iViz.session.URL + _vcId, function(response) {
           _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
           var _selectedPatientIds = [];
           _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function(_patientIds) {

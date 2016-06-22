@@ -40,7 +40,7 @@
               '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
               '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
               ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
-              ':reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes"></chart-operations>' +
+              ':reset-btn-id="resetBtnId" :component="piechart" :chart="chartInst" :attributes="attributes"></chart-operations>' +
               '<div class="dc-chart dc-pie-chart" :class="{view: showPieIcon}" align="center" style="float:none' +
               ' !important;" id={{chartId}} ></div>' +
               '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
@@ -57,9 +57,10 @@
         chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
+        component: '',
         showOperations: false,
         cluster: '',
-        _piechart:'',
+        piechart:'',
         hasChartTitle:true,
         showTableIcon:true,
         showPieIcon:false,
@@ -91,7 +92,7 @@
     },
     events: {
       'toTableView': function() {
-        this._piechart.changeView(this,!this.showTableIcon);
+        this.piechart.changeView(this,!this.showTableIcon);
       },
       'closeChart':function(){
         $('#' +this.charDivId).qtip('destroy');
@@ -110,7 +111,7 @@
           this.showOperations = false;
         }
       },initMainDivQtip : function(){
-        this._piechart.initMainDivQtip();
+        this.piechart.initMainDivQtip();
       }
     },
     ready: function() {
@@ -124,8 +125,8 @@
         width: window.style['piechart-svg-width'] | 130,
         height: window.style['piechart-svg-height'] | 130
       };
-      this._piechart = new iViz.view.component.pieChart();
-      this.chartInst = this._piechart.init(this.ndx, this.attributes, opts);
+      this.piechart = new iViz.view.component.PieChart(this.ndx, this.attributes, opts);
+      this.chartInst = this.piechart.getChart();
       var self_ = this;
       this.chartInst.on('filtered', function(_chartInst, _filter) {
         if(!self_.filtersUpdated) {
