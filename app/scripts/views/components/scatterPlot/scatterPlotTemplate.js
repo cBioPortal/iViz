@@ -37,7 +37,7 @@
   Vue.component('scatterPlot', {
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
       '<chart-operations :show-operations="showOperations" :display-name="displayName" :has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
-      '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
+      '<div class="dc-chart dc-scatter-plot" :chart-ctrl="chartInst" align="center" style="float:none !important;" id={{chartId}} >' +
       '</div>',
     props: [
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
@@ -73,7 +73,7 @@
       
       var _self = this;
       
-      _self.chartInst = new iViz.view.component.scatterPlot();
+      _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(this.data, this.chartId, this.charDivId);
       
       document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {

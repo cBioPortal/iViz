@@ -36,8 +36,10 @@
 
 'use strict';
 (function (iViz) {
-  iViz.view.component.survival = function () {
-    var content_ = {}, data_= {};
+  iViz.view.component.Survival = function () {
+    var content_ = this, data_= {};
+    
+    content_.dataForDownload = {};
     content_.init = function (_data, _chartId, _attrId, _opts) { //_attrId here indicates chart type (OS or DFS)
       $('#' + _chartId).empty();
       data_ = _data;
@@ -61,8 +63,8 @@
         this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, "#006bb3");
       }
     }
-    return content_;
+    // return content_;
   };
-  iViz.util.scatterPlot = (function () {
-  })();
+  iViz.view.component.Survival.prototype = new iViz.view.component.GeneralChart('survival');
+  iViz.view.component.Survival.constructor = iViz.view.component.Survival;
 })(window.iViz);

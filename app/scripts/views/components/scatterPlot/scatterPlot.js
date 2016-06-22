@@ -36,11 +36,12 @@
 
 'use strict';
 (function (iViz, _, d3, $) {
-  iViz.view.component.scatterPlot = function () {
+  iViz.view.component.ScatterPlot = function () {
     
-    var content = {};
+    var content = this;
     var chartId_ , data_;
 
+    content.dataForDownload = {};
     content.init = function (_data, _chartId) {
       chartId_ = _chartId;
       data_ = _data;
@@ -129,8 +130,11 @@
       Plotly.redraw(document.getElementById(chartId_));
     }
     
-    return content;
+    // return content;
   };
+  
+  iViz.view.component.ScatterPlot.prototype = new iViz.view.component.GeneralChart('scatterPlot');
+  iViz.view.component.ScatterPlot.constructor = iViz.view.component.ScatterPlot;
   iViz.util.scatterPlot = (function () {
   })();
 })(window.iViz, window._, window.d3, window.jQuery || window.$);
