@@ -66,6 +66,8 @@
 
     initDCPieChart();
 
+    content.dataForDownload = {};
+    
     content.getChart = function() {
       return v.chart;
     };
@@ -198,14 +200,31 @@
     function initTsvDownloadData() {
       var data = '';
 
-      data = data + v.data.display_name + '\t' + 'Count';
+      data = data + v.data.display_name + '\tCount';
 
       for (var i = 0; i < labelMetaData.length; i++) {
         data += '\r\n';
         data += labelMetaData[i].name + '\t';
         data += labelMetaData[i].samples;
       }
-      content.dataForDownload.tsv = data;
+      content.setDownloadData('tsv', data);
+    }
+
+    function initCanvasDownloadData() {
+      content.setDownloadData('svg', {
+        title: v.data.display_name,
+        chartDivId: v.opts.charDivId,
+        chartId: v.opts.chartId,
+        fileName: v.data.display_name,
+        labels: labels
+      });
+      content.setDownloadData('pdf', {
+        title: v.data.display_name,
+        chartDivId: v.opts.charDivId,
+        chartId: v.opts.chartId,
+        fileName: v.data.display_name,
+        labels: labels
+      });
     }
 
     function animateTable(target, view, callback) {
@@ -231,8 +250,9 @@
 
     function initLabels() {
       labelMetaData = initLabelInfo();
-      labels = $.extend(true, [] , labelMetaData);
+      labels = $.extend(true, [], labelMetaData);
       initTsvDownloadData();
+      initCanvasDownloadData();
     }
 
     function initLabelInfo() {
@@ -272,6 +292,9 @@
         }else{
           // StudyViewUtil.echoWarningMessg("Initial Label Error");
         }
+        _.each(_labels, function(label) {
+          label.sampleRate = ( currentSampleSize <= 0 ? 0 : (Number(label.samples) * 100 / currentSampleSize).toFixed(1).toString()) + '%'
+        });
       });
 
       return _labels;
@@ -310,6 +333,7 @@
 
     function updateCurrentLabels() {
       labels = filterLabels();
+      initCanvasDownloadData();
     }
 
     function findLabel(labelName) {
@@ -410,14 +434,9 @@
           };
           result.data.push(datum);
         }
-        result.data.push({
-          'attr_id': 'sampleRate',
-          'uniqueId': item.id,
-          'attr_val': ( currentSampleSize <= 0 ? 0 : (Number(item.samples) * 100 / currentSampleSize).toFixed(1).toString()) + '%'
-        });
       });
 
-      reactTableData =  result;
+      reactTableData = result;
     }
 
     function removeMarker() {
@@ -572,12 +591,12 @@
         'stroke-width': '1px'
       });
     }
-
+    
     // return content;
   };
 
   iViz.view.component.PieChart.prototype = new iViz.view.component.GeneralChart('pieChart');
-  iViz.view.component.PieChart.constructor = iViz.view.component.pieChart;
+  iViz.view.component.PieChart.constructor = iViz.view.component.PieChart;
 
   // Utils designed for pie chart.
   iViz.util.pieChart = (function() {
