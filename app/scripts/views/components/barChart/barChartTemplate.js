@@ -48,10 +48,10 @@
   };
 
   Vue.component('barChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item-w-2 grid-item-h-1" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+    template: '<div id={{charDivId}} class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :show-survival-icon="showSurvivalIcon" :show-log-scale="showLogScale"' +
     ':show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :show-log-scale="showLogScale"></chart-operations>' +
-    '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><p class="text-center">{{displayName}}</p>' +
+    '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><span class="text-center chart-title-span">{{displayName}}</span>' +
     '</div>',
     props: [
       'data', 'ndx', 'attributes', 'filters', 'groupid'
