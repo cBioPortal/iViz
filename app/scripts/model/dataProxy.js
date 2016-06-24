@@ -254,12 +254,16 @@
 
                         // --- web API results converting ----
                         var _patientData = [], _sampleData = [];
-                        var _patientIds = _.uniq(_.pluck(_ajaxPatientData, 'patient_id'));
-                        var _sampleIds = _.uniq(_.pluck(_ajaxSampleData, 'sample_id'));
+                        var _patientIds = [];
                         var _indexSample = 0, _sampleDataIndicesObj = {};
                         var _storedCnaGeneInventory = {}, _storedCnaGeneIndex = 0;
                         var _storedMutGeneInventory = {}, _storedMutGeneIndex = 0;
-                        _.each(_sampleIds, function (_sampleId) {
+                        _.each(Object.keys(_ajaxPatient2SampleIdMappingObj), function (_tmpPatientId) {
+                          _patientIds.push(_tmpPatientId);
+                          var _sampleIdArr = _ajaxPatient2SampleIdMappingObj[_tmpPatientId];
+                          _.each(_sampleIdArr, function (_sampleId) {
+                            // map from sample to patient
+                            _ajaxSample2PatientIdMappingObj[_sampleId] = new Array(_tmpPatientId);
                           var _datum = {};
                           _datum['sample_id'] = _sampleId;
                           _.each(_ajaxSampleData, function (_dataObj) {
@@ -267,15 +271,6 @@
                               _datum[_dataObj['attr_id']] = _dataObj['attr_val'];
                               _datum['study_id'] = _dataObj['study_id'];
                             }
-                          });
-                          // map from sample to patient
-                          _.each(Object.keys(_ajaxPatient2SampleIdMappingObj), function (_tmpPatientId) {
-                            var _sampleIdArr = _ajaxPatient2SampleIdMappingObj[_tmpPatientId];
-                            _.each(_sampleIdArr, function (_tmpSampleId) {
-                              if (_tmpSampleId === _sampleId) {
-                                _ajaxSample2PatientIdMappingObj[_sampleId] = new Array(_tmpPatientId);
-                              }
-                            });
                           });
                           // indices
                           _sampleDataIndicesObj[_sampleId] = _indexSample;
@@ -301,12 +296,13 @@
                                   _datum['mutated_genes'].push(_storedMutGeneInventory[_mutGeneDataObj.gene_symbol].index);
                                 } else {
                                   _storedMutGeneInventory[_mutGeneDataObj.gene_symbol] = {};
-                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].gene_symbol = _mutGeneDataObj.gene_symbol;
-                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_mut = _mutGeneDataObj.num_muts;
+                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].gene = _mutGeneDataObj.gene_symbol;
+                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts = _mutGeneDataObj.num_muts;
+                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].caseIds = _mutGeneDataObj.caseIds;
                                   if (_mutGeneDataObj.hasOwnProperty('qval')) {
-                                    _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].q_val = _mutGeneDataObj.q_val;
+                                    _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].qval = _mutGeneDataObj.qval;
                                   } else {
-                                    _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].q_val = null;
+                                    _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].qval = null;
                                   }
                                   _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].index = _storedMutGeneIndex;
                                   _datum['mutated_genes'].push(_storedMutGeneIndex);
@@ -324,13 +320,25 @@
                                   _datum['cna_details'].push(_storedCnaGeneInventory[_ajaxCnaData.gene[_index]].index);
                                 } else { // create a new gene entry
                                   _storedCnaGeneInventory[_ajaxCnaData.gene[_index]] = {};
-                                  _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].gene_symbol = _ajaxCnaData.gene[_index];
-                                  _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cna = _ajaxCnaData.alter[_index];
+                                  _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].gene = _ajaxCnaData.gene[_index];
+                                  var _altType='';
+                                  switch (_ajaxCnaData.alter[_index]) {
+                                    case -2:
+                                      _altType = 'DEL';
+                                      break;
+                                    case 2:
+                                      _altType = 'AMP';
+                                      break;
+                                    default:
+                                      break;
+                                  }
+                                  _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cna = _altType;
                                   _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cytoband = _ajaxCnaData.cytoband[_index];
+                                  _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].caseIds = _ajaxCnaData.caseIds[_index];
                                   if (_ajaxCnaData.gistic[_index] === null) {
-                                    _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].gistic = null;
+                                    _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].qval = null;
                                   } else {
-                                    _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].gistic = _ajaxCnaData.gistic[_index][0];
+                                    _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].qval = _ajaxCnaData.gistic[_index][0];
                                   }
                                   _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].index = _storedCnaGeneIndex;
                                   _datum['cna_details'].push(_storedCnaGeneIndex);
@@ -342,6 +350,7 @@
                           // final push
                           _sampleData.push(_datum);
                         });
+                      });
 
                         //add Mutation Count chart
                         if(_ajaxMutationCountData.length !=0){
@@ -357,22 +366,24 @@
                         // add CNA details
                         if (_gisticStudyIdArr.length !== 0) {
                           var _cnaAttrMeta = {};
-                          _cnaAttrMeta.type = 'TABLE';
+                          _cnaAttrMeta.type = 'cna';
                           _cnaAttrMeta.view_type = 'table';
                           _cnaAttrMeta.display_name = 'Copy Number Alterations';
                           _cnaAttrMeta.description = 'Copy Number Alterations';
                           _cnaAttrMeta.gene_list = _storedCnaGeneInventory;
+                          _cnaAttrMeta.attr_id = 'cna_details';
                           _ajaxSampleMeta.unshift(_cnaAttrMeta);
                         }
 
                         // add Gene Mutation Info
                         if (_mutDataStudyIdArr.length !== 0) {
                           var _mutDataAttrMeta = {};
-                          _mutDataAttrMeta.type = 'TABLE';
+                          _mutDataAttrMeta.type = 'mutatedGene';
                           _mutDataAttrMeta.view_type = 'table';
                           _mutDataAttrMeta.display_name = 'Mutated Genes';
                           _mutDataAttrMeta.description = 'Mutated Genes';
                           _mutDataAttrMeta.gene_list = _storedMutGeneInventory;
+                          _mutDataAttrMeta.attr_id = 'mutated_genes';
                           _ajaxSampleMeta.unshift(_mutDataAttrMeta);
                         }
                         
@@ -386,23 +397,27 @@
                         _ajaxSampleMeta.unshift(_mutCntAttrMeta);
 
                         // add DFS survival
-                        var _dfsSurvivalAttrMeta = {};
-                        _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
-                        _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
-                        _dfsSurvivalAttrMeta.view_type = 'survival';
-                        _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
-                        _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
-                        _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
+                        if(_.find(_ajaxPatientMeta,function(item) { return item.attr_id.indexOf('DFS_MONTHS')>-1 }) !== undefined){
+                          var _dfsSurvivalAttrMeta = {};
+                          _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
+                          _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
+                          _dfsSurvivalAttrMeta.view_type = 'survival';
+                          _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
+                          _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
+                          _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
+                        }
 
                         // add OS survival
-                        var _osSurvivalAttrMeta = {};
-                        _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
-                        _osSurvivalAttrMeta.datatype = 'SURVIVAL';
-                        _osSurvivalAttrMeta.view_type = 'survival';
-                        _osSurvivalAttrMeta.description = 'Overall Survival';
-                        _osSurvivalAttrMeta.display_name = 'Overall Survival';
-                        _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
+                        if(_.find(_ajaxPatientMeta,function(item) { return item.attr_id.indexOf('OS_MONTHS')>-1 }) !== undefined){
+                          var _osSurvivalAttrMeta = {};
+                          _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
+                          _osSurvivalAttrMeta.datatype = 'SURVIVAL';
+                          _osSurvivalAttrMeta.view_type = 'survival';
+                          _osSurvivalAttrMeta.description = 'Overall Survival';
+                          _osSurvivalAttrMeta.display_name = 'Overall Survival';
+                          _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
 
+                        }
                         // add Cancer Study
                         _ajaxPatientMeta.unshift({
                           "datatype": "STRING",

@@ -50,6 +50,7 @@
             selectedpatients: [],
             patientmap: [],
             samplemap: [],
+            selectedgenes: [],
             showVCList: false,
             addNewVC: false,
             selectedPatientsNum: 0,
@@ -75,14 +76,24 @@
             }
           }, events: {
             'redraw-all-charts':function(){
-              console.log('redraw-all-charts')
               this.redrawgroups.push(true);
+            },'manage-gene':function(gene){
+              var index = this.selectedgenes.indexOf(gene);
+              if(index==-1) {
+                this.selectedgenes.push(gene);
+              }
+              else{
+                this.selectedgenes.splice(index, 1);
+              }
+              console.log(this.selectedgenes);
+              this.$broadcast('gene-list-updated',this.selectedgenes);
             }
           },methods: {
             initialize: function() {
                 this.groups = [],
                 this.selectedsamples = [],
                 this.selectedpatients = [],
+                this.selectedgenes = [],
                 this.patientmap = [],
                 this.samplemap = [],
                 this.showVCList = false,

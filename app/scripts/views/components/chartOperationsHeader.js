@@ -77,7 +77,6 @@
         }
       },
       logChecked : function(newVal,oldVal){
-        console.log(newVal+'  '+oldVal);
         this.reset();
         this.$dispatch('changeLogScale',newVal);
       }

@@ -61,7 +61,7 @@
           currentView = 'survival';
           break;
         case 'table':
-         // currentView = 'table';
+          currentView = 'table-view';
           break;
       }
       return {

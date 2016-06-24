@@ -60,7 +60,7 @@
         this.updateGrid();
       },
       'selectedsamples': function(val) {
-        this.$broadcast('scatter-plot-sample-update', val);
+        this.$broadcast('selected-sample-update', val);
       },
       'selectedpatients': function(val) {
         this.$broadcast('survival-update', val);
@@ -103,18 +103,25 @@
         var _selectedSamplesByFiltersOnly = _.keys(this.samplemap);
         var _hasFilters = false;
         _.each(this.groups, function(group) {
-          var filters_ = [], _scatterPlotSel = [];
+          var filters_ = [], _scatterPlotSel = [], _tableSel = [];
           _.each(group.attributes, function(attributes) {
             if (attributes.filter.length > 0) {
               _hasFilters = true;
-              if (attributes.view_type !== 'scatter_plot') {
-                filters_[attributes.attr_id] = attributes.filter;
-              } else {
+              if (attributes.view_type === 'scatter_plot') {
                 if(_scatterPlotSel.length !== 0){
                   _scatterPlotSel = _.intersection(_scatterPlotSel,attributes.filter);
                 }else{
                   _scatterPlotSel =attributes.filter;
                 }
+              } else if (attributes.view_type === 'table') {
+                var _samples = attributes.filter[0].caseIds;
+                if(_scatterPlotSel.length !== 0){
+                  _tableSel = _.intersection(_tableSel,_samples);
+                }else{
+                  _tableSel = _samples;
+                }
+              } else{
+                filters_[attributes.attr_id] = attributes.filter;
               }
             } 
           });
@@ -122,6 +129,10 @@
           if (_scatterPlotSel.length !== 0) {
             _selectedSamplesByFiltersOnly =
               _.intersection(_selectedSamplesByFiltersOnly, _scatterPlotSel);
+          }
+          if (_tableSel.length !== 0) {
+            _selectedSamplesByFiltersOnly =
+              _.intersection(_selectedSamplesByFiltersOnly, _tableSel);
           }
           if (group.type === 'sample') {
             _selectedSamplesByFiltersOnly =

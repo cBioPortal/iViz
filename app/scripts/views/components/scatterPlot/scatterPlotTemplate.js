@@ -61,7 +61,17 @@
         this.$dispatch('update-samples',newVal);
       }
     },
-    events: {},
+    events: {
+      'selected-sample-update': function(_selectedSamples) {
+      if (_selectedSamples.length !== this.data.length) {
+        this.selectedSamples=_selectedSamples;
+        this.chartInst.update(_selectedSamples);
+      } else {
+        this.selectedSamples=_selectedSamples;
+        this.chartInst.update([]);
+      }
+    }
+    },
     methods: {
       mouseEnter: function() {
         this.showOperations = true;
@@ -93,17 +103,6 @@
           //_self.$dispatch('update-samples', _self.selectedSamples);
         }
       });
-      
-      _self.$on('scatter-plot-sample-update', function(_selectedSamples) {
-        if (_selectedSamples.length !== _self.data.length) {
-          _self.selectedSamples=_selectedSamples;
-          _self.chartInst.update(_selectedSamples);
-        } else {
-          _self.selectedSamples=_selectedSamples;
-          _self.chartInst.update([]);
-        }
-      });
-    
     }
   });
 })(window.Vue, window.dc, window.iViz,
