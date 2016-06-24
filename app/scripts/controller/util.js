@@ -159,6 +159,12 @@
         case 'barChart':
           barChartDownload(fileType, content);
           break;
+        case 'survivalPlot':
+          survivalChartDownload(fileType, content);
+          break;
+        case 'scatterPlot':
+          survivalChartDownload(fileType, content);
+          break;
         default:
           break;
       }
@@ -463,10 +469,75 @@
       }
     }
 
+    function survivalChartDownload(fileType, content) {
+      switch (fileType) {
+        case 'svg':
+          survivalChartCanvasDownload(content, {
+            filename: content.fileName + '.svg'
+          });
+          break;
+        case 'pdf':
+          survivalChartCanvasDownload(content, {
+            filename: content.fileName + '.pdf',
+            contentType: 'application/pdf',
+            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+          });
+          break;
+        default:
+          break;
+      }
+    }
+
+    function survivalChartCanvasDownload(data, downloadOpts) {
+      var _svgElement, _svgLabels, _svgTitle,
+        _labelTextMaxLength = 0,
+        _numOfLabels = 0,
+        _svgWidth = 360,
+        _svgheight = 360;
+
+      _svgElement = cbio.download.serializeHtml($('#' + data.chartDivId + ' svg')[0]);
+      // _svgLabels = $('#' + data.labelDivId + ' svg');
+      //
+      // _svgLabels.find('image').remove();
+      // _svgLabels.find('text').each(function(i, obj) {
+      //   var _value = $(obj).attr('oValue');
+      //
+      //   if (typeof _value === 'undefined') {
+      //     _value = $(obj).text();
+      //   }
+      //
+      //   if (_value.length > _labelTextMaxLength) {
+      //     _labelTextMaxLength = _value.length;
+      //   }
+      //   $(obj).text(_value);
+      //   _numOfLabels++;
+      // });
+
+      _svgWidth += _labelTextMaxLength * 14;
+
+      if (_svgheight < _numOfLabels * 20) {
+        _svgheight = _numOfLabels * 20 + 40;
+      }
+
+      // _svgLabels = cbio.download.serializeHtml(_svgLabels[0]);
+
+      _svgTitle = '<g><text text-anchor="middle" x="210" y="30" ' +
+        'style="font-weight:bold">' + data.title + '</text></g>';
+
+      _svgElement = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + _svgWidth + 'px" height="' + _svgheight + 'px" style="font-size:14px">' +
+        _svgTitle + '<g transform="translate(0,40)">' +
+        _svgElement + '</g>' +
+        // '<g transform="translate(370,50)">' +
+        // _svgLabels + '</g>' +
+        '</svg>';
+
+      cbio.download.initDownload(
+        _svgElement, downloadOpts);
+    }
+
     function csvDownload(fileName, content) {
       fileName = fileName || 'test';
       var downloadOpts = {
-//                            filename: cancerStudyName + "_" + selectedAttrDisplay + ".txt",
         filename: fileName + '.txt',
         contentType: 'text/plain;charset=utf-8',
         preProcess: false

@@ -35,25 +35,32 @@
  */
 
 'use strict';
-(function (iViz) {
-  iViz.view.component.Survival = function () {
-    var content_ = this, data_= {};
-    
+(function(iViz, _) {
+  iViz.view.component.Survival = function() {
+    var content_ = this;
+    var data_ = {};
+    var opts_ = {};
+
     content_.dataForDownload = {};
-    content_.init = function (_data, _chartId, _attrId, _opts) { //_attrId here indicates chart type (OS or DFS)
-      $('#' + _chartId).empty();
+    content_.init = function(_data, _opts) { //_attrId here indicates chart type (OS or DFS)
+      opts_ = $.extend(true, {}, _opts);
+      $('#' + opts_.chartId).empty();
       data_ = _data;
-      var _dataProxy = new survivalChartProxy(_data, _attrId);
-      this.chartInst_ = new survivalCurve(_chartId, _dataProxy.get(), _opts);
+      var _dataProxy = new survivalChartProxy(_data, opts_.attrId);
+      this.chartInst_ = new survivalCurve(opts_.chartId, _dataProxy.get(), opts_);
     };
     content_.update = function(_selectedPatients, _chartId, _attrId) {
       // remove previous curves
       this.chartInst_.removeCurves();
       // settings for selected samples curve
-      var _selectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.patient_id, _selectedPatients) !== -1; });
+      var _selectedData = _.filter(data_, function(_dataObj) {
+        return $.inArray(_dataObj.patient_id, _selectedPatients) !== -1;
+      });
       var _selectedDataProxy = new survivalChartProxy(_selectedData, _attrId);
       // settings for unselected samples curve
-      var _unselectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.patient_id, _selectedPatients) === -1; });
+      var _unselectedData = _.filter(data_, function(_dataObj) {
+        return $.inArray(_dataObj.patient_id, _selectedPatients) === -1;
+      });
       var _unselectedDataProxy = new survivalChartProxy(_unselectedData, _attrId);
       // add curves
       if (_unselectedDataProxy.get().length === 0) {
@@ -62,9 +69,24 @@
         this.chartInst_.addCurve(_selectedDataProxy.get(), 0, "red");
         this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, "#006bb3");
       }
+      initCanvasDownloadData();
     }
+    
+    function initCanvasDownloadData() {
+      content_.setDownloadData('svg', {
+        title: opts_.title,
+        chartDivId: opts_.chartId,
+        fileName: opts_.title
+      });
+      content_.setDownloadData('pdf', {
+        title: opts_.title,
+        chartDivId: opts_.chartId,
+        fileName: opts_.title
+      });
+    }
+
     // return content_;
   };
-  iViz.view.component.Survival.prototype = new iViz.view.component.GeneralChart('survival');
+  iViz.view.component.Survival.prototype = new iViz.view.component.GeneralChart('survivalPlot');
   iViz.view.component.Survival.constructor = iViz.view.component.Survival;
-})(window.iViz);
+})(window.iViz, window._);

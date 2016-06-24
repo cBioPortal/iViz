@@ -74,11 +74,14 @@
     ready: function() {
       var _self = this;
       var _opts = {
-        width: window.style.vars.survivalWidth, 
-        height: window.style.vars.survivalHeight
+        width: window.style.vars.survivalWidth,
+        height: window.style.vars.survivalHeight,
+        chartId: this.chartId,
+        attrId: this.attributes.attr_id,
+        title: this.attributes.display_name
       };
       _self.chartInst = new iViz.view.component.Survival();
-      _self.chartInst.init(this.data, this.chartId, this.attributes.attr_id, _opts);
+      _self.chartInst.init(this.data, _opts);
       _self.$on('survival-update', function(_selectedPatients) {
         _self.chartInst.update(_selectedPatients, _self.chartId, _self.attributes.attr_id);
       });
