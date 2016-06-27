@@ -69,9 +69,11 @@
               }
             },
             'selectedsamples': function(val) {
+              this.$broadcast('selected-sample-update', val);
               this.selectedSamplesNum = val.length;
             },
             'selectedpatients': function(val) {
+              this.$broadcast('survival-update', val);
               this.selectedPatientsNum = val.length;
             }
           }, events: {

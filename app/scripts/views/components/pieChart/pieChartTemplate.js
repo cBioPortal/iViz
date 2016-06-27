@@ -40,7 +40,7 @@
               '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
               '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
               ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
-              ':reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes"></chart-operations>' +
+              ':reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes" :has-filters="hasFilters"></chart-operations>' +
               '<div class="dc-chart dc-pie-chart" :class="{view: showPieIcon}" align="center" style="float:none' +
               ' !important;" id={{chartId}} ></div>' +
               '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
@@ -63,11 +63,13 @@
         hasChartTitle:true,
         showTableIcon:true,
         showPieIcon:false,
-        filtersUpdated:false
+        filtersUpdated:false,
+        hasFilters:false
       }
     },
     watch: {
       'filters': function(newVal, oldVal) {
+        this.hasFilters = newVal.length>0?true:false;
         if(!this.filtersUpdated) {
           this.filtersUpdated = true;
           if (newVal.length === oldVal.length) {

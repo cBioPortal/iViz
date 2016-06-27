@@ -263,7 +263,7 @@
                           var _sampleIdArr = _ajaxPatient2SampleIdMappingObj[_tmpPatientId];
                           _.each(_sampleIdArr, function (_sampleId) {
                             // map from sample to patient
-                            _ajaxSample2PatientIdMappingObj[_sampleId] = new Array(_tmpPatientId);
+                            _ajaxSample2PatientIdMappingObj[_sampleId] = [_tmpPatientId];
                           var _datum = {};
                           _datum['sample_id'] = _sampleId;
                           _.each(_ajaxSampleData, function (_dataObj) {

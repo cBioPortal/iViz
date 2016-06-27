@@ -36,14 +36,12 @@
 (function(Vue, dc, iViz) {
   Vue.component('scatterPlot', {
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-      '<chart-operations :show-operations="showOperations" :display-name="displayName" :has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
+      '<chart-operations :show-operations="showOperations" :display-name="displayName" :has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :attributes="attributes" :has-filters="hasFilters"></chart-operations>' +
       '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
       '</div>',
     props: [
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
-    created: function() {
-    },
     data: function() {
       return {
         charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
@@ -52,11 +50,13 @@
         displayName: this.attributes.display_name,
         showOperations: false,
         selectedSamples: [],
-        chartInst: {}
+        chartInst: {},
+        hasFilters:false
       };
     },
     watch: {
       'filters': function(newVal) {
+        this.hasFilters = newVal.length>0?true:false;
         this.chartInst.update(newVal);
         this.$dispatch('update-samples',newVal);
       }
@@ -70,7 +70,10 @@
         this.selectedSamples=_selectedSamples;
         this.chartInst.update([]);
       }
-    }
+    },
+      'closeChart':function(){
+        this.$dispatch('close');
+      }
     },
     methods: {
       mouseEnter: function() {
@@ -80,12 +83,15 @@
       }
     },
     ready: function() {
-      
       var _self = this;
       
       _self.chartInst = new iViz.view.component.scatterPlot();
       _self.chartInst.init(this.data, this.chartId, this.charDivId);
-      
+      var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
+      if (_selectedSamples.length !== this.data.length) {
+        this.selectedSamples=_selectedSamples;
+        this.chartInst.update(_selectedSamples);
+      }
       document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];
@@ -103,6 +109,7 @@
           //_self.$dispatch('update-samples', _self.selectedSamples);
         }
       });
+      this.$dispatch('data-loaded', true);
     }
   });
 })(window.Vue, window.dc, window.iViz,

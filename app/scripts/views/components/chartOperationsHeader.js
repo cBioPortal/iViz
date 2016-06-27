@@ -53,11 +53,10 @@
             '</div>' +
             '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon'
+      'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon','hasFilters'
     ],
     data: function () {
       return {
-        hasFilters : false,
         chartOperationsActive:'chart-operations-active',
         chartOperations:'chart-operations',
         chartTitle:'chart-title',
@@ -66,16 +65,6 @@
       }
     },
     watch: {
-      showOperations: function () {
-        if (typeof this.chart !== 'undefined' &&
-            this.chart !== '') {
-          if (typeof this.chart.filters !== 'undefined' && this.chart.filters().length > 0) {
-            this.hasFilters = true;
-          } else {
-            this.hasFilters = false;
-          }
-        }
-      },
       logChecked : function(newVal,oldVal){
         this.reset();
         this.$dispatch('changeLogScale',newVal);
@@ -86,10 +75,16 @@
         iViz.shared.resetAll(this.chart, this.groupid)
       },
       close: function () {
-        if (this.chart.hasFilter()) {
+        /*if (this.chart.hasFilter()) {
           iViz.shared.resetAll(this.chart, this.groupid)
         }
-        dc.deregisterChart(this.chart, this.groupid);
+        dc.deregisterChart(this.chart, this.groupid);*/
+        if(this.chart.hasOwnProperty('hasFilter')){
+          if(this.hasFilters){
+            iViz.shared.resetAll(this.chart, this.groupid)
+          }
+          dc.deregisterChart(this.chart, this.groupid);
+        }
         this.$dispatch('closeChart')
       },
       changeView:function(){

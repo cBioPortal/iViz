@@ -50,7 +50,7 @@
   Vue.component('barChart', {
     template: '<div id={{charDivId}} class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :show-survival-icon="showSurvivalIcon" :show-log-scale="showLogScale"' +
-    ':show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :show-log-scale="showLogScale"></chart-operations>' +
+    ':show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :show-log-scale="showLogScale" :has-filters="hasFilters"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><span class="text-center chart-title-span">{{displayName}}</span>' +
     '</div>',
     props: [
@@ -69,10 +69,12 @@
         showOperations: false,
         filtersUpdated:false,
         showLogScale:false,
-        showSurvivalIcon:true
+        showSurvivalIcon:true,
+        hasFilters:false
       }
     }, watch: {
       'filters': function(newVal, oldVal) {
+        this.hasFilters = newVal.length>0?true:false;
         if(!this.filtersUpdated) {
           this.filtersUpdated = true;
           if (newVal.length == 0) {

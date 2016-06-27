@@ -82,6 +82,7 @@
       _self.$on('survival-update', function(_selectedPatients) {
         _self.chartInst.update(_selectedPatients, _self.chartId, _self.attributes.attr_id);
       });
+      this.$dispatch('data-loaded', true);
     }
   });
 })(window.Vue, window.dc, window.iViz,

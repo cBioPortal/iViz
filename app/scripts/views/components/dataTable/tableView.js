@@ -51,19 +51,23 @@
       return _.intersection(selectedSamples,sequencedSampleIds);
     };
 
-    content.init = function (_selectedSamples,_geneData,_data, _chartId,_type,_callbacks) {
+    content.init = function (_completeSamples,_selectedSamples,_geneData,_data, _chartId,_type,_callbacks) {
       _.each(_geneData, function (item, index) {
         sequencedSampleIds = sequencedSampleIds.concat(item.caseIds);
       });
       sequencedSampleIds = _.uniq(sequencedSampleIds);
-      allSamplesIds = _selectedSamples;
-      selectedSamples = _selectedSamples;
+      allSamplesIds = _completeSamples;
+      selectedSamples = _completeSamples;
       chartId_ = _chartId;
       data_ = _data;
       geneData_ = _geneData;
       type_ = _type;
       callbacks_ = _callbacks;
-      initReactTable();
+      if(iViz.util.tableView.compare(_completeSamples, _selectedSamples)){
+        initReactTable();
+      } else{
+        content.update(_selectedSamples);
+      }
     };
 
     content.update = function(_selectedSamples,_selectedRows){
@@ -129,7 +133,7 @@
         resultInfo: false,
         groupHeader: false,
         fixedChoose: false,
-        uniqueId: "uniqueId",
+        uniqueId: 'uniqueId',
         rowHeight: 25,
         tableWidth: 375,
         maxHeight: 290,
@@ -153,7 +157,7 @@
       var genes = [];
       var numOfCases_ = content.getCases().length;
       if (geneData_) {
-        _.each(geneData_, function (item, index) {
+        $.each(geneData_, function (index,item) {
           var datum = {};
           datum.gene = item.gene;
           if(selectedSamples !== undefined){
