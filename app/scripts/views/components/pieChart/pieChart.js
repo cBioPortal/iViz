@@ -177,8 +177,8 @@
           classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width iviz-pie-qtip iviz-pie-label-qtip'
         },
         show: {event: "mouseover", solo: true, delay: 0, ready: true},
-        // hide: {fixed:true, delay: 300, event: "mouseleave"},
-        hide: false,
+        hide: {fixed:true, delay: 300, event: "mouseleave"},
+        // hide: false,
         position: {my:'left center',at:'center right', viewport: $(window)},
         content: '<div id="qtip-' + v.opts.charDivId + '-content-react">Loading....</div>',
         events: {
