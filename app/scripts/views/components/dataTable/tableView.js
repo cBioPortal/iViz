@@ -37,52 +37,56 @@
   // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.tableView = function() {
     var content = {};
-    var chartId_ , geneData_, data_;
-    var type_='';
-    var attr_=[];
+    var chartId_, geneData_, data_;
+    var type_ = '';
+    var attr_ = [];
     var selectedRows = [];
     var selectedGenes = [];
     var callbacks_ = {};
     var sequencedSampleIds = [];
     var selectedSamples = [];
     var allSamplesIds = [];
+    var reactTableData = {};
 
-    content.getCases = function(){
-      return _.intersection(selectedSamples,sequencedSampleIds);
+    content.getCases = function() {
+      return _.intersection(selectedSamples, sequencedSampleIds);
     };
 
-    content.init = function (_completeSamples,_selectedSamples,_geneData,_data, _chartId,_type,_callbacks) {
-      _.each(_geneData, function (item, index) {
-        sequencedSampleIds = sequencedSampleIds.concat(item.caseIds);
-      });
-      sequencedSampleIds = _.uniq(sequencedSampleIds);
-      allSamplesIds = _completeSamples;
-      selectedSamples = _completeSamples;
-      chartId_ = _chartId;
-      data_ = _data;
-      geneData_ = _geneData;
-      type_ = _type;
-      callbacks_ = _callbacks;
-      if(iViz.util.tableView.compare(_completeSamples, _selectedSamples)){
-        initReactTable();
-      } else{
-        content.update(_selectedSamples);
-      }
-    };
+    content.init =
+      function(_completeSamples, _selectedSamples, _selectedGenes, _geneData,
+               _data, _chartId, _type, _callbacks) {
+        _.each(_geneData, function(item, index) {
+          sequencedSampleIds = sequencedSampleIds.concat(item.caseIds);
+        });
+        sequencedSampleIds = _.uniq(sequencedSampleIds);
+        allSamplesIds = _completeSamples;
+        selectedSamples = _completeSamples;
+        selectedGenes = _selectedGenes;
+        chartId_ = _chartId;
+        data_ = _data;
+        geneData_ = _geneData;
+        type_ = _type;
+        callbacks_ = _callbacks;
+        if (iViz.util.tableView.compare(_completeSamples, _selectedSamples)) {
+          initReactTable(true);
+        } else {
+          content.update(_selectedSamples);
+        }
+      };
 
-    content.update = function(_selectedSamples,_selectedRows){
-      var updatedGenes_ = [];
+    content.update = function(_selectedSamples, _selectedRows) {
+      var selectedGenesMap_ = [];
       var includeMutationCount = false;
-      if(_selectedRows !== undefined)
+      if (_selectedRows !== undefined)
         selectedRows = _selectedRows;
-      if(!iViz.util.tableView.compare(selectedSamples,_selectedSamples)){
+      if (!iViz.util.tableView.compare(selectedSamples, _selectedSamples)) {
         selectedSamples = _selectedSamples;
-      if(!iViz.util.tableView.compare(allSamplesIds,_selectedSamples)){
-          _.each(data_,function(item, index){
+        if (!iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
+          _.each(data_, function(item, index) {
             var sampleId = item.sample_id;
-            if(_selectedSamples.indexOf(sampleId)!==-1){
+            if (_selectedSamples.indexOf(sampleId) !== -1) {
               var tempData_ = '';
-              switch(type_){
+              switch (type_) {
                 case 'mutatedGene':
                   tempData_ = item.mutated_genes;
                   includeMutationCount = true;
@@ -92,38 +96,40 @@
                   includeMutationCount = false;
                   break;
               }
-              _.each(tempData_,function(geneIndex){
-                if(updatedGenes_[geneIndex] === undefined){
-                  updatedGenes_[geneIndex] = {};
-                  if(includeMutationCount){
-                    updatedGenes_[geneIndex].num_muts = 1;
+              _.each(tempData_, function(geneIndex) {
+                if (selectedGenesMap_[geneIndex] === undefined) {
+                  selectedGenesMap_[geneIndex] = {};
+                  if (includeMutationCount) {
+                    selectedGenesMap_[geneIndex].num_muts = 1;
                   }
-                  updatedGenes_[geneIndex].caseIds = [sampleId];
-                }else{
-                  if(includeMutationCount){
-                    updatedGenes_[geneIndex].num_muts = updatedGenes_[geneIndex].num_muts+1;
+                  selectedGenesMap_[geneIndex].caseIds = [sampleId];
+                } else {
+                  if (includeMutationCount) {
+                    selectedGenesMap_[geneIndex].num_muts =
+                      selectedGenesMap_[geneIndex].num_muts + 1;
                   }
-                  updatedGenes_[geneIndex].caseIds.push(sampleId);
+                  selectedGenesMap_[geneIndex].caseIds.push(sampleId);
                 }
               });
             }
           });
-          initReactTable(updatedGenes_);
-        }else{
-          initReactTable();
+          initReactTable(true,selectedGenesMap_);
+        } else {
+          initReactTable(true);
         }
       }
     };
 
-    content.updateGenes = function(genes){
+    content.updateGenes = function(genes) {
       selectedGenes = genes;
-      initReactTable();
+      initReactTable(false);
     };
 
-    function initReactTable(_updatedMutatedGenes) {
-      var _data = initReactData(_updatedMutatedGenes);
+    function initReactTable(_reloadData,_selectedGenesMap) {
+      if(_reloadData)
+        reactTableData = initReactData(_selectedGenesMap);
       var _opts = {
-        input: _data,
+        input: reactTableData,
         filter: "ALL",
         download: "NONE",
         downloadFileName: "data.txt",
@@ -148,27 +154,29 @@
         geneClickFunc: reactGeneClickCallback,
         tableType: type_
       };
-      var testElement = React.createElement(EnhancedFixedDataTableSpecial, _opts);
+      var testElement = React.createElement(EnhancedFixedDataTableSpecial,
+        _opts);
 
       ReactDOM.render(testElement, document.getElementById(chartId_));
     }
 
-    function mutatedGenesData(selectedSamples) {
+    function mutatedGenesData(_selectedGenesMap) {
       var genes = [];
       var numOfCases_ = content.getCases().length;
       if (geneData_) {
-        $.each(geneData_, function (index,item) {
+        $.each(geneData_, function(index, item) {
           var datum = {};
           datum.gene = item.gene;
-          if(selectedSamples !== undefined){
-            if(selectedSamples[item.index]!==undefined){
-              datum.caseIds = _.uniq(selectedSamples[item.index].caseIds);
+          if (_selectedGenesMap !== undefined) {
+            if (_selectedGenesMap[item.index] !== undefined) {
+              datum.caseIds = _.uniq(_selectedGenesMap[item.index].caseIds);
               datum.samples = datum.caseIds.length;
-              switch(type_){
+              switch (type_) {
                 case 'mutatedGene':
-                  datum.numOfMutations = selectedSamples[item.index].num_muts;
+                  datum.numOfMutations = _selectedGenesMap[item.index].num_muts;
                   datum.sampleRate = (numOfCases_ <= 0 ? 0 :
-                      ((datum.samples / Number(numOfCases_) * 100).toFixed(1))) + '%';
+                      ((datum.samples / Number(numOfCases_) * 100).toFixed(
+                        1))) + '%';
                   datum.uniqueId = datum.gene;
                   break;
                 case 'cna':
@@ -176,20 +184,21 @@
                   datum.altType = item.cna;
                   datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
                       (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
-                  datum.uniqueId = datum.gene+'-'+ datum.altType;
+                  datum.uniqueId = datum.gene + '-' + datum.altType;
                   break;
               }
-            }else{
+            } else {
               return;
             }
-          }else{
+          } else {
             datum.caseIds = _.uniq(item.caseIds);
             datum.samples = datum.caseIds.length;
-            switch(type_){
+            switch (type_) {
               case 'mutatedGene':
                 datum.numOfMutations = item.num_muts;
                 datum.sampleRate = (numOfCases_ <= 0 ? 0 :
-                    ((datum.samples / Number(numOfCases_) * 100).toFixed(1))) + '%';
+                    ((datum.samples / Number(numOfCases_) * 100).toFixed(1))) +
+                  '%';
                 datum.uniqueId = datum.gene;
                 break;
               case 'cna':
@@ -197,12 +206,12 @@
                 datum.altType = item.cna;
                 datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
                     (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
-                datum.uniqueId = datum.gene+'-'+ datum.altType;
+                datum.uniqueId = datum.gene + '-' + datum.altType;
                 break;
             }
           }
 
-          if (item.qval!==null) {
+          if (item.qval !== null) {
             var qval = Number(item.qval);
             if (qval === 0) {
               datum.qval = 0;
@@ -219,17 +228,17 @@
       return genes;
     }
 
-    function initReactData(_updatedMutatedGenes) {
+    function initReactData(_selectedGenesMap) {
       attr_ = iViz.util.tableView.getAttributes(type_);
       var result = {
         data: [],
         attributes: attr_
       };
-      var _mutationData = mutatedGenesData(_updatedMutatedGenes);
-      _.each(_mutationData, function (item, index) {
-        for(var key in item) {
+      var _mutationData = mutatedGenesData(_selectedGenesMap);
+      _.each(_mutationData, function(item, index) {
+        for (var key in item) {
           var datum = {
-            attr_id : key,
+            attr_id: key,
             uniqueId: item.uniqueId,
             attr_val: key === 'caseIds' ? item.caseIds.join(',') : item[key]
           };
@@ -241,28 +250,29 @@
 
     function reactRowClickCallback(data, selected, _selectedRows) {
       var selectedRows_ = [];
-      _.each(_selectedRows,function(item){
+      _.each(_selectedRows, function(item) {
         selectedRows_.push(item.uniqueId)
       });
       selectedRows = selectedRows_;
-      if(callbacks_.hasOwnProperty('rowClick')) {
-        callbacks_.rowClick( _selectedRows, data, selected);
+      if (callbacks_.hasOwnProperty('rowClick')) {
+        callbacks_.rowClick(_selectedRows, data, selected);
       }
     }
 
     function reactGeneClickCallback(selectedRow, selected) {
       callbacks_.addGeneClick(selectedRow);
     }
+
     return content;
   };
 
 
   iViz.util.tableView = (function() {
     var content = {};
-    content.compare = function(arr1,arr2) {
+    content.compare = function(arr1, arr2) {
       if (arr1.length != arr2.length) return false;
       for (var i = 0; i < arr2.length; i++) {
-        if(arr1.indexOf(arr2[i]) == -1)
+        if (arr1.indexOf(arr2[i]) == -1)
           return false;
       }
       return true;
@@ -319,10 +329,10 @@
         case 'cna':
           _attr = [
             {
-            "attr_id": "gene",
-            "display_name": "Gene",
-            "datatype": "STRING",
-            "column_width": 80
+              "attr_id": "gene",
+              "display_name": "Gene",
+              "datatype": "STRING",
+              "column_width": 80
             },
             {
               "attr_id": "cytoband",

@@ -156,6 +156,7 @@
       var callbacks = {};
       var _selectedSampleList = this.$parent.$parent.$parent.selectedsamples;
       var _completeSampleList = this.$parent.$parent.$parent.completeSamplesList;
+      var _selectedGenes = this.$parent.$parent.$parent.$parent.selectedgenes;
 
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.rowClick = this.rowClick;
@@ -164,7 +165,7 @@
       if(_completeSampleList.length === 0){
         _completeSampleList = _selectedSampleList;
       }
-      _self.chartInst.init(_completeSampleList, _selectedSampleList,this.attributes['gene_list'],this.data, this.chartId, this.attributes.type, callbacks);
+      _self.chartInst.init(_completeSampleList, _selectedSampleList, _selectedGenes,this.attributes['gene_list'],this.data, this.chartId, this.attributes.type, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
       this.$dispatch('data-loaded', true);
     }
