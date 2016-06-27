@@ -1,3 +1,8 @@
+.bar-chart {
+  .dc-bar-chart {
+  }
 
-.dc-bar-chart {
+  .chart-title-span {
+    @extend .chart-title-span;
+  }
 }

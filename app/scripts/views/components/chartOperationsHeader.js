@@ -35,21 +35,21 @@
 'use strict';
 (function (Vue, iViz, $) {
   Vue.component('chartOperations', {
-    template:'<div class="study-view-chart-header">' +
-            '<div class="chart-title"  :class="[showOperations?chartTitleActive:chartTitle]" v-if="hasChartTitle&&((showTableIcon===undefined)||showTableIcon)"><span class="chart-title-span" id="{{chartId}}-title">{{displayName}}</span></div>' +
-            '<div :class="[showOperations?chartOperationsActive:chartOperations]">'+
-            '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="study-view-title-icon hover"/>'+
+    template:'<div class="chart-header">' +
+            '<div class="chart-title" :class="[showOperations?chartTitleActive:chartTitle]" v-if="hasChartTitle&&((showTableIcon===undefined)||showTableIcon)"><span class="chart-title-span" id="{{chartId}}-title">{{displayName}}</span></div>' +
+            '<div :class="[showOperations?chartOperationsActive:chartOperations]">' + 
+            '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="icon hover"/>'+
             '<div style="float:left" v-if="showLogScale"></input style="float:left"><input type="checkbox" value="" id="" ' +
-            'class="study-view-bar-x-log" v-model="logChecked">' +
+            'class="bar-x-log" v-model="logChecked">' +
             '<span id="scale-span-{{chartId}}" style="float:left; font-size:10px; margin-right: 15px; color: grey">Log Scale X</span></div>'+
-            '<img v-if="showTableIcon" src="images/table.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
-            '<img v-if="showPieIcon" src="images/pie.svg" class="study-view-title-icon hover" @click="changeView()"/>' +
-            '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" class="study-view-title-icon hover"/>' +
-            '<div id="{{chartId}}-download-icon-wrapper" class="study-view-download-icon">' +
-            '<img src="images/in.svg" class="study-view-title-icon hover" id="{{chartId}}-download"/>'+
+            '<img v-if="showTableIcon" src="images/table.svg" class="icon hover" @click="changeView()"/>' +
+            '<img v-if="showPieIcon" src="images/pie.svg" class="icon hover" @click="changeView()"/>' +
+            '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" class="icon hover"/>' +
+            '<div id="{{chartId}}-download-icon-wrapper" class="download">' +
+            '<img src="images/in.svg" class="icon hover" id="{{chartId}}-download"/>'+
             '</div>'+
-            '<img src="images/move.svg" class="dc-chart-drag study-view-title-icon" class="study-view-title-icon"/>'+
-            '<div style="float:right"><i class="fa fa-times dc-chart-pointer study-view-title-icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>' +
+            '<img src="images/move.svg" class="dc-chart-drag icon" class="icon"/>'+
+            '<div style="float:right"><i class="fa fa-times dc-chart-pointer icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>' +
             '</div>' +
             '</div>',
     props: [
