@@ -36,7 +36,10 @@
 (function(Vue, dc, iViz) {
   Vue.component('scatterPlot', {
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-      '<chart-operations :show-operations="showOperations" :display-name="displayName" :has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :attributes="attributes" :has-filters="hasFilters"></chart-operations>' +
+      '<chart-operations :show-operations="showOperations"' +
+    ' :display-name="displayName" :has-chart-title="true" :groupid="groupid"' +
+    ' :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId"' +
+    ' :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
       '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
       '</div>',
     props: [
@@ -56,7 +59,6 @@
     },
     watch: {
       'filters': function(newVal) {
-        this.hasFilters = newVal.length>0?true:false;
         this.chartInst.update(newVal);
         this.$dispatch('update-samples',newVal);
       }

@@ -397,7 +397,6 @@
                         _ajaxSampleMeta.unshift(_mutCntAttrMeta);
 
                         // add DFS survival
-                        if(_.find(_ajaxPatientMeta,function(item) { return item.attr_id.indexOf('DFS_MONTHS')>-1 }) !== undefined){
                           var _dfsSurvivalAttrMeta = {};
                           _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
                           _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
@@ -405,10 +404,8 @@
                           _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
                           _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
                           _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
-                        }
 
                         // add OS survival
-                        if(_.find(_ajaxPatientMeta,function(item) { return item.attr_id.indexOf('OS_MONTHS')>-1 }) !== undefined){
                           var _osSurvivalAttrMeta = {};
                           _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
                           _osSurvivalAttrMeta.datatype = 'SURVIVAL';
@@ -417,7 +414,6 @@
                           _osSurvivalAttrMeta.display_name = 'Overall Survival';
                           _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
 
-                        }
                         // add Cancer Study
                         _ajaxPatientMeta.unshift({
                           "datatype": "STRING",

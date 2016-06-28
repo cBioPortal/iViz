@@ -38,7 +38,7 @@
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" :display-name="displayName" ' +
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" ' +
-    ':chart-id="chartId" :attributes="attributes" :has-filters="hasFilters"></chart-operations>' +
+    ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
     '<div class="dc-chart dc-table-plot" :class="{hideLoading: showLoad}" align="center" style="float:none !important;" id={{chartId}} >' +
     '<div class="study-view-loader" :class="{showLoading: showload}" style="display:none; top:30%;left:30%"><img src="images/ajax-loader.gif"/></div>' +
     '</div>',
@@ -59,8 +59,7 @@
         showLoading:'show-loading',
         hideLoading:'hide-loading',
         fromRowSelection:false,
-        updateTable:true,
-        hasFilters:false
+        updateTable:true
       };
     },
     watch: {
@@ -74,15 +73,18 @@
         this.chartInst.updateGenes(genes);
       },'selected-sample-update': function(_selectedSamples) {
         if(this.updateTable){
-          //var _selectedRows = _.pluck(this.filters, 'uniqueId');
           this.chartInst.update(_selectedSamples);
           this.setDisplayTitle(this.chartInst.getCases().length);
         }else{
           this.updateTable = true;
+          if(this.filters.length === 0){
+            this.chartInst.update(_selectedSamples);
+            this.setDisplayTitle(this.chartInst.getCases().length);
+          }
         }
       },
       'closeChart':function(){
-        if(this.hasFilters){
+        if(this.filters.length>0){
           this.filters = [];
           this.updateFilters([],true);
         }
@@ -117,8 +119,6 @@
       }, setDisplayTitle: function(numOfCases) {
         this.displayName = this.attributes.display_name+'('+numOfCases+' profiled samples)';
       }, updateFilters: function(newVal,removeChart){
-
-        this.hasFilters = newVal.length>0?true:false;
         var _samples = [];
         if(!removeChart){
         if(this.fromRowSelection){

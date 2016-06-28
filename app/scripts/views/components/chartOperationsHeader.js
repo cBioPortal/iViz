@@ -53,7 +53,7 @@
             '</div>' +
             '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon','hasFilters'
+      'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon','filters'
     ],
     data: function () {
       return {
@@ -61,26 +61,33 @@
         chartOperations:'chart-operations',
         chartTitle:'chart-title',
         chartTitleActive:'chart-title-active',
-        logChecked:true
+        logChecked:true,
+        hasFilters:false
       }
     },
     watch: {
       logChecked : function(newVal,oldVal){
         this.reset();
         this.$dispatch('changeLogScale',newVal);
+      }, filters : function(newVal){
+          this.hasFilters = newVal.length>0;
       }
     },
     methods: {
       reset: function() {
-        iViz.shared.resetAll(this.chart, this.groupid)
+        if(this.chart.hasOwnProperty('hasFilter')){
+          if(this.filters.length>0){
+            iViz.shared.resetAll(this.chart, this.groupid)
+          }
+        }else {
+          if(this.filters.length>0){
+            this.filters = [];
+          }
+        }
       },
       close: function () {
-        /*if (this.chart.hasFilter()) {
-          iViz.shared.resetAll(this.chart, this.groupid)
-        }
-        dc.deregisterChart(this.chart, this.groupid);*/
         if(this.chart.hasOwnProperty('hasFilter')){
-          if(this.hasFilters){
+          if(this.filters.length>0){
             iViz.shared.resetAll(this.chart, this.groupid)
           }
           dc.deregisterChart(this.chart, this.groupid);
