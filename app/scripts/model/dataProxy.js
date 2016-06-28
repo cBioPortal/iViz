@@ -195,6 +195,7 @@
                       data: {cmd: 'get_smg', mutation_profile: _studyId + '_mutations'}
                     });
                   })).done(function () {
+                    _results = [];
                     if(_mutDataStudyIdArr.length==1){
                       _results = _results.concat(arguments[0]);
                     }else{
@@ -294,12 +295,14 @@
                               if (_caseId === _sampleId) {
                                 if (_storedMutGeneInventory.hasOwnProperty(_mutGeneDataObj.gene_symbol)) { // if gene is already stored in the inventory
                                   _datum['mutated_genes'].push(_storedMutGeneInventory[_mutGeneDataObj.gene_symbol].index);
+                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts = _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts+1;
+                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].caseIds.push(_caseId);
                                 } else {
                                   _storedMutGeneInventory[_mutGeneDataObj.gene_symbol] = {};
                                   _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].gene = _mutGeneDataObj.gene_symbol;
-                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts = _mutGeneDataObj.num_muts;
-                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].caseIds = _mutGeneDataObj.caseIds;
-                                  if (_mutGeneDataObj.hasOwnProperty('qval')) {
+                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts = 1;
+                                  _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].caseIds = [_caseId];
+                                  if ((_studyIdArr.length==1) && _mutGeneDataObj.hasOwnProperty('qval')) {
                                     _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].qval = _mutGeneDataObj.qval;
                                   } else {
                                     _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].qval = null;
@@ -318,6 +321,7 @@
                               if (_sampleId === _caseId) {
                                 if (_storedCnaGeneInventory.hasOwnProperty(_ajaxCnaData.gene[_index])) { // if gene is already stored in the inventory
                                   _datum['cna_details'].push(_storedCnaGeneInventory[_ajaxCnaData.gene[_index]].index);
+                                  _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].caseIds.push(_caseId);
                                 } else { // create a new gene entry
                                   _storedCnaGeneInventory[_ajaxCnaData.gene[_index]] = {};
                                   _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].gene = _ajaxCnaData.gene[_index];
@@ -334,8 +338,8 @@
                                   }
                                   _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cna = _altType;
                                   _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cytoband = _ajaxCnaData.cytoband[_index];
-                                  _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].caseIds = _ajaxCnaData.caseIds[_index];
-                                  if (_ajaxCnaData.gistic[_index] === null) {
+                                  _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].caseIds = [_caseId];
+                                  if ((_studyIdArr.length !==1) || _ajaxCnaData.gistic[_index] === null) {
                                     _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].qval = null;
                                   } else {
                                     _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].qval = _ajaxCnaData.gistic[_index][0];

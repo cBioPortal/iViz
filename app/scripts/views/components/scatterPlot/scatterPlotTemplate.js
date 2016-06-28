@@ -59,7 +59,6 @@
     },
     watch: {
       'filters': function(newVal) {
-        this.chartInst.update(newVal);
         this.$dispatch('update-samples',newVal);
       }
     },

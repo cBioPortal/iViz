@@ -68,13 +68,17 @@
                 this.redrawgroups = [];
               }
             },
-            'selectedsamples': function(val) {
-              this.$broadcast('selected-sample-update', val);
-              this.selectedSamplesNum = val.length;
+            'selectedsamples': function(newVal,oldVal) {
+              if(newVal.length!==oldVal.length){
+                this.$broadcast('selected-sample-update', newVal);
+                this.selectedSamplesNum = newVal.length;
+              }
             },
-            'selectedpatients': function(val) {
-              this.$broadcast('survival-update', val);
-              this.selectedPatientsNum = val.length;
+            'selectedpatients': function(newVal,oldVal) {
+              if(newVal.length!==oldVal.length){
+                this.$broadcast('survival-update', newVal);
+                this.selectedPatientsNum = newVal.length;
+              }
             }
           }, events: {
             'redraw-all-charts':function(){

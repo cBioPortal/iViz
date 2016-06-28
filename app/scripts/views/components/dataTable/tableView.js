@@ -47,13 +47,15 @@
     var selectedSamples = [];
     var allSamplesIds = [];
     var reactTableData = {};
+    var initialLoaded = false;
+    var patientDataIndices = {};
 
     content.getCases = function() {
       return _.intersection(selectedSamples, sequencedSampleIds);
     };
 
     content.init =
-      function(_completeSamples, _selectedSamples, _selectedGenes, _geneData,
+      function(_completeSamples, _selectedSamples, _selectedGenes, _indices, _geneData,
                _data, _chartId, _type, _callbacks) {
         _.each(_geneData, function(item, index) {
           sequencedSampleIds = sequencedSampleIds.concat(item.caseIds);
@@ -63,6 +65,7 @@
         selectedSamples = _completeSamples;
         selectedGenes = _selectedGenes;
         chartId_ = _chartId;
+        patientDataIndices = _indices;
         data_ = _data;
         geneData_ = _geneData;
         type_ = _type;
@@ -82,36 +85,35 @@
       if (!iViz.util.tableView.compare(selectedSamples, _selectedSamples)) {
         selectedSamples = _selectedSamples;
         if (!iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
-          _.each(data_, function(item, index) {
-            var sampleId = item.sample_id;
-            if (_selectedSamples.indexOf(sampleId) !== -1) {
-              var tempData_ = '';
-              switch (type_) {
-                case 'mutatedGene':
-                  tempData_ = item.mutated_genes;
-                  includeMutationCount = true;
-                  break;
-                case 'cna':
-                  tempData_ = item.cna_details;
-                  includeMutationCount = false;
-                  break;
-              }
-              _.each(tempData_, function(geneIndex) {
-                if (selectedGenesMap_[geneIndex] === undefined) {
-                  selectedGenesMap_[geneIndex] = {};
-                  if (includeMutationCount) {
-                    selectedGenesMap_[geneIndex].num_muts = 1;
-                  }
-                  selectedGenesMap_[geneIndex].caseIds = [sampleId];
-                } else {
-                  if (includeMutationCount) {
-                    selectedGenesMap_[geneIndex].num_muts =
-                      selectedGenesMap_[geneIndex].num_muts + 1;
-                  }
-                  selectedGenesMap_[geneIndex].caseIds.push(sampleId);
-                }
-              });
+          _.each(_selectedSamples, function(caseId) {
+            var caseIndex_ = patientDataIndices[caseId];
+            var caseData_ = data_[caseIndex_];
+            var tempData_ = '';
+            switch (type_) {
+              case 'mutatedGene':
+                tempData_ = caseData_.mutated_genes;
+                includeMutationCount = true;
+                break;
+              case 'cna':
+                tempData_ = caseData_.cna_details;
+                includeMutationCount = false;
+                break;
             }
+            _.each(tempData_, function(geneIndex) {
+              if (selectedGenesMap_[geneIndex] === undefined) {
+                selectedGenesMap_[geneIndex] = {};
+                if (includeMutationCount) {
+                  selectedGenesMap_[geneIndex].num_muts = 1;
+                }
+                selectedGenesMap_[geneIndex].caseIds = [caseId];
+              } else {
+                if (includeMutationCount) {
+                  selectedGenesMap_[geneIndex].num_muts =
+                    selectedGenesMap_[geneIndex].num_muts + 1;
+                }
+                selectedGenesMap_[geneIndex].caseIds.push(caseId);
+              }
+            });
           });
           initReactTable(true,selectedGenesMap_);
         } else {
@@ -192,6 +194,8 @@
             }
           } else {
             datum.caseIds = _.uniq(item.caseIds);
+            if(!initialLoaded)
+              datum.defaultCaseIds = datum.caseIds;
             datum.samples = datum.caseIds.length;
             switch (type_) {
               case 'mutatedGene':
@@ -224,6 +228,9 @@
 
           genes.push(datum);
         })
+      }
+      if(!initialLoaded){
+        initialLoaded = true;
       }
       return genes;
     }

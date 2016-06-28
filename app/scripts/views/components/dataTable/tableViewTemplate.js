@@ -43,10 +43,8 @@
     '<div class="study-view-loader" :class="{showLoading: showload}" style="display:none; top:30%;left:30%"><img src="images/ajax-loader.gif"/></div>' +
     '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
+      'data', 'ndx', 'attributes', 'options', 'filters', 'groupid','indices'
     ],
-    created: function() {
-    },
     data: function() {
       return {
         charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
@@ -165,7 +163,7 @@
       if(_completeSampleList.length === 0){
         _completeSampleList = _selectedSampleList;
       }
-      _self.chartInst.init(_completeSampleList, _selectedSampleList, _selectedGenes,this.attributes['gene_list'],this.data, this.chartId, this.attributes.type, callbacks);
+      _self.chartInst.init(_completeSampleList, _selectedSampleList, _selectedGenes, this.indices, this.attributes['gene_list'],this.data, this.chartId, this.attributes.type, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
       this.$dispatch('data-loaded', true);
     }

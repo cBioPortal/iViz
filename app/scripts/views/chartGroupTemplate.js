@@ -49,10 +49,10 @@
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
     ' :ndx="ndx" :data="data"  :groupid="groupid"' +
-    ' :attributes.sync="attribute" v-for="attribute in attributes" ></div>',
+    ' :attributes.sync="attribute" v-for="attribute in attributes" :indices="indices"></div>',
     props: [
       'data', 'attributes', 'type', 'mappedsamples', 'id',
-      'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters'
+      'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters', 'indices'
     ], created: function() {
       var ndx_ = crossfilter(this.data);
       var invisibleBridgeChart_ = iViz.bridgeChart.init(ndx_, settings_,
