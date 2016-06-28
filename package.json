@@ -66,5 +66,8 @@
       ],
       "block-scoped-var": 0
     }
+  },
+  "dependencies": {
+    "grunt-clearcache": "0.0.4"
   }
 }
