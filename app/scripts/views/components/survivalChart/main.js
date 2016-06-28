@@ -60,6 +60,7 @@
         this.chartInst_.addCurve(_selectedDataProxy.get(), 0, "red");
         this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, "#006bb3");
       }
+      this.chartInst_.addPval(_selectedDataProxy.get(), _unselectedDataProxy.get());
     }
     return content_;
   };
