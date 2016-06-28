@@ -258,3 +258,8 @@ survivalCurve.prototype.addPval = function(_selectedData, _unselectedData) {
     .style("text-anchor", "end")
     .text("p = " + _pVal.toPrecision(2));
 }
+
+survivalCurve.prototype.removePval = function() {
+  var _self = this;
+  _self.elem_.svg.selectAll(".pval").remove();
+}
