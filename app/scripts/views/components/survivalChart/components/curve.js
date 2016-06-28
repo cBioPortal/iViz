@@ -131,12 +131,14 @@ survivalCurve.prototype.addCurve = function(_data, _curveIndex, _lineColor) {
   var _self = this;
   
   // add an empty/zero point so the curve starts from zero time point
-  if (_data[0].time !== 0) {
-    _data.unshift({
-      status: 0,
-      survival_rate: 1,
-      time: 0
-    });
+  if (_data !== null && _data.length !== 0) {
+    if (_data[0].time !== 0) {
+      _data.unshift({
+        status: 0,
+        survival_rate: 1,
+        time: 0
+      });
+    }    
   }
   
   // init line elem
