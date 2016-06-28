@@ -39,13 +39,12 @@
     template: /*'<div v-if="attributes.show">' +*/
     '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
     ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
-    ':ndx="ndx" :attributes.sync="attributes" :data="data"></component>'
+    ':ndx="ndx" :attributes.sync="attributes" :data="data" :indices="indices"></component>'
     /*'</div>'*/,
     props: [
-      'data', 'ndx', 'attributes', 'groupid'
+      'data', 'ndx', 'attributes', 'groupid', 'indices'
     ],
     data: function() {
-      var options = {};
       var currentView = '';
       switch (this.attributes.view_type) {
         case 'pie_chart':
@@ -61,7 +60,7 @@
           currentView = 'survival';
           break;
         case 'table':
-         // currentView = 'table';
+          currentView = 'table-view';
           break;
       }
       return {

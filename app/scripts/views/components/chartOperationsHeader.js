@@ -53,44 +53,45 @@
             '</div>' +
             '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon'
+      'showOperations', 'resetBtnId', 'chart', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon','filters'
     ],
     data: function () {
       return {
-        hasFilters : false,
         chartOperationsActive:'chart-operations-active',
         chartOperations:'chart-operations',
         chartTitle:'chart-title',
         chartTitleActive:'chart-title-active',
-        logChecked:true
+        logChecked:true,
+        hasFilters:false
       }
     },
     watch: {
-      showOperations: function () {
-        if (typeof this.chart !== 'undefined' &&
-            this.chart !== '') {
-          if (typeof this.chart.filters !== 'undefined' && this.chart.filters().length > 0) {
-            this.hasFilters = true;
-          } else {
-            this.hasFilters = false;
-          }
-        }
-      },
       logChecked : function(newVal,oldVal){
-        console.log(newVal+'  '+oldVal);
         this.reset();
         this.$dispatch('changeLogScale',newVal);
+      }, filters : function(newVal){
+          this.hasFilters = newVal.length>0;
       }
     },
     methods: {
       reset: function() {
-        iViz.shared.resetAll(this.chart, this.groupid)
+        if(this.chart.hasOwnProperty('hasFilter')){
+          if(this.filters.length>0){
+            iViz.shared.resetAll(this.chart, this.groupid)
+          }
+        }else {
+          if(this.filters.length>0){
+            this.filters = [];
+          }
+        }
       },
       close: function () {
-        if (this.chart.hasFilter()) {
-          iViz.shared.resetAll(this.chart, this.groupid)
+        if(this.chart.hasOwnProperty('hasFilter')){
+          if(this.filters.length>0){
+            iViz.shared.resetAll(this.chart, this.groupid)
+          }
+          dc.deregisterChart(this.chart, this.groupid);
         }
-        dc.deregisterChart(this.chart, this.groupid);
         this.$dispatch('closeChart')
       },
       changeView:function(){
