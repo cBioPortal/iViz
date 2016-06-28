@@ -30,6 +30,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+'use strict'
 var survivalCurve = function (_divId, _data, _opts) {
 
   var _self = this;
@@ -37,6 +38,7 @@ var survivalCurve = function (_divId, _data, _opts) {
   _self.elem_ = '';
   _self.divId_ = _divId;
   _self.data_ = _data;
+  _self.opts_ = _opts;
   var formatAsPercentage_ = d3.format('%');
   
   var leftMargin_ = 60, rightMargin_ = 10,
@@ -234,10 +236,25 @@ survivalCurve.prototype.addCurve = function(_data, _curveIndex, _lineColor) {
     .attr('class', 'curve')
     .attr('class', 'invisible_dots');
   
-}
+};
 
 survivalCurve.prototype.removeCurves = function() {
   var _self = this;
   _self.elem_.svg.selectAll(".curve").remove();
   _self.elem_.svg.selectAll(".invisible_dots").remove();
+};
+
+survivalCurve.prototype.addPval = function(_selectedData, _unselectedData) {
+  var _self = this;
+  _self.elem_.svg.selectAll(".pval").remove();
+  _selectedData.splice(0, 1);
+  _unselectedData.splice(0, 1);
+  var _pVal = LogRankTest.calc(_selectedData, _unselectedData);
+  _self.elem_.svg.append("text")
+    .attr("class","pval")
+    .attr("x", _self.opts_.width - 30)
+    .attr("y", 30)
+    .attr("font-size", 10)
+    .style("text-anchor", "end")
+    .text("p = " + _pVal.toPrecision(2));
 }
