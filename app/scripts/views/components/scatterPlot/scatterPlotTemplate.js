@@ -36,14 +36,15 @@
 (function(Vue, dc, iViz) {
   Vue.component('scatterPlot', {
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-      '<chart-operations :show-operations="showOperations" :display-name="displayName" :has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
-      '<div class="dc-chart dc-scatter-plot" :chart-ctrl="chartInst" align="center" style="float:none !important;" id={{chartId}} >' +
+      '<chart-operations :show-operations="showOperations"' +
+    ' :display-name="displayName" :has-chart-title="true" :groupid="groupid"' +
+    ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId"' +
+    ' :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
+      '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
       '</div>',
     props: [
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
-    created: function() {
-    },
     data: function() {
       return {
         charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
@@ -52,16 +53,29 @@
         displayName: this.attributes.display_name,
         showOperations: false,
         selectedSamples: [],
-        chartInst: {}
+        chartInst: {},
+        hasFilters:false
       };
     },
     watch: {
       'filters': function(newVal) {
-        this.chartInst.update(newVal);
         this.$dispatch('update-samples',newVal);
       }
     },
-    events: {},
+    events: {
+      'selected-sample-update': function(_selectedSamples) {
+      if (_selectedSamples.length !== this.data.length) {
+        this.selectedSamples=_selectedSamples;
+        this.chartInst.update(_selectedSamples);
+      } else {
+        this.selectedSamples=_selectedSamples;
+        this.chartInst.update([]);
+      }
+    },
+      'closeChart':function(){
+        this.$dispatch('close');
+      }
+    },
     methods: {
       mouseEnter: function() {
         this.showOperations = true;
@@ -70,7 +84,6 @@
       }
     },
     ready: function() {
-      
       var _self = this;
       var _opts = {
         chartId: this.chartId,
@@ -79,7 +92,11 @@
       };
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(this.data, _opts);
-      
+      var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
+      if (_selectedSamples.length !== this.data.length) {
+        this.selectedSamples=_selectedSamples;
+        this.chartInst.update(_selectedSamples);
+      }
       document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];
@@ -97,17 +114,7 @@
           //_self.$dispatch('update-samples', _self.selectedSamples);
         }
       });
-      
-      _self.$on('scatter-plot-sample-update', function(_selectedSamples) {
-        if (_selectedSamples.length !== _self.data.length) {
-          _self.selectedSamples=_selectedSamples;
-          _self.chartInst.update(_selectedSamples);
-        } else {
-          _self.selectedSamples=_selectedSamples;
-          _self.chartInst.update([]);
-        }
-      });
-    
+      this.$dispatch('data-loaded', true);
     }
   });
 })(window.Vue, window.dc, window.iViz,

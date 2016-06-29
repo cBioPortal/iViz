@@ -36,17 +36,17 @@
 (function(Vue, dc, iViz, $) {
 
   Vue.component('pieChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" class="study-view-dc-chart study-view-pie-main" ' +
+    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" ' +
               '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
               '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
               ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
-              ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" :chart="chartInst" :attributes="attributes"></chart-operations>' +
+              ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" :chart="chartInst" :filters.sync="filters" :attributes="attributes"></chart-operations>' +
               '<div class="dc-chart dc-pie-chart" :class="{view: showPieIcon}" align="center" style="float:none' +
               ' !important;" id={{chartId}} ></div>' +
               '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
               '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid','data','options'
+      'ndx', 'attributes', 'filters', 'groupid','data','options','indices'
     ],
     data: function() {
       return {

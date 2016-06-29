@@ -38,6 +38,7 @@
   <script src="/bower_components/plotly.js/dist/plotly.min.js"></script>
   <script src="/bower_components/react/react.js"></script>
   <script src="/bower_components/react/react-dom.js"></script>
+  <script src="/bower_components/jstat/dist/jstat.min.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
 
@@ -54,7 +55,6 @@
 
   <!-- build:css(.tmp) styles/main.css -->
   <link rel="stylesheet" href="styles/main.css"/>
-  <link rel="stylesheet" href="styles/study-view.css"/>
 
   <!-- endbuild -->
 
@@ -92,6 +92,8 @@
   <script src="scripts/views/components/survivalChart/components/curve.js"></script>
   <script src="scripts/views/components/survivalChart/components/kmEstimator.js"></script>
   <script src="scripts/views/components/survivalChart/components/logRankTest.js"></script>
+  <script src="scripts/views/components/dataTable/tableView.js"></script>
+  <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
   <script src="scripts/views/components/vc/editableFieldComponent.js"></script>
   <script src="scripts/views/components/vc/editableRowComponent.js"></script>
   <script src="scripts/views/components/vc/modalTemplate.js"></script>
@@ -121,7 +123,7 @@
       <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
       <!--:selected-samples-num="selectedSamplesNum"-->
       <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
-      <select id="study-view-add-chart" class="chosen-select"
+      <select id="add-chart" class="chosen-select"
               v-select :groups="groups">
         <option id='' value="">Add Chart</option>
         <!--<option v-for="attributes in groups[0].attributes"></option>-->

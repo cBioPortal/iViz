@@ -1,55 +1,68 @@
-.chart-operations {
-  display: none;
-}
-
-.chart-operations-active {
-  display: block;
-  float: right;
-}
-
-.chart-title-span {
-  font-size: 10px;
-  color: black;
-  font-weight: bold;
-  padding-left: 5px;
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  text-align: center;
-}
-
-.chart-title {
-  width: 100%;
-  float: none;
-}
-
-.chart-title-active {
-  width: 60%;
-  float: left;
-}
-
-.dc-chart-pointer {
-  font-size: 16px;
-  color: grey;
-  cursor: pointer;
-}
 
 .chart-header {
-  margin-left: 10px;
-  margin-top: 5px;
-}
+  margin-top: 2px;
+  height: 15px;
+  .chart-title {
+    width: 100%;
+    float: none;
+  }
+  .chart-operations {
+    display: none;
+  }
+  .icon {
+    width: 12px;
+    height: 12px;
+    margin-top: 2px;
+    margin-right: 4px;
+    float: left;
+  }
+  .icon:hover {
+    cursor: pointer;
+  }
+  .download {
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    float: left;
+  }
+  .download:hover {
+    cursor: pointer;
+  }
+  .bar-x-log {
+    float: left;
+    margin-right: 2px;
+    margin-top: 3px !important;
+  }
+  .chart-title-span {
+    @extend .chart-title-span;
+  }
+  .chart-operations-active {
+    display: block;
+    float: right;
+  }
+  .chart-title-active {
+    width: 60%;
+    float: left;
+  }
 
-.study-view-chart-header {
-  height: 16px;
-  width: 100%;
-  text-align: center;
-}
+  .dc-chart-pointer {
+    font-size: 16px;
+    color: grey;
+    cursor: pointer;
+  }
 
-.dc-chart-drag {
-  color: grey;
-  font-size: 12px;
-}
-.dc-chart-drag:hover {
-  cursor: move;
+  .study-view-chart-header {
+    height: 16px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .dc-chart-drag {
+    color: grey;
+    font-size: 12px;
+  }
+
+  .dc-chart-drag:hover {
+    cursor: move;
+  }
 }

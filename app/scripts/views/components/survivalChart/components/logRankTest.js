@@ -31,7 +31,7 @@
  */
 
 
-var logRankTest = function() {
+var LogRankTest = (function() {
 
   var datum = {
       time: "",    //num of months
@@ -42,10 +42,10 @@ var logRankTest = function() {
       expectation: 0, //(n1j / (n1j + n2j)) * (m1j + m2j)
       variance: 0
     },
-    mergedArr = [],
-    callBackFunc = "";
+    mergedArr = [];
+  
   //os: DECEASED-->1, LIVING-->0; dfs: Recurred/Progressed --> 1, Disease Free-->0
-  function mergeGrps(inputGrp1, inputGrp2, _callBackFunc) {
+  function mergeGrps(inputGrp1, inputGrp2) {
     var _ptr_1 = 0; //index indicator/pointer for group1
     var _ptr_2 = 0; //index indicator/pointer for group2
 
@@ -53,7 +53,7 @@ var logRankTest = function() {
       if (inputGrp1[_ptr_1].time < inputGrp2[_ptr_2].time) {
         var _datum = jQuery.extend(true, {}, datum);
         _datum.time = inputGrp1[_ptr_1].time;
-        if (inputGrp1[_ptr_1].status === "1") {
+        if (inputGrp1[_ptr_1].status === 1) {
           _datum.num_of_failure_1 = 1;
           _datum.num_at_risk_1 = inputGrp1[_ptr_1].num_at_risk;
           _datum.num_at_risk_2 = inputGrp2[_ptr_2].num_at_risk;
@@ -65,7 +65,7 @@ var logRankTest = function() {
       } else if (inputGrp1[_ptr_1].time > inputGrp2[_ptr_2].time) {
         var _datum = jQuery.extend(true, {}, datum);
         _datum.time = inputGrp2[_ptr_2].time;
-        if (inputGrp2[_ptr_2].status === "1") {
+        if (inputGrp2[_ptr_2].status === 1) {
           _datum.num_of_failure_2 = 1;
           _datum.num_at_risk_1 = inputGrp1[_ptr_1].num_at_risk;
           _datum.num_at_risk_2 = inputGrp2[_ptr_2].num_at_risk;
@@ -77,11 +77,11 @@ var logRankTest = function() {
       } else { //events occur at the same time point
         var _datum = jQuery.extend(true, {}, datum);
         _datum.time = inputGrp1[_ptr_1].time;
-        if (inputGrp1[_ptr_1].status === "1" || inputGrp2[_ptr_2].status === "1") {
-          if (inputGrp1[_ptr_1].status === "1") {
+        if (inputGrp1[_ptr_1].status === 1 || inputGrp2[_ptr_2].status === 1) {
+          if (inputGrp1[_ptr_1].status === 1) {
             _datum.num_of_failure_1 = 1;
           }
-          if (inputGrp2[_ptr_2].status === "1") {
+          if (inputGrp2[_ptr_2].status === 1) {
             _datum.num_of_failure_2 = 1;
           }
           _datum.num_at_risk_1 = inputGrp1[_ptr_1].num_at_risk;
@@ -96,26 +96,23 @@ var logRankTest = function() {
       }
       mergedArr.push(_datum);
     }
-    calcExpection(_callBackFunc);
   }
 
-  function calcExpection(_callBackFunc) {
+  function calcExpection() {
     $.each(mergedArr, function(index, _item) {
       _item.expectation = (_item.num_at_risk_1 / (_item.num_at_risk_1 + _item.num_at_risk_2)) * (_item.num_of_failure_1 + _item.num_of_failure_2);
     });
-    calcVariance(_callBackFunc);
   }
 
-  function calcVariance(_callBackFunc) {
+  function calcVariance() {
     $.each(mergedArr, function(index, _item) {
       var _num_of_failures = _item.num_of_failure_1 + _item.num_of_failure_2;
       var _num_at_risk = _item.num_at_risk_1 + _item.num_at_risk_2;
       _item.variance = ( _num_of_failures * (_num_at_risk - _num_of_failures) * _item.num_at_risk_1 * _item.num_at_risk_2) / ((_num_at_risk * _num_at_risk) * (_num_at_risk - 1));
     });
-    calcPval(_callBackFunc);
   }
 
-  function calcPval(_callBackFunc) {
+  function calcPval() {
     var O1 = 0, E1 = 0, V = 0;
     $.each(mergedArr, function(index, obj) {
       O1 += obj.num_of_failure_1;
@@ -123,20 +120,17 @@ var logRankTest = function() {
       V += obj.variance;
     });
     var chi_square_score = (O1 - E1) * (O1 - E1) / V;
-    $.post( "calcPval.do", { chi_square_score: chi_square_score })
-      .done( function(_data) {
-        callBackFunc = _callBackFunc;
-        callBackFunc(_data);
-      });
+    var _pVal = jStat.chisquare.cdf(chi_square_score, 1);
+    return _pVal;
   }
 
   return {
-    calc: function(inputGrp1, inputGrp2, _callBackFunc) {
+    calc: function(inputGrp1, inputGrp2) {
       mergedArr.length = 0;
-      mergeGrps(inputGrp1, inputGrp2, _callBackFunc);
-      //calcExpection(_callBackFunc);
-      //calcVariance();
-      //calcPval(_callBackFunc);
+      mergeGrps(inputGrp1, inputGrp2);
+      calcExpection();
+      calcVariance();
+      return calcPval();
     }
   };
-};
+}());

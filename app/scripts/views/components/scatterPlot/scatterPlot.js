@@ -67,15 +67,21 @@
         }
       };
       var data = [trace];
+      var _marginX = (d3.max(_xArr) - d3.min(_xArr)) * 0.05, 
+          _marginY = (d3.max(_yArr) - d3.min(_yArr)) * 0.05;
       var layout = {
         xaxis: {
           title: 'Fraction of copy number altered genome',
-          range: [d3.min(_xArr), d3.max(_xArr)],
-          fixedrange: true
+          range: [ d3.min(_xArr) - _marginX, d3.max(_xArr) + _marginX ],
+          fixedrange: true,
+          zeroline: false,
+          showline: true
         },
         yaxis: {
           title: '# of mutations',
-          range: [d3.min(_yArr), d3.max(_yArr)],
+          range: [ d3.min(_yArr) - _marginY, d3.max(_yArr) + _marginY ],
+          zeroline: false,
+          showline: true
         },
         hovermode: 'closest',
         showlegend: false,
@@ -116,7 +122,7 @@
         type: 'scatter',
         hoverinfo: "text",
         marker: {
-          size: 7,
+          size: 6,
           color: '#006bb3',
           line: {color: 'white'}
         }
@@ -129,7 +135,7 @@
         type: 'scatter',
         hoverinfo: "text",
         marker: {
-          size: 7,
+          size: 6, 
           color: 'red',
           line: {color: 'white'}
         }
