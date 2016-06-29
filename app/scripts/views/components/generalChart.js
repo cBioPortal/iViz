@@ -51,5 +51,8 @@
     this.setDownloadData = function(type, content) {
       this.dataForDownload[type] = content;
     };
+    this.getDownloadFileTypes = function() {
+      return Object.keys(this.dataForDownload);
+    };
   };
 })(window.iViz);

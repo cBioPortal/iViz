@@ -33,75 +33,75 @@
  * Created by Karthik Kalletla on 4/14/16.
  */
 'use strict';
-(function (Vue, iViz, $) {
+(function(Vue, iViz, $, _) {
   Vue.component('chartOperations', {
-    template:'<div class="chart-header">' +
-            '<div class="chart-title" :class="[showOperations?chartTitleActive:chartTitle]" v-if="hasChartTitle&&((showTableIcon===undefined)||showTableIcon)"><span class="chart-title-span" id="{{chartId}}-title">{{displayName}}</span></div>' +
-            '<div :class="[showOperations?chartOperationsActive:chartOperations]">' + 
-            '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="icon hover"/>'+
-            '<div style="float:left" v-if="showLogScale"></input style="float:left"><input type="checkbox" value="" id="" ' +
-            'class="bar-x-log" v-model="logChecked">' +
-            '<span id="scale-span-{{chartId}}" style="float:left; font-size:10px; margin-right: 15px; color: grey">Log Scale X</span></div>'+
-            '<img v-if="showTableIcon" src="images/table.svg" class="icon hover" @click="changeView()"/>' +
-            '<img v-if="showPieIcon" src="images/pie.svg" class="icon hover" @click="changeView()"/>' +
-            '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" class="icon hover"/>' +
-            '<div id="{{chartId}}-download-icon-wrapper" class="download">' +
-            '<img src="images/in.svg" class="icon hover" id="{{chartId}}-download"/>'+
-            '</div>'+
-            '<img src="images/move.svg" class="dc-chart-drag icon" class="icon"/>'+
-            '<div style="float:right"><i class="fa fa-times dc-chart-pointer icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>' +
-            '</div>' +
-            '</div>',
+    template: '<div class="chart-header">' +
+    '<div class="chart-title" :class="[showOperations?chartTitleActive:chartTitle]" v-if="hasChartTitle&&((showTableIcon===undefined)||showTableIcon)"><span class="chart-title-span" id="{{chartId}}-title">{{displayName}}</span></div>' +
+    '<div :class="[showOperations?chartOperationsActive:chartOperations]">' +
+    '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" class="icon hover"/>' +
+    '<div style="float:left" v-if="showLogScale"></input style="float:left"><input type="checkbox" value="" id="" ' +
+    'class="bar-x-log" v-model="logChecked">' +
+    '<span id="scale-span-{{chartId}}" style="float:left; font-size:10px; margin-right: 15px; color: grey">Log Scale X</span></div>' +
+    '<img v-if="showTableIcon" src="images/table.svg" class="icon hover" @click="changeView()"/>' +
+    '<img v-if="showPieIcon" src="images/pie.svg" class="icon hover" @click="changeView()"/>' +
+    '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" class="icon hover"/>' +
+    '<div id="{{chartId}}-download-icon-wrapper" class="download">' +
+    '<img src="images/in.svg" class="icon hover" id="{{chartId}}-download"/>' +
+    '</div>' +
+    '<img src="images/move.svg" class="dc-chart-drag icon" class="icon"/>' +
+    '<div style="float:right"><i class="fa fa-times dc-chart-pointer icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>' +
+    '</div>' +
+    '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'chartCtrl', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon','showLogScale','showSurvivalIcon','filters'
+      'showOperations', 'resetBtnId', 'chart', 'chartCtrl', 'groupid', 'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon', 'showTableIcon', 'showLogScale', 'showSurvivalIcon', 'filters'
     ],
-    data: function () {
+    data: function() {
       return {
-        chartOperationsActive:'chart-operations-active',
-        chartOperations:'chart-operations',
-        chartTitle:'chart-title',
-        chartTitleActive:'chart-title-active',
-        logChecked:true,
-        hasFilters:false
+        chartOperationsActive: 'chart-operations-active',
+        chartOperations: 'chart-operations',
+        chartTitle: 'chart-title',
+        chartTitleActive: 'chart-title-active',
+        logChecked: true,
+        hasFilters: false
       }
     },
     watch: {
-      logChecked : function(newVal,oldVal){
+      logChecked: function(newVal, oldVal) {
         this.reset();
-        this.$dispatch('changeLogScale',newVal);
-      }, filters : function(newVal){
-          this.hasFilters = newVal.length>0;
+        this.$dispatch('changeLogScale', newVal);
+      }, filters: function(newVal) {
+        this.hasFilters = newVal.length > 0;
       }
     },
     methods: {
       reset: function() {
-        if(this.chart.hasOwnProperty('hasFilter')){
-          if(this.filters.length>0){
+        if (this.chart.hasOwnProperty('hasFilter')) {
+          if (this.filters.length > 0) {
             iViz.shared.resetAll(this.chart, this.groupid)
           }
-        }else {
-          if(this.filters.length>0){
+        } else {
+          if (this.filters.length > 0) {
             this.filters = [];
           }
         }
       },
-      close: function () {
-        if(this.chart.hasOwnProperty('hasFilter')){
-          if(this.filters.length>0){
+      close: function() {
+        if (this.chart.hasOwnProperty('hasFilter')) {
+          if (this.filters.length > 0) {
             iViz.shared.resetAll(this.chart, this.groupid)
           }
           dc.deregisterChart(this.chart, this.groupid);
         }
         this.$dispatch('closeChart')
       },
-      changeView:function(){
+      changeView: function() {
         this.showTableIcon = !this.showTableIcon;
         this.showPieIcon = !this.showPieIcon;
         this.$dispatch('toTableView');
       }
-    }, 
-    ready: function () {
-    
+    },
+    ready: function() {
+
       $('#' + this.chartId + '-download').qtip('destroy', true);
       $('#' + this.chartId + '-download-icon-wrapper').qtip('destroy', true);
       var chartId = this.chartId;
@@ -133,29 +133,26 @@
         hide: {fixed: true, delay: 300, event: "mouseout"},
         position: {my: 'top center', at: 'bottom center', viewport: $(window)},
         content: {
-          text: "<div style='display:inline-block;'>" +
-          "<button id='" + this.chartId + "-pdf' style=\"width:50px\">PDF</button>" +
-          "</div>" +
-          "<br>" +
-          "<div style='display:inline-block;'>" +
-          "<button id='" + this.chartId + "-svg' style=\"width:50px\">SVG</button>" +
-          "</div>" +
-          "<br>" +
-          "<div style='display:inline-block;'>" +
-          "<button id='" + this.chartId + "-tsv' style=\"width:50px\">TXT</button>" +
-          "</div>"
+          text: ''
         }, events: {
-          show: function () {
+          show: function() {
             $('#' + chartId + '-download-icon-wrapper').qtip('api').hide();
           },
           render: function(event, api) {
+            var downloadFileTypes = self.chartCtrl.getDownloadFileTypes();
+            var content = [];
+            _.each(downloadFileTypes, function(item) {
+              content.push('<div style="display:inline-block;"><button id="' + self.chartId + '-' + item + '" style="width:50px">' + item.toUpperCase() + '</button></div>');
+            })
+
+            api.set('content.text', content.join('<br/>'));
             $('#' + chartId + '-pdf', api.elements.tooltip).click(function() {
               iViz.util.download(self.chartCtrl.getChartType(), 'pdf', self.chartCtrl.getDownloadData('pdf'));
             });
-            $("#" + chartId + "-svg", api.elements.tooltip).click(function () {
+            $("#" + chartId + "-svg", api.elements.tooltip).click(function() {
               iViz.util.download(self.chartCtrl.getChartType(), 'svg', self.chartCtrl.getDownloadData('svg'));
             });
-            $("#" + chartId + "-tsv").click(function () {
+            $("#" + chartId + "-tsv").click(function() {
               iViz.util.download(self.chartCtrl.getChartType(), 'tsv', self.chartCtrl.getDownloadData('tsv'));
             });
           }
@@ -164,4 +161,5 @@
     }
   });
 })(window.Vue, window.iViz,
-  window.$ || window.jQuery);
+  window.$ || window.jQuery,
+  window._);
