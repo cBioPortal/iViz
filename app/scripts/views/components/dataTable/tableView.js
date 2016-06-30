@@ -49,10 +49,19 @@
     var reactTableData = {};
     var initialLoaded = false;
     var patientDataIndices = {};
+    var selectedRowData = [];
 
     content.getCases = function() {
       return _.intersection(selectedSamples, sequencedSampleIds);
     };
+
+    content.getselectedRowData = function() {
+      return selectedRowData;
+    };
+    content.clearSelectedRowData = function() {
+      selectedRowData = [];
+    };
+
 
     content.init =
       function(_completeSamples, _selectedSamples, _selectedGenes, _indices, _geneData,
@@ -156,6 +165,7 @@
         selectedGene: selectedGenes,
         rowClickFunc: reactRowClickCallback,
         geneClickFunc: reactGeneClickCallback,
+        submitClickFunc: reactSubmitClickCallback,
         tableType: type_
       };
       var testElement = React.createElement(EnhancedFixedDataTableSpecial,
@@ -174,7 +184,6 @@
           if (_selectedGenesMap !== undefined) {
             if (_selectedGenesMap[item.index] !== undefined) {
               datum.caseIds = _.uniq(_selectedGenesMap[item.index].caseIds);
-              datum.defaultCaseIds =  _.uniq(item.caseIds);
               datum.samples = datum.caseIds.length;
               switch (type_) {
                 case 'mutatedGene':
@@ -198,7 +207,6 @@
           } else {
             datum.caseIds = _.uniq(item.caseIds);
             //if(!initialLoaded)
-              datum.defaultCaseIds = datum.caseIds;
             datum.samples = datum.caseIds.length;
             switch (type_) {
               case 'mutatedGene':
@@ -236,6 +244,7 @@
         initialLoaded = true;
       }*/
       return genes;
+
     }
 
     function initReactData(_selectedGenesMap) {
@@ -250,23 +259,46 @@
           var datum = {
             attr_id: key,
             uniqueId: item.uniqueId,
-            attr_val: key === 'caseIds' ? item.caseIds.join(',') : key === 'samples' ? item.samples+'('+item.defaultCaseIds.length+')' :item[key]
+            attr_val: key === 'caseIds' ? item.caseIds.join(',') : item[key]
           };
           result.data.push(datum);
         }
       });
       return result;
+
+    }
+
+    function reactSubmitClickCallback(){
+      var selectedSamplesUnion = _.pluck(selectedRowData,'caseIds');
+      $.each(selectedRowData, function(index,item){
+        var casesIds = item.caseIds.split(',');
+        selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
+      });
+      selectedRowData = [];
+      callbacks_.submitClick(_.unique(selectedSamplesUnion));
+
     }
 
     function reactRowClickCallback(data, selected, _selectedRows) {
-      var selectedRows_ = [];
+      if(selected){
+        selectedRowData.push(data);
+      }
+      else{
+        selectedRowData = _.filter(selectedRowData, function(index,item){
+          if(item.uniqueId === selected.uniqueId){
+            return false;
+          }return true
+        })
+      }
+      callbacks_.rowClick(selectedRowData.length>0);
+     /* var selectedRows_ = [];
       _.each(_selectedRows, function(item) {
         selectedRows_.push(item.uniqueId)
       });
       selectedRows = selectedRows_;
       if (callbacks_.hasOwnProperty('rowClick')) {
         callbacks_.rowClick(_selectedRows, data, selected);
-      }
+      }*/
     }
 
     function reactGeneClickCallback(selectedRow, selected) {
@@ -306,8 +338,8 @@
             },
             {
               "attr_id": "samples",
-              "display_name": "#(Total number of Samples)",
-              "datatype": "STRING",
+              "display_name": "#",
+              "datatype": "NUMBER",
               "column_width": 90
             },
             {
@@ -358,8 +390,8 @@
             },
             {
               "attr_id": "samples",
-              "display_name": "#(Total number of Samples)",
-              "datatype": "STRING",
+              "display_name": "#",
+              "datatype": "NUMBER",
               "column_width": 70
             },
             {

@@ -112,16 +112,11 @@
                     _scatterPlotSel =attributes.filter;
                   }
                 } else if (attributes.view_type === 'table') {
-                  var _tableSelTemp = [];
-                  _.each(attributes.filter,function(tableFilter,index){
-                    var _samples = tableFilter.defaultCaseIds;
-                    if(_tableSelTemp.length !== 0){
-                      _tableSelTemp = _.union(_tableSelTemp,_samples);
-                    }else{
-                      _tableSelTemp = _samples;
-                    }
-                  });
-                  _tableSel.push(_tableSelTemp);
+                  if(_tableSel.length !== 0){
+                    _tableSel = _.intersection(_tableSel,attributes.filter);
+                  }else{
+                    _tableSel =attributes.filter;
+                  }
                 } else{
                   filters_[attributes.attr_id] = attributes.filter;
                 }
@@ -134,12 +129,6 @@
               _.intersection(_selectedSamplesByFiltersOnly, _scatterPlotSel);
           }
           if (_tableSel.length !== 0) {
-           // if(_tableSel.length>1){
-              _tableSel = _.intersection.apply(_, _tableSel);
-           // }else{
-             // _tableSel = _tableSel[0]
-           // }
-
             _selectedSamplesByFiltersOnly =
               _.intersection(_selectedSamplesByFiltersOnly, _tableSel);
           }

@@ -39,8 +39,9 @@
     '<chart-operations :show-operations="showOperations" :display-name="displayName" ' +
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" ' +
     ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
+    '<div class="study-view-loader" style="display: block;z-index: 5;position:absolute;right:0px;bottom:0px;" v-if="hasfilters"> <button type="button" @click="submitClick()">Submit</button> </div>' +
     '<div class="dc-chart dc-table-plot" :class="{hideLoading: showLoad}" align="center" style="float:none !important;" id={{chartId}} >' +
-    '<div class="study-view-loader" :class="{showLoading: showload}" style="display:none; top:30%;left:30%"><img src="images/ajax-loader.gif"/></div>' +
+
     '</div>',
     props: [
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid','indices'
@@ -56,12 +57,17 @@
         showLoad:true,
         showLoading:'show-loading',
         hideLoading:'hide-loading',
+        hasfilters:false,
+        selectedRows:[]
         //fromRowSelection:false,
         //updateTable:true
       };
     },
     watch: {
       'filters': function(newVal) {
+        if(newVal.length === 0 ){
+          this.selectedRows=[];
+        }
         this.updateFilters(newVal,false);
       }
     },
@@ -71,7 +77,7 @@
         this.chartInst.updateGenes(genes);
       },'selected-sample-update': function(_selectedSamples) {
         //if(this.updateTable){
-          this.chartInst.update(_selectedSamples, _.pluck(this.filters,'uniqueId'));
+          this.chartInst.update(_selectedSamples, this.selectedRows);
           this.setDisplayTitle(this.chartInst.getCases().length);
         /*}else{
           this.updateTable = true;
@@ -94,7 +100,29 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
-      }, rowClick: function( data, clickedRowData, rowSelected) {
+      }, submitClick:function(selectedSample){
+        var selectedSamplesUnion = [];
+        var temp_ = this.chartInst.getselectedRowData();
+        var selectedRowsUids = _.pluck(temp_,'uniqueId');
+        this.selectedRows = _.union(this.selectedRows,selectedRowsUids);
+        $.each(temp_, function(index,item){
+          var casesIds = item.caseIds.split(',');
+          selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
+        });
+        //this.selectedRows = [];
+
+        if(this.filters.length === 0 ){
+          this.filters = selectedSamplesUnion;
+        }else{
+          this.filters = _.intersection(this.filters,selectedSamplesUnion);
+        }
+
+        this.chartInst.clearSelectedRowData();
+        this.hasfilters = false;
+
+
+      }, rowClick: function( hasSelectedRows, clickedRowData, rowSelected) {
+        this.hasfilters = hasSelectedRows;
        // this.fromRowSelection = true;
        // this.updateTable = true;
         /* var _filters = [];
@@ -112,7 +140,12 @@
           item.caseIds = _caseIds;
         });*/
 
-          this.filters = data;
+         // this.filters = data;
+       /* if(data.length>0){
+          this.hasfilters = true;
+        }else{
+          this.hasfilters = false;
+        }*/
       }, addGeneClick: function(clickedRowData) {
         this.$dispatch('manage-gene',clickedRowData.gene);
       }, setDisplayTitle: function(numOfCases) {
