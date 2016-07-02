@@ -129,7 +129,7 @@
                 if(group.type==='sample'){
                   _.map(group.attributes,function(attribute){
                     if(attribute.attr_id === 'sample_id'){
-                      attribute.filter = selectedCases;
+                      attribute.filter = _.unique(selectedCases);
                     }
                   });
                 }
@@ -153,7 +153,7 @@
                 if(group.type==='patient'){
                   _.map(group.attributes,function(attribute){
                     if(attribute.attr_id === 'patient_id'){
-                      attribute.filter = selectedCases;
+                      attribute.filter = _.unique(selectedCases);
                     }
                   });
                 }
