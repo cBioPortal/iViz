@@ -39,7 +39,7 @@
     '<chart-operations :show-operations="showOperations" :display-name="displayName" ' +
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" ' +
     ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
-    '<div class="study-view-loader" style="display: block;z-index: 5;position:absolute;right:0px;bottom:0px;" v-if="hasfilters"> <button type="button" @click="submitClick()">Submit</button> </div>' +
+    // '<div class="study-view-loader" style="display: block;z-index: 5;position:absolute;right:0px;bottom:0px;" v-if="hasfilters"> <button type="button" @click="submitClick()">Submit</button> </div>' +
     '<div class="dc-chart dc-table-plot" :class="{hideLoading: showLoad}" align="center" style="float:none !important;" id={{chartId}} >' +
 
     '</div>',
@@ -102,7 +102,7 @@
         this.showOperations = false;
       }, submitClick:function(selectedSample){
         var selectedSamplesUnion = [];
-        var temp_ = this.chartInst.getselectedRowData();
+        var temp_ = this.chartInst.getSelectedRowData();
         var selectedRowsUids = _.pluck(temp_,'uniqueId');
         this.selectedRows = _.union(this.selectedRows,selectedRowsUids);
         $.each(temp_, function(index,item){
@@ -192,6 +192,7 @@
 
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.rowClick = this.rowClick;
+      callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.tableView();
 
       if(_selectedSampleList.length === 0){

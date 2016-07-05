@@ -55,7 +55,7 @@
       return _.intersection(selectedSamples, sequencedSampleIds);
     };
 
-    content.getselectedRowData = function() {
+    content.getSelectedRowData = function() {
       return selectedRowData;
     };
     content.clearSelectedRowData = function() {
@@ -153,18 +153,20 @@
         fixedChoose: false,
         uniqueId: 'uniqueId',
         rowHeight: 25,
-        tableWidth: 375,
+        tableWidth: 373,
         maxHeight: 290,
         headerHeight: 26,
         groupHeaderHeight: 40,
         autoColumnWidth: false,
         columnMaxWidth: 300,
         columnSorting: false,
-        selectedRow: selectedRows,
+        selectedRows: selectedRows,
         selectedGene: selectedGenes,
         rowClickFunc: reactRowClickCallback,
         geneClickFunc: reactGeneClickCallback,
-        submitClickFunc: reactSubmitClickCallback,
+        selectButtonClickCallback: reactSubmitClickCallback,
+        // sortBy: "name",
+        // sortDir: "DESC",
         tableType: type_
       };
       var testElement = React.createElement(EnhancedFixedDataTableSpecial,
@@ -273,7 +275,7 @@
         var casesIds = item.caseIds.split(',');
         selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
       });
-      selectedRowData = [];
+      // selectedRowData = [];
       callbacks_.submitClick(_.unique(selectedSamplesUnion));
 
     }
@@ -345,7 +347,7 @@
               "attr_id": "sampleRate",
               "display_name": "Freq",
               "datatype": "PERCENTAGE",
-              "column_width": 95
+              "column_width": 93
             },
             {
               "attr_id": "caseIds",
@@ -397,7 +399,7 @@
               "attr_id": "altrateInSample",
               "display_name": "Freq",
               "datatype": "PERCENTAGE",
-              "column_width": 80
+              "column_width": 78
             },
             {
               "attr_id": "caseIds",
