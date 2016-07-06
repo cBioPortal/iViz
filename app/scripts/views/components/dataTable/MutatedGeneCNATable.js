@@ -1448,7 +1448,7 @@ var EnhancedFixedDataTableSpecial = (function() {
           ),
           React.createElement("div", {className: "EFDT-finish-selection-button"},
 
-            (['mutatedGene', 'cna'].indexOf(this.props.tableType) !== -1 && this.state.selectedRows.length > 0) ?
+            (['mutatedGene', 'cna'].indexOf(this.props.tableType) !== -1 && this.state.selectedRows.length > 0 && this.state.confirmedRows.length !== this.state.selectedRows.length ) ?
               React.createElement("button", {className: "btn btn-default btn-xs", onClick: this.state.selectButtonClickCallback}, "Select") : ''
 
           )
