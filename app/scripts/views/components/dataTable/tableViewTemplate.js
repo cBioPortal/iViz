@@ -39,7 +39,6 @@
     '<chart-operations :show-operations="showOperations" :display-name="displayName" ' +
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" ' +
     ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
-    // '<div class="study-view-loader" style="display: block;z-index: 5;position:absolute;right:0px;bottom:0px;" v-if="hasfilters"> <button type="button" @click="submitClick()">Submit</button> </div>' +
     '<div class="dc-chart dc-table-plot" :class="{hideLoading: showLoad}" align="center" style="float:none !important;" id={{chartId}} >' +
 
     '</div>',
@@ -57,10 +56,7 @@
         showLoad:true,
         showLoading:'show-loading',
         hideLoading:'hide-loading',
-        hasfilters:false,
         selectedRows:[]
-        //fromRowSelection:false,
-        //updateTable:true
       };
     },
     watch: {
@@ -68,29 +64,22 @@
         if(newVal.length === 0 ){
           this.selectedRows=[];
         }
-        this.updateFilters(newVal,false);
+        this.updateFilters();
       }
     },
     events: {
       'gene-list-updated':function(genes){
         genes = $.extend(true,[],genes);
         this.chartInst.updateGenes(genes);
-      },'selected-sample-update': function(_selectedSamples) {
-        //if(this.updateTable){
-          this.chartInst.update(_selectedSamples, this.selectedRows);
-          this.setDisplayTitle(this.chartInst.getCases().length);
-        /*}else{
-          this.updateTable = true;
-          if(this.filters.length === 0){
-            this.chartInst.update(_selectedSamples);
-            this.setDisplayTitle(this.chartInst.getCases().length);
-          }
-        }*/
+      },
+      'selected-sample-update': function(_selectedSamples) {
+        this.chartInst.update(_selectedSamples, this.selectedRows);
+        this.setDisplayTitle(this.chartInst.getCases().length);
       },
       'closeChart':function(){
         if(this.filters.length>0){
           this.filters = [];
-          this.updateFilters([],true);
+          this.updateFilters();
         }
         this.$dispatch('close',true);
       }
@@ -98,88 +87,32 @@
     methods: {
       mouseEnter: function() {
         this.showOperations = true;
-      }, mouseLeave: function() {
+      },
+      mouseLeave: function() {
         this.showOperations = false;
-      }, submitClick:function(selectedSample){
+      },
+      submitClick:function(_selectedRowData){
         var selectedSamplesUnion = [];
-        var temp_ = this.chartInst.getSelectedRowData();
-        var selectedRowsUids = _.pluck(temp_,'uniqueId');
+        var selectedRowsUids = _.pluck(_selectedRowData,'uniqueId');
         this.selectedRows = _.union(this.selectedRows,selectedRowsUids);
-        $.each(temp_, function(index,item){
+        $.each(_selectedRowData, function(index,item){
           var casesIds = item.caseIds.split(',');
           selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
         });
-        //this.selectedRows = [];
-
         if(this.filters.length === 0 ){
           this.filters = selectedSamplesUnion;
         }else{
           this.filters = _.intersection(this.filters,selectedSamplesUnion);
         }
-
         this.chartInst.clearSelectedRowData();
-        this.hasfilters = false;
-
-
-      }, rowClick: function( hasSelectedRows, clickedRowData, rowSelected) {
-        this.hasfilters = hasSelectedRows;
-       // this.fromRowSelection = true;
-       // this.updateTable = true;
-        /* var _filters = [];
-        var _caseIds = [];
-          _.each(data,function(item,index){
-            var _selectedGeneSamplesMap = {};
-            _selectedGeneSamplesMap.uniqueId = item.uniqueId;
-            _selectedGeneSamplesMap.caseIds = [];
-            _selectedGeneSamplesMap.defaultCaseIds = item.defaultCaseIds;
-            _caseIds = _caseIds.concat(item.caseIds.split(','));
-            _filters.push(_selectedGeneSamplesMap);
-          });
-        _caseIds = _.unique(_caseIds);
-        _.map(_filters,function(item){
-          item.caseIds = _caseIds;
-        });*/
-
-         // this.filters = data;
-       /* if(data.length>0){
-          this.hasfilters = true;
-        }else{
-          this.hasfilters = false;
-        }*/
-      }, addGeneClick: function(clickedRowData) {
+      },
+      addGeneClick: function(clickedRowData) {
         this.$dispatch('manage-gene',clickedRowData.gene);
-      }, setDisplayTitle: function(numOfCases) {
+      },
+      setDisplayTitle: function(numOfCases) {
         this.displayName = this.attributes.display_name+'('+numOfCases+' profiled samples)';
-      }, updateFilters: function(newVal,removeChart){
-       // var _samples = [];
-        /*if(!removeChart){
-        if(this.fromRowSelection){
-          this.fromRowSelection = false;
-          /!*if(newVal.length>0){
-            _.each(newVal,function(item,index){
-              _samples = _samples.concat(item.caseIds);
-            });
-            _samples = _.unique(_samples);
-          }else{
-            _samples = this.chartInst.getCases();
-          }*!/
-        }else{
-          //this.fromRowSelection = true;
-         // this.updateTable = true;
-          /!*var _selectedRows = [];
-          if(newVal.length>0){
-            _.each(newVal,function(item,index){
-              _samples = _samples.concat(item.caseIds);
-              _selectedRows.push(item.uniqueId)
-            });
-            _samples = _.unique(_samples);
-          }else{
-            _samples = this.chartInst.getCases();
-          }
-          console.log(_selectedRows)*!/
-          //this.chartInst.update(_samples,_selectedRows);
-        }
-        }*/
+      },
+      updateFilters: function(){
         this.$dispatch('update-samples-from-table');
       }
 
@@ -191,7 +124,6 @@
       var _selectedGenes = this.$parent.$parent.$parent.$parent.selectedgenes;
 
       callbacks.addGeneClick = this.addGeneClick;
-      callbacks.rowClick = this.rowClick;
       callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.tableView();
 

@@ -207,7 +207,6 @@
             }
           } else {
             datum.caseIds = _.uniq(item.caseIds);
-            //if(!initialLoaded)
             datum.samples = datum.caseIds.length;
             switch (type_) {
               case 'mutatedGene':
@@ -237,13 +236,9 @@
           } else {
             datum.qval = '';
           }
-
           genes.push(datum);
         })
       }
-      /*if(!initialLoaded){
-        initialLoaded = true;
-      }*/
       return genes;
 
     }
@@ -270,14 +265,7 @@
     }
 
     function reactSubmitClickCallback(){
-      var selectedSamplesUnion = _.pluck(selectedRowData,'caseIds');
-      $.each(selectedRowData, function(index,item){
-        var casesIds = item.caseIds.split(',');
-        selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
-      });
-      // selectedRowData = [];
-      callbacks_.submitClick(_.unique(selectedSamplesUnion));
-
+      callbacks_.submitClick(selectedRowData);
     }
 
     function reactRowClickCallback(data, selected, _selectedRows) {
@@ -286,26 +274,14 @@
       }
       else{
         selectedRowData = _.filter(selectedRowData, function(index,item){
-          if(item.uniqueId === selected.uniqueId){
-            return false;
-          }return true
-        })
+          return (item.uniqueId === selected.uniqueId);
+        });
       }
-      callbacks_.rowClick(selectedRowData.length>0);
-     /* var selectedRows_ = [];
-      _.each(_selectedRows, function(item) {
-        selectedRows_.push(item.uniqueId)
-      });
-      selectedRows = selectedRows_;
-      if (callbacks_.hasOwnProperty('rowClick')) {
-        callbacks_.rowClick(_selectedRows, data, selected);
-      }*/
     }
 
     function reactGeneClickCallback(selectedRow, selected) {
       callbacks_.addGeneClick(selectedRow);
     }
-
     return content;
   };
 
