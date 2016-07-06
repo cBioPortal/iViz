@@ -120,7 +120,6 @@
                   }
                 });
               }
-              console.log(self_.selectedgenes);
               this.$broadcast('gene-list-updated',self_.selectedgenes);
             },
             setSamplesSelectedCases: function(selectedCases){

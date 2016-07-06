@@ -71,7 +71,7 @@
         if (this.attributes.view_type === 'bar_chart') {
           this.filters = [];
         } else if(this.attributes.view_type === 'pie_chart'){
-          if(this.filtersToSkipShowing.indexOf(this.attributes.attr_id)){
+          if(this.filtersToSkipShowing.indexOf(this.attributes.attr_id) !== -1){
             this.filters = [];
           }else{
             this.filters.$remove(val);

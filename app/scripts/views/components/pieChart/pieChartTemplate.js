@@ -70,18 +70,14 @@
       'filters': function(newVal, oldVal) {
         if(!this.filtersUpdated) {
           this.filtersUpdated = true;
-          if (newVal.length === oldVal.length) {
-            if (newVal.length == 0) {
-              this.chartInst.filterAll();
-            } else {
-              this.chartInst.filter(newVal);
-            }
+          if (newVal.length === 0) {
+            this.chartInst.filterAll();
           }else{
-            if (newVal.length == 0) {
-              this.chartInst.filterAll();
-            }else{
+            if (newVal.length === oldVal.length) {
+                this.chartInst.filter(newVal);
+            }
+            else{
               var temp =newVal.length>1?[newVal]:newVal;
-              console.log(temp)
               this.chartInst.replaceFilter(temp);
             }
           }
