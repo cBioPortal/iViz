@@ -128,7 +128,7 @@
       _self.chartInst = new iViz.view.component.tableView();
 
       if(_selectedSampleList.length === 0){
-        _selectedSampleList = this.attributes['allCases'];
+        _selectedSampleList = this.attributes.options['allCases'];
       }
       _self.chartInst.init(this.attributes, _selectedSampleList, _selectedGenes, this.indices, this.data, this.chartId, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
