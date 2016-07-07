@@ -112,11 +112,10 @@
                     _scatterPlotSel =attributes.filter;
                   }
                 } else if (attributes.view_type === 'table') {
-                  var _samples = attributes.filter[0].caseIds;
-                  if(_scatterPlotSel.length !== 0){
-                    _tableSel = _.intersection(_tableSel,_samples);
+                  if(_tableSel.length !== 0){
+                    _tableSel = _.intersection(_tableSel,attributes.filter);
                   }else{
-                    _tableSel = _samples;
+                    _tableSel =attributes.filter;
                   }
                 } else{
                   filters_[attributes.attr_id] = attributes.filter;
