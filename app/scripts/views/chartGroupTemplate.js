@@ -114,8 +114,8 @@
         this.$dispatch('update-all-filters', this.type);
       },
       'update-samples-from-table':function(_sampleIds) {
-        this.chartInvisible.filter(null);
-        this.chartInvisible.filter([_sampleIds]);
+        //this.chartInvisible.filter(null);
+       // this.chartInvisible.filter([_sampleIds]);
         this.$dispatch('update-all-filters', this.type);
       }
     },

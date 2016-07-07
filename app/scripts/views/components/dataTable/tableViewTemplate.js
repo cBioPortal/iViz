@@ -56,8 +56,8 @@
         showLoad:true,
         showLoading:'show-loading',
         hideLoading:'hide-loading',
-        fromRowSelection:false,
-        updateTable:true
+        //fromRowSelection:false,
+        //updateTable:true
       };
     },
     watch: {
@@ -70,16 +70,16 @@
         genes = $.extend(true,[],genes);
         this.chartInst.updateGenes(genes);
       },'selected-sample-update': function(_selectedSamples) {
-        if(this.updateTable){
-          this.chartInst.update(_selectedSamples);
+        //if(this.updateTable){
+          this.chartInst.update(_selectedSamples, _.pluck(this.filters,'uniqueId'));
           this.setDisplayTitle(this.chartInst.getCases().length);
-        }else{
+        /*}else{
           this.updateTable = true;
           if(this.filters.length === 0){
             this.chartInst.update(_selectedSamples);
             this.setDisplayTitle(this.chartInst.getCases().length);
           }
-        }
+        }*/
       },
       'closeChart':function(){
         if(this.filters.length>0){
@@ -95,45 +95,46 @@
       }, mouseLeave: function() {
         this.showOperations = false;
       }, rowClick: function( data, clickedRowData, rowSelected) {
-        this.fromRowSelection = true;
-        this.updateTable = false;
-         var _filters = [];
+       // this.fromRowSelection = true;
+       // this.updateTable = true;
+        /* var _filters = [];
         var _caseIds = [];
           _.each(data,function(item,index){
             var _selectedGeneSamplesMap = {};
             _selectedGeneSamplesMap.uniqueId = item.uniqueId;
             _selectedGeneSamplesMap.caseIds = [];
+            _selectedGeneSamplesMap.defaultCaseIds = item.defaultCaseIds;
             _caseIds = _caseIds.concat(item.caseIds.split(','));
             _filters.push(_selectedGeneSamplesMap);
           });
         _caseIds = _.unique(_caseIds);
         _.map(_filters,function(item){
           item.caseIds = _caseIds;
-        });
+        });*/
 
-          this.filters = _filters;
+          this.filters = data;
       }, addGeneClick: function(clickedRowData) {
         this.$dispatch('manage-gene',clickedRowData.gene);
       }, setDisplayTitle: function(numOfCases) {
         this.displayName = this.attributes.display_name+'('+numOfCases+' profiled samples)';
       }, updateFilters: function(newVal,removeChart){
-        var _samples = [];
-        if(!removeChart){
+       // var _samples = [];
+        /*if(!removeChart){
         if(this.fromRowSelection){
           this.fromRowSelection = false;
-          if(newVal.length>0){
+          /!*if(newVal.length>0){
             _.each(newVal,function(item,index){
               _samples = _samples.concat(item.caseIds);
             });
             _samples = _.unique(_samples);
           }else{
             _samples = this.chartInst.getCases();
-          }
+          }*!/
         }else{
-          this.fromRowSelection = true;
-          this.updateTable = true;
-          var _selectedRows = [];
-          if(newVal.lenght>0){
+          //this.fromRowSelection = true;
+         // this.updateTable = true;
+          /!*var _selectedRows = [];
+          if(newVal.length>0){
             _.each(newVal,function(item,index){
               _samples = _samples.concat(item.caseIds);
               _selectedRows.push(item.uniqueId)
@@ -142,10 +143,11 @@
           }else{
             _samples = this.chartInst.getCases();
           }
-          this.chartInst.update(_samples,_selectedRows);
+          console.log(_selectedRows)*!/
+          //this.chartInst.update(_samples,_selectedRows);
         }
-        }
-        this.$dispatch('update-samples-from-table',_samples);
+        }*/
+        this.$dispatch('update-samples-from-table');
       }
 
     },

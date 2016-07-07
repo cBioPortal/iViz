@@ -119,6 +119,8 @@
         } else {
           initReactTable(true);
         }
+      }else{
+        initReactTable(false);
       }
     };
 
@@ -172,6 +174,7 @@
           if (_selectedGenesMap !== undefined) {
             if (_selectedGenesMap[item.index] !== undefined) {
               datum.caseIds = _.uniq(_selectedGenesMap[item.index].caseIds);
+              datum.defaultCaseIds =  _.uniq(item.caseIds);
               datum.samples = datum.caseIds.length;
               switch (type_) {
                 case 'mutatedGene':
@@ -194,7 +197,7 @@
             }
           } else {
             datum.caseIds = _.uniq(item.caseIds);
-            if(!initialLoaded)
+            //if(!initialLoaded)
               datum.defaultCaseIds = datum.caseIds;
             datum.samples = datum.caseIds.length;
             switch (type_) {
@@ -229,9 +232,9 @@
           genes.push(datum);
         })
       }
-      if(!initialLoaded){
+      /*if(!initialLoaded){
         initialLoaded = true;
-      }
+      }*/
       return genes;
     }
 
@@ -247,7 +250,7 @@
           var datum = {
             attr_id: key,
             uniqueId: item.uniqueId,
-            attr_val: key === 'caseIds' ? item.caseIds.join(',') : item[key]
+            attr_val: key === 'caseIds' ? item.caseIds.join(',') : key === 'samples' ? item.samples+'('+item.defaultCaseIds.length+')' :item[key]
           };
           result.data.push(datum);
         }
@@ -303,8 +306,8 @@
             },
             {
               "attr_id": "samples",
-              "display_name": "#",
-              "datatype": "NUMBER",
+              "display_name": "#(Total number of Samples)",
+              "datatype": "STRING",
               "column_width": 90
             },
             {
@@ -355,8 +358,8 @@
             },
             {
               "attr_id": "samples",
-              "display_name": "#",
-              "datatype": "NUMBER",
+              "display_name": "#(Total number of Samples)",
+              "datatype": "STRING",
               "column_width": 70
             },
             {
