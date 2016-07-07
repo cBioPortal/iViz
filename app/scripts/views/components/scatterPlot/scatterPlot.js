@@ -51,7 +51,7 @@
         _yArr = _.pluck(data_, 'mutation_count');
       var _qtips = [];
       _.each(data_, function(_dataObj) {
-        _qtips.push("Sample Id: " + _dataObj.sample_id + "<br>" + "CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _qtips.push("Cancer Study:" + _dataObj.study_id +  "<br>" + "Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
       });
       var trace = {
         x: _xArr,
@@ -60,6 +60,8 @@
         mode: 'markers',
         type: 'scatter',
         hoverinfo: 'text',
+        study_id: _.pluck(data_, 'study_id'),
+        sample_id: _.pluck(data_, 'sample_id'),
         marker: {
           size: 7,
           color: '#006bb3',
@@ -96,6 +98,15 @@
         },
       };
       Plotly.plot(document.getElementById(chartId_), data, layout);
+
+      //link to sample view
+      var _plotsElem = document.getElementById(chartId_);
+      _plotsElem.on('plotly_click', function(data){
+        var _pts_study_id = data.points[0].data.study_id[data.points[0].pointNumber];
+        var _pts_sample_id = data.points[0].data.sample_id[data.points[0].pointNumber];
+        window.open(cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_id));
+      });
+      
       initCanvasDownloadData();
     };
 
@@ -109,10 +120,10 @@
       document.getElementById(chartId_).data = [];
       var _unselectedDataQtips = [], _selectedDataQtips = [];
       _.each(_unselectedData, function(_dataObj) {
-        _unselectedDataQtips.push("Sample Id: " + _dataObj.sample_id + "<br>" + "CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _unselectedDataQtips.push("Cancer Study:" + _dataObj.study_id + "<br>" + "Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
       });
       _.each(_selectedData, function(_dataObj) {
-        _selectedDataQtips.push("Sample Id: " + _dataObj.sample_id + "<br>" + "CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _selectedDataQtips.push("Cancer Study:" + _dataObj.study_id + "<br>" + "Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
       });
       document.getElementById(chartId_).data[0] = {
         x: _.pluck(_unselectedData, 'cna_fraction'),
@@ -120,7 +131,9 @@
         text: _unselectedDataQtips,
         mode: 'markers',
         type: 'scatter',
-        hoverinfo: "text",
+        hoverinfo: 'text',
+        study_id: _.pluck(data_, 'study_id'),
+        sample_id: _.pluck(data_, 'sample_id'),
         marker: {
           size: 6,
           color: '#006bb3',
@@ -133,7 +146,9 @@
         text: _selectedDataQtips,
         mode: 'markers',
         type: 'scatter',
-        hoverinfo: "text",
+        hoverinfo: 'text',
+        study_id: _.pluck(data_, 'study_id'),
+        sample_id: _.pluck(data_, 'sample_id'),
         marker: {
           size: 6, 
           color: 'red',

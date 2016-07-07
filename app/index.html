@@ -102,6 +102,7 @@
   <!-- endbuild -->
   
   <script src="scripts/model/dataProxy.js"></script>
+  <script src="_components/cbio-util.js"></script>
 
 </head>
 <body>
@@ -218,13 +219,7 @@
         window.style.vars.barchartHeight = 120;
       });
     
-    // Using dataProxy
     iViz.data.init(iViz.init, ['blca_tcga_pub', 'brca_tcga_pub', 'ov_tcga_pub']); 
-    
-    // Using raw data 
-    // $.getJSON('/data/sample.json', function(_data) {
-    //   iViz.init(_data);
-    // });
 
   });
 </script>
