@@ -84,6 +84,7 @@
       }
     },
     ready: function() {
+      
       var _self = this;
       var _opts = {
         chartId: this.chartId,
