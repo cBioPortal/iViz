@@ -47,7 +47,7 @@
     var selectedSamples = [];
     var allSamplesIds = [];
     var reactTableData = {};
-    var initialLoaded = false;
+    var initialized = false;
     var patientDataIndices = {};
     var selectedRowData = [];
 
@@ -64,22 +64,20 @@
 
 
     content.init =
-      function(_completeSamples, _selectedSamples, _selectedGenes, _indices, _geneData,
-               _data, _chartId, _type, _callbacks) {
-        _.each(_geneData, function(item, index) {
-          sequencedSampleIds = sequencedSampleIds.concat(item.caseIds);
-        });
-        sequencedSampleIds = _.uniq(sequencedSampleIds);
-        allSamplesIds = _completeSamples;
-        selectedSamples = _completeSamples;
+      function(_attributes, _selectedSamples, _selectedGenes, _indices,
+               _data, _chartId, _callbacks) {
+        initialized = false;
+        allSamplesIds = _attributes.options.allCases;
+        selectedSamples = _selectedSamples;
+        sequencedSampleIds = _attributes.options.sequencedCases;
         selectedGenes = _selectedGenes;
         chartId_ = _chartId;
         patientDataIndices = _indices;
         data_ = _data;
-        geneData_ = _geneData;
-        type_ = _type;
+        geneData_ = _attributes.gene_list;
+        type_ = _attributes.type;
         callbacks_ = _callbacks;
-        if (iViz.util.tableView.compare(_completeSamples, _selectedSamples)) {
+        if (iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
           initReactTable(true);
         } else {
           content.update(_selectedSamples);
@@ -91,7 +89,8 @@
       var includeMutationCount = false;
       if (_selectedRows !== undefined)
         selectedRows = _selectedRows;
-      if (!iViz.util.tableView.compare(selectedSamples, _selectedSamples)) {
+      if ((!initialized) || (!iViz.util.tableView.compare(selectedSamples, _selectedSamples))) {
+        initialized = true;
         selectedSamples = _selectedSamples;
         if (!iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
           _.each(_selectedSamples, function(caseId) {

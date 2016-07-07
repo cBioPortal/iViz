@@ -188,17 +188,16 @@
       var _self = this;
       var callbacks = {};
       var _selectedSampleList = this.$parent.$parent.$parent.selectedsamples;
-      var _completeSampleList = this.$parent.$parent.$parent.completeSamplesList;
       var _selectedGenes = this.$parent.$parent.$parent.$parent.selectedgenes;
 
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.rowClick = this.rowClick;
       _self.chartInst = new iViz.view.component.tableView();
 
-      if(_completeSampleList.length === 0){
-        _completeSampleList = _selectedSampleList;
+      if(_selectedSampleList.length === 0){
+        _selectedSampleList = this.attributes['allCases'];
       }
-      _self.chartInst.init(_completeSampleList, _selectedSampleList, _selectedGenes, this.indices, this.attributes['gene_list'],this.data, this.chartId, this.attributes.type, callbacks);
+      _self.chartInst.init(this.attributes, _selectedSampleList, _selectedGenes, this.indices, this.data, this.chartId, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
       this.$dispatch('data-loaded', true);
     }
