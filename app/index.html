@@ -56,7 +56,6 @@
 
   <!-- build:css(.tmp) styles/iviz.css -->
   <link rel="stylesheet" href="styles/main.css"/>
-
   <!-- endbuild -->
 
   <!-- build:js scripts/iviz.js -->
@@ -96,6 +95,8 @@
   <script src="scripts/views/components/vc/addVCPopup.js"></script>
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
   <!-- endbuild -->
+  
+  <script src="scripts/model/dataProxy.js"></script>
 
 </head>
 <body>
@@ -199,18 +200,16 @@
         window.style.vars.survivalHeight = 320;
         window.style.vars.barchartWidth = 350;
         window.style.vars.barchartHeight = 120;
-      })
-    
-    URL = "http://localhost:8081/api/sessions/";
-    var vcId_ = location.search.split('vc_id=')[1];
-    iViz.session.manage.init();
-    if (typeof vcId_ != 'undefined') {
-      iViz.session.model.getVirtualCohortDetails(vcId_);
-    } else {
-      $.getJSON('/data/sample.json', function(_data) {
-        iViz.init(_data);
       });
-    }
+    
+    // Using dataProxy
+    iViz.data.init(iViz.init, ['blca_tcga_pub', 'brca_tcga_pub', 'ov_tcga_pub']); 
+    
+    // Using raw data 
+    // $.getJSON('/data/sample.json', function(_data) {
+    //   iViz.init(_data);
+    // });
+
   });
 </script>
 </html>
