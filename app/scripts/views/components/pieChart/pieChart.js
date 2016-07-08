@@ -197,15 +197,15 @@
       }
     }
 
-    function initTsvDownloadData() {
-      var data = '';
+    function initTsvDownloadData(meta) {
+      var data = v.data.display_name + '\tCount';
 
-      data = data + v.data.display_name + '\tCount';
-
-      for (var i = 0; i < labelMetaData.length; i++) {
+      meta = meta || labelMetaData;
+      
+      for (var i = 0; i < meta.length; i++) {
         data += '\r\n';
-        data += labelMetaData[i].name + '\t';
-        data += labelMetaData[i].samples;
+        data += meta[i].name + '\t';
+        data += meta[i].samples;
       }
       content.setDownloadData('tsv', data);
     }
@@ -333,6 +333,7 @@
 
     function updateCurrentLabels() {
       labels = filterLabels();
+      initTsvDownloadData(labels);
       initCanvasDownloadData();
     }
 
