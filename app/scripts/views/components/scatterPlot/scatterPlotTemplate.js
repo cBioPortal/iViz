@@ -38,7 +38,7 @@
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
       '<chart-operations :show-operations="showOperations"' +
     ' :display-name="displayName" :has-chart-title="true" :groupid="groupid"' +
-    ' :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId"' +
+    ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId"' +
     ' :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
       '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
       '</div>',
@@ -86,9 +86,13 @@
     ready: function() {
       
       var _self = this;
-      
-      _self.chartInst = new iViz.view.component.scatterPlot();
-      _self.chartInst.init(this.data, this.chartId, this.charDivId);
+      var _opts = {
+        chartId: this.chartId,
+        chartDivId: this.charDivId,
+        title: this.attributes.display_name
+      };
+      _self.chartInst = new iViz.view.component.ScatterPlot();
+      _self.chartInst.init(this.data, _opts);
       var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
       if (_selectedSamples.length !== this.data.length) {
         this.selectedSamples=_selectedSamples;

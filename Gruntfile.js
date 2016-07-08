@@ -80,7 +80,8 @@ module.exports = function(grunt) {
           server: {
             baseDir: ['.tmp', config.app],
             routes: {
-              '/bower_components': './bower_components'
+              '/bower_components': './bower_components',
+              '/app': './app'
             }
           }
         }
@@ -94,7 +95,8 @@ module.exports = function(grunt) {
           server: {
             baseDir: ['.tmp', './test', config.app],
             routes: {
-              '/bower_components': './bower_components'
+              '/bower_components': './bower_components',
+              '/app': './app'
             }
           }
         }

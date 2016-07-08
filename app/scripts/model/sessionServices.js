@@ -65,7 +65,7 @@
         };
         $.ajax({
           type: 'POST',
-          url: URL,
+          url:  iViz.session.URL,
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(data)
         }).done(function(response) {
@@ -79,7 +79,7 @@
       removeSession: function(_virtualCohort) {
         $.ajax({
           type: 'DELETE',
-          url: URL + _virtualCohort.virtualCohortID,
+          url:  iViz.session.URL + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8'
         }).done(function() {
           localStorageDelete_(_virtualCohort);
@@ -93,7 +93,7 @@
         };
         $.ajax({
           type: 'PUT',
-          url: URL + _virtualCohort.virtualCohortID,
+          url:  iViz.session.URL + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(data)
         }).done(function(response) {
@@ -110,7 +110,7 @@
       loadUserVirtualCohorts: function(userID) {
         $.ajax({
           type: 'GET',
-          url: URL + 'query/',
+          url:  iViz.session.URL + 'query/',
           contentType: 'application/json;charset=UTF-8',
           data: {userid: userID}
         }).done(function(response) {
@@ -127,7 +127,7 @@
       },
 
       getVirtualCohortDetails: function(virtualCohortID) {
-        $.getJSON(URL + virtualCohortID, function(response) {
+        $.getJSON( iViz.session.URL + virtualCohortID, function(response) {
           iViz.applyVC(_.omit(response.data.virtualCohort,
             ['created', 'userID', 'virtualCohortID']));
           jQuery.notify('Imported Virtual Cohort', 'success');
