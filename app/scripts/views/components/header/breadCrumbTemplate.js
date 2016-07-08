@@ -38,7 +38,7 @@
     template: 
       '<span class="breadcrumb_container" v-if="attributes.filter.length > 0">' +
         '<span>{{attributes.display_name}}</span>' +
-        '<span v-if="filtersToSkipShowing.indexOf(attributes.attr_id) === -1" class="breadcrumb_items">' +
+        '<span v-if="(filtersToSkipShowing.indexOf(attributes.attr_id) === -1) && (attributes.view_type ! == \'table\')" class="breadcrumb_items">' +
           '<span v-if="filters.filterType === \'RangedFilter\'">' +
             '<span class="breadcrumb_item">{{filters[0]}} -- {{filters[1]}}</span>' +
             '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)">' +
