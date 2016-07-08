@@ -35,20 +35,23 @@
  */
 
 'use strict';
-(function (iViz, _, d3, $) {
-  iViz.view.component.scatterPlot = function () {
-    
-    var content = {};
-    var chartId_ , data_;
+(function(iViz, _, d3, $) {
+  iViz.view.component.ScatterPlot = function() {
+    var content = this;
+    var chartId_;
+    var data_;
+    var opts_;
 
-    content.init = function (_data, _chartId) {
-      chartId_ = _chartId;
+    content.dataForDownload = {};
+    content.init = function(_data, opts) {
+      opts_ = $.extend(true, {}, opts);
+      chartId_ = opts_.chartId;
       data_ = _data;
       var _xArr = _.pluck(data_, 'cna_fraction'),
-          _yArr = _.pluck(data_, 'mutation_count');
+        _yArr = _.pluck(data_, 'mutation_count');
       var _qtips = [];
       _.each(data_, function(_dataObj) {
-        _qtips.push("Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _qtips.push("Sample Id: " + _dataObj.sample_id + "<br>" + "CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
       });
       var trace = {
         x: _xArr,
@@ -92,19 +95,24 @@
           pad: 0
         },
       };
-      Plotly.plot(document.getElementById(_chartId), data, layout);
+      Plotly.plot(document.getElementById(chartId_), data, layout);
+      initCanvasDownloadData();
     };
-    
+
     content.update = function(_sampleIds) { // update selected samples (change color)
-      var _selectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.sample_id, _sampleIds) !== -1 ;});
-      var _unselectedData = _.filter(data_, function(_dataObj) { return $.inArray(_dataObj.sample_id, _sampleIds) === -1 ;});
+      var _selectedData = _.filter(data_, function(_dataObj) {
+        return $.inArray(_dataObj.sample_id, _sampleIds) !== -1;
+      });
+      var _unselectedData = _.filter(data_, function(_dataObj) {
+        return $.inArray(_dataObj.sample_id, _sampleIds) === -1;
+      });
       document.getElementById(chartId_).data = [];
       var _unselectedDataQtips = [], _selectedDataQtips = [];
       _.each(_unselectedData, function(_dataObj) {
-        _unselectedDataQtips.push("Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _unselectedDataQtips.push("Sample Id: " + _dataObj.sample_id + "<br>" + "CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
       });
       _.each(_selectedData, function(_dataObj) {
-        _selectedDataQtips.push("Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _selectedDataQtips.push("Sample Id: " + _dataObj.sample_id + "<br>" + "CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
       });
       document.getElementById(chartId_).data[0] = {
         x: _.pluck(_unselectedData, 'cna_fraction'),
@@ -133,10 +141,27 @@
         }
       };
       Plotly.redraw(document.getElementById(chartId_));
+      initCanvasDownloadData();
     }
-    
-    return content;
+
+    function initCanvasDownloadData() {
+      content.setDownloadData('svg', {
+        title: opts_.title,
+        chartDivId: opts_.chartId,
+        fileName: opts_.title
+      });
+      content.setDownloadData('pdf', {
+        title: opts_.title,
+        chartDivId: opts_.chartId,
+        fileName: opts_.title
+      });
+    }
+
+    // return content;
   };
-  iViz.util.scatterPlot = (function () {
+
+  iViz.view.component.ScatterPlot.prototype = new iViz.view.component.GeneralChart('scatterPlot');
+  iViz.view.component.ScatterPlot.constructor = iViz.view.component.ScatterPlot;
+  iViz.util.scatterPlot = (function() {
   })();
 })(window.iViz, window._, window.d3, window.jQuery || window.$);
