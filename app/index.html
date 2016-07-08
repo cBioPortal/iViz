@@ -132,6 +132,10 @@
           <span class="breadcrumb_container">Your selections: </span>
         </div>
 
+        <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
+          <span>{{customfilter.display_name}}</span>
+          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">'
+        </span>
           <div style="float:left" v-for="group in groups">
             <bread-crumb :attributes.sync="item"
                          :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
@@ -177,9 +181,8 @@
     <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
                    :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
                    :selectedsamples.sync="selectedsamples"
-                   :hasfilters.sync="hasfilters"></main-template>
+                   :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
   </div>
-  <div id="main-bridge" style="display: none;"></div>
 
 
 </div>

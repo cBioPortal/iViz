@@ -39,7 +39,7 @@
     ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes" :indices="group.indices"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
-      'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap', 'hasfilters', 'redrawgroups'
+      'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap', 'hasfilters', 'redrawgroups', 'customfilter'
     ], data: function() {
       return {
         messages: [],
@@ -142,6 +142,14 @@
           }
         });
         this.hasfilters = _hasFilters;
+        if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0) {
+          this.hasfilters = true;
+            _selectedPatientsByFiltersOnly =
+              _.intersection(_selectedPatientsByFiltersOnly, this.customfilter.patientIds);
+            _selectedSamplesByFiltersOnly =
+              _.intersection(_selectedSamplesByFiltersOnly, this.customfilter.sampleIds);
+        }
+        
         var mappedSelectedSamples = iViz.util.idMapping(this.patientmap,
           _selectedPatientsByFiltersOnly);
         var resultSelectedSamples = _.intersection(mappedSelectedSamples,
@@ -159,6 +167,22 @@
         }
         this.selectedsamples = resultSelectedSamples;
         this.selectedpatients = resultSelectedPatients;
+      },
+      'update-custom-filters': function() {
+        if (this.customfilter.type === 'patient') {
+          this.patientsync = this.customfilter.patientIds;
+          this.samplesync = iViz.util.idMapping(this.patientmap,
+            this.patientsync);
+          this.customfilter.sampleIds = this.samplesync;
+        } else {
+          this.patientsync = iViz.util.idMapping(this.samplemap,
+            this.customfilter.sampleIds);
+          this.samplesync = this.customfilter.sampleIds;
+          this.customfilter.patientIds = this.patientsync;
+        }
+        
+        this.selectedsamples =  this.samplesync;
+        this.selectedpatients = this.patientsync;
       }
     }
   });

@@ -303,6 +303,9 @@
     }
 
     function findLabel(labelName) {
+      if(labelMetaData.length===0){
+        initLabels();
+      }
       for (var i = 0; i < labelMetaData.length; i++) {
         if (labelMetaData[i].name === labelName) {
           return labelMetaData[i];
