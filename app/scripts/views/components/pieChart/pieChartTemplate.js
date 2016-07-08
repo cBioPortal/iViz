@@ -71,18 +71,16 @@
       'filters': function(newVal, oldVal) {
         if(!this.filtersUpdated) {
           this.filtersUpdated = true;
-          if (newVal.length === oldVal.length) {
-            if (newVal.length == 0) {
-              this.chartInst.filterAll();
-            } else {
-              var newFilters = $.extend(true, [], newVal);
-              var exisitngFilters = $.extend(true, [],
-                this.chartInst.filters());
-              var temp = _.difference(exisitngFilters, newFilters);
-              this.chartInst.filter(temp);
-            }
-          }else{
+          if (newVal.length === 0) {
             this.chartInst.filterAll();
+          }else{
+            if (newVal.length === oldVal.length) {
+                this.chartInst.filter(newVal);
+            }
+            else{
+              var temp =newVal.length>1?[newVal]:newVal;
+              this.chartInst.replaceFilter(temp);
+            }
           }
           this.$dispatch('update-filters');
         }else{

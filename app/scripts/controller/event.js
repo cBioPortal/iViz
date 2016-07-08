@@ -61,13 +61,17 @@
         }, 0);
       } else if (type === 'pie_chart') {
           //add filter
-        if ($.inArray(filter, filters) === -1) {
-          filters.push(filter);
-          //remove filter
-        } else {
-          filters = _.filter(filters, function(d) {
-            return d !== filter;
-          });
+        if(filter instanceof Array){
+          filters = filter;
+        }else{
+          if ($.inArray(filter, filters) === -1) {
+            filters.push(filter);
+            //remove filter
+          } else {
+            filters = _.filter(filters, function(d) {
+              return d !== filter;
+            });
+          }
         }
       }
     }

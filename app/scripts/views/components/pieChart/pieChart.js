@@ -337,6 +337,9 @@
     }
 
     function findLabel(labelName) {
+      if(labelMetaData.length===0){
+        initLabels();
+      }
       for (var i = 0; i < labelMetaData.length; i++) {
         if (labelMetaData[i].name === labelName) {
           return labelMetaData[i];
@@ -565,7 +568,7 @@
         columnMaxWidth: 300,
         columnSorting: false,
         tableType: 'pieLabel',
-        selectedRow: selectedRows,
+        selectedRows: selectedRows,
         rowClickFunc: pieLabelClick
       }, opts);
 

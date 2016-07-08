@@ -47,30 +47,37 @@
     var selectedSamples = [];
     var allSamplesIds = [];
     var reactTableData = {};
-    var initialLoaded = false;
+    var initialized = false;
     var patientDataIndices = {};
+    var selectedRowData = [];
 
     content.getCases = function() {
       return _.intersection(selectedSamples, sequencedSampleIds);
     };
 
+    content.getSelectedRowData = function() {
+      return selectedRowData;
+    };
+    content.clearSelectedRowData = function() {
+      selectedRowData = [];
+    };
+
+
     content.init =
-      function(_completeSamples, _selectedSamples, _selectedGenes, _indices, _geneData,
-               _data, _chartId, _type, _callbacks) {
-        _.each(_geneData, function(item, index) {
-          sequencedSampleIds = sequencedSampleIds.concat(item.caseIds);
-        });
-        sequencedSampleIds = _.uniq(sequencedSampleIds);
-        allSamplesIds = _completeSamples;
-        selectedSamples = _completeSamples;
+      function(_attributes, _selectedSamples, _selectedGenes, _indices,
+               _data, _chartId, _callbacks) {
+        initialized = false;
+        allSamplesIds = _attributes.options.allCases;
+        selectedSamples = _selectedSamples;
+        sequencedSampleIds = _attributes.options.sequencedCases;
         selectedGenes = _selectedGenes;
         chartId_ = _chartId;
         patientDataIndices = _indices;
         data_ = _data;
-        geneData_ = _geneData;
-        type_ = _type;
+        geneData_ = _attributes.gene_list;
+        type_ = _attributes.type;
         callbacks_ = _callbacks;
-        if (iViz.util.tableView.compare(_completeSamples, _selectedSamples)) {
+        if (iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
           initReactTable(true);
         } else {
           content.update(_selectedSamples);
@@ -82,7 +89,8 @@
       var includeMutationCount = false;
       if (_selectedRows !== undefined)
         selectedRows = _selectedRows;
-      if (!iViz.util.tableView.compare(selectedSamples, _selectedSamples)) {
+      if ((!initialized) || (!iViz.util.tableView.compare(selectedSamples, _selectedSamples))) {
+        initialized = true;
         selectedSamples = _selectedSamples;
         if (!iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
           _.each(_selectedSamples, function(caseId) {
@@ -119,6 +127,8 @@
         } else {
           initReactTable(true);
         }
+      }else{
+        initReactTable(false);
       }
     };
 
@@ -150,10 +160,13 @@
         autoColumnWidth: false,
         columnMaxWidth: 300,
         columnSorting: false,
-        selectedRow: selectedRows,
+        selectedRows: selectedRows,
         selectedGene: selectedGenes,
         rowClickFunc: reactRowClickCallback,
         geneClickFunc: reactGeneClickCallback,
+        selectButtonClickCallback: reactSubmitClickCallback,
+        // sortBy: "name",
+        // sortDir: "DESC",
         tableType: type_
       };
       var testElement = React.createElement(EnhancedFixedDataTableSpecial,
@@ -194,8 +207,6 @@
             }
           } else {
             datum.caseIds = _.uniq(item.caseIds);
-            if(!initialLoaded)
-              datum.defaultCaseIds = datum.caseIds;
             datum.samples = datum.caseIds.length;
             switch (type_) {
               case 'mutatedGene':
@@ -225,14 +236,11 @@
           } else {
             datum.qval = '';
           }
-
           genes.push(datum);
         })
       }
-      if(!initialLoaded){
-        initialLoaded = true;
-      }
       return genes;
+
     }
 
     function initReactData(_selectedGenesMap) {
@@ -253,23 +261,27 @@
         }
       });
       return result;
+
+    }
+
+    function reactSubmitClickCallback(){
+      callbacks_.submitClick(selectedRowData);
     }
 
     function reactRowClickCallback(data, selected, _selectedRows) {
-      var selectedRows_ = [];
-      _.each(_selectedRows, function(item) {
-        selectedRows_.push(item.uniqueId)
-      });
-      selectedRows = selectedRows_;
-      if (callbacks_.hasOwnProperty('rowClick')) {
-        callbacks_.rowClick(_selectedRows, data, selected);
+      if(selected){
+        selectedRowData.push(data);
+      }
+      else{
+        selectedRowData = _.filter(selectedRowData, function(index,item){
+          return (item.uniqueId === selected.uniqueId);
+        });
       }
     }
 
     function reactGeneClickCallback(selectedRow, selected) {
       callbacks_.addGeneClick(selectedRow);
     }
-
     return content;
   };
 
@@ -311,7 +323,7 @@
               "attr_id": "sampleRate",
               "display_name": "Freq",
               "datatype": "PERCENTAGE",
-              "column_width": 95
+              "column_width": 93
             },
             {
               "attr_id": "caseIds",
@@ -363,7 +375,7 @@
               "attr_id": "altrateInSample",
               "display_name": "Freq",
               "datatype": "PERCENTAGE",
-              "column_width": 80
+              "column_width": 78
             },
             {
               "attr_id": "caseIds",
