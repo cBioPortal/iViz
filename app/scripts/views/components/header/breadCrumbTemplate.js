@@ -38,7 +38,7 @@
     template: 
       '<span class="breadcrumb_container" v-if="attributes.filter.length > 0">' +
         '<span>{{attributes.display_name}}</span>' +
-        '<span v-if="(attributes.attr_id !== \'MUT_CNT_VS_CNA\')&&(attributes.view_type ! == \'table\')" class="breadcrumb_items">' +
+        '<span v-if="(filtersToSkipShowing.indexOf(attributes.attr_id) === -1) && (attributes.view_type ! == \'table\')" class="breadcrumb_items">' +
           '<span v-if="filters.filterType === \'RangedFilter\'">' +
             '<span class="breadcrumb_item">{{filters[0]}} -- {{filters[1]}}</span>' +
             '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)">' +
@@ -57,7 +57,11 @@
       '</span>',
     props: [
       'filters', 'attributes'
-    ],
+    ], data: function() {
+      return {
+        filtersToSkipShowing:['MUT_CNT_VS_CNA','sample_id','patient_id']
+      }
+    },
     watch: {
       'filters': function(val) {
       }
@@ -67,7 +71,11 @@
         if (this.attributes.view_type === 'bar_chart') {
           this.filters = [];
         } else if(this.attributes.view_type === 'pie_chart'){
-          this.filters.$remove(val);
+          if(this.filtersToSkipShowing.indexOf(this.attributes.attr_id) !== -1){
+            this.filters = [];
+          }else{
+            this.filters.$remove(val);
+          }
         } else if(this.attributes.view_type === 'scatter_plot'){
           this.filters = [];
         }else if(this.attributes.view_type === 'table'){
