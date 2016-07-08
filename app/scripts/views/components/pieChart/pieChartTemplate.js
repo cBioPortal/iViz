@@ -74,14 +74,16 @@
             if (newVal.length == 0) {
               this.chartInst.filterAll();
             } else {
-              var newFilters = $.extend(true, [], newVal);
-              var exisitngFilters = $.extend(true, [],
-                this.chartInst.filters());
-              var temp = _.difference(exisitngFilters, newFilters);
-              this.chartInst.filter(temp);
+              this.chartInst.filter(newVal);
             }
           }else{
-            this.chartInst.filterAll();
+            if (newVal.length == 0) {
+              this.chartInst.filterAll();
+            }else{
+              var temp =newVal.length>1?[newVal]:newVal;
+              console.log(temp)
+              this.chartInst.replaceFilter(temp);
+            }
           }
           this.$dispatch('update-filters');
         }else{

@@ -83,35 +83,93 @@
           }, events: {
             'redraw-all-charts':function(){
               this.redrawgroups.push(true);
-            },'manage-gene':function(gene){
-              var index = this.selectedgenes.indexOf(gene);
-              if(index==-1) {
-                this.selectedgenes.push(gene);
-              }
-              else{
-                this.selectedgenes.splice(index, 1);
-              }
-              console.log(this.selectedgenes);
-              this.$broadcast('gene-list-updated',this.selectedgenes);
+            },'manage-genes':function(geneList){
+              this.updateGeneList(geneList,false);
             }
           },methods: {
             initialize: function() {
-                this.groups = [],
-                this.selectedsamples = [],
-                this.selectedpatients = [],
-                this.selectedgenes = [],
-                this.patientmap = [],
-                this.samplemap = [],
-                this.showVCList = false,
-                this.addNewVC = false,
-                this.selectedPatientsNum = 0,
-                this.selectedSamplesNum = 0,
-                this.hasfilters = false,
-                this.virtualCohorts = [],
-                this.isloading = true
+                this.groups = [];
+                this.selectedsamples = [];
+                this.selectedpatients = [];
+                this.selectedgenes = [];
+                this.patientmap = [];
+                this.samplemap = [];
+                this.showVCList = false;
+                this.addNewVC = false;
+                this.selectedPatientsNum = 0;
+                this.selectedSamplesNum = 0;
+                this.hasfilters = false;
+                this.virtualCohorts = [];
+                this.isloading = true;
             },
             clearAll: function(){
               this.$broadcast('clear-all-filters');
+            },
+            updateGeneList : function(geneList,reset){
+              var self_ = this;
+              if(reset){
+                self_.selectedgenes = geneList;
+              }else{
+                _.each(geneList,function(gene){
+                  var index = self_.selectedgenes.indexOf(gene);
+                  if(index === -1) {
+                    self_.selectedgenes.push(gene);
+                  }
+                  else{
+                    self_.selectedgenes.splice(index, 1);
+                  }
+                });
+              }
+              console.log(self_.selectedgenes);
+              this.$broadcast('gene-list-updated',self_.selectedgenes);
+            },
+            setSamplesSelectedCases: function(selectedCases){
+              var self_ = this;
+              _.map(self_.groups,function(group){
+                if(group.type==='sample'){
+                  _.map(group.attributes,function(attribute){
+                    if(attribute.attr_id === 'sample_id'){
+                      attribute.filter = selectedCases;
+                    }
+                  });
+                }
+              });
+            },
+            setSamplesChartVisibility: function(){
+              var self_ = this;
+              _.map(self_.groups,function(group){
+                if(group.type==='sample'){
+                  _.map(group.attributes,function(attribute){
+                    if((attribute.attr_id === 'sample_id') && !attribute.show){
+                      attribute.show = true;
+                    }
+                  });
+                }
+              });
+            },
+            setPatientsSelectedCases: function(selectedCases){
+              var self_ = this;
+              _.map(self_.groups,function(group){
+                if(group.type==='patient'){
+                  _.map(group.attributes,function(attribute){
+                    if(attribute.attr_id === 'patient_id'){
+                      attribute.filter = selectedCases;
+                    }
+                  });
+                }
+              });
+            },
+            setPatientsChartVisibility: function(){
+              var self_ = this;
+              _.map(self_.groups,function(group){
+                if(group.type==='patient'){
+                  _.map(group.attributes,function(attribute){
+                    if((attribute.attr_id === 'patient_id') && !attribute.show){
+                      attribute.show = true;
+                    }
+                  });
+                }
+              });
             }
           }, ready: function() {
             this.$watch('showVCList', function() {
@@ -125,6 +183,24 @@
           this.init();
         }
         return vmInstance_;
+      },
+      setSelectedSamples : function(selectedCases){
+        vmInstance_.setSamplesChartVisibility();
+        Vue.nextTick(function () {
+          vmInstance_.setSamplesSelectedCases(selectedCases)
+        })
+      },
+      setSelectedPatients : function(selectedCases){
+        vmInstance_.setPatientsChartVisibility();
+        Vue.nextTick(function () {
+          vmInstance_.setPatientsSelectedCases(selectedCases)
+        })
+      },
+      setGeneList : function(geneList){
+        vmInstance_.updateGeneList(geneList,true)
+      },
+      getGeneList : function(){
+        return vmInstance_.selectedgenes;
       }
     };
   })();
@@ -134,7 +210,7 @@
     twoWay: true,
     params: ['groups'],
     bind: function() {
-      var self = this
+      var self = this;
       $(this.el).chosen({
           width: '30%'
         })
@@ -146,7 +222,7 @@
           }.bind(this)
         );
     }
-  })
+  });
 
   // This is an example to add sample to a virtual cohort from scatter plot
   iViz.session.vmScatter = (function() {
