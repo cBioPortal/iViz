@@ -38,7 +38,7 @@
     template: 
       '<span class="breadcrumb_container" v-if="attributes.filter.length > 0">' +
         '<span>{{attributes.display_name}}</span>' +
-        '<span v-if="attributes.attr_id !== \'MUT_CNT_VS_CNA\'" class="breadcrumb_items">' +
+        '<span v-if="(attributes.attr_id !== \'MUT_CNT_VS_CNA\')&&(attributes.view_type ! == \'table\')" class="breadcrumb_items">' +
           '<span v-if="filters.filterType === \'RangedFilter\'">' +
             '<span class="breadcrumb_item">{{filters[0]}} -- {{filters[1]}}</span>' +
             '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)">' +
@@ -71,9 +71,10 @@
         } else if(this.attributes.view_type === 'scatter_plot'){
           this.filters = [];
         }else if(this.attributes.view_type === 'table'){
-          var filters_ = $.extend(true,[],this.filters);
+          this.filters = [];
+        /*  var filters_ = $.extend(true,[],this.filters);
           filters_ = _.reject(filters_, function(el) { return el.uniqueId === val.uniqueId; });
-          this.filters = filters_;
+          this.filters = filters_;*/
         }
       }
     }

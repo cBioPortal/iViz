@@ -40,7 +40,7 @@
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" ' +
     ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
     '<div class="dc-chart dc-table-plot" :class="{hideLoading: showLoad}" align="center" style="float:none !important;" id={{chartId}} >' +
-    '<div class="study-view-loader" :class="{showLoading: showload}" style="display:none; top:30%;left:30%"><img src="images/ajax-loader.gif"/></div>' +
+
     '</div>',
     props: [
       'data', 'ndx', 'attributes', 'options', 'filters', 'groupid','indices'
@@ -56,35 +56,30 @@
         showLoad:true,
         showLoading:'show-loading',
         hideLoading:'hide-loading',
-        fromRowSelection:false,
-        updateTable:true
+        selectedRows:[]
       };
     },
     watch: {
       'filters': function(newVal) {
-        this.updateFilters(newVal,false);
+        if(newVal.length === 0 ){
+          this.selectedRows=[];
+        }
+        this.updateFilters();
       }
     },
     events: {
       'gene-list-updated':function(genes){
         genes = $.extend(true,[],genes);
         this.chartInst.updateGenes(genes);
-      },'selected-sample-update': function(_selectedSamples) {
-        if(this.updateTable){
-          this.chartInst.update(_selectedSamples);
-          this.setDisplayTitle(this.chartInst.getCases().length);
-        }else{
-          this.updateTable = true;
-          if(this.filters.length === 0){
-            this.chartInst.update(_selectedSamples);
-            this.setDisplayTitle(this.chartInst.getCases().length);
-          }
-        }
+      },
+      'selected-sample-update': function(_selectedSamples) {
+        this.chartInst.update(_selectedSamples, this.selectedRows);
+        this.setDisplayTitle(this.chartInst.getCases().length);
       },
       'closeChart':function(){
         if(this.filters.length>0){
           this.filters = [];
-          this.updateFilters([],true);
+          this.updateFilters();
         }
         this.$dispatch('close',true);
       }
@@ -92,60 +87,33 @@
     methods: {
       mouseEnter: function() {
         this.showOperations = true;
-      }, mouseLeave: function() {
+      },
+      mouseLeave: function() {
         this.showOperations = false;
-      }, rowClick: function( data, clickedRowData, rowSelected) {
-        this.fromRowSelection = true;
-        this.updateTable = false;
-         var _filters = [];
-        var _caseIds = [];
-          _.each(data,function(item,index){
-            var _selectedGeneSamplesMap = {};
-            _selectedGeneSamplesMap.uniqueId = item.uniqueId;
-            _selectedGeneSamplesMap.caseIds = [];
-            _caseIds = _caseIds.concat(item.caseIds.split(','));
-            _filters.push(_selectedGeneSamplesMap);
-          });
-        _caseIds = _.unique(_caseIds);
-        _.map(_filters,function(item){
-          item.caseIds = _caseIds;
+      },
+      submitClick:function(_selectedRowData){
+        var selectedSamplesUnion = [];
+        var selectedRowsUids = _.pluck(_selectedRowData,'uniqueId');
+        this.selectedRows = _.union(this.selectedRows,selectedRowsUids);
+        $.each(_selectedRowData, function(index,item){
+          var casesIds = item.caseIds.split(',');
+          selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
         });
-
-          this.filters = _filters;
-      }, addGeneClick: function(clickedRowData) {
-        this.$dispatch('manage-gene',clickedRowData.gene);
-      }, setDisplayTitle: function(numOfCases) {
-        this.displayName = this.attributes.display_name+'('+numOfCases+' profiled samples)';
-      }, updateFilters: function(newVal,removeChart){
-        var _samples = [];
-        if(!removeChart){
-        if(this.fromRowSelection){
-          this.fromRowSelection = false;
-          if(newVal.length>0){
-            _.each(newVal,function(item,index){
-              _samples = _samples.concat(item.caseIds);
-            });
-            _samples = _.unique(_samples);
-          }else{
-            _samples = this.chartInst.getCases();
-          }
+        if(this.filters.length === 0 ){
+          this.filters = selectedSamplesUnion;
         }else{
-          this.fromRowSelection = true;
-          this.updateTable = true;
-          var _selectedRows = [];
-          if(newVal.lenght>0){
-            _.each(newVal,function(item,index){
-              _samples = _samples.concat(item.caseIds);
-              _selectedRows.push(item.uniqueId)
-            });
-            _samples = _.unique(_samples);
-          }else{
-            _samples = this.chartInst.getCases();
-          }
-          this.chartInst.update(_samples,_selectedRows);
+          this.filters = _.intersection(this.filters,selectedSamplesUnion);
         }
-        }
-        this.$dispatch('update-samples-from-table',_samples);
+        this.chartInst.clearSelectedRowData();
+      },
+      addGeneClick: function(clickedRowData) {
+        this.$dispatch('manage-gene',clickedRowData.gene);
+      },
+      setDisplayTitle: function(numOfCases) {
+        this.displayName = this.attributes.display_name+'('+numOfCases+' profiled samples)';
+      },
+      updateFilters: function(){
+        this.$dispatch('update-samples-from-table');
       }
 
     },
@@ -153,17 +121,16 @@
       var _self = this;
       var callbacks = {};
       var _selectedSampleList = this.$parent.$parent.$parent.selectedsamples;
-      var _completeSampleList = this.$parent.$parent.$parent.completeSamplesList;
       var _selectedGenes = this.$parent.$parent.$parent.$parent.selectedgenes;
 
       callbacks.addGeneClick = this.addGeneClick;
-      callbacks.rowClick = this.rowClick;
+      callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.tableView();
 
-      if(_completeSampleList.length === 0){
-        _completeSampleList = _selectedSampleList;
+      if(_selectedSampleList.length === 0){
+        _selectedSampleList = this.attributes.options['allCases'];
       }
-      _self.chartInst.init(_completeSampleList, _selectedSampleList, _selectedGenes, this.indices, this.attributes['gene_list'],this.data, this.chartId, this.attributes.type, callbacks);
+      _self.chartInst.init(this.attributes, _selectedSampleList, _selectedGenes, this.indices, this.data, this.chartId, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
       this.$dispatch('data-loaded', true);
     }

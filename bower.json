@@ -23,6 +23,12 @@
     "jstat": "^1.5.3"
   },
   "overrides": {
+    "d3": {
+      "main": "d3.min.js"
+    },
+    "jquery": {
+      "main": "dist/jquery.min.js"
+    },
     "jstat": {
       "main": [
         "dist/jstat.min.js"
@@ -61,7 +67,7 @@
     },
     "fixed-data-table": {
       "main": [
-        "fixed-data-table.js",
+        "dist/fixed-data-table.min.js",
         "dist/fixed-data-table.min.css"
       ]
     }

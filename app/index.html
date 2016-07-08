@@ -4,13 +4,13 @@
   <meta charset="utf-8">
 
 
-  <!-- build:js(.) scripts/vendor.js -->
+  <!-- build:js(.) scripts/iviz-vendor.js -->
   <!-- bower:js -->
   <script src="/bower_components/modernizr/modernizr.js"></script>
-  <script src="/bower_components/jquery/dist/jquery.js"></script>
+  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/bower_components/chosen/chosen.jquery.min.js"></script>
   <script src="/bower_components/datatables/media/js/jquery.dataTables.js"></script>
-  <script src="/bower_components/d3/d3.js"></script>
+  <script src="/bower_components/d3/d3.min.js"></script>
   <script src="/bower_components/crossfilter2/crossfilter.min.js"></script>
   <script src="/bower_components/dcjs/dc.js"></script>
   <script src="/bower_components/classie/classie.js"></script>
@@ -38,11 +38,12 @@
   <script src="/bower_components/plotly.js/dist/plotly.min.js"></script>
   <script src="/bower_components/react/react.js"></script>
   <script src="/bower_components/react/react-dom.js"></script>
+  <script src="/bower_components/fixed-data-table/dist/fixed-data-table.min.js"></script>
   <script src="/bower_components/jstat/dist/jstat.min.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
 
-  <!-- build:css(.) styles/vendor.css -->
+  <!-- build:css(.) styles/iviz-vendor.css -->
   <!-- bower:css -->
   <link rel="stylesheet" href="/bower_components/chosen/chosen.min.css" />
   <link rel="stylesheet" href="/bower_components/datatables/media/css/jquery.dataTables.css" />
@@ -53,14 +54,12 @@
   <!-- endbower -->
   <!-- endbuild -->
 
-  <!-- build:css(.tmp) styles/main.css -->
+  <!-- build:css(.tmp) styles/iviz.css -->
   <link rel="stylesheet" href="styles/main.css"/>
-
   <!-- endbuild -->
 
-  <!-- build:js scripts/scripts.js -->
+  <!-- build:js scripts/iviz.js -->
   <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
-  <script src="/bower_components/fixed-data-table/dist/fixed-data-table.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/vueCore.js"></script>
   <script src="scripts/controller/util.js"></script>
@@ -96,6 +95,9 @@
   <script src="scripts/views/components/vc/addVCPopup.js"></script>
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
   <!-- endbuild -->
+  
+  <script src="scripts/model/dataProxy.js"></script>
+  <script src="_components/cbio-util.js"></script>
 
 </head>
 <body>
@@ -199,18 +201,10 @@
         window.style.vars.survivalHeight = 320;
         window.style.vars.barchartWidth = 350;
         window.style.vars.barchartHeight = 120;
-      })
-    
-    URL = "http://localhost:8081/api/sessions/";
-    var vcId_ = location.search.split('vc_id=')[1];
-    iViz.session.manage.init();
-    if (typeof vcId_ != 'undefined') {
-      iViz.session.model.getVirtualCohortDetails(vcId_);
-    } else {
-      $.getJSON('/data/sample.json', function(_data) {
-        iViz.init(_data);
       });
-    }
+    
+    iViz.data.init(iViz.init, ['blca_tcga_pub', 'brca_tcga_pub', 'ov_tcga_pub']); 
+
   });
 </script>
 </html>

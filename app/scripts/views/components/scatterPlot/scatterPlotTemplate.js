@@ -84,6 +84,7 @@
       }
     },
     ready: function() {
+      
       var _self = this;
       
       _self.chartInst = new iViz.view.component.scatterPlot();
