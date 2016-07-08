@@ -58,7 +58,13 @@
             hasfilters: false,
             virtualCohorts: [],
             isloading: true,
-            redrawgroups:[]
+            redrawgroups:[],
+            customfilter:{
+              display_name:"Custom",
+              type:"",
+              sampleIds:[],
+              patientIds:[]
+            }
           }, watch: {
             'redrawgroups':function(newVal,oldVal){
               if(newVal.length>0){
@@ -101,8 +107,19 @@
                 this.hasfilters = false;
                 this.virtualCohorts = [];
                 this.isloading = true;
+                this.customfilter ={
+                  display_name:"Custom",
+                  type:"",
+                  sampleIds:[],
+                  patientIds:[]
+                }
             },
             clearAll: function(){
+              if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
+                this.customfilter.sampleIds = [];
+                this.customfilter.patientIds = [];
+                this.$broadcast('update-all-filters');
+              }
               this.$broadcast('clear-all-filters');
             },
             updateGeneList : function(geneList,reset){
@@ -124,51 +141,33 @@
             },
             setSamplesSelectedCases: function(selectedCases){
               var self_ = this;
-              _.map(self_.groups,function(group){
-                if(group.type==='sample'){
-                  _.map(group.attributes,function(attribute){
-                    if(attribute.attr_id === 'sample_id'){
-                      attribute.filter = _.unique(selectedCases);
-                    }
-                  });
-                }
-              });
-            },
-            setSamplesChartVisibility: function(){
-              var self_ = this;
-              _.map(self_.groups,function(group){
-                if(group.type==='sample'){
-                  _.map(group.attributes,function(attribute){
-                    if((attribute.attr_id === 'sample_id') && !attribute.show){
-                      attribute.show = true;
-                    }
-                  });
-                }
-              });
+              if(selectedCases.length>0){
+                $.each(self_.groups,function(key,group){
+                  if(group.type==='sample'){
+                    self_.hasfilters = true;
+                    self_.customfilter.type = group.type;
+                    self_.customfilter.sampleIds = selectedCases;
+                    self_.customfilter.patientIds = [];
+                    self_.$broadcast('update-custom-filters');
+                    return false;
+                  }
+                });
+              }
             },
             setPatientsSelectedCases: function(selectedCases){
               var self_ = this;
-              _.map(self_.groups,function(group){
-                if(group.type==='patient'){
-                  _.map(group.attributes,function(attribute){
-                    if(attribute.attr_id === 'patient_id'){
-                      attribute.filter = _.unique(selectedCases);
-                    }
-                  });
-                }
-              });
-            },
-            setPatientsChartVisibility: function(){
-              var self_ = this;
-              _.map(self_.groups,function(group){
-                if(group.type==='patient'){
-                  _.map(group.attributes,function(attribute){
-                    if((attribute.attr_id === 'patient_id') && !attribute.show){
-                      attribute.show = true;
-                    }
-                  });
-                }
-              });
+              if(selectedCases.length>0){
+                $.each(self_.groups,function(key,group){
+                  if(group.type==='patient'){
+                    self_.hasfilters = true;
+                    self_.customfilter.type = group.type;
+                    self_.customfilter.patientIds = selectedCases;
+                    self_.customfilter.sampleIds = [];
+                    self_.$broadcast('update-custom-filters');
+                    return false;
+                  }
+                });
+              }
             }
           }, ready: function() {
             this.$watch('showVCList', function() {
@@ -184,13 +183,13 @@
         return vmInstance_;
       },
       setSelectedSamples : function(selectedCases){
-        vmInstance_.setSamplesChartVisibility();
+        vmInstance_.clearAll();
         Vue.nextTick(function () {
           vmInstance_.setSamplesSelectedCases(selectedCases)
         })
       },
       setSelectedPatients : function(selectedCases){
-        vmInstance_.setPatientsChartVisibility();
+        vmInstance_.clearAll();
         Vue.nextTick(function () {
           vmInstance_.setPatientsSelectedCases(selectedCases)
         })
