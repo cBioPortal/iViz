@@ -91,6 +91,8 @@
               this.redrawgroups.push(true);
             },'manage-genes':function(geneList){
               this.updateGeneList(geneList,false);
+            },'set-selected-cases' : function(selectionType, selectedCases){
+              this.setSelectedCases(selectionType, selectedCases);
             }
           },methods: {
             initialize: function() {
@@ -139,35 +141,64 @@
               }
               this.$broadcast('gene-list-updated',self_.selectedgenes);
             },
-            setSamplesSelectedCases: function(selectedCases){
-              var self_ = this;
-              if(selectedCases.length>0){
-                $.each(self_.groups,function(key,group){
-                  if(group.type==='sample'){
-                    self_.hasfilters = true;
-                    self_.customfilter.type = group.type;
-                    self_.customfilter.sampleIds = selectedCases;
-                    self_.customfilter.patientIds = [];
-                    self_.$broadcast('update-custom-filters');
-                    return false;
+            setSelectedCases : function(selectionType, selectedCases){
+              var radioVal = selectionType;
+              var selectedCaseIds = [];
+              var unmappedCaseIds = [];
+
+              if (radioVal === 'patient') {
+                var patientIdsList = Object.keys(vmInstance_.patientmap);
+                _.each(selectedCases, function (id) {
+                  if(patientIdsList.indexOf(id) !== -1){
+                    selectedCaseIds.push(id);
+                  }else{
+                    unmappedCaseIds.push(id)
+                  }
+                });
+              } else {
+                var sampleIdsList = Object.keys(vmInstance_.samplemap);
+                _.each(selectedCases, function (id) {
+                  if(sampleIdsList.indexOf(id) !== -1){
+                    selectedCaseIds.push(id);
+                  }else{
+                    unmappedCaseIds.push(id)
                   }
                 });
               }
-            },
-            setPatientsSelectedCases: function(selectedCases){
-              var self_ = this;
-              if(selectedCases.length>0){
-                $.each(self_.groups,function(key,group){
-                  if(group.type==='patient'){
-                    self_.hasfilters = true;
-                    self_.customfilter.type = group.type;
-                    self_.customfilter.patientIds = selectedCases;
-                    self_.customfilter.sampleIds = [];
-                    self_.$broadcast('update-custom-filters');
-                    return false;
-                  }
-                });
+
+              if (unmappedCaseIds.length > 0) {
+                new Notification().createNotification(selectedCaseIds.length +
+                  ' cases selected. The following ' + (radioVal === 'patient' ? 'patient' : 'sample') +
+                  ' ID' + (unmappedCaseIds.length === 1 ? ' was' : 's were') + ' not found in this study: ' +
+                  unmappedCaseIds.join(', '), {message_type: 'warning'});
+              } else {
+                new Notification().createNotification(selectedCaseIds.length + ' case(s) selected.', {message_type: 'info'});
               }
+
+              $('#study-view-header-right-1').qtip('toggle');
+              if(selectedCaseIds.length > 0) {
+                this.clearAll();
+                var self_ = this;
+                Vue.nextTick(function () {
+
+                  $.each(self_.groups,function(key,group){
+                    if(group.type === radioVal){
+                      self_.hasfilters = true;
+                      self_.customfilter.type = group.type;
+                      if(radioVal ==='sample'){
+                        self_.customfilter.sampleIds = selectedCaseIds;
+                        self_.customfilter.patientIds = [];
+                      }else{
+                        self_.customfilter.patientIds = selectedCaseIds;
+                        self_.customfilter.sampleIds = [];
+                      }
+                      self_.$broadcast('update-custom-filters');
+                      return false;
+                    }
+                  });
+                })
+              }
+
             }
           }, ready: function() {
             this.$watch('showVCList', function() {
@@ -182,17 +213,8 @@
         }
         return vmInstance_;
       },
-      setSelectedSamples : function(selectedCases){
-        vmInstance_.clearAll();
-        Vue.nextTick(function () {
-          vmInstance_.setSamplesSelectedCases(selectedCases)
-        })
-      },
-      setSelectedPatients : function(selectedCases){
-        vmInstance_.clearAll();
-        Vue.nextTick(function () {
-          vmInstance_.setPatientsSelectedCases(selectedCases)
-        })
+      setSelectedCases : function(selectionType, selectedCases){
+        vmInstance_.setSelectedCases(selectionType, selectedCases);
       },
       setGeneList : function(geneList){
         vmInstance_.updateGeneList(geneList,true)
