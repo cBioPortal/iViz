@@ -108,6 +108,7 @@
       },
       addGeneClick: function(clickedRowData) {
         this.$dispatch('manage-gene',clickedRowData.gene);
+        QueryByGeneTextArea.addRemoveGene(clickedRowData.gene);
       },
       setDisplayTitle: function(numOfCases) {
         this.displayName = this.attributes.display_name+'('+numOfCases+' profiled samples)';
