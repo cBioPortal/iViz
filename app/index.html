@@ -147,7 +147,7 @@
 
         <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
           <span>{{customfilter.display_name}}</span>
-          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">'
+          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">
         </span>
           <div style="float:left" v-for="group in groups">
             <bread-crumb :attributes.sync="item"
