@@ -274,7 +274,7 @@
     }
 
     content.dataForDownload = {};
-    
+
     content.hasLogScale = function() {
       if (data_ !== undefined) {
         if (data_.min !== null && data_.max !== null) {
@@ -283,7 +283,7 @@
       }
       return false;
     };
-    
+
     content.init = function(ndx, data, opts) {
       data_.meta = _.map(_.filter(_.pluck(data, opts.attrId), function(d) {
         return d !== 'NA';
@@ -336,6 +336,13 @@
       }
     };
 
+    content.updateDataForDownload = function(fileType) {
+      if (fileType === 'tsv') {
+        initTsvDownloadData();
+      } else if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
+    }
     // return content;
   };
 
