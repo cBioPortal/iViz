@@ -41,7 +41,8 @@
 (function (iViz, $) {
 
   iViz.data = {};
-  iViz.data.init = function(_callBackFunc, _studyIdArr, _inputSampleList, _inputPatientList) {
+
+  iViz.data.init = function (_studyIdArr, _callbackFunc, _inputSampleList, _inputPatientList) {
 
     var _result = {};
     //var PORTAL_INST_URL = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1];
@@ -573,8 +574,7 @@
                           _result.groups.group_mapping.patient = {};
                           _result.groups.group_mapping.sample.patient = _ajaxSample2PatientIdMappingObj;
                           _result.groups.group_mapping.patient.sample = _ajaxPatient2SampleIdMappingObjSimplified;
-
-                          _callBackFunc(_result, _inputSampleList, _inputPatientList);
+                          _callbackFunc(_result, _inputSampleList, _inputPatientList);
 
                         });
                       });
@@ -587,5 +587,6 @@
         });
       });
     });
+
   }
 }(window.iViz, window.$));

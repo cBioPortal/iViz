@@ -38,12 +38,11 @@ var iViz = (function (_, $) {
 
   return {
 
-    init: function (_rawDataJSON, _inputSampleList, _inputPatientList) {
+    init: function (_rawDataJson, _inputSampleList, _inputPatientList) {
 
       vm_ = iViz.session.manage.getInstance();
-
       vm_.isloading = false;
-      data_ = _rawDataJSON;
+      data_ = _rawDataJson;
 
       if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
         var _sampleData = _.filter(_data.groups.sample.data, function (_dataObj) {
