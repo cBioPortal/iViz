@@ -1,3 +1,6 @@
+#complete-screen textarea {
+  box-sizing: content-box;
+}
 textarea.expand{
   margin: 0 5px 0 0;
   font-family: Verdana,Arial,sans-serif;
@@ -14,7 +17,7 @@ textarea.expand{
   /*vertical-align: middle;*/
 }
 textarea.expandFocusOut{
-  width: 175px;
+  width: 200px;
   font-size: 0.8em;
   height: 18px;
   line-height: 17px;
