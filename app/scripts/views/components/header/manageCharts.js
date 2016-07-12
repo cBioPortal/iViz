@@ -39,7 +39,7 @@
     props: [
       'data', 'parent'
     ], ready: function() {
-      $("#add-chart").trigger("chosen:updated");
+      $("#study-view-add-chart").trigger("chosen:updated");
     }
   });
 })(window.Vue, window.iViz,

@@ -33,13 +33,13 @@
   <script src="/bower_components/qtip2/jquery.qtip.js"></script>
   <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
   <script src="/bower_components/vue/dist/vue.js"></script>
-  <script src="/bower_components/notifyjs/dist/notify.js"></script>
   <script src="/bower_components/clipboard/dist/clipboard.js"></script>
   <script src="/bower_components/plotly.js/dist/plotly.js"></script>
   <script src="/bower_components/react/react.js"></script>
   <script src="/bower_components/react/react-dom.js"></script>
   <script src="/bower_components/fixed-data-table/dist/fixed-data-table.min.js"></script>
   <script src="/bower_components/jstat/dist/jstat.min.js"></script>
+  <script src="/bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
 
@@ -60,7 +60,6 @@
   <!-- endbuild -->
 
   <!-- build:js scripts/iviz.js -->
-  <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
   <script src="/bower_components/fixed-data-table/dist/fixed-data-table.js"></script>
   <script src="/app/_components/FileSaver.min.js"></script>
   <script src="/app/_components/cbio-util.js"></script>
@@ -99,6 +98,8 @@
   <script src="scripts/views/components/vc/modalTemplate.js"></script>
   <script src="scripts/views/components/vc/addVCPopup.js"></script>
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
+  <script src="scripts/views/components/Notification.js"></script>
+  <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <!-- endbuild -->
 
 </head>
@@ -116,20 +117,28 @@
       <!--@click="showVCList = true">-->
       <!--<i class="fa fa-bars"></i>-->
       <!--</button>-->
+      <div id="study-view-header-left">
+        
+      
       <span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
           Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
       </span>
+      </div>
+      <div id="study-view-header-right" style="margin-right:30px;">
+        <custom-case-input></custom-case-input>
+      
       <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
       <!--:selected-samples-num="selectedSamplesNum"-->
       <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
-      <select id="add-chart" class="chosen-select"
+      <select id="study-view-add-chart" class="chosen-select"
               v-select :groups="groups">
         <option id='' value="">Add Chart</option>
         <!--<option v-for="attributes in groups[0].attributes"></option>-->
         <option is="manage-charts" :data.sync="group"
                 v-for="(index,group) in groups" :parent="index"></option>
       </select>
+      </div>
 
       <div id="breadcrumbs_container" v-if="hasfilters">
         <div style="float:left;" >
@@ -138,7 +147,7 @@
 
         <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
           <span>{{customfilter.display_name}}</span>
-          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">'
+          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">
         </span>
           <div style="float:left" v-for="group in groups">
             <bread-crumb :attributes.sync="item"
