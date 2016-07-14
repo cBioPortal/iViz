@@ -34,7 +34,12 @@
  */
 
 'use strict';
+window.iViz = window.iViz ? window.iViz : {};
+
 (function(iViz, _, $) {
+  if(!_.isObject(iViz.session)) {
+    iViz.session = {};
+  }
   iViz.session.model = (function() {
     var localStorageAdd_ = function(id, virtualCohort) {
       virtualCohort.virtualCohortID = id;

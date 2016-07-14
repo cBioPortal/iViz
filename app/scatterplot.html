@@ -67,11 +67,11 @@
 <script type="text/javascript">
 $( document ).ready(function() {
 
-  iViz.session.URL = "http://localhost:8080/api/sessions/";
-  iViz.session.vmScatter.init();
+  iViz.session.URL = "http://loxcalhost:8080/api/sessions/";
+  iViz.vue.vmScatter.init();
 
     $(document).on('click', '#button', function (e) {
-      var _vm =iViz.session.vmScatter.getInstance();
+      var _vm =iViz.vue.vmScatter.getInstance();
       _vm.sampleID = $(e.target).val();
       _vm.cancerStudyID = 'ucec_tcga1';
       _vm.showList = true;

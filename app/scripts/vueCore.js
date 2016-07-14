@@ -35,9 +35,9 @@
 
 'use strict';
 (function(Vue, iViz, dc, _) {
-  iViz.session = {};
+  iViz.vue = {};
 
-  iViz.session.manage = (function() {
+  iViz.vue.manage = (function() {
     var vmInstance_;
 
     return {
@@ -202,7 +202,9 @@
             }
           }, ready: function() {
             this.$watch('showVCList', function() {
-              this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
+              if (_.isObject(iViz.session)) {
+                this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
+              }
             });
           }
         });
@@ -245,7 +247,7 @@
   });
 
   // This is an example to add sample to a virtual cohort from scatter plot
-  iViz.session.vmScatter = (function() {
+  iViz.vue.vmScatter = (function() {
     var vmInstance_;
 
     return {
@@ -260,7 +262,9 @@
             addNewVC: false
           }, ready: function() {
             this.$watch('showList', function() {
-              this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
+              if (_.isObject(iViz.session)) {
+                this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
+              }
             });
           }
         });
