@@ -455,7 +455,7 @@ var EnhancedFixedDataTableSpecial = (function() {
       return (
         React.createElement(Cell, {onFocus: this.onFocus, className: 'EFDT-cell EFDT-cell-full' +
           (this.props.selectedRowIndex.indexOf(data[rowIndex].index) != -1 ? ' row-selected' : ''),
-            columnKey: field},
+            },
           React.createElement("span", {style: flag ? {backgroundColor:'yellow'} : {},
               onClick: field === 'gene' ? this.selectGene.bind(this, data[rowIndex].index) : '',
               onMouseEnter: (tableType === 'pieLabel' && _.isFunction(this.props.pieLabelMouseEnterFunc) && field === 'name') ? this.enterPieLabel.bind(this, data[rowIndex].row) : '',
