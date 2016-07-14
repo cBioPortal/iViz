@@ -77,6 +77,8 @@
   <script src="scripts/views/components/bridgeChart/bridgeChart.js"></script>
   <script src="scripts/views/components/header/manageCharts.js"></script>
   <script src="scripts/views/components/header/breadCrumbTemplate.js"></script>
+  <script src="scripts/views/components/lineChart/lineChart.js"></script>
+  <script src="scripts/views/components/lineChart/lineChartTemplate.js"></script>
   <script src="scripts/views/components/pieChart/pieChart.js"></script>
   <script src="scripts/views/components/pieChart/pieChartTemplate.js"></script>
   <script src="scripts/views/components/barChart/barChart.js"></script>
@@ -177,6 +179,7 @@
                    :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
                    :selectedsamples.sync="selectedsamples"
                    :hasfilters.sync="hasfilters"></main-template>
+      <line-chart></line-chart>
   </div>
   <div id="main-bridge" style="display: none;"></div>
 
