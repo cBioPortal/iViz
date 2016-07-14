@@ -58,7 +58,7 @@
   <link rel="stylesheet" href="styles/main.css"/>
 
   <!-- endbuild -->
-
+  
   <!-- build:js scripts/iviz.js -->
   <script src="/bower_components/fixed-data-table/dist/fixed-data-table.js"></script>
   <script src="/app/_components/FileSaver.min.js"></script>
@@ -68,9 +68,6 @@
   <script src="scripts/controller/util.js"></script>
   <script src="scripts/controller/sync.js"></script>
   <script src="scripts/controller/event.js"></script>
-  <script src="scripts/controller/sessionEvent.js"></script>
-  <script src="scripts/controller/sessionUtil.js"></script>
-  <script src="scripts/model/sessionServices.js"></script>
   <script src="scripts/views/mainTemplate.js"></script>
   <script src="scripts/views/chartGroupTemplate.js"></script>
   <script src="scripts/views/individualChartTemplate.js"></script>
@@ -101,7 +98,12 @@
   <script src="scripts/views/components/Notification.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <!-- endbuild -->
-
+  
+  <!-- build:js scripts/iviz-session.js -->
+  <script src="scripts/session/sessionEvent.js"></script>
+  <script src="scripts/session/sessionUtil.js"></script>
+  <script src="scripts/session/sessionServices.js"></script>
+  <!-- endbuild -->
 </head>
 <body>
 
@@ -219,7 +221,7 @@
 
     iViz.session.URL = "http://localhost:8081/api/sessions/";
     var vcId_ = location.search.split('vc_id=')[1];
-    iViz.session.manage.init();
+    iViz.vue.manage.init();
     if (typeof vcId_ != 'undefined') {
       iViz.session.model.getVirtualCohortDetails(vcId_);
     } else {
