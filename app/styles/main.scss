@@ -23,3 +23,9 @@ body {
 
 @import "vendor/dashiboard";
 @import "vendor/efdt";
+
+#study-view-case-select-custom-dialog input[type="radio"] {
+  margin: 3px;
+}
+
+.qtip-wide{max-width:380px !important;}

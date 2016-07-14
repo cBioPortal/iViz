@@ -107,6 +107,15 @@
         window.open(cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_id));
       });
       Plotly.plot(document.getElementById(chartId_), data, layout);
+
+      //link to sample view
+      var _plotsElem = document.getElementById(chartId_);
+      _plotsElem.on('plotly_click', function(data){
+        var _pts_study_id = data.points[0].data.study_id[data.points[0].pointNumber];
+        var _pts_sample_id = data.points[0].data.sample_id[data.points[0].pointNumber];
+        window.open(cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_id));
+      });
+      
       initCanvasDownloadData();
     };
 

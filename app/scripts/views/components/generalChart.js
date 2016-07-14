@@ -33,7 +33,7 @@
 /**
  * @author Hongxin Zhang on 6/21/16.
  */
-(function(iViz) {
+(function(iViz, _) {
   // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.GeneralChart = function(chartType) {
     'use strict';
@@ -46,6 +46,9 @@
       this.chartType = chartType;
     };
     this.getDownloadData = function(fileType) {
+      if (_.isFunction(this.updateDataForDownload)) {
+        this.updateDataForDownload(fileType);
+      }
       return this.dataForDownload[fileType];
     };
     this.setDownloadData = function(type, content) {
@@ -55,4 +58,4 @@
       return Object.keys(this.dataForDownload);
     };
   };
-})(window.iViz);
+})(window.iViz, window._);

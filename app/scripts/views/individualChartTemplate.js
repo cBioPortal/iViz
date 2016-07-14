@@ -71,7 +71,7 @@
       'attributes.show': function(newVal) {
         if (!newVal)
           this.$dispatch('update-grid',true)
-        $("#add-chart").trigger("chosen:updated");
+        $("#study-view-add-chart").trigger("chosen:updated");
       }
     },
     events: {
