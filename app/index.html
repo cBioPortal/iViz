@@ -60,7 +60,7 @@
   <link rel="stylesheet" href="styles/main.css"/>
   <!-- endbuild -->
 
-  <!-- build:js scripts/iviz.js -->
+  <!-- build:js(.) scripts/iviz.js -->
   <script src="/app/_components/FileSaver.min.js"></script>
   <script src="/app/_components/cbio-util.js"></script>
   <script src="/app/_components/Notification.js"></script>
@@ -230,7 +230,7 @@
         window.style.vars.barchartHeight = 120;
       });
     
-    iViz.data.init(iViz.init, ['blca_tcga_pub']);
+    iViz.data.init(['blca_tcga_pub'], iViz.init);
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
       iViz.session.manage.getInstance().$broadcast('gene-list-updated',genes);
     });
