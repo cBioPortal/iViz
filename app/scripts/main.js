@@ -45,14 +45,14 @@ var iViz = (function (_, $) {
       data_ = _rawDataJson;
 
       if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
-        var _sampleData = _.filter(_data.groups.sample.data, function (_dataObj) {
+        var _sampleData = _.filter(data_.groups.sample.data, function (_dataObj) {
           return $.inArray(_dataObj['sample_id'], _inputSampleList) !== -1
         });
         var _sampleDataIndices = {};
         for (var _i = 0; _i < _sampleData.length; _i++) {
           _sampleDataIndices[_sampleData[_i].sample_id] = _i;
         }
-        var _patientData = _.filter(_data.groups.patient.data, function (_dataObj) {
+        var _patientData = _.filter(data_.groups.patient.data, function (_dataObj) {
           return $.inArray(_dataObj['patient_id'], _inputPatientList) !== -1
         });
         var _patientDataIndices = {};
