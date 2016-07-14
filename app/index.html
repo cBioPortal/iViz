@@ -34,7 +34,7 @@
   <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
   <script src="/bower_components/vue/dist/vue.js"></script>
   <script src="/bower_components/clipboard/dist/clipboard.js"></script>
-  <script src="/bower_components/plotly.js/dist/plotly.js"></script>
+  <script src="/bower_components/plotly.js/dist/plotly.min.js"></script>
   <script src="/bower_components/react/react.js"></script>
   <script src="/bower_components/react/react-dom.js"></script>
   <script src="/bower_components/fixed-data-table/dist/fixed-data-table.min.js"></script>
@@ -61,7 +61,6 @@
   <!-- endbuild -->
 
   <!-- build:js scripts/iviz.js -->
-  <script src="/bower_components/fixed-data-table/dist/fixed-data-table.js"></script>
   <script src="/app/_components/FileSaver.min.js"></script>
   <script src="/app/_components/cbio-util.js"></script>
   <script src="/app/_components/Notification.js"></script>
@@ -235,6 +234,7 @@
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
       iViz.session.manage.getInstance().$broadcast('gene-list-updated',genes);
     });
+
   });
 </script>
 </html>

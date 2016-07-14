@@ -41,7 +41,8 @@
 (function (iViz, $) {
 
   iViz.data = {};
-  iViz.data.init = function(_callBackFunc, _studyIdArr, _inputSampleList, _inputPatientList) {
+
+  iViz.data.init = function (_studyIdArr, _callbackFunc, _inputSampleList, _inputPatientList) {
 
     var _result = {};
     //var PORTAL_INST_URL = window.location.protocol + "//" + window.location.host + "/" + window.location.pathname.split('/')[1];
@@ -77,6 +78,11 @@
 
       }
     }
+    
+    /* 
+     * Cascade of calling web APIs
+     */
+    
     // patient clinical attribute meta
     $.when.apply($, _studyIdArr.map(function (_studyId) {
       return $.ajax({
@@ -308,20 +314,34 @@
                               _ajaxCnaData.caseIds = _ajaxCnaData.caseIds.concat(arguments[i][0].caseIds);
                             }
                           }
-                          // --- web API results converting ----
-                          var _patientData = [], _sampleData = [];
-                          var _patientIds = {};
+                          
+                          
+                          /* 
+                           * web API results converting 
+                           */
+                          
+                          var _patientData = [], 
+                              _sampleData = [];
+                          var _patientIds = {}, _sampleIds = {};
                           var _indexSample = 0, _sampleDataIndicesObj = {};
                           var _storedCnaGeneInventory = {}, _storedCnaGeneIndex = 0;
                           var _storedMutGeneInventory = {}, _storedMutGeneIndex = 0;
                           var _ajaxPatient2SampleIdMappingObjSimplified = {};
+                          
                           _.each(Object.keys(_ajaxPatient2SampleIdMappingObj), function (_tmpPatientId) {
-                            // _patientIds.push(_tmpPatientId);
+                            
                             var _sampleIdArr = _ajaxPatient2SampleIdMappingObj[_tmpPatientId]['sample_ids'];
+                            
                             var _studyId = _ajaxPatient2SampleIdMappingObj[_tmpPatientId]['study_id'];
                             _patientIds[_tmpPatientId]=_studyId;
                             _ajaxPatient2SampleIdMappingObjSimplified[_tmpPatientId]=_sampleIdArr;
                             _.each(_sampleIdArr, function (_sampleId) {
+
+                              // create a sample id hash map
+                              if (!_sampleIds.hasOwnProperty(_sampleId)) {
+                                _sampleIds[_sampleId] = [];
+                              }
+                              
                               // map from sample to patient
                               _ajaxSample2PatientIdMappingObj[_sampleId] = [_tmpPatientId];
                               var _datum = {};
@@ -332,91 +352,180 @@
                                   _datum[_dataObj['attr_id']] = _dataObj['attr_val'];
                                 }
                               });
+                              
                               // indices
                               _sampleDataIndicesObj[_sampleId] = _indexSample;
                               _indexSample += 1;
+                              
                               // mutation count
                               if (_ajaxMutationCountData[_sampleId] === undefined || _ajaxMutationCountData[_sampleId] === null) {
                                 _datum['mutation_count'] = 'NA';
                               } else {
                                 _datum['mutation_count'] = _ajaxMutationCountData[_sampleId];
                               }
+                              
                               // cna fraction
                               if (_ajaxCnaFractionData[_sampleId] === undefined || _ajaxCnaFractionData[_sampleId] === null) {
                                 _datum['cna_fraction'] = 0;
                               } else {
                                 _datum['cna_fraction'] = _ajaxCnaFractionData[_sampleId];
                               }
-                              // mutation gene data
-                              _datum['mutated_genes'] = [];
-                              _.each(_ajaxMutGenesData, function (_mutGeneDataObj) {
-                                _.each(_mutGeneDataObj.caseIds, function (_caseId) {
-                                  if (_caseId === _sampleId) {
-                                    if (_storedMutGeneInventory.hasOwnProperty(_mutGeneDataObj.gene_symbol)) { // if gene is already stored in the inventory
-                                      _datum['mutated_genes'].push(_storedMutGeneInventory[_mutGeneDataObj.gene_symbol].index);
-                                      _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts = _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts+1;
-                                      _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].caseIds.push(_caseId);
-                                    } else {
-                                      _storedMutGeneInventory[_mutGeneDataObj.gene_symbol] = {};
-                                      _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].gene = _mutGeneDataObj.gene_symbol;
-                                      _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts = 1;
-                                      _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].caseIds = [_caseId];
-                                      if ((_studyIdArr.length==1) && _mutGeneDataObj.hasOwnProperty('qval')) {
-                                        _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].qval = _mutGeneDataObj.qval;
-                                      } else {
-                                        _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].qval = null;
-                                      }
-                                      _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].index = _storedMutGeneIndex;
-                                      _datum['mutated_genes'].push(_storedMutGeneIndex);
-                                      _storedMutGeneIndex += 1;
-                                    }
-                                  }
-                                });
-                              });
+                              
+                              // // mutation gene data
+                              // _datum['mutated_genes'] = [];
+                              // _.each(_ajaxMutGenesData, function (_mutGeneDataObj) {
+                              //   _.each(_mutGeneDataObj.caseIds, function (_caseId) {
+                              //     if (_caseId === _sampleId) {
+                              //       if (_storedMutGeneInventory.hasOwnProperty(_mutGeneDataObj.gene_symbol)) { // if gene is already stored in the inventory
+                              //         _datum['mutated_genes'].push(_storedMutGeneInventory[_mutGeneDataObj.gene_symbol].index);
+                              //         _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts = _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts+1;
+                              //         _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].caseIds.push(_caseId);
+                              //       } else {
+                              //         _storedMutGeneInventory[_mutGeneDataObj.gene_symbol] = {};
+                              //         _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].gene = _mutGeneDataObj.gene_symbol;
+                              //         _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].num_muts = 1;
+                              //         _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].caseIds = [_caseId];
+                              //         if ((_studyIdArr.length==1) && _mutGeneDataObj.hasOwnProperty('qval')) {
+                              //           _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].qval = _mutGeneDataObj.qval;
+                              //         } else {
+                              //           _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].qval = null;
+                              //         }
+                              //         _storedMutGeneInventory[_mutGeneDataObj.gene_symbol].index = _storedMutGeneIndex;
+                              //         _datum['mutated_genes'].push(_storedMutGeneIndex);
+                              //         _storedMutGeneIndex += 1;
+                              //       }
+                              //     }
+                              //   });
+                              // });
+                              
                               // cna data
-                              _datum['cna_details'] = [];
-                              $.each(_ajaxCnaData.caseIds, function (_index, _caseIdsPerGene) {
-                                _.each(_caseIdsPerGene, function (_caseId) {
-                                  if (_sampleId === _caseId) {
-                                    if (_storedCnaGeneInventory.hasOwnProperty(_ajaxCnaData.gene[_index])) { // if gene is already stored in the inventory
-                                      _datum['cna_details'].push(_storedCnaGeneInventory[_ajaxCnaData.gene[_index]].index);
-                                      _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].caseIds.push(_caseId);
-                                    } else { // create a new gene entry
-                                      _storedCnaGeneInventory[_ajaxCnaData.gene[_index]] = {};
-                                      _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].gene = _ajaxCnaData.gene[_index];
-                                      var _altType='';
-                                      switch (_ajaxCnaData.alter[_index]) {
-                                        case -2:
-                                          _altType = 'DEL';
-                                          break;
-                                        case 2:
-                                          _altType = 'AMP';
-                                          break;
-                                        default:
-                                          break;
-                                      }
-                                      _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cna = _altType;
-                                      _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cytoband = _ajaxCnaData.cytoband[_index];
-                                      _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].caseIds = [_caseId];
-                                      if ((_studyIdArr.length !==1) || _ajaxCnaData.gistic[_index] === null) {
-                                        _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].qval = null;
-                                      } else {
-                                        _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].qval = _ajaxCnaData.gistic[_index][0];
-                                      }
-                                      _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].index = _storedCnaGeneIndex;
-                                      _datum['cna_details'].push(_storedCnaGeneIndex);
-                                      _storedCnaGeneIndex += 1;
-                                    }
-                                  }
-                                });
-                              });
+                              // _datum['cna_details'] = [];
+                              // $.each(_ajaxCnaData.caseIds, function (_index, _caseIdsPerGene) {
+                              //   _.each(_caseIdsPerGene, function (_caseId) {
+                              //     if (_sampleId === _caseId) {
+                              //       if (_storedCnaGeneInventory.hasOwnProperty(_ajaxCnaData.gene[_index])) { // if gene is already stored in the inventory
+                              //         _datum['cna_details'].push(_storedCnaGeneInventory[_ajaxCnaData.gene[_index]].index);
+                              //         _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].caseIds.push(_caseId);
+                              //       } else { // create a new gene entry
+                              //         _storedCnaGeneInventory[_ajaxCnaData.gene[_index]] = {};
+                              //         _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].gene = _ajaxCnaData.gene[_index];
+                              //         var _altType='';
+                              //         switch (_ajaxCnaData.alter[_index]) {
+                              //           case -2:
+                              //             _altType = 'DEL';
+                              //             break;
+                              //           case 2:
+                              //             _altType = 'AMP';
+                              //             break;
+                              //           default:
+                              //             break;
+                              //         }
+                              //         _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cna = _altType;
+                              //         _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].cytoband = _ajaxCnaData.cytoband[_index];
+                              //         _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].caseIds = [_caseId];
+                              //         if ((_studyIdArr.length !==1) || _ajaxCnaData.gistic[_index] === null) {
+                              //           _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].qval = null;
+                              //         } else {
+                              //           _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].qval = _ajaxCnaData.gistic[_index][0];
+                              //         }
+                              //         _storedCnaGeneInventory[_ajaxCnaData.gene[_index]].index = _storedCnaGeneIndex;
+                              //         _datum['cna_details'].push(_storedCnaGeneIndex);
+                              //         _storedCnaGeneIndex += 1;
+                              //       }
+                              //     }
+                              //   });
+                              // });
                               // final push
                               _sampleData.push(_datum);
                             });
                           });
 
-                          //add Mutation Count chart
-                          if(_ajaxMutationCountData.length !=0){
+                          // extract mutation data
+                          var _caseMutGeneMap = {}, _mutGeneMeta = {}, _mutGeneMetaIndex = 0;
+                          _.each(_ajaxMutGenesData, function(_mutGeneDataObj) {
+                            var _geneSymbol = _mutGeneDataObj.gene_symbol;
+                            _.each(_mutGeneDataObj.caseIds, function(_caseId) {
+                              if (_sampleIds.hasOwnProperty(_caseId)) {
+                                if (_mutGeneMeta.hasOwnProperty(_geneSymbol)) {
+                                  _mutGeneMeta[_geneSymbol].num_muts += 1;
+                                  _mutGeneMeta[_geneSymbol].caseIds.push(_caseId);
+                                } else {
+                                  _mutGeneMeta[_geneSymbol] = {};
+                                  _mutGeneMeta[_geneSymbol].gene = _geneSymbol;
+                                  _mutGeneMeta[_geneSymbol].num_muts = 1;
+                                  _mutGeneMeta[_geneSymbol].caseIds = [_caseId];
+                                  _mutGeneMeta[_geneSymbol].qval = (_studyIdArr.length === 1 && _mutGeneDataObj.hasOwnProperty('qval'))? _mutGeneDataObj.qval: null;
+                                  _mutGeneMeta[_geneSymbol].index = _mutGeneMetaIndex;
+                                  _mutGeneMetaIndex += 1;
+                                }
+                              }
+                            });
+                          });
+                          _.each(_ajaxMutGenesData, function(_mutGeneDataObj) {
+                            _.each(_mutGeneDataObj.caseIds, function(_caseId) {
+                              var _geneSymbol = _mutGeneDataObj.gene_symbol;
+                              if (!_caseMutGeneMap.hasOwnProperty(_caseId)) _caseMutGeneMap[_caseId] = [];
+                              _caseMutGeneMap[_caseId].push(_mutGeneMeta[_geneSymbol].index);
+                            });
+                          });
+                          _.each(_sampleData, function(_sampleDataObj) {
+                            var _sampleId = _sampleDataObj.sample_id;
+                            _sampleDataObj['mutated_genes'] = _caseMutGeneMap[_sampleId];
+                          });
+                          
+                          // extract cna data
+                          var _caseCnaMap = {}, _cnaMeta = {}, _cnaMetaIndex = 0;
+                          $.each(_ajaxCnaData.caseIds, function(_index, _caseIdsPerGene) {
+                            var _geneSymbol = _ajaxCnaData.gene[_index];
+                            _.each(_caseIdsPerGene, function(_caseId) {
+                              if (_sampleIds.hasOwnProperty(_caseId)) {
+                                if (_cnaMeta.hasOwnProperty(_geneSymbol)) {
+                                  _cnaMeta[_geneSymbol].caseIds.push(_caseId);
+                                } else {
+                                  _cnaMeta[_geneSymbol] = {};
+                                  _cnaMeta[_geneSymbol].gene = _geneSymbol;
+                                  var _altType='';
+                                  switch (_ajaxCnaData.alter[_index]) {
+                                    case -2:
+                                      _altType = 'DEL';
+                                      break;
+                                    case 2:
+                                      _altType = 'AMP';
+                                      break;
+                                    default:
+                                      break;
+                                  }
+                                  _cnaMeta[_geneSymbol].cna = _altType;
+                                  _cnaMeta[_geneSymbol].cytoband = _ajaxCnaData.cytoband[_index];
+                                  _cnaMeta[_geneSymbol].caseIds = [_caseId];
+                                  if ((_studyIdArr.length !==1) || _ajaxCnaData.gistic[_index] === null) {
+                                    _cnaMeta[_geneSymbol].qval = null;
+                                  } else {
+                                    _cnaMeta[_geneSymbol].qval = _ajaxCnaData.gistic[_index][0];
+                                  }
+                                  _cnaMeta[_geneSymbol].index = _cnaMetaIndex;
+                                  _cnaMetaIndex += 1;
+                                }
+                                if (_caseCnaMap.hasOwnProperty(_caseId)) {
+                                  _caseCnaMap['cna_details'].push(_cnaMeta[_geneSymbol].index);
+                                } else {
+                                  _caseCnaMap['cna_details'] = [_cnaMeta[_geneSymbol].index];
+                                }
+                              }
+                            });
+                          });
+                          _.each(_sampleData, function(_sampleDataObj) {
+                            var _sampleId = _sampleDataObj.sample_id;
+                            _sampleDataObj['cna_details'] = _caseCnaMap[_sampleId];
+                          });
+                          
+
+                          /* 
+                           * apply additional attributes to add special charts
+                           */
+                          
+                          // add mutation count 
+                          if(_ajaxMutationCountData.length !== 0){
                             var _MutationCountMeta = {};
                             _MutationCountMeta.datatype = 'NUMBER';
                             _MutationCountMeta.description = "Mutation Count";
@@ -433,7 +542,7 @@
                             _cnaAttrMeta.view_type = 'table';
                             _cnaAttrMeta.display_name = 'Copy Number Alterations';
                             _cnaAttrMeta.description = 'Copy Number Alterations';
-                            _cnaAttrMeta.gene_list = _storedCnaGeneInventory;
+                            _cnaAttrMeta.gene_list = _cnaMeta;
                             _cnaAttrMeta.attr_id = 'cna_details';
                             _cnaAttrMeta.options = {
                               allCases : _allSampleIds,
@@ -449,7 +558,7 @@
                             _mutDataAttrMeta.view_type = 'table';
                             _mutDataAttrMeta.display_name = 'Mutated Genes';
                             _mutDataAttrMeta.description = 'Mutated Genes';
-                            _mutDataAttrMeta.gene_list = _storedMutGeneInventory;
+                            _mutDataAttrMeta.gene_list = _mutGeneMeta;
                             _mutDataAttrMeta.attr_id = 'mutated_genes';
                             _mutDataAttrMeta.options = {
                               allCases : _allSampleIds,
@@ -556,7 +665,6 @@
                             "filter":[]
                           });
 
-
                           _result.groups = {};
                           _result.groups.patient = {};
                           _result.groups.sample = {};
@@ -573,8 +681,7 @@
                           _result.groups.group_mapping.patient = {};
                           _result.groups.group_mapping.sample.patient = _ajaxSample2PatientIdMappingObj;
                           _result.groups.group_mapping.patient.sample = _ajaxPatient2SampleIdMappingObjSimplified;
-
-                          _callBackFunc(_result, _inputSampleList, _inputPatientList);
+                          _callbackFunc(_result, _inputSampleList, _inputPatientList);
 
                         });
                       });
@@ -587,5 +694,6 @@
         });
       });
     });
+
   }
 }(window.iViz, window.$));
