@@ -93,14 +93,18 @@
         }
       },
       clickDelete: function(_virtualStudy) {
-        iViz.session.events.removeVirtualCohort(_virtualStudy);
+        if (_.isObject(iViz.session)) {
+          iViz.session.events.removeVirtualCohort(_virtualStudy);
+        }
       },
       clickSave: function(_virtualStudy) {
         this.edit = false;
         if (_virtualStudy.studyName === '') {
           _virtualStudy.studyName = 'My virtual study';
         }
-        iViz.session.events.editVirtualCohort(_virtualStudy);
+        if (_.isObject(iViz.session)) {
+          iViz.session.events.editVirtualCohort(_virtualStudy);
+        }
       },
       clickImport: function(_virtualStudy) {
         this.showmodal = false;

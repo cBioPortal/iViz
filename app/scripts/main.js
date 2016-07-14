@@ -40,7 +40,8 @@ var iViz = (function (_, $) {
 
     init: function (_rawDataJson, _inputSampleList, _inputPatientList) {
 
-      vm_ = iViz.session.manage.getInstance();
+      vm_ = iViz.vue.manage.getInstance();
+
       vm_.isloading = false;
       data_ = _rawDataJson;
 
@@ -250,7 +251,7 @@ var iViz = (function (_, $) {
           iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
         });
       } else {
-        iViz.session.manage.getInstance().initialize();
+        iViz.vue.manage.getInstance().initialize();
         iViz.init(data_);
       }
     }

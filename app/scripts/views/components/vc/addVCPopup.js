@@ -88,21 +88,23 @@
     },
     methods: {
       saveCohort: function() {
-        var _stats = {};
-        if (this.fromIViz) {
-          _stats = iViz.stat();
-        } else {
-          var _selectedCases = iViz.session.utils.buildCaseListObject([],
-            this.cancerStudyId,
-            this.sample);
-          _stats.filters = {patients: {}, samples: {}};
-          _stats.selected_cases = _selectedCases;
+        if (_.isObject(iViz.session)) {
+          var _stats = {};
+          if (this.fromIViz) {
+            _stats = iViz.stat();
+          } else {
+            var _selectedCases = iViz.session.utils.buildCaseListObject([],
+              this.cancerStudyId,
+              this.sample);
+            _stats.filters = {patients: {}, samples: {}};
+            _stats.selected_cases = _selectedCases;
+          }
+          iViz.session.events.saveCohort(_stats,
+            this.selectedPatientsNum, this.selectedSamplesNum, null, this.name,
+            this.description || '');
+          this.addNewVc = false;
+          jQuery.notify('Added to new Virtual Study', 'success');
         }
-        iViz.session.events.saveCohort(_stats,
-          this.selectedPatientsNum, this.selectedSamplesNum, null, this.name,
-          this.description || '');
-        this.addNewVc = false;
-        jQuery.notify('Added to new Virtual Study', 'success');
       }
     }
   });
