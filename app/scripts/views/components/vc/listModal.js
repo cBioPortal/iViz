@@ -73,17 +73,19 @@
         this.show = false;
       },
       addToVC: function(virtualCohortID) {
-        var _message = iViz.session.events.addSampleToVirtualCohort(
-          virtualCohortID,
-          this.cancerStudyId, this.sample);
-        var msgToShow = 'Error while adding sample';
-        if (_message === 'success') {
-          msgToShow = 'Added sample Virtual Study';
-        } else if (_message === 'warn') {
-          msgToShow = 'Sample already present is Virtual Study';
+        if (_.isObject(iViz.session)) {
+          var _message = iViz.session.events.addSampleToVirtualCohort(
+            virtualCohortID,
+            this.cancerStudyId, this.sample);
+          var msgToShow = 'Error while adding sample';
+          if (_message === 'success') {
+            msgToShow = 'Added sample Virtual Study';
+          } else if (_message === 'warn') {
+            msgToShow = 'Sample already present is Virtual Study';
+          }
+          jQuery.notify(msgToShow, _message);
+          this.close();
         }
-        jQuery.notify(msgToShow, _message);
-        this.close();
       },
       addNewVC: function() {
         this.showPopup = true;

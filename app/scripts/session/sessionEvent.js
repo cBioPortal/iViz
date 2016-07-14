@@ -33,7 +33,13 @@
  * Created by Karthik Kalletla on 3/21/16.
  */
 'use strict';
+
+window.iViz = window.iViz ? window.iViz : {};
+
 (function(iViz, _) {
+  if (!_.isObject(iViz.session)) {
+    iViz.session = {};
+  }
   iViz.session.events = (function() {
     return {
       saveCohort: function(stats, selectedPatientsNum, selectedSamplesNum,
@@ -45,7 +51,7 @@
         iViz.session.model.saveSession(_virtualCohort);
       },
       removeVirtualCohort: function(virtualCohort) {
-        iViz.session.manage.getInstance().virtualCohorts.$remove(virtualCohort);
+        iViz.vue.manage.getInstance().virtualCohorts.$remove(virtualCohort);
         iViz.session.model.removeSession(virtualCohort);
       },
       editVirtualCohort: function(virtualCohort) {

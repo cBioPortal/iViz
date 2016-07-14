@@ -33,7 +33,12 @@
  * Created by Karthik Kalletla on 3/21/16.
  */
 'use strict';
+window.iViz = window.iViz ? window.iViz : {};
+
 (function(iViz, _, $) {
+  if(!_.isObject(iViz.session)) {
+    iViz.session = {};
+  }
   iViz.session.utils = (function() {
     var virtualCohort_ = {
       studyName: 'My virtual study',

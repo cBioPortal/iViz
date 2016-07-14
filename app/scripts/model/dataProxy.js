@@ -597,8 +597,8 @@
                           // add Cancer Study
                           _ajaxPatientMeta.unshift({
                             "datatype": "STRING",
-                            "description": "Cancer Types",
-                            "display_name": "Cancer Types",
+                            "description": "Cancer Studies",
+                            "display_name": "Cancer Studies",
                             "attr_id": "study_id",
                             "view_type": "pie_chart"
                           });
