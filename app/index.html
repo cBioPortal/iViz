@@ -233,7 +233,8 @@
         window.style.vars.barchartHeight = 120;
       });
     
-    iViz.data.init(['blca_tcga_pub'], iViz.init);
+    iViz.data.init('http://localhost:8080/cbioportal', ['blca_tcga_pub'], iViz.init);
+    
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
       iViz.vue.manage.getInstance().$broadcast('gene-list-updated',genes);
     });
