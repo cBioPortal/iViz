@@ -55,7 +55,23 @@ body {
     content: "";
     position: relative;
   }
+  .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
 
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+  
   @import "components/barchart";
   @import "components/piechart";
   @import "components/breadcrumb";

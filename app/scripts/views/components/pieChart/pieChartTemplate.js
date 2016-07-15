@@ -64,7 +64,7 @@
         showTableIcon:true,
         showPieIcon:false,
         filtersUpdated:false
-      }
+      };
     },
     watch: {
       'filters': function(newVal, oldVal) {
@@ -124,7 +124,8 @@
         width: window.style['piechart-svg-width'] | 130,
         height: window.style['piechart-svg-height'] | 130
       };
-      this._piechart = new iViz.view.component.pieChart();
+      this._piechart = new iViz.view.component.pieChart(); //create a new instance
+                                                           //of pie chart each time the function is run
       this.chartInst = this._piechart.init(this.ndx, this.attributes, opts);
       var self_ = this;
       this.chartInst.on('filtered', function(_chartInst, _filter) {

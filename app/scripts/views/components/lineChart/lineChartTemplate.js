@@ -6,15 +6,14 @@
 'use strict';
 (function(Vue, dc, iViz, $){
     Vue.component('lineChart',{
-            template:'<div class="grid-item grid-item-h-1 grid-item-w-1" ' +
-                     'class="study-view-dc-chart study-view-pie-main">' +
-                     '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName">' +
-                     '</chart-operations></div>',
+            template:'<div id = "line-chart" class="grid-item grid-item-h-2 grid-item-w-2" class="study-view-dc-chart">' +
+                     '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName"> ' +
+                     '</chart-operations></div>', //everything written in template replaces
+                                                                     //the tag in the html file
             props: [],
-            data:function(l) {
-                l="Line Chart";
+            data:function() {
                 return {
-                    displayName: l,
+                    displayName: "Line Chart",
                     hasChartTitle: true
                 };
             },
@@ -24,7 +23,10 @@
             },
             methods:{   
             },
-            ready:function(){   
+            ready:function(){ 
+               this._linechart = new iViz.view.component.lineChart("#line-chart").init(); //create new instance of a line chart
+                                                                        //each time this function is called - will not 
+                                                                        //reference the same one everytime                                                                                                                                                                                                                                      
             }
     });
 })(window.Vue, window.dc, window.iViz,

@@ -34,7 +34,7 @@
  * Created by Karthik Kalletla on 4/6/16.
  */
 'use strict';
-(function(Vue, dc, iViz, $) {
+(function(Vue, dc, iViz, $, d3) {
   Vue.component('individualChart', {
     template: /*'<div v-if="attributes.show">' +*/
     '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
@@ -92,4 +92,4 @@
     }
   });
 })(window.Vue, window.dc, window.iViz,
-  window.$ || window.jQuery);
+  window.$ || window.jQuery, window.d3);
