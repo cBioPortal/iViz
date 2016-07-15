@@ -408,8 +408,10 @@
                                 if (_mutGeneMeta.hasOwnProperty(_geneSymbol)) {
                                   _mutGeneMeta[_geneSymbol].num_muts += 1;
                                   _mutGeneMeta[_geneSymbol].caseIds.push(_caseId);
-                                  if( _sampleData[_caseId]['mutated_genes'] !== undefined){
+                                  if (_sampleData[_caseId].hasOwnProperty('mutated_genes')) {
                                     _sampleData[_caseId]['mutated_genes'].push(_mutGeneMeta[_geneSymbol].index)
+                                  } else {
+                                    _sampleData[_caseId]['mutated_genes'] = [_mutGeneMeta[_geneSymbol].index]
                                   }
                                 } else {
                                   _mutGeneMeta[_geneSymbol] = {};
@@ -418,12 +420,10 @@
                                   _mutGeneMeta[_geneSymbol].caseIds = [_caseId];
                                   _mutGeneMeta[_geneSymbol].qval = (_studyIdArr.length === 1 && _mutGeneDataObj.hasOwnProperty('qval')) ? _mutGeneDataObj.qval : null;
                                   _mutGeneMeta[_geneSymbol].index = _mutGeneMetaIndex;
-                                  if (_sampleData.hasOwnProperty(_caseId)) {
-                                    if( _sampleData[_caseId]['mutated_genes'] !== undefined){
-                                      _sampleData[_caseId]['mutated_genes'].push(_mutGeneMetaIndex)
-                                    }else{
-                                      _sampleData[_caseId]['mutated_genes'] = [_mutGeneMetaIndex]
-                                    }
+                                  if (_sampleData[_caseId].hasOwnProperty('mutated_genes')) {
+                                    _sampleData[_caseId]['mutated_genes'].push(_mutGeneMetaIndex)
+                                  } else {
+                                    _sampleData[_caseId]['mutated_genes'] = [_mutGeneMetaIndex]
                                   }
                                   _mutGeneMetaIndex += 1;
                                 }
@@ -450,11 +450,11 @@
                               if (_sampleIdStudyIdMap.hasOwnProperty(_caseId)) {
                                 if (_cnaMeta.hasOwnProperty(_geneSymbol)) {
                                   _cnaMeta[_geneSymbol].caseIds.push(_caseId);
-                                  if (_sampleData.hasOwnProperty(_caseId)) {
-                                    if( _sampleData[_caseId]['cna_details'] !== undefined){
+                                    if( _sampleData[_caseId].hasOwnProperty('cna_details')){
                                       _sampleData[_caseId]['cna_details'].push(_cnaMeta[_geneSymbol].index)
+                                    }else{
+                                      _sampleData[_caseId]['cna_details'] = [_cnaMeta[_geneSymbol].index]
                                     }
-                                  }
                                 } else {
                                   _cnaMeta[_geneSymbol] = {};
                                   _cnaMeta[_geneSymbol].gene = _geneSymbol;
@@ -478,13 +478,11 @@
                                     _cnaMeta[_geneSymbol].qval = _ajaxCnaData.gistic[_index][0];
                                   }
                                   _cnaMeta[_geneSymbol].index = _cnaMetaIndex;
-                                  if (_sampleData.hasOwnProperty(_caseId)) {
-                                    if( _sampleData[_caseId]['cna_details'] !== undefined){
+                                    if( _sampleData[_caseId].hasOwnProperty('cna_details')){
                                       _sampleData[_caseId]['cna_details'].push(_cnaMetaIndex)
                                     }else{
                                       _sampleData[_caseId]['cna_details'] = [_cnaMetaIndex]
                                     }
-                                  }
                                   
                                   _cnaMetaIndex += 1;
                                 }

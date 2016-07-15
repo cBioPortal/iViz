@@ -68,16 +68,26 @@ var iViz = (function (_, $) {
 
       // ---- generating data matrix & fill the empty slots ----
       _.each(data_.groups.patient.data, function (_dataObj) {
-        _.each(_.pluck(data_.groups.patient.attr_meta, 'attr_id'), function (_attrId) {
-          if (!_dataObj.hasOwnProperty(_attrId)) {
-            _dataObj[_attrId] = 'NA';
+        _.each(data_.groups.patient.attr_meta, function (meta) {
+          if (!_dataObj.hasOwnProperty(meta['attr_id'])) {
+            if(meta['view_type'] === 'table'){
+              _dataObj[meta['attr_id']] = [];
+            }
+            else{
+              _dataObj[meta['attr_id']] = 'NA';
+            }
           }
         });
       });
       _.each(data_.groups.sample.data, function (_dataObj) {
-        _.each(_.pluck(data_.groups.sample.attr_meta, 'attr_id'), function (_attrId) {
-          if (!_dataObj.hasOwnProperty(_attrId)) {
-            _dataObj[_attrId] = 'NA';
+        _.each(data_.groups.sample.attr_meta, function (meta) {
+          if (!_dataObj.hasOwnProperty(meta['attr_id'])) {
+            if(meta['view_type'] === 'table'){
+              _dataObj[meta['attr_id']] = [];
+            }
+            else{
+              _dataObj[meta['attr_id']] = 'NA';
+            }
           }
         });
       });
