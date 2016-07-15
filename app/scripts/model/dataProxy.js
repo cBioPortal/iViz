@@ -310,7 +310,7 @@
                            * web API results converting 
                            */
 
-                          var _patientData = [], _sampleData = [];
+                          var _patientData = [], _sampleData = {};
                           var _patientIdStudyIdMap = {}, _sampleIdStudyIdMap = {};
                           var _indexSample = 0, _sampleDataIndicesObj = {};
                           var _indexPatient = 0, _patientDataIndicesObj = {};
@@ -394,7 +394,8 @@
                                 _datum['cna_fraction'] = _ajaxCnaFractionData[_sampleId];
                               }
 
-                              _sampleData.push(_datum);
+                              //_sampleData.push(_datum);
+                              _sampleData[_sampleId]=_datum;
                             });
                           });
 
@@ -407,6 +408,9 @@
                                 if (_mutGeneMeta.hasOwnProperty(_geneSymbol)) {
                                   _mutGeneMeta[_geneSymbol].num_muts += 1;
                                   _mutGeneMeta[_geneSymbol].caseIds.push(_caseId);
+                                  if( _sampleData[_caseId]['mutated_genes'] !== undefined){
+                                    _sampleData[_caseId]['mutated_genes'].push(_mutGeneMeta[_geneSymbol].index)
+                                  }
                                 } else {
                                   _mutGeneMeta[_geneSymbol] = {};
                                   _mutGeneMeta[_geneSymbol].gene = _geneSymbol;
@@ -414,12 +418,19 @@
                                   _mutGeneMeta[_geneSymbol].caseIds = [_caseId];
                                   _mutGeneMeta[_geneSymbol].qval = (_studyIdArr.length === 1 && _mutGeneDataObj.hasOwnProperty('qval')) ? _mutGeneDataObj.qval : null;
                                   _mutGeneMeta[_geneSymbol].index = _mutGeneMetaIndex;
+                                  if (_sampleData.hasOwnProperty(_caseId)) {
+                                    if( _sampleData[_caseId]['mutated_genes'] !== undefined){
+                                      _sampleData[_caseId]['mutated_genes'].push(_mutGeneMetaIndex)
+                                    }else{
+                                      _sampleData[_caseId]['mutated_genes'] = [_mutGeneMetaIndex]
+                                    }
+                                  }
                                   _mutGeneMetaIndex += 1;
                                 }
                               }
                             });
                           });
-                          _.each(_ajaxMutGenesData, function (_mutGeneDataObj) {
+                         /* _.each(_ajaxMutGenesData, function (_mutGeneDataObj) {
                             _.each(_mutGeneDataObj.caseIds, function (_caseId) {
                               var _geneSymbol = _mutGeneDataObj.gene_symbol;
                               if (!_caseMutGeneMap.hasOwnProperty(_caseId)) _caseMutGeneMap[_caseId] = [];
@@ -429,7 +440,7 @@
                           _.each(_sampleData, function (_sampleDataObj) {
                             var _sampleId = _sampleDataObj.sample_id;
                             _sampleDataObj['mutated_genes'] = _caseMutGeneMap[_sampleId];
-                          });
+                          });*/
 
                           // extract cna data
                           var _caseCnaMap = {}, _cnaMeta = {}, _cnaMetaIndex = 0;
@@ -439,6 +450,11 @@
                               if (_sampleIdStudyIdMap.hasOwnProperty(_caseId)) {
                                 if (_cnaMeta.hasOwnProperty(_geneSymbol)) {
                                   _cnaMeta[_geneSymbol].caseIds.push(_caseId);
+                                  if (_sampleData.hasOwnProperty(_caseId)) {
+                                    if( _sampleData[_caseId]['cna_details'] !== undefined){
+                                      _sampleData[_caseId]['cna_details'].push(_cnaMeta[_geneSymbol].index)
+                                    }
+                                  }
                                 } else {
                                   _cnaMeta[_geneSymbol] = {};
                                   _cnaMeta[_geneSymbol].gene = _geneSymbol;
@@ -462,20 +478,30 @@
                                     _cnaMeta[_geneSymbol].qval = _ajaxCnaData.gistic[_index][0];
                                   }
                                   _cnaMeta[_geneSymbol].index = _cnaMetaIndex;
+                                  if (_sampleData.hasOwnProperty(_caseId)) {
+                                    if( _sampleData[_caseId]['cna_details'] !== undefined){
+                                      _sampleData[_caseId]['cna_details'].push(_cnaMetaIndex)
+                                    }else{
+                                      _sampleData[_caseId]['cna_details'] = [_cnaMetaIndex]
+                                    }
+                                  }
+                                  
                                   _cnaMetaIndex += 1;
                                 }
-                                if (_caseCnaMap.hasOwnProperty(_caseId)) {
+                                
+                                
+                               /* if (_caseCnaMap.hasOwnProperty(_caseId)) {
                                   _caseCnaMap['cna_details'].push(_cnaMeta[_geneSymbol].index);
                                 } else {
                                   _caseCnaMap['cna_details'] = [_cnaMeta[_geneSymbol].index];
-                                }
+                                }*/
                               }
                             });
                           });
-                          _.each(_sampleData, function (_sampleDataObj) {
+                         /* _.each(_sampleData, function (_sampleDataObj) {
                             var _sampleId = _sampleDataObj.sample_id;
                             _sampleDataObj['cna_details'] = _caseCnaMap[_sampleId];
-                          });
+                          });*/
 
                           /* 
                            * apply additional attributes to add special charts
@@ -586,6 +612,10 @@
                             }
                             tempCount++;
                           });
+                          var _sampleDataSimplified = [];
+                          _.each(_sampleData,function(val,key){
+                            _sampleDataSimplified.push(val)
+                          });
 
                           _result.groups = {};
                           _result.groups.patient = {};
@@ -594,7 +624,7 @@
                           _result.groups.patient.attr_meta = _ajaxPatientMeta;
                           _result.groups.sample.attr_meta = _ajaxSampleMeta;
                           _result.groups.patient.data = _patientData;
-                          _result.groups.sample.data = _sampleData;
+                          _result.groups.sample.data = _sampleDataSimplified;
                           _result.groups.patient.data_indices = {};
                           _result.groups.sample.data_indices = {};
                           _result.groups.patient.data_indices.patient_id = _patientDataIndicesObj;
