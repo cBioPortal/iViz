@@ -61,6 +61,9 @@
         type: String
       }, sample: {
         type: String
+      }, userid:{
+        type: String,
+        default: 'DEFAULT'
       }
 
     },
@@ -100,7 +103,7 @@
             _stats.selected_cases = _selectedCases;
           }
           iViz.session.events.saveCohort(_stats,
-            this.selectedPatientsNum, this.selectedSamplesNum, null, this.name,
+            this.selectedPatientsNum, this.selectedSamplesNum, this.userid, this.name,
             this.description || '');
           this.addNewVc = false;
           jQuery.notify('Added to new Virtual Study', 'success');

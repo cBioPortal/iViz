@@ -75,7 +75,7 @@ window.iViz = window.iViz ? window.iViz : {};
           data: JSON.stringify(data)
         }).done(function(response) {
           localStorageAdd_(response.id,
-            response.data.virtualCohort);
+            data.virtualCohort);
         }).fail(function() {
           localStorageAdd_(iViz.session.utils.generateUUID(),
             data.virtualCohort);
@@ -102,7 +102,7 @@ window.iViz = window.iViz ? window.iViz : {};
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(data)
         }).done(function(response) {
-          localStorageEdit_(response.data.virtualCohort);
+          localStorageEdit_(data.virtualCohort);
         }).fail(function(jqXHR) {
           if (jqXHR.status === 404) {
             localStorageDelete_(_virtualCohort);
@@ -113,11 +113,13 @@ window.iViz = window.iViz ? window.iViz : {};
         });
       },
       loadUserVirtualCohorts: function(userID) {
+        var def = new $.Deferred();
         $.ajax({
           type: 'GET',
           url:  iViz.session.URL + 'query/',
           contentType: 'application/json;charset=UTF-8',
-          data: {userid: userID}
+          data: { field : 'data.virtualCohort.userID',
+            value : userID}
         }).done(function(response) {
           var _virtualCohorts = [];
           $.each(response, function(key, val) {
@@ -125,10 +127,13 @@ window.iViz = window.iViz ? window.iViz : {};
             _virtualCohort.virtualCohortID = val.id;
             _virtualCohorts.push(_virtualCohort);
           });
-          iViz.session.utils.setVirtualCohorts(_virtualCohorts);
+          def.resolve(_virtualCohorts);
+          //iViz.session.utils.setVirtualCohorts(_virtualCohorts);
         }).fail(function() {
           console.log('unable to get user virtual cohorts');
+          def.reject();
         });
+        return def.promise();
       },
 
       getVirtualCohortDetails: function(virtualCohortID) {
