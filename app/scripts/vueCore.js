@@ -45,14 +45,14 @@
         vmInstance_ = new Vue({
           el: '#complete-screen',
           data: {
+            showSaveButton:true,
+            showManageButton:false,
             groups: [],
             selectedsamples: [],
             selectedpatients: [],
             patientmap: [],
             samplemap: [],
             selectedgenes: [],
-            showVCList: false,
-            addNewVC: false,
             selectedPatientsNum: 0,
             selectedSamplesNum: 0,
             hasfilters: false,
@@ -65,7 +65,8 @@
               sampleIds:[],
               patientIds:[]
             },
-            initalLoad:true
+            initalLoad:true,
+            userid : 'DEFAULT'
           }, watch: {
             'redrawgroups':function(newVal,oldVal){
               if(newVal.length>0){
@@ -105,14 +106,14 @@
             }
           },methods: {
             initialize: function() {
+                this.showSaveButton = true;
+                this.showManageButton = false;
                 this.groups = [];
                 this.selectedsamples = [];
                 this.selectedpatients = [];
                 this.selectedgenes = [];
                 this.patientmap = [];
                 this.samplemap = [];
-                this.showVCList = false;
-                this.addNewVC = false;
                 this.selectedPatientsNum = 0;
                 this.selectedSamplesNum = 0;
                 this.hasfilters = false;
@@ -123,7 +124,8 @@
                   type:"",
                   sampleIds:[],
                   patientIds:[]
-                }
+                };
+                this.userid = 'DEFAULT';
             },
             clearAll: function(){
               if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
@@ -209,12 +211,6 @@
               }
 
             }
-          }, ready: function() {
-            this.$watch('showVCList', function() {
-              if (_.isObject(iViz.session)) {
-                this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
-              }
-            });
           }
         });
       },

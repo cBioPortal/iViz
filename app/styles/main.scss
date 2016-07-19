@@ -18,7 +18,11 @@ body {
   @import "components/chart-operations";
   @import "components/scatterplot";
   @import "components/survivalplot";
+}
+
+#cohort-component{
   @import "components/vc";
+  @import "partials/global";
 }
 
 @import "vendor/dashiboard";

@@ -58,6 +58,13 @@
   <link rel="stylesheet" href="styles/main.css"/>
 
   <!-- endbuild -->
+
+  <!-- build:js scripts/iviz-session.js -->
+
+  <script src="scripts/session/sessionEvent.js"></script>
+  <script src="scripts/session/sessionUtil.js"></script>
+  <script src="scripts/session/sessionServices.js"></script>
+  <!-- endbuild -->
   
   <!-- build:js scripts/iviz.js -->
   <script src="/bower_components/fixed-data-table/dist/fixed-data-table.js"></script>
@@ -94,45 +101,34 @@
   <script src="scripts/views/components/vc/editableRowComponent.js"></script>
   <script src="scripts/views/components/vc/modalTemplate.js"></script>
   <script src="scripts/views/components/vc/addVCPopup.js"></script>
+  <script src="scripts/views/components/vc/sessionComponent.js"></script>
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
   <script src="scripts/views/components/Notification.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <!-- endbuild -->
   
-  <!-- build:js scripts/iviz-session.js -->
-  <script src="scripts/session/sessionEvent.js"></script>
-  <script src="scripts/session/sessionUtil.js"></script>
-  <script src="scripts/session/sessionServices.js"></script>
-  <!-- endbuild -->
 </head>
 <body>
 
 <div class="container-fluid" id="complete-screen">
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header">
-      <!--<button type='button' class='btn btn-default'-->
-      <!--@click="addNewVC = true"-->
-      <!--id="save_cohort_btn">Save-->
-      <!--Cohort-->
-      <!--</button>-->
-      <!--<button type='button' class="btn btn-default"-->
-      <!--@click="showVCList = true">-->
-      <!--<i class="fa fa-bars"></i>-->
-      <!--</button>-->
-      <div id="study-view-header-left">
-        
       
+      <div id="study-view-header-left">
+        <div style="float:left">
+        <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton" :selected-patients-num="selectedPatientsNum"
+                           :selected-samples-num="selectedSamplesNum" :userid="userid"></session-component>
+        </div>
+        <div style="float:left">
       <span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
           Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
       </span>
+        </div>
       </div>
       <div id="study-view-header-right" style="margin-right:30px;">
         <custom-case-input></custom-case-input>
       
-      <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
-      <!--:selected-samples-num="selectedSamplesNum"-->
-      <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
       <select id="study-view-add-chart" class="chosen-select"
               v-select :groups="groups">
         <option id='' value="">Add Chart</option>
@@ -165,31 +161,6 @@
           All</button></div>
       </div>
 
-      <!--<modaltemplate :show.sync="showVCList" size="modal-xlg">-->
-      <!--<div slot="header">-->
-      <!--<h4 class="modal-title">Virtual Cohorts</h4>-->
-      <!--</div>-->
-      <!--<div slot="body">-->
-      <!--<table class="table table-bordered table-hover table-condensed">-->
-      <!--<thead>-->
-      <!--<tr style="font-weight: bold">-->
-      <!--<td style="width:20%">Name</td>-->
-      <!--<td style="width:40%">Description</td>-->
-      <!--<td style="width:10%">Patients</td>-->
-      <!--<td style="width:10%">Samples</td>-->
-      <!--<td style="width:20%">Operations</td>-->
-      <!--</tr>-->
-      <!--</thead>-->
-      <!--<tr is="editable-row" :data="virtualCohort" :showmodal.sync="showVCList" v-for="virtualCohort in virtualCohorts">-->
-      <!--</tr>-->
-      <!--</table>-->
-      <!--</div>-->
-
-      <!--<div slot="footer">-->
-      <!--&lt;!&ndash;<button type="button" class="btn btn-default"&ndash;&gt;-->
-      <!--&lt;!&ndash;onclick="window.location.href='/index.html'">Add new</button>&ndash;&gt;-->
-      <!--</div>-->
-      <!--</modaltemplate>-->
     </div>
   </nav>
   <div class="grid" id="main-grid" :class="{loading:isloading}">
@@ -219,8 +190,8 @@
         window.style.vars.barchartHeight = 120;
       })
 
-    iViz.session.URL = "http://localhost:8081/api/sessions/";
     var vcId_ = location.search.split('vc_id=')[1];
+    vcSession.URL = "http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/";
     iViz.vue.manage.init();
     if (typeof vcId_ != 'undefined') {
       iViz.session.model.getVirtualCohortDetails(vcId_);

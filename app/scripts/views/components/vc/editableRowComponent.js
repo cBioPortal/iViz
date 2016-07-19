@@ -34,7 +34,7 @@
  */
 
 'use strict';
-(function(Vue, iViz, $, Clipboard) {
+(function(Vue, vcSession, $, Clipboard) {
   var clipboard = null;
   $(document).on('mouseleave', '.btn-share', function(e) {
     $(e.currentTarget).removeClass('tooltipped tooltipped-s');
@@ -69,7 +69,11 @@
     ' @click="clickImport(data)">Visualize</button></div></td></tr>',
     props: [
       'data', 'showmodal'
-    ],
+    ], created: function() {
+      this.edit = false,
+        this.share = false,
+        this.shortenedLink = '---'
+  },
     data: function() {
       return {
         edit: false,
@@ -93,8 +97,9 @@
         }
       },
       clickDelete: function(_virtualStudy) {
-        if (_.isObject(iViz.session)) {
-          iViz.session.events.removeVirtualCohort(_virtualStudy);
+        if (_.isObject(vcSession)) {
+          this.$dispatch('remove-cohort',_virtualStudy);
+          vcSession.events.removeVirtualCohort(_virtualStudy);
         }
       },
       clickSave: function(_virtualStudy) {
@@ -102,13 +107,14 @@
         if (_virtualStudy.studyName === '') {
           _virtualStudy.studyName = 'My virtual study';
         }
-        if (_.isObject(iViz.session)) {
-          iViz.session.events.editVirtualCohort(_virtualStudy);
+        if (_.isObject(vcSession)) {
+          vcSession.events.editVirtualCohort(_virtualStudy);
         }
       },
       clickImport: function(_virtualStudy) {
         this.showmodal = false;
-        iViz.applyVC(_virtualStudy);
+        //TODO: need to update functionality
+        //iViz.applyVC(_virtualStudy);
       },
       clickShare: function(_virtualStudy) {
         // TODO: Create Bitly URL
@@ -148,5 +154,5 @@
       showTooltip(e.trigger, 'Unable to copy');
     });
   }
-})(window.Vue, window.iViz,
+})(window.Vue, window.vcSession,
   window.$ || window.jQuery, window.Clipboard);

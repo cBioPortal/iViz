@@ -45,6 +45,7 @@ var iViz = (function (_, $) {
       vm_.isloading = false;
       data_ = _rawDataJSON;
       var _inputPatientList = [];
+      if(_inputSampleList !== undefined)
       $.each(_inputSampleList,function(key,sampleId){
         var patientList_ = data_.groups.group_mapping.sample.patient[sampleId];
         if(data_.groups.group_mapping.sample.patient[sampleId] !== undefined){
