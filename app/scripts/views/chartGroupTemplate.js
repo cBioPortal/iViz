@@ -33,7 +33,7 @@
  * Created by Karthik Kalletla on 4/6/16.
  */
 'use strict';
-(function(Vue, dc, iViz, $) {
+(function(Vue, dc, iViz, $, d3) {
   var settings_ = {
     pieChart: {
       width: 150,
@@ -125,4 +125,4 @@
     }
   });
 })(window.Vue, window.dc, window.iViz,
-  window.$ || window.jQuery);
+  window.$ || window.jQuery, window.d3);

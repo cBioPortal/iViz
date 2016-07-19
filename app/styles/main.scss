@@ -12,6 +12,45 @@ body {
   @import "partials/grids";
   @import "partials/global";
   
+  .view {
+    display: none;
+  }
+
+  //not used
+  .hide-content {
+    display: none;
+  }
+
+  //Used in index.html
+  .loading {
+    //padding:400px;
+    margin: 400px;
+    background-image: url('../images/ajax-loader.gif');
+    background-repeat: no-repeat;
+    background-size: 100px 100px;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    content: "";
+    position: relative;
+  }
+  .axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+  
   @import "components/barchart";
   @import "components/piechart";
   @import "components/breadcrumb";
