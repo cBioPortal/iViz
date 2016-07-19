@@ -38,13 +38,20 @@ var iViz = (function (_, $) {
 
   return {
 
-    init: function (_rawDataJSON, _inputSampleList, _inputPatientList) {
+    init: function (_rawDataJSON, _inputSampleList) {
 
       vm_ = iViz.vue.manage.getInstance();
 
       vm_.isloading = false;
       data_ = _rawDataJSON;
-
+      var _inputPatientList = [];
+      if(_inputSampleList !== undefined)
+      $.each(_inputSampleList,function(key,sampleId){
+        var patientList_ = data_.groups.group_mapping.sample.patient[sampleId];
+        if(data_.groups.group_mapping.sample.patient[sampleId] !== undefined){
+          _inputPatientList = _inputPatientList.concat(patientList_)
+        }
+      });
       if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
         var _sampleData = _.filter(_data.groups.sample.data, function (_dataObj) {
           return $.inArray(_dataObj['sample_id'], _inputSampleList) !== -1

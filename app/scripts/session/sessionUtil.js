@@ -33,13 +33,13 @@
  * Created by Karthik Kalletla on 3/21/16.
  */
 'use strict';
-window.iViz = window.iViz ? window.iViz : {};
+window.vcSession = window.vcSession ? window.vcSession : {};
 
-(function(iViz, _, $) {
-  if(!_.isObject(iViz.session)) {
-    iViz.session = {};
+(function(vcSession, _, $) {
+  if(!_.isObject(vcSession)) {
+    vcSession = {};
   }
-  iViz.session.utils = (function() {
+  vcSession.utils = (function() {
     var virtualCohort_ = {
       studyName: 'My virtual study',
       description: 'My virtual study - Description',
@@ -119,6 +119,6 @@ window.iViz = window.iViz ? window.iViz : {};
       buildCaseListObject: buildCaseListObject_
     };
   })();
-})(window.iViz,
+})(window.vcSession,
   window._,
   window.$ || window.jQuery);

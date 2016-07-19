@@ -1,0 +1,60 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+  <meta charset="utf-8">
+
+
+  <!-- build:js(.) scripts/iviz-session-vendor.js -->
+  <!-- bower:js -->
+  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="/bower_components/qtip2/jquery.qtip.js"></script>
+  <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
+  <script src="/bower_components/vue/dist/vue.js"></script>
+  <script src="/bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
+  <script src="/bower_components/underscore/underscore.js"></script>
+  <script src="/bower_components/clipboard/dist/clipboard.js"></script>
+  <!-- endbower -->
+  <!-- endbuild -->
+
+  <!-- build:css(.) styles/iviz-session-vendor.css -->
+  <!-- bower:css -->
+  <link rel="stylesheet" href="/bower_components/qtip2/jquery.qtip.css" />
+  <link rel="stylesheet" href="/bower_components/components-font-awesome/css/font-awesome.css" />
+  <!-- endbower -->
+  <!-- endbuild -->
+
+  <!-- build:css(.tmp) styles/iviz-session.css -->
+  <link rel="stylesheet" href="styles/main.css"/>
+
+  <!-- endbuild -->
+
+  <!-- build:js scripts/iviz-session.js -->
+  <script src="scripts/session/vueSession.js"></script>
+  <script src="scripts/views/components/vc/editableFieldComponent.js"></script>
+  <script src="scripts/views/components/vc/editableRowComponent.js"></script>
+  <script src="scripts/views/components/vc/modalTemplate.js"></script>
+  <script src="scripts/views/components/vc/addVCPopup.js"></script>
+  <script src="scripts/views/components/vc/sessionComponent.js"></script>
+  <script src="scripts/session/sessionEvent.js"></script>
+  <script src="scripts/session/sessionUtil.js"></script>
+  <script src="scripts/session/sessionServices.js"></script>
+
+  <!-- endbuild -->
+</head>
+<body>
+
+<div id="cohort-component1">
+  <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"  :selected-patients-num="selectedPatientsNum"
+                     :selected-samples-num="selectedSamplesNum" :userid="userid"></session-component>
+    </div>
+
+
+
+</body>
+<script>
+  $(document).ready(function () {
+    vcSession.URL = "http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/";
+    vcSession.init();
+  });
+</script>
+</html>

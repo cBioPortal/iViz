@@ -34,7 +34,7 @@
  */
 
 'use strict';
-(function(Vue, iViz) {
+(function(Vue, vcSession, iViz) {
   Vue.component('addVc', {
 
     props: {
@@ -61,8 +61,10 @@
         type: String
       }, sample: {
         type: String
+      }, userid:{
+        type: String,
+        default: 'DEFAULT'
       }
-
     },
     template: '<modaltemplate :show.sync="addNewVc" size="modal-lg"><div' +
     ' slot="header"><h3 class="modal-title">Save Virtual' +
@@ -88,19 +90,19 @@
     },
     methods: {
       saveCohort: function() {
-        if (_.isObject(iViz.session)) {
+        if (_.isObject(vcSession)) {
           var _stats = {};
           if (this.fromIViz) {
-            _stats = iViz.stat();
+            _stats = $.extend(true,{},iViz.stat());
           } else {
-            var _selectedCases = iViz.session.utils.buildCaseListObject([],
+            var _selectedCases = vcSession.utils.buildCaseListObject([],
               this.cancerStudyId,
               this.sample);
             _stats.filters = {patients: {}, samples: {}};
             _stats.selected_cases = _selectedCases;
           }
-          iViz.session.events.saveCohort(_stats,
-            this.selectedPatientsNum, this.selectedSamplesNum, null, this.name,
+          vcSession.events.saveCohort(_stats,
+            this.selectedPatientsNum, this.selectedSamplesNum, this.userid, this.name,
             this.description || '');
           this.addNewVc = false;
           jQuery.notify('Added to new Virtual Study', 'success');
@@ -108,4 +110,4 @@
       }
     }
   });
-})(window.Vue, window.iViz);
+})(window.Vue, window.vcSession,window.iViz);
