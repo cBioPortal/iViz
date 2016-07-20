@@ -4,13 +4,13 @@
   <meta charset="utf-8">
 
 
-  <!-- build:js(.) scripts/vendor.js -->
+  <!-- build:js(.) scripts/iviz-vendor.js -->
   <!-- bower:js -->
   <script src="/bower_components/modernizr/modernizr.js"></script>
-  <script src="/bower_components/jquery/dist/jquery.js"></script>
+  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/bower_components/chosen/chosen.jquery.min.js"></script>
   <script src="/bower_components/datatables/media/js/jquery.dataTables.js"></script>
-  <script src="/bower_components/d3/d3.js"></script>
+  <script src="/bower_components/d3/d3.min.js"></script>
   <script src="/bower_components/crossfilter2/crossfilter.min.js"></script>
   <script src="/bower_components/dcjs/dc.js"></script>
   <script src="/bower_components/classie/classie.js"></script>
@@ -33,15 +33,17 @@
   <script src="/bower_components/qtip2/jquery.qtip.js"></script>
   <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
   <script src="/bower_components/vue/dist/vue.js"></script>
-  <script src="/bower_components/notifyjs/dist/notify.js"></script>
   <script src="/bower_components/clipboard/dist/clipboard.js"></script>
-  <script src="/bower_components/plotly.js/dist/plotly.min.js"></script>
+  <script src="/bower_components/plotly.js/dist/plotly.js"></script>
   <script src="/bower_components/react/react.js"></script>
   <script src="/bower_components/react/react-dom.js"></script>
+  <script src="/bower_components/fixed-data-table/dist/fixed-data-table.min.js"></script>
+  <script src="/bower_components/jstat/dist/jstat.min.js"></script>
+  <script src="/bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
 
-  <!-- build:css(.) styles/vendor.css -->
+  <!-- build:css(.) styles/iviz-vendor.css -->
   <!-- bower:css -->
   <link rel="stylesheet" href="/bower_components/chosen/chosen.min.css" />
   <link rel="stylesheet" href="/bower_components/datatables/media/css/jquery.dataTables.css" />
@@ -52,28 +54,24 @@
   <!-- endbower -->
   <!-- endbuild -->
 
-  <!-- build:css(.tmp) styles/main.css -->
+  <!-- build:css(.tmp) styles/iviz.css -->
   <link rel="stylesheet" href="styles/main.css"/>
-  <link rel="stylesheet" href="styles/study-view.css"/>
 
   <!-- endbuild -->
-
-  <!-- build:js scripts/scripts.js -->
-  <script src="https://rawgit.com/notifyjs/notifyjs/master/dist/notify.js"></script>
-  <script src="https://d3js.org/d3.v3.min.js"></script>   
+  
+  <!-- build:js scripts/iviz.js -->
   <script src="/bower_components/fixed-data-table/dist/fixed-data-table.js"></script>
+  <script src="/app/_components/FileSaver.min.js"></script>
+  <script src="/app/_components/cbio-util.js"></script>
   <script src="scripts/main.js"></script>
   <script src="scripts/vueCore.js"></script>
   <script src="scripts/controller/util.js"></script>
   <script src="scripts/controller/sync.js"></script>
   <script src="scripts/controller/event.js"></script>
-  <script src="scripts/controller/sessionEvent.js"></script>
-  <script src="scripts/controller/sessionUtil.js"></script>
-  <script src="scripts/model/sessionServices.js"></script>
-  <script src="scripts/model/dataProxy.js"></script>
   <script src="scripts/views/mainTemplate.js"></script>
   <script src="scripts/views/chartGroupTemplate.js"></script>
   <script src="scripts/views/individualChartTemplate.js"></script>
+  <script src="scripts/views/components/generalChart.js"></script>
   <script src="scripts/views/components/chartOperationsHeader.js"></script>
   <script src="scripts/views/components/bridgeChart/bridgeChart.js"></script>
   <script src="scripts/views/components/header/manageCharts.js"></script>
@@ -94,13 +92,22 @@
   <script src="scripts/views/components/survivalChart/components/curve.js"></script>
   <script src="scripts/views/components/survivalChart/components/kmEstimator.js"></script>
   <script src="scripts/views/components/survivalChart/components/logRankTest.js"></script>
+  <script src="scripts/views/components/dataTable/tableView.js"></script>
+  <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
   <script src="scripts/views/components/vc/editableFieldComponent.js"></script>
   <script src="scripts/views/components/vc/editableRowComponent.js"></script>
   <script src="scripts/views/components/vc/modalTemplate.js"></script>
   <script src="scripts/views/components/vc/addVCPopup.js"></script>
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
+  <script src="scripts/views/components/Notification.js"></script>
+  <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <!-- endbuild -->
-
+  
+  <!-- build:js scripts/iviz-session.js -->
+  <script src="scripts/session/sessionEvent.js"></script>
+  <script src="scripts/session/sessionUtil.js"></script>
+  <script src="scripts/session/sessionServices.js"></script>
+  <!-- endbuild -->
 </head>
 <body>
 
@@ -116,10 +123,17 @@
       <!--@click="showVCList = true">-->
       <!--<i class="fa fa-bars"></i>-->
       <!--</button>-->
+      <div id="study-view-header-left">
+        
+      
       <span id="stat">
           Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
           Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
       </span>
+      </div>
+      <div id="study-view-header-right" style="margin-right:30px;">
+        <custom-case-input></custom-case-input>
+      
       <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
       <!--:selected-samples-num="selectedSamplesNum"-->
       <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
@@ -130,12 +144,17 @@
         <option is="manage-charts" :data.sync="group"
                 v-for="(index,group) in groups" :parent="index"></option>
       </select>
+      </div>
 
       <div id="breadcrumbs_container" v-if="hasfilters">
         <div style="float:left;" >
           <span class="breadcrumb_container">Your selections: </span>
         </div>
 
+        <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
+          <span>{{customfilter.display_name}}</span>
+          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">
+        </span>
           <div style="float:left" v-for="group in groups">
             <bread-crumb :attributes.sync="item"
                          :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
@@ -182,8 +201,6 @@
                    :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
                    :selectedsamples.sync="selectedsamples"
                    :hasfilters.sync="hasfilters"></main-template>
-      <example-line-chart></example-line-chart>
-      <line-chart></line-chart>
   </div>
   <div id="main-bridge" style="display: none;"></div>
 </div>
@@ -204,14 +221,16 @@
         window.style.vars.barchartWidth = 350;
         window.style.vars.barchartHeight = 120;
       })
-    
-    URL = "http://localhost:8081/api/sessions/";
+
+    iViz.session.URL = "http://localhost:8081/api/sessions/";
     var vcId_ = location.search.split('vc_id=')[1];
-    iViz.session.manage.init();
+    iViz.vue.manage.init();
     if (typeof vcId_ != 'undefined') {
       iViz.session.model.getVirtualCohortDetails(vcId_);
     } else {
-      iViz.init(["blca_tcga_pub"]);
+      $.getJSON('/data/sample.json', function(_data) {
+        iViz.init(_data);
+      });
     }
   });
 </script>

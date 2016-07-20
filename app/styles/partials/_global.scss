@@ -1,0 +1,124 @@
+* {
+  box-sizing: border-box;
+}
+
+#main-header {
+  margin-left: 25px;
+  margin-bottom: 15px;
+  margin-top: 10px;
+  bottom: -5px;
+  left: 10px;
+  position: relative;
+}
+
+#stat {
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.navbar button {
+  margin-top: 10px;
+  margin-left: 5px;
+}
+
+.view {
+  display: none;
+}
+
+//not used
+.hide-content {
+  display: none;
+}
+
+//Used in index.html
+.loading {
+  //padding:400px;
+  margin: 400px;
+  background-image: url('../images/ajax-loader.gif');
+  background-repeat: no-repeat;
+  background-size: 100px 100px;
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+  content: "";
+  position: relative;
+}
+
+.chart-title-span {
+  font-size: 10px;
+  color: black;
+  font-weight: bold;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+
+#study-view-case-select-custom-dialog input[type="radio"] {
+  margin: 3px;
+}
+
+#study-view-case-select-custom-dialog {
+  margin: 3px 0;
+}
+
+.study-view-hidden {
+  display: none;
+}
+.show {
+  display: block;
+}
+
+#study-view-header-right-1 {
+  font-size: 1.1em;
+  width: 160px;
+}
+
+.study-view-header-button {
+  float: left;
+  margin: 0 5px 0 0;
+ // font-family: Verdana,Arial,sans-serif;
+  font-size: 1.1em;
+  border: 1px solid darkgray;
+  background: none;
+  font-weight: normal;
+  color: #555555;
+  padding: 5px 10px;
+  margin-top: -3px;
+  margin-right: 10px;
+  border: solid 1px;
+  border-radius: 5px;
+  border-color: darkgrey;
+  line-height: 18px;
+}
+.study-view-header-button:hover {
+  cursor: pointer;
+}
+
+#study-view-header-left{
+  display: inline-block;
+}
+#study-view-header-right {
+  float: right;
+}
+
+#study_view_add_chart_chosen {
+  margin-top: -3px;
+  width: 250px !important;
+  background-image: none !important;
+}
+
+#study_view_add_chart_chosen>a {
+  background-image: none;
+  height: 28px;
+  line-height: 28px;
+}
+
+div.geneValidationNotification,
+div.geneAddedNotification{
+  width:400px;
+  height: 15px;
+  font-size: 0.8em;
+}

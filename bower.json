@@ -14,14 +14,31 @@
     "qtip2": "~2.2.1",
     "vue": "~1.0.15",
     "components-font-awesome": "^4.5.0",
-    "notifyjs": "^0.4.0",
     "bootstrap-sass": "^3.3.6",
     "clipboard": "^1.5.9",
-    "plotly.js": "^1.12.0",
+    "plotly.js": "https://github.com/yichaoS/plotly.js.git#portal",
     "react": "^15.1.0",
-    "fixed-data-table": "^0.6.0"
+    "fixed-data-table": "^0.6.0",
+    "jstat": "^1.5.3",
+    "remarkable-bootstrap-notify": "^3.1.3"
   },
   "overrides": {
+    "d3": {
+      "main": "d3.min.js"
+    },
+    "jquery": {
+      "main": "dist/jquery.min.js"
+    },
+    "jstat": {
+      "main": [
+        "dist/jstat.min.js"
+      ]
+    },
+    "plotly.js": {
+      "main": [
+        "dist/plotly.js"
+      ]
+    },
     "bootstrap-sass": {
       "main": [
         "assets/stylesheets/_bootstrap.scss",
@@ -54,8 +71,8 @@
       ]
     },
     "fixed-data-table": {
-      "main":[
-        "fixed-data-table.js",
+      "main": [
+        "dist/fixed-data-table.min.js",
         "dist/fixed-data-table.min.css"
       ]
     }

@@ -48,17 +48,17 @@
   };
 
   Vue.component('barChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item-w-2 grid-item-h-1" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+    template: '<div id={{charDivId}} class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :show-survival-icon="showSurvivalIcon" :show-log-scale="showLogScale"' +
-    ':show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" :chart-id="chartId" :show-log-scale="showLogScale"></chart-operations>' +
-    '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><p class="text-center">{{displayName}}</p>' +
+    ':show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart-ctrl="barChart" :chart="chartInst" :chart-id="chartId" :show-log-scale="showLogScale" :filters.sync="filters"></chart-operations>' +
+    '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><span class="text-center chart-title-span">{{displayName}}</span>' +
     '</div>',
     props: [
       'data', 'ndx', 'attributes', 'filters', 'groupid'
     ],
     data: function() {
       return {
-        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
+        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
         '-div',
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
         '-reset',
@@ -82,7 +82,7 @@
         } else{
           this.filtersUpdated = false;
         }
-      },
+      }
     },events: {
       'closeChart':function(){
         this.$dispatch('close');
@@ -100,8 +100,16 @@
         this.showOperations = false;
       },initChart:function(logScaleChecked){
         this.chartInst =
-          this.barChart.init(this.ndx, this.data, this.attributes, settings_,
-            this.chartId, this.groupid,logScaleChecked);
+          this.barChart.init(this.ndx, this.data, {
+            attrId: this.attributes.attr_id,
+            displayName: this.attributes.display_name,
+            chartDivId: this.chartDivId,
+            chartId: this.chartId,
+            groupid: this.groupid,
+            width: settings_.barChart.width,
+            height: settings_.barChart.height,
+            logScaleChecked: logScaleChecked
+          });
         this.showLogScale =this.barChart.hasLogScale();
         var self_ = this;
         this.chartInst.on('filtered', function(_chartInst, _filter) {
@@ -123,7 +131,7 @@
       }
     },
     ready: function() {
-      this.barChart = new iViz.view.component.barChart();
+      this.barChart = new iViz.view.component.BarChart();
       settings_.barChart.width = window.style.vars.barchartWidth || 150;
       settings_.barChart.height = window.style.vars.barchartHeight || 150;
       this.initChart();

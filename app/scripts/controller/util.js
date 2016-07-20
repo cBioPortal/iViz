@@ -31,8 +31,8 @@
  */
 
 'use strict';
-(function (iViz, _) {
-  iViz.util = (function () {
+(function(iViz, _, cbio) {
+  iViz.util = (function() {
     var content = {};
 
     /**
@@ -42,18 +42,23 @@
      * @param {number} threshold The upper bound threshold.
      * @return {number} Converted number.
      */
-    content.toPrecision = function (number, precision, threshold) {
+    content.toPrecision = function(number, precision, threshold) {
       if (number >= 0.000001 && number < threshold) {
         return number.toExponential(precision);
       }
       return number.toPrecision(precision);
     };
-
+    content.getRandomDate = function (){
+                  var from = new Date ("2016-01-01").getTime(); //this is in milliseconds, so math can be done later on it
+                  var to = new Date ("2016-12-31").getTime(); //also in milliseconds
+                  var randomDate = new Date (from + (Math.random()*(to-from))); //create a new date object after math is done
+                  return randomDate.getMonth()+1 + "-" + randomDate.getDate() + "-" + randomDate.getFullYear(); //create a date string: "m-d-yyyy"
+                  };
     /**
      * iViz color schema.
      * @return {string[]} Color array.
      */
-    content.getColors = function () {
+    content.getColors = function() {
       return [
         '#2986e2', '#dc3912', '#f88508', '#109618',
         '#990099', '#0099c6', '#dd4477', '#66aa00',
@@ -111,12 +116,12 @@
       ];
     };
 
-    content.idMapping = function (mappingObj, inputCases) {
+    content.idMapping = function(mappingObj, inputCases) {
       var _selectedMappingCases = [];
       _selectedMappingCases.length = 0;
-      _.each(inputCases, function (_case) {
+      _.each(inputCases, function(_case) {
         if (Array.isArray(mappingObj[_case])) {
-          _.each(mappingObj[_case], function (_id) {
+          _.each(mappingObj[_case], function(_id) {
             _selectedMappingCases.push(_id);
           });
         } else {
@@ -127,7 +132,7 @@
       return _.uniq(_selectedMappingCases);
     };
 
-    content.isRangeFilter = function (filterObj) {
+    content.isRangeFilter = function(filterObj) {
       if (filterObj.filterType !== undefined) {
         if (filterObj.filterType === 'RangedFilter') {
           return true;
@@ -136,12 +141,14 @@
       return false;
     };
 
-    content.sortByAttribute = function (objs, attrName) {
+    content.sortByAttribute = function(objs, attrName) {
       function compare(a, b) {
-        if (a[attrName] < b[attrName])
+        if (a[attrName] < b[attrName]) {
           return -1;
-        if (a[attrName] > b[attrName])
+        }
+        if (a[attrName] > b[attrName]) {
           return 1;
+        }
         return 0;
       }
 
@@ -149,7 +156,428 @@
       return objs;
     };
 
+    content.download = function(chartType, fileType, content) {
+      switch (chartType) {
+        case 'pieChart':
+          pieChartDownload(fileType, content);
+          break;
+        case 'barChart':
+          barChartDownload(fileType, content);
+          break;
+        case 'survivalPlot':
+          survivalChartDownload(fileType, content);
+          break;
+        case 'scatterPlot':
+          survivalChartDownload(fileType, content);
+          break;
+        default:
+          break;
+      }
+    };
+
+    content.restrictNumDigits = function(str) {
+      if (!isNaN(str)) {
+        var num = Number(str);
+        if (num % 1 !== 0) {
+          num = num.toFixed(2);
+          str = num.toString();
+        }
+      }
+      return str;
+    }
+
+    function pieChartDownload(fileType, content) {
+      switch (fileType) {
+        case 'tsv':
+          csvDownload('test', content);
+          break;
+        case 'svg':
+          pieChartCanvasDownload(content, {
+            filename: content.fileName + '.svg'
+          });
+          break;
+        case 'pdf':
+          pieChartCanvasDownload(content, {
+            filename: content.fileName + '.pdf',
+            contentType: 'application/pdf',
+            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+          });
+          break;
+        default:
+          break;
+      }
+    }
+
+    function getPieWidthInfo(data) {
+      var length = data.title.length;
+      var labels = data.labels;
+      var labelMaxName = _.last(_.sortBy(_.pluck(labels, 'name'), function(item) {
+        return item.toString().length;
+      })).toString().length;
+      var labelMaxNumber = _.last(_.sortBy(_.pluck(labels, 'samples'), function(item) {
+        return item.toString().length;
+      })).toString().length;
+      var labelMaxFreq = _.last(_.sortBy(_.pluck(labels, 'sampleRate'), function(item) {
+        return item.toString().length;
+      })).toString().length;
+
+      if (labelMaxName > length) {
+        length = labelMaxName;
+      }
+      length = length * 10 + labelMaxNumber * 10 + labelMaxFreq * 10 + 30;
+
+      return {
+        svg: length,
+        name: labelMaxName > data.title.length ? labelMaxName : data.title.length,
+        number: labelMaxNumber,
+        freq: labelMaxFreq
+      };
+    }
+
+    function pieChartCanvasDownload(data, downloadOpts) {
+      var _svgElement;
+
+      var _width = getPieWidthInfo(data);
+      var _valueXCo = 0;
+      var _pieLabelString = '';
+      var _pieLabelYCoord = 0;
+      var _svg = $('#' + data.chartId + ' svg');
+      var _previousHidden = false;
+
+      if ($('#' + data.chartDivId).css('display') === 'none') {
+        _previousHidden = true;
+        $('#' + data.chartDivId).css('display', 'block');
+      }
+
+      var _svgHeight = _svg.height();
+      var _text = _svg.find('text');
+      var _textLength = _text.length;
+      var _slice = _svg.find('g .pie-slice');
+      var _sliceLength = _slice.length;
+      var _pieLabel = data.labels;
+      var _pieLabelLength = _pieLabel.length;
+      var i = 0;
+
+      if (_previousHidden) {
+        $('#' + data.chartDivId).css('display', 'none');
+      }
+
+      // Change pie slice text styles
+      for (i = 0; i < _textLength; i++) {
+        $(_text[i]).css({
+          'fill': 'white',
+          'font-size': '14px',
+          'stroke': 'white',
+          'stroke-width': '1px'
+        });
+      }
+
+      // Change pie slice styles
+      for (i = 0; i < _sliceLength; i++) {
+        $($(_slice[i]).find('path')[0]).css({
+          'stroke': 'white',
+          'stroke-width': '1px'
+        });
+      }
+
+      if (_width.svg < 180) {
+        _width.svg = 180;
+      }
+
+      // Draw sampleSize header
+      _pieLabelString += '<g transform="translate(0, ' +
+        _pieLabelYCoord + ')"><text x="13" y="10" ' +
+        'style="font-size:12px; font-weight:bold">' +
+        data.title + '</text>' +
+        '<text x="' + _width.name * 10 + '" y="10" ' +
+        'style="font-size:12px; font-weight:bold">#</text>' +
+        '<text x="' + (_width.name + _width.number) * 10 + '" y="10" ' +
+        'style="font-size:12px; font-weight:bold">Freq</text>' +
+        '<line x1="0" y1="14" x2="' + ((_width.name + _width.number) * 10 - 20) + '" y2="14" ' +
+        'style="stroke:black;stroke-width:2"></line>' +
+        '<line x1="' + (_width.name * 10 - 10) + '" y1="14" x2="' + (_width.svg - 20) + '" y2="14" ' +
+        'style="stroke:black;stroke-width:2"></line>' +
+        '<line x1="' + ((_width.name + _width.number) * 10 - 10) + '" y1="14" x2="' + (_width.svg - 20) + '" y2="14" ' +
+        'style="stroke:black;stroke-width:2"></line>' +
+        '</g>';
+
+      _pieLabelYCoord += 18;
+
+      // Draw pie label into output
+      for (i = 0; i < _pieLabelLength; i++) {
+        var _label = _pieLabel[i];
+
+        _pieLabelString += '<g transform="translate(0, ' +
+          _pieLabelYCoord + ')"><rect height="10" width="10" fill="' + _label.color +
+          '"></rect><text x="13" y="10" ' +
+          'style="font-size:15px">' + _label.name + '</text>' +
+          '<text x="' + _width.name * 10 + '" y="10" ' +
+          'style="font-size:15px">' + _label.samples + '</text>' +
+          '<text x="' + (_width.name + _width.number) * 10 + '" y="10" ' +
+          'style="font-size:15px">' + _label.sampleRate + '</text>' +
+          '</g>';
+
+        _pieLabelYCoord += 15;
+      }
+
+      _svgElement = cbio.download.serializeHtml($('#' + data.chartId + ' svg>g')[0]);
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + _width.svg + '" height="' + (180 + _pieLabelYCoord) + '">' +
+        '<g><text x="' + (_width.svg / 2) + '" y="20" style="font-weight: bold;" text-anchor="middle">' +
+        data.title + '</text></g>' +
+        '<g transform="translate(' + (_width.svg / 2 - 65) + ', 20)">' + _svgElement + '</g>' +
+        '<g transform="translate(10, ' + (_svgHeight + 20) + ')">' +
+        _pieLabelString + '</g></svg>';
+
+      cbio.download.initDownload(svg, downloadOpts);
+
+      // Remove pie slice text styles
+      for (i = 0; i < _textLength; i++) {
+        $(_text[i]).css({
+          'fill': '',
+          'font-size': '',
+          'stroke': '',
+          'stroke-width': ''
+        });
+      }
+
+      // Remove pie slice styles
+      for (i = 0; i < _sliceLength; i++) {
+        $($(_slice[i]).find('path')[0]).css({
+          'stroke': '',
+          'stroke-width': ''
+        });
+      }
+    }
+
+    function barChartCanvasDownload(data, downloadOpts) {
+      var _svgElement = '';
+      var _svg = $('#' + data.chartId + ' svg');
+      var _brush = _svg.find('g.brush');
+      var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
+      var i = 0;
+
+      if (_brushWidth === 0) {
+        _brush.css('display', 'none');
+      }
+
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '0.2',
+          'fill': '#2986e2'
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '#eee',
+          'stroke': '#666'
+        });
+
+      // Change deselected bar chart
+      var _chartBody = _svg.find('.chart-body');
+      var _deselectedCharts = _chartBody.find('.bar.deselected');
+      var _deselectedChartsLength = _deselectedCharts.length;
+
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': '#ccc'
+        });
+      }
+
+      // Change axis style
+      var _axis = _svg.find('.axis');
+      var _axisDomain = _axis.find('.domain');
+      var _axisDomainLength = _axisDomain.length;
+      var _axisTick = _axis.find('.tick.major line');
+      var _axisTickLength = _axisTick.length;
+
+      for (i = 0; i < _axisDomainLength; i++) {
+        $(_axisDomain[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLength; i++) {
+        $(_axisTick[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      //Change x/y axis text size
+      var _chartText = _svg.find('.axis text'),
+        _chartTextLength = _chartText.length;
+
+      for (i = 0; i < _chartTextLength; i++) {
+        $(_chartText[i]).css({
+          'font-size': '12px'
+        });
+      }
+
+      $('#' + data.chartId + ' svg>g').each(function(i, e) {
+        _svgElement += cbio.download.serializeHtml(e);
+      });
+      $('#' + data.chartId + ' svg>defs').each(function(i, e) {
+        _svgElement += cbio.download.serializeHtml(e);
+      });
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="370" height="200">' +
+        '<g><text x="180" y="20" style="font-weight: bold; text-anchor: middle">' +
+        data.title + '</text></g>' +
+        '<g transform="translate(0, 20)">' + _svgElement + '</g></svg>';
+
+      cbio.download.initDownload(
+        svg, downloadOpts);
+
+      _brush.css('display', '');
+
+      // Remove added styles
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '',
+          'fill': ''
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '',
+          'stroke': ''
+        });
+
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': ''
+        });
+      }
+
+      for (i = 0; i < _axisDomainLength; i++) {
+        $(_axisDomain[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLength; i++) {
+        $(_axisTick[i]).css({
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _chartTextLength; i++) {
+        $(_chartText[i]).css({
+          'font-size': ''
+        });
+      }
+    }
+
+    function survivalChartDownload(fileType, content) {
+      switch (fileType) {
+        case 'svg':
+          survivalChartCanvasDownload(content, {
+            filename: content.fileName + '.svg'
+          });
+          break;
+        case 'pdf':
+          survivalChartCanvasDownload(content, {
+            filename: content.fileName + '.pdf',
+            contentType: 'application/pdf',
+            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+          });
+          break;
+        default:
+          break;
+      }
+    }
+
+    function survivalChartCanvasDownload(data, downloadOpts) {
+      var _svgElement, _svgLabels, _svgTitle,
+        _labelTextMaxLength = 0,
+        _numOfLabels = 0,
+        _svgWidth = 360,
+        _svgheight = 360;
+
+      _svgElement = cbio.download.serializeHtml($('#' + data.chartDivId + ' svg')[0]);
+      // _svgLabels = $('#' + data.labelDivId + ' svg');
+      //
+      // _svgLabels.find('image').remove();
+      // _svgLabels.find('text').each(function(i, obj) {
+      //   var _value = $(obj).attr('oValue');
+      //
+      //   if (typeof _value === 'undefined') {
+      //     _value = $(obj).text();
+      //   }
+      //
+      //   if (_value.length > _labelTextMaxLength) {
+      //     _labelTextMaxLength = _value.length;
+      //   }
+      //   $(obj).text(_value);
+      //   _numOfLabels++;
+      // });
+
+      _svgWidth += _labelTextMaxLength * 14;
+
+      if (_svgheight < _numOfLabels * 20) {
+        _svgheight = _numOfLabels * 20 + 40;
+      }
+
+      // _svgLabels = cbio.download.serializeHtml(_svgLabels[0]);
+
+      _svgTitle = '<g><text text-anchor="middle" x="210" y="30" ' +
+        'style="font-weight:bold">' + data.title + '</text></g>';
+
+      _svgElement = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + _svgWidth + 'px" height="' + _svgheight + 'px" style="font-size:14px">' +
+        _svgTitle + '<g transform="translate(0,40)">' +
+        _svgElement + '</g>' +
+        // '<g transform="translate(370,50)">' +
+        // _svgLabels + '</g>' +
+        '</svg>';
+
+      cbio.download.initDownload(
+        _svgElement, downloadOpts);
+    }
+
+    function csvDownload(fileName, content) {
+      fileName = fileName || 'test';
+      var downloadOpts = {
+        filename: fileName + '.txt',
+        contentType: 'text/plain;charset=utf-8',
+        preProcess: false
+      };
+
+      cbio.download.initDownload(content, downloadOpts);
+    }
+
+    function barChartDownload(fileType, content) {
+      switch (fileType) {
+        case 'tsv':
+          csvDownload('test', content);
+          break;
+        case 'svg':
+          barChartCanvasDownload(content, {
+            filename: content.fileName + '.svg'
+          });
+          break;
+        case 'pdf':
+          barChartCanvasDownload(content, {
+            filename: content.fileName + '.pdf',
+            contentType: 'application/pdf',
+            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+          });
+          break;
+        default:
+          break;
+      }
+    }
+
+    function downloadTextFile(content, delimiter) {
+
+    }
+
     return content;
   })();
 })(window.iViz,
-  window._);
+  window._, window.cbio);

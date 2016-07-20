@@ -36,17 +36,17 @@
 (function(Vue, dc, iViz, $) {
 
   Vue.component('pieChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" class="study-view-dc-chart study-view-pie-main" ' +
+    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" ' +
               '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
               '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
               ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
-              ':reset-btn-id="resetBtnId" :chart="chartInst" :attributes="attributes"></chart-operations>' +
+              ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" :chart="chartInst" :filters.sync="filters" :attributes="attributes"></chart-operations>' +
               '<div class="dc-chart dc-pie-chart" :class="{view: showPieIcon}" align="center" style="float:none' +
               ' !important;" id={{chartId}} ></div>' +
               '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
               '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid','data','options'
+      'ndx', 'attributes', 'filters', 'groupid','data','options','indices'
     ],
     data: function() {
       return {
@@ -57,9 +57,10 @@
         chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)/g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
+        component: '',
         showOperations: false,
         cluster: '',
-        _piechart:'',
+        piechart:'',
         hasChartTitle:true,
         showTableIcon:true,
         showPieIcon:false,
@@ -70,18 +71,16 @@
       'filters': function(newVal, oldVal) {
         if(!this.filtersUpdated) {
           this.filtersUpdated = true;
-          if (newVal.length === oldVal.length) {
-            if (newVal.length == 0) {
-              this.chartInst.filterAll();
-            } else {
-              var newFilters = $.extend(true, [], newVal);
-              var exisitngFilters = $.extend(true, [],
-                this.chartInst.filters());
-              var temp = _.difference(exisitngFilters, newFilters);
-              this.chartInst.filter(temp);
-            }
-          }else{
+          if (newVal.length === 0) {
             this.chartInst.filterAll();
+          }else{
+            if (newVal.length === oldVal.length) {
+                this.chartInst.filter(newVal);
+            }
+            else{
+              var temp =newVal.length>1?[newVal]:newVal;
+              this.chartInst.replaceFilter(temp);
+            }
           }
           this.$dispatch('update-filters');
         }else{
@@ -91,7 +90,7 @@
     },
     events: {
       'toTableView': function() {
-        this._piechart.changeView(this,!this.showTableIcon);
+        this.piechart.changeView(this,!this.showTableIcon);
       },
       'closeChart':function(){
         $('#' +this.charDivId).qtip('destroy');
@@ -110,7 +109,7 @@
           this.showOperations = false;
         }
       },initMainDivQtip : function(){
-        this._piechart.initMainDivQtip();
+        this.piechart.initMainDivQtip();
       }
     },
     ready: function() {
@@ -124,9 +123,8 @@
         width: window.style['piechart-svg-width'] | 130,
         height: window.style['piechart-svg-height'] | 130
       };
-      this._piechart = new iViz.view.component.pieChart(); //create a new instance
-                                                           //of pie chart each time the function is run
-      this.chartInst = this._piechart.init(this.ndx, this.attributes, opts);
+      this.piechart = new iViz.view.component.PieChart(this.ndx, this.attributes, opts);
+      this.chartInst = this.piechart.getChart();
       var self_ = this;
       this.chartInst.on('filtered', function(_chartInst, _filter) {
         if(!self_.filtersUpdated) {

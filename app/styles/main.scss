@@ -7,31 +7,10 @@ body {
 }
 
 #complete-screen {
+  @import "partials/mixins";
   @import "partials/vars";
   @import "partials/grids";
-
-  * {
-    box-sizing: border-box;
-  }
-
-  #main-header {
-    margin-left: 25px;
-    margin-bottom: 15px;
-    margin-top: 10px;
-    bottom: -5px;
-    left: 10px;
-    position: relative;
-  }
-
-  #stat {
-    margin-left: 10px;
-    margin-top: 10px;
-  }
-
-  .navbar button {
-    margin-top: 10px;
-    margin-left: 5px;
-  }
+  @import "partials/global";
   
   .view {
     display: none;
@@ -81,4 +60,11 @@ body {
   @import "components/vc";
 }
 
+@import "vendor/dashiboard";
 @import "vendor/efdt";
+
+#study-view-case-select-custom-dialog input[type="radio"] {
+  margin: 3px;
+}
+
+.qtip-wide{max-width:380px !important;}

@@ -33,8 +33,8 @@
 'use strict';
 (function(iViz, dc, _, $, d3) {
   // iViz pie chart component. It includes DC pie chart.
-  iViz.view.component.barChart = function() {
-    var content = {};
+  iViz.view.component.BarChart = function() {
+    var content = this;
 
     var chartInst_;// DC chart instance.
     var opts_ = {};// Chart configuration options
@@ -140,17 +140,17 @@
 
       var emptyValueMapping = "1000";//Will be changed later based on maximum
       // value
-      var xDomain =[];
+      var xDomain = [];
 
-      for(var i=0; ;i+=0.5){
-        var _tmpValue = parseInt(Math.pow(10,i));
+      for (var i = 0; ; i += 0.5) {
+        var _tmpValue = parseInt(Math.pow(10, i));
 
         xDomain.push(_tmpValue);
-        if(_tmpValue >  data_.max){
+        if (_tmpValue > data_.max) {
 
-          emptyValueMapping = Math.pow(10,i+0.5);
+          emptyValueMapping = Math.pow(10, i + 0.5);
           xDomain.push(emptyValueMapping);
-          _maxDomain = Math.pow(10,i+1);
+          _maxDomain = Math.pow(10, i + 1);
           break;
         }
       }
@@ -164,20 +164,20 @@
 
         var i, val = Number(d[data_.attrId]);
 
-        if(isNaN(val)){
+        if (isNaN(val)) {
           hasEmptyValue_ = true;
           val = emptyValueMapping;
-        }else{
-          for(i = 1;i < _domainLength; i++){
-            if(d[data_.attrId] < xDomain[i] &&
-              d[data_.attrId] >= xDomain[i-1]){
+        } else {
+          for (i = 1; i < _domainLength; i++) {
+            if (d[data_.attrId] < xDomain[i] &&
+              d[data_.attrId] >= xDomain[i - 1]) {
 
-              val = parseInt( Math.pow(10, i / 2 - 0.25 ));
+              val = parseInt(Math.pow(10, i / 2 - 0.25));
             }
           }
         }
 
-        if(tickVal.indexOf(val) === -1) {
+        if (tickVal.indexOf(val) === -1) {
           tickVal.push(Number(val));
         }
 
@@ -217,20 +217,21 @@
         .renderVerticalGridLines(false);
 
       chartInst_.x(d3.scale.log().nice()
-        .domain([0.7,_maxDomain]));
+        .domain([0.7, _maxDomain]));
 
       chartInst_.yAxis().ticks(6);
       chartInst_.yAxis().tickFormat(d3.format('d'));
       chartInst_.xAxis().tickFormat(function(v) {
         var _returnValue = v;
-        if(v === emptyValueMapping){
+        if (v === emptyValueMapping) {
           _returnValue = 'NA';
-        }else{
+        } else {
           var index = xDomain.indexOf(v);
-          if(index % 2 === 0)
+          if (index % 2 === 0) {
             return v.toString();
-          else
+          } else {
             return '';
+          }
         }
         return _returnValue;
       });
@@ -241,16 +242,50 @@
         return xDomain.length * 1.3 <= 5 ? 5 : xDomain.length * 1.3;
       });
     };
-    content.hasLogScale=function(){
-      if(data_!==undefined){
-        if(data_.min!==null && data_.max!==null){
-          return ((data_.max-data_.min)>1000)&&(data_.min>1)?true:false;
+
+    function initTsvDownloadData() {
+      var data = '';
+      var _cases = chartInst_.dimension().top(Infinity);
+
+      data = 'Sample ID\tPatient ID\t' + data_.displayName;
+
+      for (var i = 0; i < _cases.length; i++) {
+        data += '\r\n';
+        data += _cases[i].sample_id + '\t';
+        data += _cases[i].patient_id + '\t';
+        data += iViz.util.restrictNumDigits(_cases[i][data_.attrId]);
+      }
+      content.setDownloadData('tsv', data);
+    }
+
+    function initCanvasDownloadData() {
+      content.setDownloadData('svg', {
+        title: data_.displayName,
+        chartDivId: opts_.chartDivId,
+        chartId: opts_.chartId,
+        fileName: data_.displayName
+      });
+      content.setDownloadData('pdf', {
+        title: data_.displayName,
+        chartDivId: opts_.chartDivId,
+        chartId: opts_.chartId,
+        fileName: data_.displayName
+      });
+    }
+
+    content.dataForDownload = {};
+
+    content.hasLogScale = function() {
+      if (data_ !== undefined) {
+        if (data_.min !== null && data_.max !== null) {
+          return ((data_.max - data_.min) > 1000) && (data_.min > 1) ? true : false;
         }
       }
       return false;
     };
-    content.init = function(ndx, data, attrObj, settings, chartId, groupid, logScaleChecked) {
-      data_.meta = _.map(_.filter(_.pluck(data, attrObj.attr_id), function(d) {
+
+    content.init = function(ndx, data, opts) {
+      data_.meta = _.map(_.filter(_.pluck(data, opts.attrId), function(d) {
         return d !== 'NA';
       }), function(d) {
         return parseFloat(d);
@@ -261,20 +296,20 @@
         min: d3.min(data_.meta),
         max: d3.max(data_.meta)
       });
-      data_.attrId = attrObj.attr_id;
-      data_.displayName = attrObj.display_name;
-      opts_.width = settings.barChart.width;
-      opts_.height = settings.barChart.height;
-
+      data_.attrId = opts.attrId;
+      data_.displayName = opts.displayName;
+      opts_.width = opts.width;
+      opts_.height = opts.height;
+      opts_.chartDivId = opts.chartDivId;
+      opts_.chartId = opts.chartId;
       ndx_ = ndx;
 
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
-      chartInst_ = dc.barChart('#' + chartId, groupid);
+      chartInst_ = dc.barChart('#' + opts.chartId, opts.groupid);
 
-      //if (type === 'log') {
-      if(logScaleChecked!==undefined){
-        if(logScaleChecked){
+      if (opts.logScaleChecked !== undefined) {
+        if (opts.logScaleChecked) {
           logDc_();
         } else {
           regularDc_();
@@ -287,19 +322,32 @@
         }
       }
       chartInst_.render();
+
+      initTsvDownloadData();
+      initCanvasDownloadData();
       return chartInst_;
     };
 
-    content.redraw = function(logScaleChecked){
-      if(logScaleChecked){
+    content.redraw = function(logScaleChecked) {
+      if (logScaleChecked) {
         regularDc_();
       } else {
         logDc_();
       }
     };
 
-    return content;
+    content.updateDataForDownload = function(fileType) {
+      if (fileType === 'tsv') {
+        initTsvDownloadData();
+      } else if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
+    }
+    // return content;
   };
+
+  iViz.view.component.BarChart.prototype = new iViz.view.component.GeneralChart('barChart');
+  iViz.view.component.BarChart.constructor = iViz.view.component.BarChart;
 
   iViz.util.barChart = (function() {
     var content = {};

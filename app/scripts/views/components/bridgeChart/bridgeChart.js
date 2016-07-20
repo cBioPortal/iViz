@@ -50,11 +50,6 @@
       dimHide = ndx.dimension(function (d) { return d.sample_id; }),
         countPerFuncHide = dimHide.group().reduceCount();
     }
-    $('#main-bridge').append(
-      '<div class="grid-item" id="' + type +'_'+id+ '_id_chart_div">' +
-      '<div class="dc-chart dc-pie-chart" id="' + type +'_'+id+ '_id_chart"></div>' +
-      "</div>"
-    );
     var _chartInvisible = dc.pieChart('#' + type +'_'+id+ '_id_chart', type +'-'+id);
     _chartInvisible.width(settings.pieChart.width)
       .height(settings.pieChart.height)
