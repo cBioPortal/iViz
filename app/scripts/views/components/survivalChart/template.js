@@ -58,12 +58,13 @@
         hasChartTitle:true
       };
     },
-    watch: {
-      'mappedsamples': function(val) {
-        
-      }
-    },
-    events: {},
+    events: {
+      'survival-update': function(_selectedPatients) {
+        this.chartInst.update(_selectedPatients, this.chartId, this.attributes.attr_id);
+      },
+      'closeChart':function(){
+      this.$dispatch('close');
+    }},
     methods: {
       mouseEnter: function() {
         this.showOperations = true;
@@ -80,11 +81,9 @@
         attrId: this.attributes.attr_id,
         title: this.attributes.display_name
       };
+      var _selectedPatientList = this.$parent.$parent.$parent.selectedpatients;
       _self.chartInst = new iViz.view.component.Survival();
-      _self.chartInst.init(this.data, _opts);
-      _self.$on('survival-update', function(_selectedPatients) {
-        _self.chartInst.update(_selectedPatients, _self.chartId, _self.attributes.attr_id);
-      });
+      _self.chartInst.init(this.data, _opts,_selectedPatientList);
       this.$dispatch('data-loaded', true);
     }
   });
