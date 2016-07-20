@@ -45,6 +45,9 @@
   iViz.data.init = function (_portalInstURL, _studyIdArr, _callbackFunc, _inputSampleList, _inputPatientList) {
 
     var _result = {};
+    var _hasDfsSurvivalData = false;
+    var _hasOsStatus = false;
+    var _hasMutationCNAScatterPlot = false;
     var PORTAL_INST_URL = _portalInstURL;
 
     var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
@@ -271,6 +274,9 @@
                             _ajaxCnaFractionData = $.extend({}, arguments[i][0], _ajaxCnaFractionData);
                           }
                         }
+                        if(_ajaxCnaFractionData.length>0){
+                          _hasMutationCNAScatterPlot = true;
+                        }
 
                         // cna data (for CNA table)
                         var _gisticStudyIdArr = _.filter(_studyIdArr, function (_studyId) {
@@ -323,6 +329,11 @@
                               _patientIdToClinDataMap[_dataObj.patient_id] = {};
                             }
                             _patientIdToClinDataMap[_dataObj.patient_id][_dataObj.attr_id] = _dataObj.attr_val;
+                            if(_dataObj.attr_id === 'DFS_MONTHS' || _dataObj.attr_id === 'DFS_STATUS'){
+                              _hasDfsSurvivalData = true;
+                            }else if(_dataObj.attr_id === 'OS_MONTHS' || _dataObj.attr_id === 'OS_STATUS'){
+                              _hasOsStatus = true;
+                            }
                           });
 
                           // map clinical data to each sample (key: sample ID, value: object of attributes vs. val)
@@ -388,10 +399,12 @@
                               }
 
                               // cna fraction
-                              if (_ajaxCnaFractionData[_sampleId] === undefined || _ajaxCnaFractionData[_sampleId] === null) {
-                                _datum['cna_fraction'] = 0;
-                              } else {
-                                _datum['cna_fraction'] = _ajaxCnaFractionData[_sampleId];
+                              if(_hasMutationCNAScatterPlot) {
+                                if (_ajaxCnaFractionData[_sampleId] === undefined || _ajaxCnaFractionData[_sampleId] === null) {
+                                  _datum['cna_fraction'] = 0;
+                                } else {
+                                  _datum['cna_fraction'] = _ajaxCnaFractionData[_sampleId];
+                                }
                               }
 
                               //_sampleData.push(_datum);
@@ -549,40 +562,48 @@
                           }
 
                           // add Mutation count vs. CNA fraction
-                          var _mutCntAttrMeta = {};
-                          _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
-                          _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
-                          _mutCntAttrMeta.view_type = 'scatter_plot';
-                          _mutCntAttrMeta.description = 'Mutation Count vs. CNA';
-                          _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
-                          _ajaxSampleMeta.unshift(_mutCntAttrMeta);
+                          if(_hasMutationCNAScatterPlot) {
+                            var _mutCntAttrMeta = {};
+                            _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
+                            _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
+                            _mutCntAttrMeta.view_type = 'scatter_plot';
+                            _mutCntAttrMeta.description = 'Mutation Count vs. CNA';
+                            _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
+                            _ajaxSampleMeta.unshift(_mutCntAttrMeta);
+                          }
 
                           // add DFS survival
-                          var _dfsSurvivalAttrMeta = {};
-                          _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
-                          _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
-                          _dfsSurvivalAttrMeta.view_type = 'survival';
-                          _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
-                          _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
-                          _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
+                          if(_hasDfsSurvivalData) {
+                            var _dfsSurvivalAttrMeta = {};
+                            _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
+                            _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
+                            _dfsSurvivalAttrMeta.view_type = 'survival';
+                            _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
+                            _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
+                            _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
+                          }
 
                           // add OS survival
-                          var _osSurvivalAttrMeta = {};
-                          _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
-                          _osSurvivalAttrMeta.datatype = 'SURVIVAL';
-                          _osSurvivalAttrMeta.view_type = 'survival';
-                          _osSurvivalAttrMeta.description = 'Overall Survival';
-                          _osSurvivalAttrMeta.display_name = 'Overall Survival';
-                          _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
+                          if(_hasOsStatus) {
+                            var _osSurvivalAttrMeta = {};
+                            _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
+                            _osSurvivalAttrMeta.datatype = 'SURVIVAL';
+                            _osSurvivalAttrMeta.view_type = 'survival';
+                            _osSurvivalAttrMeta.description = 'Overall Survival';
+                            _osSurvivalAttrMeta.display_name = 'Overall Survival';
+                            _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
+                          }
 
                           // add Cancer Study
-                          _ajaxPatientMeta.unshift({
-                            "datatype": "STRING",
-                            "description": "Cancer Studies",
-                            "display_name": "Cancer Studies",
-                            "attr_id": "study_id",
-                            "view_type": "pie_chart"
-                          });
+                          if(_studyIdArr.length>1) {
+                            _ajaxPatientMeta.unshift({
+                              "datatype": "STRING",
+                              "description": "Cancer Studies",
+                              "display_name": "Cancer Studies",
+                              "attr_id": "study_id",
+                              "view_type": "pie_chart"
+                            });
+                          }
 
                           // TODO : temporary fix to show/hide charts
                           var tempCount = 0;
