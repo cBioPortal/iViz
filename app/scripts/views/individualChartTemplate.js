@@ -62,15 +62,18 @@
         case 'table':
           currentView = 'table-view';
           break;
+        case 'line_chart':
+          currentView = 'line-chart';
+          break;
       }
       return {
         currentView: currentView
-      }
+      };
     },
     watch: {
       'attributes.show': function(newVal) {
         if (!newVal)
-          this.$dispatch('update-grid',true)
+          this.$dispatch('update-grid',true);
         $("#study-view-add-chart").trigger("chosen:updated");
       }
     },
@@ -87,7 +90,7 @@
         if(_self.attributes.filter.length>0){
           _self.attributes.filter = [];
         }
-      })
+      });
     }
   });
 })(window.Vue, window.dc, window.iViz,

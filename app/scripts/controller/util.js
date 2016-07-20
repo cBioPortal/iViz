@@ -48,7 +48,12 @@
       }
       return number.toPrecision(precision);
     };
-
+    content.getRandomDate = function (){
+                  var from = new Date ("2016-01-01").getTime(); //this is in milliseconds, so math can be done later on it
+                  var to = new Date ("2016-12-31").getTime(); //also in milliseconds
+                  var randomDate = new Date (from + (Math.random()*(to-from))); //create a new date object after math is done
+                  return randomDate.getMonth()+1 + "-" + randomDate.getDate() + "-" + randomDate.getFullYear(); //create a date string: "m-d-yyyy"
+                  };
     /**
      * iViz color schema.
      * @return {string[]} Color array.

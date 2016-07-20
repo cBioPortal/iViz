@@ -10,7 +10,7 @@
                      '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName"> ' +
                      '</chart-operations></div>', //everything written in template replaces
                                                                      //the tag in the html file
-            props: [],
+            props: ['ndx', 'data'],
             data:function() {
                 return {
                     displayName: "Line Chart",
@@ -23,8 +23,10 @@
             },
             methods:{   
             },
-            ready:function(){ 
-               new iViz.view.component.lineChart().init(); //create new instance of a line chart
+            ready:function(){
+//                console.log(this.ndx);
+//                console.log(iViz.view.component.lineChart(this.ndx).init());
+               new iViz.view.component.lineChart(this.ndx, this.data).init(); //create new instance of a line chart
                                                                         //each time this function is called - will not 
                                                                         //reference the same one everytime                                                                                                                                                                                                                                      
             }
