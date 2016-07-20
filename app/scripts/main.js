@@ -53,7 +53,7 @@ var iViz = (function (_, $) {
         for (var _i = 0; _i < _sampleData.length; _i++) {
           _sampleDataIndices[_sampleData[_i].sample_id] = _i;
         }
-        var _patientData = _.filter(_data.groups.patient.data, function (_dataObj) {
+        var _patientData = _.filter(_data.groups.patient.data, function (_dataObj) { //gets the array of patient data
           return $.inArray(_dataObj['patient_id'], _inputPatientList) !== -1
         });
         var _patientDataIndices = {};
@@ -61,20 +61,22 @@ var iViz = (function (_, $) {
           _patientDataIndices[_patientData[_j].patient_id] = _j;
         }
 
-        data_.groups.patient.data = _patientData;
+        data_.groups.patient.data = _patientData; //holds the array of patient data
         data_.groups.sample.data = _sampleData;
         data_.groups.patient.data_indices.patient_id = _patientDataIndices;
         data_.groups.sample.data_indices.sample_id = _sampleDataIndices;
       }
-
+        
       // ---- generating data matrix & fill the empty slots ----
       _.each(data_.groups.patient.data, function (_dataObj) {
         _.each(_.pluck(data_.groups.patient.attr_meta, 'attr_id'), function (_attrId) {
-          if (!_dataObj.hasOwnProperty(_attrId)) {
-            _dataObj[_attrId] = 'NA';
-          }
-        });
+            if (!_dataObj.hasOwnProperty(_attrId)) {
+              _dataObj[_attrId] = 'NA';
+            }     
       });
+        _dataObj.DATE_OF_DIAGNOSIS = iViz.util.getRandomDate();
+  });
+      
       _.each(data_.groups.sample.data, function (_dataObj) {
         _.each(_.pluck(data_.groups.sample.attr_meta, 'attr_id'), function (_attrId) {
           if (!_dataObj.hasOwnProperty(_attrId)) {
@@ -208,7 +210,7 @@ var iViz = (function (_, $) {
       iViz.init(data_, _selectedSamples, _selectedPatients);
     },
     resetAll: function () {
-      var _selectedStudyIds = []
+      var _selectedStudyIds = [];
       var _currentURL = window.location.href;
       if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") !== -1) {
         var _vcId;
@@ -255,7 +257,7 @@ var iViz = (function (_, $) {
         iViz.init(data_);
       }
     }
-  }
+  };
 }(window._, window.$));
 
 
