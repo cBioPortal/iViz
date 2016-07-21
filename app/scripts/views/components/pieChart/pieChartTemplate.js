@@ -154,8 +154,7 @@
         });
         _self.$dispatch('data-loaded', true);
       } else {
-        $('#' + _self.charDivId).qtip('destroy');
-        _self.$dispatch('close');
+        _self.$dispatch('close', true);
       }
       
     }

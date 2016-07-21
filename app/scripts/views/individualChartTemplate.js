@@ -75,8 +75,11 @@
       }
     },
     events: {
-      'close': function() {
+      'close': function(newVal) {
         this.attributes.show = false;
+        if (newVal) {
+          $("#study-view-add-chart").trigger("chosen:updated");
+        }
       }/*,
       'update-grid':function(){
         this.$dispatch('update-grid')
