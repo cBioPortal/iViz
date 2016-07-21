@@ -65,7 +65,8 @@
               sampleIds:[],
               patientIds:[]
             },
-            initalLoad:true
+            initializedSampleSpecialCharts:true,
+            initializedPatientSpecialCharts:true
           }, watch: {
             'redrawgroups':function(newVal,oldVal){
               if(newVal.length>0){
@@ -77,20 +78,20 @@
             },
             'selectedsamples': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
-                if(!this.initalLoad) {
+                if(!this.initializedSampleSpecialCharts) {
                   this.$broadcast('selected-sample-update', newVal);
                 }else{
-                  this.initalLoad = false;
+                  this.initializedSampleSpecialCharts = false;
                 }
                 this.selectedSamplesNum = newVal.length;
               }
             },
             'selectedpatients': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
-                if(!this.initalLoad) {
+                if(!this.initializedPatientSpecialCharts) {
                   this.$broadcast('survival-update', newVal);
                 }else{
-                  this.initalLoad = false;
+                  this.initializedPatientSpecialCharts = false;
                 }
                 this.selectedPatientsNum = newVal.length;
               }
