@@ -65,7 +65,7 @@
         showTableIcon:true,
         showPieIcon:false,
         filtersUpdated:false
-      }
+      };
     },
     watch: {
       'filters': function(newVal, oldVal) {

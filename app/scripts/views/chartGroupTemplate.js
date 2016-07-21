@@ -33,7 +33,7 @@
  * Created by Karthik Kalletla on 4/6/16.
  */
 'use strict';
-(function(Vue, dc, iViz, $) {
+(function(Vue, dc, iViz, $, d3) {
   var settings_ = {
     pieChart: {
       width: 150,
@@ -54,11 +54,11 @@
       'data', 'attributes', 'type', 'mappedsamples', 'id',
       'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters', 'indices'
     ], created: function() {
-      var ndx_ = crossfilter(this.data);
+      var ndx_ = crossfilter(this.data); //crossfilters the data
       var invisibleBridgeChart_ = iViz.bridgeChart.init(ndx_, settings_,
         this.type, this.id);
       this.groupid = this.id;
-      this.ndx = ndx_;
+      this.ndx = ndx_; //property ndx contains the crossfiltered data array
       this.chartInvisible = invisibleBridgeChart_;
     }, destroyed: function() {
       this.chartInvisible.resetSvg();
@@ -125,4 +125,4 @@
     }
   });
 })(window.Vue, window.dc, window.iViz,
-  window.$ || window.jQuery);
+  window.$ || window.jQuery, window.d3);
