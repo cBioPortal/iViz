@@ -110,8 +110,6 @@
           if (typeof d[_attrId] !== 'undefined' && d[_attrId] !== 'NA') {
             _hasData = true;
           }
-          if (typeof d[_attrId] === 'undefined') d[_attrId] = 'NA';
-          return d[_attrId];
         });
         
         if (_hasData) {
