@@ -37,7 +37,7 @@
 'use strict';
 (function(iViz, dc, _, $) {
   // iViz pie chart component. It includes DC pie chart.
-  iViz.view.component.PieChart = function(ndx, attributes, opts) {
+  iViz.view.component.PieChart = function(ndx, attributes, opts, cluster) {
     var content = this;
     var v = {};
 
@@ -140,11 +140,6 @@
         var height = v.opts.height;
         var radius = (width - 20) / 2;
         var color = $.extend(true, [], v.data.color);
-        var attr = v.data.attr_id;
-        var cluster = v.data.ndx.dimension(function(d) {
-          if (typeof d[attr] === 'undefined') d[attr] = 'NA';
-          return d[attr];
-        });
 
         v.chart = dc.pieChart('#' + v.opts.chartId, v.opts.groupid);
 

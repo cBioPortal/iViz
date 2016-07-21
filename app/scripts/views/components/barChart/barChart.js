@@ -303,6 +303,7 @@
       opts_.chartDivId = opts.chartDivId;
       opts_.chartId = opts.chartId;
       ndx_ = ndx;
+      hasEmptyValue_ = false;
 
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
