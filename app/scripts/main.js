@@ -67,22 +67,6 @@ var iViz = (function (_, $) {
         data_.groups.sample.data_indices.sample_id = _sampleDataIndices;
       }
 
-      // ---- generating data matrix & fill the empty slots ----
-      _.each(data_.groups.patient.data, function (_dataObj) {
-        _.each(_.pluck(data_.groups.patient.attr_meta, 'attr_id'), function (_attrId) {
-          if (!_dataObj.hasOwnProperty(_attrId)) {
-            _dataObj[_attrId] = 'NA';
-          }
-        });
-      });
-      _.each(data_.groups.sample.data, function (_dataObj) {
-        _.each(_.pluck(data_.groups.sample.attr_meta, 'attr_id'), function (_attrId) {
-          if (!_dataObj.hasOwnProperty(_attrId)) {
-            _dataObj[_attrId] = 'NA';
-          }
-        });
-      });
-
       var _patientIds = _.uniq(_.pluck(data_.groups.patient.data, 'patient_id'));
       var _sampleIds = _.uniq(_.pluck(data_.groups.sample.data, 'sample_id'));
 

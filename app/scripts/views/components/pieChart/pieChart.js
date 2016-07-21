@@ -142,6 +142,7 @@
         var color = $.extend(true, [], v.data.color);
         var attr = v.data.attr_id;
         var cluster = v.data.ndx.dimension(function(d) {
+          if (typeof d[attr] === 'undefined') d[attr] = 'NA';
           return d[attr];
         });
 
@@ -595,8 +596,6 @@
         'stroke-width': '1px'
       });
     }
-    
-    // return content;
   };
 
   iViz.view.component.PieChart.prototype = new iViz.view.component.GeneralChart('pieChart');
