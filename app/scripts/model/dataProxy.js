@@ -589,7 +589,7 @@
                           // define view type from data type
                           _.each(_ajaxSampleMeta, function (_metaObj) {
                             _metaObj.filter = [];
-                            if (tempCount < 10) _metaObj.show = true;
+                            if (tempCount < 25) _metaObj.show = true;
                             else _metaObj.show = false;
                             if (_metaObj.datatype === "NUMBER") {
                               _metaObj.view_type = 'bar_chart';
@@ -601,7 +601,7 @@
                           tempCount = 0;
                           _.each(_ajaxPatientMeta, function (_metaObj) {
                             _metaObj.filter = [];
-                            if (tempCount < 10) _metaObj.show = true;
+                            if (tempCount < 25) _metaObj.show = true;
                             else _metaObj.show = false;
                             if (_metaObj.datatype === "NUMBER") {
                               _metaObj.view_type = 'bar_chart';
