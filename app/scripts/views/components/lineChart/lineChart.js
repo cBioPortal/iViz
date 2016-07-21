@@ -1,9 +1,10 @@
 'use strict';
 (function(iViz, dc, _, $, d3) {
-    iViz.view.component.lineChart = function(ndx, data){ //must import both ndx (for crossfiltered data) and data (array containing data)
+    iViz.view.component.lineChart = function(ndx, data, opts){ //must import both ndx (for crossfiltered data) and data (array containing data)
         var content = {};
         content.init = function initDCLineChart(){
-                    var lineChart = dc.lineChart("#line-chart"); //initialize line chart; random dates created in util.js         
+                    var lineChart = dc.lineChart("#line-chart", opts.groupid); //initialize line chart; random dates created in util.js
+                                                                               //secoind parameter adds line chart to the chart group
                          
                     var parseDate = d3.time.format("%-m-%-d-%Y").parse; //function to parse the date string (with specific format) to a date object
                     data.forEach(function(d){ //parse every date in the data array
@@ -27,7 +28,7 @@
                                                                                                                      //to determine the min. and max. date to generate scale
                             .xAxis();
 
-                    lineChart.render(); //need to render to draw the actual chart
+//                    lineChart.render(); //no need to render the line chart after adding it to the group of charts (vuecore.js handles rendering)
                 };
         return content;
     };
