@@ -284,7 +284,9 @@
       return false;
     };
 
-    content.init = function(ndx, data, opts) {
+    content.init = function(ndx, opts) {
+      //TODO: need to update logic of getting min and max
+      var data = iViz.getAttrData(opts.group_type);
       data_.meta = _.map(_.filter(_.pluck(data, opts.attrId), function(d) {
         return d !== 'NA';
       }), function(d) {

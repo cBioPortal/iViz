@@ -43,7 +43,7 @@
 
     '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'options', 'filters', 'groupid','indices'
+      'ndx', 'attributes', 'options', 'filters', 'groupid','indices'
     ],
     data: function() {
       return {
@@ -130,7 +130,8 @@
       if(_selectedSampleList.length === 0){
         _selectedSampleList = this.attributes.options['allCases'];
       }
-      _self.chartInst.init(this.attributes, _selectedSampleList, _selectedGenes, this.indices, this.data, this.chartId, callbacks);
+      var data = iViz.getAttrData(this.attributes.group_type)
+      _self.chartInst.init(this.attributes, _selectedSampleList, _selectedGenes, this.indices, data, this.chartId, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
       this.$dispatch('data-loaded', true);
     }

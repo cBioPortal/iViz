@@ -48,13 +48,15 @@
   };
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
-    ' :ndx="ndx" :data="data"  :groupid="groupid"' +
+    ' :ndx="ndx" :groupid="groupid"' +
     ' :attributes.sync="attribute" v-for="attribute in attributes" :indices="indices"></div>',
     props: [
-      'data', 'attributes', 'type', 'mappedsamples', 'id',
+      'attributes', 'type', 'mappedsamples', 'id',
       'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters', 'indices'
     ], created: function() {
-      var ndx_ = crossfilter(this.data);
+      //TODO: update this.data
+      var data_ = iViz.getAttrData(this.type);
+      var ndx_ = crossfilter(data_);
       var invisibleBridgeChart_ = iViz.bridgeChart.init(ndx_, settings_,
         this.type, this.id);
       this.groupid = this.id;
