@@ -76,25 +76,21 @@ var iViz = (function (_, $) {
       var groups = [];
 
       // group.data = data_.groups.patient.data;
-      group.indices = data_.groups.patient.data_indices.patient_id;
       group.type = 'patient';
       group.id = vm_.groupCount;
 
       $.each(data_.groups.patient.attr_meta,function(key,attrData){
-        attrData.group_id = group.id;
         attrData.group_type = group.type;
-        charts[attrData.attr_id]=attrData;
         if(chartsCount<31){
           if(attrData.show){
+            attrData.group_id = group.id;
             groupAttrs.push(attrData);
             chartsCount++;
-          }else{
-            attrData.show = false;
-            charts[attrData.attr_id]=attrData;
           }
         }else{
-          charts[attrData.attr_id]=attrData;
+          attrData.show = false;
         }
+        charts[attrData.attr_id]=attrData;
       });
       group.attributes = groupAttrs;
       groups.push(group);
@@ -105,24 +101,21 @@ var iViz = (function (_, $) {
       group = {};
       vm_.groupCount = vm_.groupCount+1;
       //group.data = data_.groups.sample.data;
-      group.indices = data_.groups.sample.data_indices.sample_id;
       group.type = 'sample';
       group.id = vm_.groupCount;
 
       $.each(data_.groups.sample.attr_meta,function(key,attrData){
-        attrData.group_id = group.id;
         attrData.group_type = group.type;
         if(chartsCount<31){
           if(attrData.show){
+            attrData.group_id = group.id;
             groupAttrs.push(attrData);
             chartsCount++;
-          }else{
-            attrData.show = false;
-            charts[attrData.attr_id]=attrData;
           }
         }else{
-          charts[attrData.attr_id]=attrData;
+          attrData.show = false;
         }
+        charts[attrData.attr_id]=attrData;
       });
       vm_.groupCount = vm_.groupCount+1;
       group.attributes = groupAttrs;
@@ -133,8 +126,8 @@ var iViz = (function (_, $) {
       vm_.isloading = false;
       vm_.selectedsamples = _sampleIds;
       vm_.selectedpatients = _patientIds;
-      vm_.patientmap = data_.groups.group_mapping.patient.sample;
-      vm_.samplemap = data_.groups.group_mapping.sample.patient;
+     // vm_.patientmap = data_.groups.group_mapping.patient.sample;
+     // vm_.samplemap = data_.groups.group_mapping.sample.patient;
       vm_.groups = groups;
       vm_.charts = charts;
 
@@ -158,6 +151,20 @@ var iViz = (function (_, $) {
         toReturn_ = _data
       }
       return toReturn_;
+    },
+    getCasesMap : function(type){
+      if(type === 'sample'){
+        return data_.groups.group_mapping.sample.patient;
+      }else{
+        return data_.groups.group_mapping.patient.sample;
+      }
+    },
+    getCaseIndices : function(type){
+      if(type === 'sample'){
+        return data_.groups.sample.data_indices.sample_id;
+      }else{
+        return data_.groups.sample.data_indices.patient_id;
+      }
     },
     stat: function () {
       var _result = {};

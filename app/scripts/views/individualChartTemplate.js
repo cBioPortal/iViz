@@ -39,10 +39,10 @@
     template: /*'<div v-if="attributes.show">' +*/
     '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
     ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
-    ':ndx="ndx" :attributes.sync="attributes" :indices="indices"></component>'
+    ':ndx="ndx" :attributes.sync="attributes"></component>'
     /*'</div>'*/,
     props: [
-      'ndx', 'attributes', 'groupid', 'indices'
+      'ndx', 'attributes', 'groupid'
     ],
     data: function() {
       var currentView = '';

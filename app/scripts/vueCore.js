@@ -48,8 +48,8 @@
             groups: [],
             selectedsamples: [],
             selectedpatients: [],
-            patientmap: [],
-            samplemap: [],
+           // patientmap: [],
+           // samplemap: [],
             selectedgenes: [],
             showVCList: false,
             addNewVC: false,
@@ -161,7 +161,6 @@
                 var groupAttrs = [];
                 groupAttrs.push(attrData);
                 // newgroup_.data = _group.data;
-                newgroup_.indices = _group.indices;
                 newgroup_.type = _group.type;
                 newgroup_.id = self_.groupCount;
                 self_.groupCount = self_.groupCount+1;
@@ -204,7 +203,7 @@
               var unmappedCaseIds = [];
 
               if (radioVal === 'patient') {
-                var patientIdsList = Object.keys(vmInstance_.patientmap);
+                var patientIdsList = Object.keys(iViz.getCasesMap('patient'));
                 _.each(selectedCases, function (id) {
                   if(patientIdsList.indexOf(id) !== -1){
                     selectedCaseIds.push(id);
@@ -213,7 +212,7 @@
                   }
                 });
               } else {
-                var sampleIdsList = Object.keys(vmInstance_.samplemap);
+                var sampleIdsList = Object.keys(iViz.getCasesMap('sample'));
                 _.each(selectedCases, function (id) {
                   if(sampleIdsList.indexOf(id) !== -1){
                     selectedCaseIds.push(id);
@@ -288,20 +287,23 @@
   Vue.directive('select', {
     twoWay: true,
     params: ['charts'],
+    paramWatchers: {
+      charts: function (val, oldVal) {
+        $("#study-view-add-chart").trigger("chosen:updated");
+      }
+    },
     bind: function() {
       var self = this;
       $(this.el).chosen({
           width: '30%'
         })
         .change(function() {
-            if (this.value !== '') {
               var value = this.el.value;
               self.params.charts[value].show = true;
               self.vm.addChart(this.el.value);
               self.vm.$nextTick(function () {
                 $("#study-view-add-chart").trigger("chosen:updated");
               });
-            }
           }.bind(this)
         );
     }

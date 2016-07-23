@@ -36,10 +36,10 @@
 (function(Vue, dc, iViz, $) {
   Vue.component('mainTemplate', {
     template: ' <chart-group :hasfilters="hasfilters"  :redrawgroups.sync="redrawgroups"   :id="group.id"   :type.sync="group.type" :mappedpatients.sync="patientsync"' +
-    ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes" :indices="group.indices"' +
+    ' :mappedsamples.sync="samplesync" :attributes.sync="group.attributes"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
-      'groups', 'selectedsamples', 'selectedpatients', 'samplemap', 'patientmap', 'hasfilters', 'redrawgroups', 'customfilter'
+      'groups', 'selectedsamples', 'selectedpatients', 'hasfilters', 'redrawgroups', 'customfilter'
     ], data: function() {
       return {
         messages: [],
@@ -47,15 +47,19 @@
         samplesync: [],
         grid_: '',
         completePatientsList: [],
-        completeSamplesList:[]
+        completeSamplesList: []
       }
     }, watch: {
-      'patientmap':function(val){
+      'groups': function(){
+        this.completePatientsList = _.keys(iViz.getCasesMap('patient'));
+          this.completeSamplesList = _.keys(iViz.getCasesMap('sample'));
+      },
+      /*'patientmap':function(val){
         this.completePatientsList =  _.keys(val);
       },
       'samplemap' : function(val){
         this.completeSamplesList =  _.keys(val);
-      },
+      },*/
       'messages': function(val) {
         _.each(this.groups, function(group) {
           dc.renderAll(group.id);
@@ -150,18 +154,18 @@
         
         _selectedSamplesByFiltersOnly = _.intersection.apply(_, _sampleSelect);
         _selectedPatientsByFiltersOnly = _.intersection.apply(_, _patientSelect);
-        var mappedSelectedSamples = iViz.util.idMapping(this.patientmap,
+        var mappedSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'),
           _selectedPatientsByFiltersOnly);
         var resultSelectedSamples = _.intersection(mappedSelectedSamples,
           _selectedSamplesByFiltersOnly);
-        var resultSelectedPatients = iViz.util.idMapping(this.samplemap,
+        var resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'),
           resultSelectedSamples);
         if (updateType === 'patient') {
           this.patientsync = resultSelectedPatients;
-          this.samplesync = iViz.util.idMapping(this.patientmap,
+          this.samplesync = iViz.util.idMapping(iViz.getCasesMap('patient'),
             _selectedPatientsByFiltersOnly);
         } else {
-          this.patientsync = iViz.util.idMapping(this.samplemap,
+          this.patientsync = iViz.util.idMapping(iViz.getCasesMap('sample'),
             _selectedSamplesByFiltersOnly);
           this.samplesync = resultSelectedSamples;
         }
@@ -171,11 +175,11 @@
       'update-custom-filters': function() {
         if (this.customfilter.type === 'patient') {
           this.patientsync = this.customfilter.patientIds;
-          this.samplesync = iViz.util.idMapping(this.patientmap,
+          this.samplesync = iViz.util.idMapping(iViz.getCasesMap('patient'),
             this.patientsync);
           this.customfilter.sampleIds = this.samplesync;
         } else {
-          this.patientsync = iViz.util.idMapping(this.samplemap,
+          this.patientsync = iViz.util.idMapping(iViz.getCasesMap('sample'),
             this.customfilter.sampleIds);
           this.samplesync = this.customfilter.sampleIds;
           this.customfilter.patientIds = this.patientsync;

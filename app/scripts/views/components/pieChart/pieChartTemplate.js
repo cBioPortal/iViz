@@ -46,7 +46,7 @@
               '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
               '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid','options','indices'
+      'ndx', 'attributes', 'filters', 'groupid','options'
     ],
     data: function() {
       return {

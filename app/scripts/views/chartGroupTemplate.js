@@ -49,10 +49,10 @@
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
     ' :ndx="ndx" :groupid="groupid"' +
-    ' :attributes.sync="attribute" v-for="attribute in attributes" :indices="indices"></div>',
+    ' :attributes.sync="attribute" v-for="attribute in attributes"></div>',
     props: [
       'attributes', 'type', 'mappedsamples', 'id',
-      'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters', 'indices'
+      'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters'
     ], created: function() {
       //TODO: update this.data
       var data_ = iViz.getAttrData(this.type);

@@ -137,8 +137,10 @@
                 v-select :charts="charts">
           <option id='' value="">Add Chart</option>
           <!--<option v-for="attributes in groups[0].attributes"></option>-->
-          <option is="manage-charts" :data.sync="chart"
-                  v-for="(index,chart) in charts"></option>
+            <option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}" v-for="(index,data) in charts">{{data.display_name}}</option>
+         
+          <!--<option is="manage-charts" :data.sync="chart"
+                  v-for="(index,chart) in charts"></option>-->
         </select>
       </div>
 
@@ -194,7 +196,7 @@
   </nav>
   <div class="grid" id="main-grid" :class="{loading:isloading}">
     <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
-                   :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
+                   :selectedpatients.sync="selectedpatients"
                    :selectedsamples.sync="selectedsamples"
                    :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
   </div>

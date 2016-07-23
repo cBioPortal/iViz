@@ -103,7 +103,7 @@
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];
           _.each(_eventData.points, function(_pointObj) {
-            _.each(_self.data, function(_dataObj) {
+            _.each(data, function(_dataObj) {
               if (_dataObj['cna_fraction'] === _pointObj.x &&
                 _dataObj['mutation_count'] === _pointObj.y) {
                 _selectedData.push(_dataObj);

@@ -64,7 +64,7 @@
 
 
     content.init =
-      function(_attributes, _selectedSamples, _selectedGenes, _indices,
+      function(_attributes, _selectedSamples, _selectedGenes,
                _data, _chartId, _callbacks) {
         initialized = false;
         allSamplesIds = _attributes.options.allCases;
@@ -72,7 +72,7 @@
         sequencedSampleIds = _attributes.options.sequencedCases;
         selectedGenes = _selectedGenes;
         chartId_ = _chartId;
-        patientDataIndices = _indices;
+        patientDataIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
         geneData_ = _attributes.gene_list;
         type_ = _attributes.type;
