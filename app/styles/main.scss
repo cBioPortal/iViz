@@ -69,6 +69,6 @@ body {
 
 .qtip-wide{max-width:380px !important;}
 
-#range-chart g.y{  /* hides the y axis on the rangeChart of the line chart*/
+.range-chart-class g.y{  /* hides the y axis on the rangeChart of the line chart*/
     display:none;
 }

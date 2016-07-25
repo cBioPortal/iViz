@@ -3,10 +3,10 @@
     iViz.view.component.lineChart = function(ndx, data, opts){ //must import both ndx (for crossfiltered data) and data (array containing data)
         var content = {};
         content.init = function initDCLineChart(){
-                    var lineChart = dc.lineChart("#the-line-chart", opts.groupid); //initialize line chart; random dates created in util.js
-                                                                               //secoind parameter adds line chart to the chart group
+                    var lineChart = dc.lineChart(opts.lineChartTarget, opts.groupid); //initialize line chart; random dates created in util.js
+                                                                               //second parameter adds line chart to the chart group
                     
-                    var rangeChart = dc.barChart("#range-chart", opts.groupid);
+                    var rangeChart = dc.barChart(opts.rangeChartTarget, opts.groupid);
                     
                     var parseDate = d3.time.format("%-m-%-d-%Y").parse; //function to parse the date string (with specific format) to a date object
                     data.forEach(function(d){ //parse every date in the data array
@@ -54,6 +54,8 @@
                 };
         return content;
     };
+    iViz.view.component.lineChart.prototype = new iViz.view.component.GeneralChart('lineChart');
+    iViz.view.component.lineChart.constructor = iViz.view.component.lineChart;
 })(window.iViz,window.dc,window._,
 window.$ || window.jQuery, window.d3);
 
