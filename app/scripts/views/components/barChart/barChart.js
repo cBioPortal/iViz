@@ -53,9 +53,10 @@
 
       var cluster = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
-        if (val === 'NA' || val === '' || val === 'NaN') {
+        if (typeof val === 'undefined' || val === 'NA' || val === '' || val === 'NaN') {
           hasEmptyValue_ = true;
-          val = opts_.emptyMappingVal;
+          //val = opts_.emptyMappingVal;
+          val = 'NA';
         } else {
           val = d[data_.attrId] >= 0 ? parseInt(
             (d[data_.attrId] - opts_.startPoint) /
