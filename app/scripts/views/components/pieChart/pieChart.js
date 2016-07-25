@@ -211,7 +211,10 @@
         data += meta[i].name + '\t';
         data += meta[i].samples;
       }
-      content.setDownloadData('tsv', data);
+      content.setDownloadData('tsv', {
+        fileName: v.data.display_name || 'Pie Chart',
+        data: data
+      });
     }
 
     function initCanvasDownloadData() {

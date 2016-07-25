@@ -255,7 +255,10 @@
         data += _cases[i].patient_id + '\t';
         data += iViz.util.restrictNumDigits(_cases[i][data_.attrId]);
       }
-      content.setDownloadData('tsv', data);
+      content.setDownloadData('tsv', {
+        fileName: data_.displayName,
+        data: data
+      });
     }
 
     function initCanvasDownloadData() {

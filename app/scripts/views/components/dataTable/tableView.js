@@ -35,8 +35,8 @@
 'use strict';
 (function(iViz, dc, _, $) {
   // iViz pie chart component. It includes DC pie chart.
-  iViz.view.component.tableView = function() {
-    var content = {};
+  iViz.view.component.TableView = function() {
+    var content = this;
     var chartId_, geneData_, data_;
     var type_ = '';
     var attr_ = [];
@@ -50,6 +50,8 @@
     var initialized = false;
     var patientDataIndices = {};
     var selectedRowData = [];
+    var selectedGeneData = [];
+    var displayName = '';
 
     /**
      * Finds the intersection elements between two arrays in a simple fashion.
@@ -78,7 +80,9 @@
 
       return result;
     }
-    
+
+    content.dataForDownload = {};
+
     content.getCases = function() {
       return intersection(selectedSamples, sequencedSampleIds)
       //return _.intersection(selectedSamples, sequencedSampleIds);
@@ -107,6 +111,7 @@
         data_ = _data;
         geneData_ = _attributes.gene_list;
         type_ = _attributes.type;
+        displayName = _attributes.attr_id || 'Table';
         callbacks_ = _callbacks;
         if (iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
           initReactTable(true);
@@ -155,11 +160,11 @@
               }
             });
           });
-          initReactTable(true,selectedGenesMap_);
+          initReactTable(true, selectedGenesMap_);
         } else {
           initReactTable(true);
         }
-      }else{
+      } else {
         initReactTable(false);
       }
     };
@@ -169,8 +174,14 @@
       initReactTable(false);
     };
 
-    function initReactTable(_reloadData,_selectedGenesMap) {
-      if(_reloadData)
+    content.updateDataForDownload = function(fileType) {
+      if (fileType === 'tsv') {
+        initTsvDownloadData();
+      }
+    }
+
+    function initReactTable(_reloadData, _selectedGenesMap) {
+      if (_reloadData)
         reactTableData = initReactData(_selectedGenesMap);
       var _opts = {
         input: reactTableData,
@@ -208,8 +219,10 @@
     }
 
     function mutatedGenesData(_selectedGenesMap) {
-      var genes = [];
       var numOfCases_ = content.getCases().length;
+
+      selectedGeneData.length = 0;
+
       if (geneData_) {
         $.each(geneData_, function(index, item) {
           var datum = {};
@@ -268,11 +281,10 @@
           } else {
             datum.qval = '';
           }
-          genes.push(datum);
+          selectedGeneData.push(datum);
         })
       }
-      return genes;
-
+      return selectedGeneData;
     }
 
     function initReactData(_selectedGenesMap) {
@@ -296,16 +308,16 @@
 
     }
 
-    function reactSubmitClickCallback(){
+    function reactSubmitClickCallback() {
       callbacks_.submitClick(selectedRowData);
     }
 
     function reactRowClickCallback(data, selected, _selectedRows) {
-      if(selected){
+      if (selected) {
         selectedRowData.push(data);
       }
-      else{
-        selectedRowData = _.filter(selectedRowData, function(index,item){
+      else {
+        selectedRowData = _.filter(selectedRowData, function(index, item) {
           return (item.uniqueId === selected.uniqueId);
         });
       }
@@ -314,8 +326,35 @@
     function reactGeneClickCallback(selectedRow, selected) {
       callbacks_.addGeneClick(selectedRow);
     }
-    return content;
-  };
+
+    function initTsvDownloadData() {
+      var attrs = iViz.util.tableView.getAttributes(type_).filter(function(attr) {
+        return attr.attr_id !== 'uniqueId';
+      });
+      var downloadOpts = {
+        fileName: displayName,
+        data: ''
+      };
+
+      if (_.isArray(attrs) && attrs.length > 0) {
+        var data = attrs.map(function(attr) {
+            return attr.display_name;
+          }).join('\t') + '\n';
+
+        _.each(selectedGeneData, function(row) {
+          var _tmp = [];
+          _.each(attrs, function(attr) {
+            _tmp.push(row[attr.attr_id] || '');
+          })
+          data += _tmp.join('\t') + '\n';
+        });
+
+        downloadOpts.data = data;
+      }
+      content.setDownloadData('tsv', downloadOpts);
+    }
+  }
+  iViz.view.component.TableView.prototype = new iViz.view.component.GeneralChart('table');
 
 
   iViz.util.tableView = (function() {
@@ -328,7 +367,7 @@
       }
       return true;
     };
-
+    
     content.getAttributes = function(type) {
       var _attr = [];
       switch (type) {
