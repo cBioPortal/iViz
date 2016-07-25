@@ -66,8 +66,8 @@ var iViz = (function (_, $) {
         data_.groups.sample.data_indices.sample_id = _sampleDataIndices;
       }
 
-      var _patientIds = _.uniq(_.pluck(data_.groups.patient.data, 'patient_id'));
-      var _sampleIds = _.uniq(_.pluck(data_.groups.sample.data, 'sample_id'));
+      var _patientIds = _.keys(data_.groups.patient.data_indices.patient_id);
+      var _sampleIds = _.keys(data_.groups.sample.data_indices.sample_id);
 
       var chartsCount = 0;
       var groupAttrs = [];
@@ -163,7 +163,7 @@ var iViz = (function (_, $) {
       if(type === 'sample'){
         return data_.groups.sample.data_indices.sample_id;
       }else{
-        return data_.groups.sample.data_indices.patient_id;
+        return data_.groups.patient.data_indices.patient_id;
       }
     },
     stat: function () {

@@ -80,7 +80,8 @@
         height: window.style.vars.survivalHeight,
         chartId: this.chartId,
         attrId: this.attributes.attr_id,
-        title: this.attributes.display_name
+        title: this.attributes.display_name,
+        type: this.attributes.group_type
       };
       var _selectedPatientList = this.$parent.$parent.$parent.selectedpatients;
       _self.chartInst = new iViz.view.component.Survival();
