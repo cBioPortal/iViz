@@ -129,17 +129,19 @@
       </div>
       <div id="study-view-header-right" style="margin-right:30px;">
         <custom-case-input></custom-case-input>
-      
-      <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
-      <!--:selected-samples-num="selectedSamplesNum"-->
-      <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
-      <select id="study-view-add-chart" class="chosen-select"
-              v-select :groups="groups">
-        <option id='' value="">Add Chart</option>
-        <!--<option v-for="attributes in groups[0].attributes"></option>-->
-        <option is="manage-charts" :data.sync="group"
-                v-for="(index,group) in groups" :parent="index"></option>
-      </select>
+
+        <!--<add-vc :add-new-vc.sync="addNewVC"  :from-iViz="true"-->
+        <!--:selected-samples-num="selectedSamplesNum"-->
+        <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
+        <select id="study-view-add-chart" class="chosen-select"
+                v-select :charts="charts">
+          <option id='' value="">Add Chart</option>
+          <!--<option v-for="attributes in groups[0].attributes"></option>-->
+            <option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}" v-for="(index,data) in charts">{{data.display_name}}</option>
+         
+          <!--<option is="manage-charts" :data.sync="chart"
+                  v-for="(index,chart) in charts"></option>-->
+        </select>
       </div>
 
       <div id="breadcrumbs_container" v-if="hasfilters">
@@ -151,16 +153,16 @@
           <span>{{customfilter.display_name}}</span>
           <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">
         </span>
-          <div style="float:left" v-for="group in groups">
+        <div style="float:left" v-for="group in groups">
+          <bread-crumb :attributes.sync="item"
+                       :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
+                       v-if="item.filter.length>0" ></bread-crumb>
+          <!--<div v-for="(index1, item) in group.attributes"
+               v-if="item.filter.length>0">
             <bread-crumb :attributes.sync="item"
-                         :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
-                         v-if="item.filter.length>0" ></bread-crumb>
-            <!--<div v-for="(index1, item) in group.attributes"
-                 v-if="item.filter.length>0">
-              <bread-crumb :attributes.sync="item"
-                           :filters.sync="item.filter"></bread-crumb>
-            </div>-->
-          </div>
+                         :filters.sync="item.filter"></bread-crumb>
+          </div>-->
+        </div>
         <div><button type='button' @click="clearAll()">Clear
           All</button></div>
       </div>
@@ -194,7 +196,7 @@
   </nav>
   <div class="grid" id="main-grid" :class="{loading:isloading}">
     <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
-                   :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
+                   :selectedpatients.sync="selectedpatients"
                    :selectedsamples.sync="selectedsamples"
                    :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
   </div>
@@ -217,7 +219,7 @@
         window.style.vars.survivalHeight = 320;
         window.style.vars.barchartWidth = 350;
         window.style.vars.barchartHeight = 120;
-      })
+      });
 
     iViz.session.URL = "http://localhost:8081/api/sessions/";
     var vcId_ = location.search.split('vc_id=')[1];
