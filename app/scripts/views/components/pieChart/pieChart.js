@@ -129,6 +129,14 @@
       });
     };
 
+    content.updateDataForDownload = function(fileType) {
+      if (fileType === 'tsv') {
+        initTsvDownloadData();
+      } else if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
+    }
+
     /**
      * This is the function to initialize dc pie chart instance.
      */
@@ -193,10 +201,10 @@
       }
     }
 
-    function initTsvDownloadData(meta) {
+    function initTsvDownloadData() {
       var data = v.data.display_name + '\tCount';
 
-      meta = meta || labelMetaData;
+      var meta = labels || [];
       
       for (var i = 0; i < meta.length; i++) {
         data += '\r\n';
@@ -247,8 +255,6 @@
     function initLabels() {
       labelMetaData = initLabelInfo();
       labels = $.extend(true, [], labelMetaData);
-      initTsvDownloadData();
-      initCanvasDownloadData();
     }
 
     function initLabelInfo() {
@@ -329,8 +335,6 @@
 
     function updateCurrentLabels() {
       labels = filterLabels();
-      initTsvDownloadData(labels);
-      initCanvasDownloadData();
     }
 
     function findLabel(labelName) {

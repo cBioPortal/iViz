@@ -85,6 +85,7 @@
       };
       var _selectedPatientList = this.$parent.$parent.$parent.selectedpatients;
       _self.chartInst = new iViz.view.component.Survival();
+      _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst.init(data, _opts, _selectedPatientList);

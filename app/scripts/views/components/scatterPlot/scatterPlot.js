@@ -96,7 +96,6 @@
         },
       };
       Plotly.plot(document.getElementById(chartId_), data, layout);
-      initCanvasDownloadData();
     };
 
     content.update = function(_sampleIds) { // update selected samples (change color)
@@ -151,9 +150,14 @@
         }
       };
       Plotly.redraw(document.getElementById(chartId_));
-      initCanvasDownloadData();
     }
 
+    content.updateDataForDownload = function(fileType) {
+      if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
+    }
+    
     function initCanvasDownloadData() {
       content.setDownloadData('svg', {
         title: opts_.title,

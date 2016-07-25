@@ -133,6 +133,7 @@
     },
     ready: function() {
       this.barChart = new iViz.view.component.BarChart();
+      this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
       settings_.barChart.width = window.style.vars.barchartWidth || 150;
       settings_.barChart.height = window.style.vars.barchartHeight || 150;
       this.initChart();

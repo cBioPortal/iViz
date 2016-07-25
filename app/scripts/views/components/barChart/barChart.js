@@ -325,9 +325,6 @@
         }
       }
       chartInst_.render();
-
-      initTsvDownloadData();
-      initCanvasDownloadData();
       return chartInst_;
     };
 
