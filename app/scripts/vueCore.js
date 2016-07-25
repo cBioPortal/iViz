@@ -48,8 +48,8 @@
             groups: [],
             selectedsamples: [],
             selectedpatients: [],
-            patientmap: [],
-            samplemap: [],
+           // patientmap: [],
+           // samplemap: [],
             selectedgenes: [],
             showVCList: false,
             addNewVC: false,
@@ -66,7 +66,9 @@
               patientIds:[]
             },
             initializedSampleSpecialCharts:true,
-            initializedPatientSpecialCharts:true
+            initializedPatientSpecialCharts:true,
+            charts: {},
+            groupCount:0
           }, watch: {
             'redrawgroups':function(newVal,oldVal){
               if(newVal.length>0){
@@ -103,29 +105,32 @@
               this.updateGeneList(geneList,false);
             },'set-selected-cases' : function(selectionType, selectedCases){
               this.setSelectedCases(selectionType, selectedCases);
+            },'remove-chart':function(attrId,groupId){
+              this.removeChart(attrId,groupId)
             }
           },methods: {
-            initialize: function() {
-                this.groups = [];
-                this.selectedsamples = [];
-                this.selectedpatients = [];
-                this.selectedgenes = [];
-                this.patientmap = [];
-                this.samplemap = [];
-                this.showVCList = false;
-                this.addNewVC = false;
-                this.selectedPatientsNum = 0;
-                this.selectedSamplesNum = 0;
-                this.hasfilters = false;
-                this.virtualCohorts = [];
-                this.isloading = true;
-                this.customfilter ={
-                  display_name:"Custom",
-                  type:"",
-                  sampleIds:[],
-                  patientIds:[]
-                }
-            },
+            /*initialize: function() {
+             this.groups = [];
+             this.selectedsamples = [];
+             this.selectedpatients = [];
+             this.selectedgenes = [];
+             this.patientmap = [];
+             this.samplemap = [];
+             this.showVCList = false;
+             this.addNewVC = false;
+             this.selectedPatientsNum = 0;
+             this.selectedSamplesNum = 0;
+             this.hasfilters = false;
+             this.virtualCohorts = [];
+             this.isloading = true;
+             this.customfilter ={
+             display_name:"Custom",
+             type:"",
+             sampleIds:[],
+             patientIds:[]
+             };
+             this.charts = {};
+             },*/
             clearAll: function(){
               if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
                 this.customfilter.sampleIds = [];
@@ -133,6 +138,47 @@
                 this.$broadcast('update-all-filters');
               }
               this.$broadcast('clear-all-filters');
+            },
+            addChart: function(attrId){
+              var self_ = this;
+              var attrData = self_.charts[attrId];
+              var _attrAdded = false;
+              var _group = {};
+              _.each(self_.groups,function(group){
+                if(group.type === attrData.group_type){
+                  if(group.attributes.length<31){
+                    attrData.group_id = group.id;
+                    group.attributes.push(attrData);
+                    _attrAdded = true;
+                    return false;
+                  }else{
+                    _group = group;
+                  }
+                }
+              });
+              if(!_attrAdded){
+                var newgroup_ = {};
+                var groupAttrs = [];
+                groupAttrs.push(attrData);
+                // newgroup_.data = _group.data;
+                newgroup_.type = _group.type;
+                newgroup_.id = self_.groupCount;
+                self_.groupCount = self_.groupCount+1;
+                newgroup_.attributes = groupAttrs;
+                self_.groups.push(newgroup_);
+              }
+
+            },
+            removeChart: function(attrId){
+              var self = this;
+              var attrData = self.charts[attrId];
+              var attributes = self.groups[attrData.group_id].attributes;
+              attributes.$remove(attrData);
+
+              self.$nextTick(function () {
+                self.$broadcast('update-grid',true);
+                $("#study-view-add-chart").trigger("chosen:updated");
+              })
             },
             updateGeneList : function(geneList,reset){
               var self_ = this;
@@ -157,7 +203,7 @@
               var unmappedCaseIds = [];
 
               if (radioVal === 'patient') {
-                var patientIdsList = Object.keys(vmInstance_.patientmap);
+                var patientIdsList = Object.keys(iViz.getCasesMap('patient'));
                 _.each(selectedCases, function (id) {
                   if(patientIdsList.indexOf(id) !== -1){
                     selectedCaseIds.push(id);
@@ -166,7 +212,7 @@
                   }
                 });
               } else {
-                var sampleIdsList = Object.keys(vmInstance_.samplemap);
+                var sampleIdsList = Object.keys(iViz.getCasesMap('sample'));
                 _.each(selectedCases, function (id) {
                   if(sampleIdsList.indexOf(id) !== -1){
                     selectedCaseIds.push(id);
@@ -240,17 +286,24 @@
 
   Vue.directive('select', {
     twoWay: true,
-    params: ['groups'],
+    params: ['charts'],
+    paramWatchers: {
+      charts: function (val, oldVal) {
+        $("#study-view-add-chart").trigger("chosen:updated");
+      }
+    },
     bind: function() {
       var self = this;
       $(this.el).chosen({
           width: '30%'
         })
         .change(function() {
-            if (this.value !== '') {
-              var value = this.el.value.split('---');
-              self.params.groups[value[0]].attributes[value[1]].show = true
-            }
+              var value = this.el.value;
+              self.params.charts[value].show = true;
+              self.vm.addChart(this.el.value);
+              self.vm.$nextTick(function () {
+                $("#study-view-add-chart").trigger("chosen:updated");
+              });
           }.bind(this)
         );
     }
