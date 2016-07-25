@@ -43,7 +43,7 @@
       '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
       '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
+      'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
     data: function() {
       return {
@@ -64,14 +64,15 @@
     },
     events: {
       'selected-sample-update': function(_selectedSamples) {
-      if (_selectedSamples.length !== this.data.length) {
-        this.selectedSamples=_selectedSamples;
-        this.chartInst.update(_selectedSamples);
-      } else {
-        this.selectedSamples=_selectedSamples;
-        this.chartInst.update([]);
-      }
-    },
+        var data = iViz.getAttrData(this.attributes.group_type);
+        if (_selectedSamples.length !== data.length) {
+          this.selectedSamples=_selectedSamples;
+          this.chartInst.update(_selectedSamples);
+        } else {
+          this.selectedSamples=_selectedSamples;
+          this.chartInst.update([]);
+        }
+      },
       'closeChart':function(){
         this.$dispatch('close');
       }
@@ -91,10 +92,11 @@
         chartDivId: this.charDivId,
         title: this.attributes.display_name
       };
+      var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst = new iViz.view.component.ScatterPlot();
-      _self.chartInst.init(this.data, _opts);
+      _self.chartInst.init(data, _opts);
       var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
-      if (_selectedSamples.length !== this.data.length) {
+      if (_selectedSamples.length !== data.length) {
         this.selectedSamples=_selectedSamples;
         this.chartInst.update(_selectedSamples);
       }
@@ -102,9 +104,9 @@
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];
           _.each(_eventData.points, function(_pointObj) {
-            _.each(_self.data, function(_dataObj) {
+            _.each(data, function(_dataObj) {
               if (_dataObj['cna_fraction'] === _pointObj.x &&
-                  _dataObj['mutation_count'] === _pointObj.y) {
+                _dataObj['mutation_count'] === _pointObj.y) {
                 _selectedData.push(_dataObj);
               }
             });

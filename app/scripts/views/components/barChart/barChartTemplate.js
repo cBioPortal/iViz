@@ -54,7 +54,7 @@
     '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><span class="text-center chart-title-span">{{displayName}}</span>' +
     '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'filters', 'groupid'
+      'ndx', 'attributes', 'filters', 'groupid'
     ],
     data: function() {
       return {
@@ -99,52 +99,36 @@
       }, mouseLeave: function() {
         this.showOperations = false;
       },initChart:function(logScaleChecked){
-
-        var _self = this;
-        
-        // check if there's data for this attribute    
-        // TODO: pass cluster into barChart.js
-        var _hasData = false;
-        var _attrId = _self.attributes.attr_id;
-        _self.ndx.dimension(function(d) {
-          if (typeof d[_attrId] !== 'undefined' && d[_attrId] !== 'NA') {
-            _hasData = true;
+        this.chartInst =
+          this.barChart.init(this.ndx, {
+            group_type:this.attributes.group_type,
+            attrId: this.attributes.attr_id,
+            displayName: this.attributes.display_name,
+            chartDivId: this.chartDivId,
+            chartId: this.chartId,
+            groupid: this.groupid,
+            width: settings_.barChart.width,
+            height: settings_.barChart.height,
+            logScaleChecked: logScaleChecked
+          });
+        this.showLogScale =this.barChart.hasLogScale();
+        var self_ = this;
+        this.chartInst.on('filtered', function(_chartInst, _filter) {
+          if(!self_.filtersUpdated) {
+            self_.filtersUpdated = true;
+            var tempFilters_ = $.extend(true, [], self_.filters);
+            tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
+              self_.attributes.view_type);
+            if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
+              tempFilters_[0] = tempFilters_[0].toFixed(2);
+              tempFilters_[1] = tempFilters_[1].toFixed(2);
+            }
+            self_.filters = tempFilters_;
+            self_.$dispatch('update-filters');
+          }else{
+            self_.filtersUpdated = false;
           }
         });
-        
-        if (_hasData) {
-          _self.chartInst =
-            _self.barChart.init(_self.ndx, _self.data, {
-              attrId: _self.attributes.attr_id,
-              displayName: _self.attributes.display_name,
-              chartDivId: _self.chartDivId,
-              chartId: _self.chartId,
-              groupid: _self.groupid,
-              width: settings_.barChart.width,
-              height: settings_.barChart.height,
-              logScaleChecked: logScaleChecked
-            });
-          this.showLogScale = _self.barChart.hasLogScale();
-          this.chartInst.on('filtered', function(_chartInst, _filter) {
-            if(!_self.filtersUpdated) {
-              _self.filtersUpdated = true;
-              var tempFilters_ = $.extend(true, [], _self.filters);
-              tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-                _self.attributes.view_type);
-              if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
-                tempFilters_[0] = tempFilters_[0].toFixed(2);
-                tempFilters_[1] = tempFilters_[1].toFixed(2);
-              }
-              _self.filters = tempFilters_;
-              _self.$dispatch('update-filters');
-            }else{
-              _self.filtersUpdated = false;
-            }
-          });
-        } else {
-          _self.$dispatch('close');
-        }
-        
       }
     },
     ready: function() {

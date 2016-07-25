@@ -41,7 +41,7 @@
               '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
               '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'options', 'filters', 'groupid'
+      'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
     created: function() {
     },
@@ -63,8 +63,9 @@
         this.chartInst.update(_selectedPatients, this.chartId, this.attributes.attr_id);
       },
       'closeChart':function(){
-      this.$dispatch('close');
-    }},
+        this.$dispatch('close');
+      }
+    },
     methods: {
       mouseEnter: function() {
         this.showOperations = true;
@@ -79,11 +80,14 @@
         height: window.style.vars.survivalHeight,
         chartId: this.chartId,
         attrId: this.attributes.attr_id,
-        title: this.attributes.display_name
+        title: this.attributes.display_name,
+        type: this.attributes.group_type
       };
       var _selectedPatientList = this.$parent.$parent.$parent.selectedpatients;
       _self.chartInst = new iViz.view.component.Survival();
-      _self.chartInst.init(this.data, _opts,_selectedPatientList);
+
+      var data = iViz.getAttrData(this.attributes.group_type);
+      _self.chartInst.init(data, _opts, _selectedPatientList);
       this.$dispatch('data-loaded', true);
     }
   });

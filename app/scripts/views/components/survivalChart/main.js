@@ -50,18 +50,29 @@
       this.chartInst_ = new survivalCurve(opts_.chartId, _dataProxy.get(), opts_);
       this.update(_selectedPatientList, opts_.chartId, opts_.attrId)
     };
+    //TODO : update initialiaziton logic, Why to initialize data for each filter update
     content_.update = function(_selectedPatients, _chartId, _attrId) {
       // remove previous curves
       this.chartInst_.removeCurves();
       // settings for selected samples curve
-      var _selectedData = _.filter(data_, function(_dataObj) {
-        return $.inArray(_dataObj.patient_id, _selectedPatients) !== -1;
+      var _selectedData = [];
+      var _unselectedData = [];
+      $.each(iViz.getCaseIndices(opts_.type),function(_key,_val){
+        if($.inArray(_key,_selectedPatients) !== -1){
+          _selectedData.push(data_[_val])
+        }else{
+          _unselectedData.push(data_[_val])
+        }
+        
       });
+     /* var _selectedData = _.filter(data_, function(_dataObj) {
+        return $.inArray(_dataObj.patient_id, _selectedPatients) !== -1;
+      });*/
       var _selectedDataProxy = new survivalChartProxy(_selectedData, _attrId);
       // settings for unselected samples curve
-      var _unselectedData = _.filter(data_, function(_dataObj) {
+      /*var _unselectedData = _.filter(data_, function(_dataObj) {
         return $.inArray(_dataObj.patient_id, _selectedPatients) === -1;
-      });
+      });*/
       var _unselectedDataProxy = new survivalChartProxy(_unselectedData, _attrId);
       // add curves
       if (_unselectedDataProxy.get().length === 0) {

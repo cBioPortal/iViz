@@ -51,8 +51,37 @@
     var patientDataIndices = {};
     var selectedRowData = [];
 
+    /**
+     * Finds the intersection elements between two arrays in a simple fashion.
+     * Should have O(n) operations, where n is n = MIN(a.length, b.length)
+     *
+     * @param a {Array} first array, must already be sorted
+     * @param b {Array} second array, must already be sorted
+     * @returns {Array}
+     */
+    function intersection(a, b) {
+      var result = [], i = 0, j = 0, aL = a.length, bL = b.length, size = 0;
+      while (i < aL && j < bL) {
+        if (a[i] < b[j]) {
+          ++i;
+        }
+        else if (a[i] > b[j]) {
+          ++j;
+        }
+        else /* they're equal */
+        {
+          result.push(a[i]);
+          ++i;
+          ++j;
+        }
+      }
+
+      return result;
+    }
+    
     content.getCases = function() {
-      return _.intersection(selectedSamples, sequencedSampleIds);
+      return intersection(selectedSamples, sequencedSampleIds)
+      //return _.intersection(selectedSamples, sequencedSampleIds);
     };
 
     content.getSelectedRowData = function() {
@@ -64,15 +93,17 @@
 
 
     content.init =
-      function(_attributes, _selectedSamples, _selectedGenes, _indices,
+      function(_attributes, _selectedSamples, _selectedGenes,
                _data, _chartId, _callbacks) {
         initialized = false;
-        allSamplesIds = _attributes.options.allCases;
+        allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
+        selectedSamples.sort();
         sequencedSampleIds = _attributes.options.sequencedCases;
+        sequencedSampleIds.sort();
         selectedGenes = _selectedGenes;
         chartId_ = _chartId;
-        patientDataIndices = _indices;
+        patientDataIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
         geneData_ = _attributes.gene_list;
         type_ = _attributes.type;
@@ -92,6 +123,7 @@
       if ((!initialized) || (!iViz.util.tableView.compare(selectedSamples, _selectedSamples))) {
         initialized = true;
         selectedSamples = _selectedSamples;
+        selectedSamples.sort();
         if (!iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
           _.each(_selectedSamples, function(caseId) {
             var caseIndex_ = patientDataIndices[caseId];
