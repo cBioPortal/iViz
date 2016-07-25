@@ -55,8 +55,7 @@
         var val = d[data_.attrId];
         if (typeof val === 'undefined' || val === 'NA' || val === '' || val === 'NaN') {
           hasEmptyValue_ = true;
-          //val = opts_.emptyMappingVal;
-          val = 'NA';
+          val = opts_.emptyMappingVal;
         } else {
           val = d[data_.attrId] >= 0 ? parseInt(
             (d[data_.attrId] - opts_.startPoint) /

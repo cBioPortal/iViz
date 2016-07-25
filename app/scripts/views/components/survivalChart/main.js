@@ -50,30 +50,31 @@
       this.chartInst_ = new survivalCurve(opts_.chartId, _dataProxy.get(), opts_);
       this.update(_selectedPatientList, opts_.chartId, opts_.attrId)
     };
-    //TODO : update initialiaziton logic, Why to initialize data for each filter update
+
     content_.update = function(_selectedPatients, _chartId, _attrId) {
+
       // remove previous curves
       this.chartInst_.removeCurves();
-      // settings for selected samples curve
-      var _selectedData = [];
-      var _unselectedData = [];
-      $.each(iViz.getCaseIndices(opts_.type),function(_key,_val){
-        if($.inArray(_key,_selectedPatients) !== -1){
-          _selectedData.push(data_[_val])
-        }else{
-          _unselectedData.push(data_[_val])
-        }
-        
+
+      // separate selected and unselected data
+      var _selectedData = [], _unselectedData = [];
+      var _tmpSelectedPatientIdMap = {};
+      _.each(_selectedPatients, function(_patientId) {
+        _tmpSelectedPatientIdMap[_patientId] = '';
       });
-     /* var _selectedData = _.filter(data_, function(_dataObj) {
-        return $.inArray(_dataObj.patient_id, _selectedPatients) !== -1;
-      });*/
+      _.each(Object.keys(iViz.getCaseIndices(opts_.type)), function(_patientId) {
+        var _index = iViz.getCaseIndices(opts_.type)[_patientId];
+        if (_tmpSelectedPatientIdMap.hasOwnProperty(_patientId)) {
+          _selectedData.push(data_[_index]);
+        } else {
+          _unselectedData.push(data_[_index]);
+        }
+      });
+      
+      // settings for different curves
       var _selectedDataProxy = new survivalChartProxy(_selectedData, _attrId);
-      // settings for unselected samples curve
-      /*var _unselectedData = _.filter(data_, function(_dataObj) {
-        return $.inArray(_dataObj.patient_id, _selectedPatients) === -1;
-      });*/
       var _unselectedDataProxy = new survivalChartProxy(_unselectedData, _attrId);
+
       // add curves
       if (_unselectedDataProxy.get().length === 0) {
         this.chartInst_.addCurve(_selectedDataProxy.get(), 0, "#006bb3");
@@ -83,6 +84,7 @@
         this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, "#006bb3");
         this.chartInst_.addPval(_selectedDataProxy.get(), _unselectedDataProxy.get());
       }
+      
       initCanvasDownloadData();
     }
     
