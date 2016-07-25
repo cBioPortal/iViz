@@ -22,7 +22,8 @@
     "jstat": "^1.5.3",
     "backbone": "^1.3.3",
     "jquery-ui": "jqueryui#^1.11.4",
-    "remarkable-bootstrap-notify": "^3.1.3"
+    "remarkable-bootstrap-notify": "^3.1.3",
+    "bootstrap-chosen": "^1.0.1"
   },
   "overrides": {
     "dc": {
@@ -64,8 +65,7 @@
     },
     "chosen": {
       "main": [
-        "chosen.jquery.min.js",
-        "chosen.min.css"
+        "chosen.jquery.min.js"
       ]
     },
     "qtip2": {
@@ -79,6 +79,16 @@
       "main": [
         "dist/fixed-data-table.min.js",
         "dist/fixed-data-table.min.css"
+      ]
+    },
+    "components-font-awesome": {
+      "main": [
+        "scss/font-awesome.scss",
+        "fonts/fontawesome-webfont.eot",
+        "fonts/fontawesome-webfont.woff",
+        "fonts/fontawesome-webfont.woff2",
+        "fonts/fontawesome-webfont.ttf",
+        "fonts/fontawesome-webfont.svg"
       ]
     }
   },

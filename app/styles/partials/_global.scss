@@ -34,7 +34,7 @@
 .loading {
   //padding:400px;
   margin: 400px;
-  background-image: url('../images/ajax-loader.gif');
+  background-image: url($images + '/ajax-loader.gif');
   background-repeat: no-repeat;
   background-size: 100px 100px;
   display: inline-block;
