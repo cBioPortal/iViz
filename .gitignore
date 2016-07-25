@@ -6,3 +6,5 @@ bower_components
 images
 .idea
 test
+_gruntBuild.scss
+.DS_Store
