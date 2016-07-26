@@ -102,7 +102,7 @@
         if(this.filters.length === 0 ){
           this.filters = selectedSamplesUnion;
         }else{
-          this.filters = _.intersection(this.filters,selectedSamplesUnion);
+          this.filters = iViz.util.intersection(this.filters.sort(),selectedSamplesUnion.sort());
         }
         this.chartInst.clearSelectedRowData();
       },

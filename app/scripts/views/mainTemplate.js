@@ -67,6 +67,14 @@
         this.updateGrid();
       }
     }, methods: {
+      getFilteredData:function(type,data,caseIds){
+        var caseIndices = iViz.getCaseIndices(type);
+        var resultData_ = [];
+        $.each(caseIds, function(key,val){
+          resultData_.push(data[caseIndices[val]]);
+        });
+        return resultData_;
+      },
       updateGrid: function() {
         if (this.grid_ !== '') {
           this.grid_.destroy();
@@ -105,8 +113,6 @@
         var _hasFilters = false;
         var _patientSelect = [];
         var _sampleSelect = [];
-        _patientSelect.push(_selectedPatientsByFiltersOnly);
-        _sampleSelect.push(_selectedSamplesByFiltersOnly);
         var _filterMap = {};
         $.each(this.groups, function(key,group) {
           var filters_ = [], _scatterPlotSel = [], _tableSel = [];
@@ -115,9 +121,9 @@
               if (attributes.filter.length > 0) {
                 _hasFilters = true;
                 if (attributes.view_type === 'scatter_plot') {
-                  _sampleSelect.push(attributes.filter);
+                  _sampleSelect.concat(attributes.filter);
                 } else if (attributes.view_type === 'table') {
-                  _sampleSelect.push(attributes.filter);
+                  _sampleSelect.concat(attributes.filter);
                 } else{
                   filters_[attributes.attr_id] = attributes.filter;
                 }
@@ -131,32 +137,45 @@
               _filterMap[group.type].filters = tempFilters;
             } else {
               _filterMap[group.type] = {};
-              _filterMap[group.type].data = iViz.getAttrData(group.type);
               _filterMap[group.type].filters = filters_;
             }
           }
         });
 
+        if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0) {
+          this.hasfilters = true;
+          _patientSelect.concat(this.customfilter.patientIds);
+          _sampleSelect.concat(this.customfilter.sampleIds);
+        }
+        var filteredSampleData = iViz.getAttrData('sample');
+        var filteredPatientData = iViz.getAttrData('patient');
+        
+        if(_sampleSelect.length !== 0){
+          filteredSampleData = this.getFilteredData('sample',filteredSampleData,_sampleSelect)
+        }
+
+        if(_patientSelect.length !== 0){
+          filteredPatientData = this.getFilteredData('patient',filteredSampleData,_patientSelect)
+        }
+
+
+
         $.each(_filterMap,function(key,val){
-          var  _selectedCases = iViz.sync.selectByFilters(val.filters, val.data, key);
           if(key === 'sample'){
-            _sampleSelect.push(_selectedCases);
+            filteredSampleData = iViz.sync.selectByFilters(val.filters, filteredSampleData, key);
           }else if(key === 'patient'){
-            _patientSelect.push(_selectedCases)
+            filteredPatientData = iViz.sync.selectByFilters(val.filters, filteredPatientData, key);
           }
         });
         this.hasfilters = _hasFilters;
-        if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0) {
-          this.hasfilters = true;
-          _patientSelect.push(this.customfilter.patientIds);
-          _sampleSelect.push(this.customfilter.sampleIds);
-        }
         
-        _selectedSamplesByFiltersOnly = _.intersection.apply(_, _sampleSelect);
-        _selectedPatientsByFiltersOnly = _.intersection.apply(_, _patientSelect);
+        _selectedSamplesByFiltersOnly = _.pluck(filteredSampleData, 'sample_id');
+        _selectedPatientsByFiltersOnly = _.pluck(filteredPatientData, 'patient_id');
         var mappedSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'),
           _selectedPatientsByFiltersOnly);
-        var resultSelectedSamples = _.intersection(mappedSelectedSamples,
+        mappedSelectedSamples.sort();
+        _selectedSamplesByFiltersOnly.sort();
+        var resultSelectedSamples = iViz.util.intersection(mappedSelectedSamples,
           _selectedSamplesByFiltersOnly);
         var resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'),
           resultSelectedSamples);

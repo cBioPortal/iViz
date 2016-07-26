@@ -35,6 +35,7 @@ var iViz = (function (_, $) {
   var data_;
   var vm_;
   var grid_;
+  var tableData_ = [];
 
   return {
 
@@ -81,6 +82,10 @@ var iViz = (function (_, $) {
 
       $.each(data_.groups.patient.attr_meta,function(key,attrData){
         attrData.group_type = group.type;
+        if(attrData.view_type=='table'){
+          tableData_[attrData.attr_id]=attrData['gene_list'];
+          attrData.gene_list = undefined;
+        }
         if(chartsCount<31){
           if(attrData.show){
             attrData.group_id = group.id;
@@ -106,6 +111,10 @@ var iViz = (function (_, $) {
 
       $.each(data_.groups.sample.attr_meta,function(key,attrData){
         attrData.group_type = group.type;
+        if(attrData.view_type=='table'){
+          tableData_[attrData.attr_id]=attrData['gene_list'];
+          attrData.gene_list = undefined;
+        }
         if(chartsCount<31){
           if(attrData.show){
             attrData.group_id = group.id;
@@ -151,6 +160,9 @@ var iViz = (function (_, $) {
         toReturn_ = _data
       }
       return toReturn_;
+    },
+    getTableData : function(attrId){
+      return tableData_[attrId];
     },
     getCasesMap : function(type){
       if(type === 'sample'){
