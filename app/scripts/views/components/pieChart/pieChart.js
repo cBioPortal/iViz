@@ -65,8 +65,6 @@
     var currentView = 'pie';
 
     initDCPieChart();
-
-    content.dataForDownload = {};
     
     content.getChart = function() {
       return v.chart;

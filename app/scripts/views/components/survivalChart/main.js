@@ -41,7 +41,6 @@
     var data_ = {};
     var opts_ = {};
 
-    content_.dataForDownload = {};
     content_.init = function(_data, _opts, _selectedPatientList) { //_attrId here indicates chart type (OS or DFS)
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();

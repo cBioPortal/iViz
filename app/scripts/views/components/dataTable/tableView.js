@@ -81,8 +81,6 @@
       return result;
     }
 
-    content.dataForDownload = {};
-
     content.getCases = function() {
       return intersection(selectedSamples, sequencedSampleIds)
       //return _.intersection(selectedSamples, sequencedSampleIds);

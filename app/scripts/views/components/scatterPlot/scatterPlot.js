@@ -42,7 +42,6 @@
     var data_;
     var opts_;
 
-    content.dataForDownload = {};
     content.init = function(_data, opts) {
       opts_ = $.extend(true, {}, opts);
       chartId_ = opts_.chartId;

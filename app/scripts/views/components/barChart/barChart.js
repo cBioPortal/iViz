@@ -276,8 +276,6 @@
       });
     }
 
-    content.dataForDownload = {};
-
     content.hasLogScale = function() {
       if (data_ !== undefined) {
         if (data_.min !== null && data_.max !== null) {
