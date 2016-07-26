@@ -41,14 +41,13 @@
     var data_ = {};
     var opts_ = {};
 
-    content_.dataForDownload = {};
     content_.init = function(_data, _opts, _selectedPatientList) { //_attrId here indicates chart type (OS or DFS)
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
       data_ = _data;
       var _dataProxy = new survivalChartProxy(_data, opts_.attrId);
       this.chartInst_ = new survivalCurve(opts_.chartId, _dataProxy.get(), opts_);
-      this.update(_selectedPatientList, opts_.chartId, opts_.attrId)
+      this.update(_selectedPatientList, opts_.chartId, opts_.attrId);
     };
 
     content_.update = function(_selectedPatients, _chartId, _attrId) {
@@ -84,8 +83,12 @@
         this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, "#006bb3");
         this.chartInst_.addPval(_selectedDataProxy.get(), _unselectedDataProxy.get());
       }
-      
-      initCanvasDownloadData();
+    }
+
+    content_.updateDataForDownload = function(fileType) {
+      if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
     }
     
     function initCanvasDownloadData() {

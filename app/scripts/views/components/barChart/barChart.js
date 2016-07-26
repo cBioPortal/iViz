@@ -255,7 +255,10 @@
         data += _cases[i].patient_id + '\t';
         data += iViz.util.restrictNumDigits(_cases[i][data_.attrId]);
       }
-      content.setDownloadData('tsv', data);
+      content.setDownloadData('tsv', {
+        fileName: data_.displayName,
+        data: data
+      });
     }
 
     function initCanvasDownloadData() {
@@ -272,8 +275,6 @@
         fileName: data_.displayName
       });
     }
-
-    content.dataForDownload = {};
 
     content.hasLogScale = function() {
       if (data_ !== undefined) {
@@ -325,9 +326,6 @@
         }
       }
       chartInst_.render();
-
-      initTsvDownloadData();
-      initCanvasDownloadData();
       return chartInst_;
     };
 
