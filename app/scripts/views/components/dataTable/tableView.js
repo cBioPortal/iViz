@@ -37,9 +37,10 @@
   // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.TableView = function() {
     var content = this;
-    var chartId_, geneData_, data_;
+    var chartId_, data_;
     var type_ = '';
     var attr_ = [];
+    var geneData_ = [];
     var selectedRows = [];
     var selectedGenes = [];
     var callbacks_ = {};
@@ -48,42 +49,13 @@
     var allSamplesIds = [];
     var reactTableData = {};
     var initialized = false;
-    var patientDataIndices = {};
+    var caseIndices = {};
     var selectedRowData = [];
     var selectedGeneData = [];
     var displayName = '';
-
-    /**
-     * Finds the intersection elements between two arrays in a simple fashion.
-     * Should have O(n) operations, where n is n = MIN(a.length, b.length)
-     *
-     * @param a {Array} first array, must already be sorted
-     * @param b {Array} second array, must already be sorted
-     * @returns {Array}
-     */
-    function intersection(a, b) {
-      var result = [], i = 0, j = 0, aL = a.length, bL = b.length, size = 0;
-      while (i < aL && j < bL) {
-        if (a[i] < b[j]) {
-          ++i;
-        }
-        else if (a[i] > b[j]) {
-          ++j;
-        }
-        else /* they're equal */
-        {
-          result.push(a[i]);
-          ++i;
-          ++j;
-        }
-      }
-
-      return result;
-    }
-
+    
     content.getCases = function() {
-      return intersection(selectedSamples, sequencedSampleIds)
-      //return _.intersection(selectedSamples, sequencedSampleIds);
+      return iViz.util.intersection(selectedSamples, sequencedSampleIds);
     };
 
     content.getSelectedRowData = function() {
@@ -105,17 +77,13 @@
         sequencedSampleIds.sort();
         selectedGenes = _selectedGenes;
         chartId_ = _chartId;
-        patientDataIndices = iViz.getCaseIndices(_attributes.group_type);
+        caseIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
-        geneData_ = _attributes.gene_list;
+        geneData_ = iViz.getTableData(_attributes.attr_id);
         type_ = _attributes.type;
         displayName = _attributes.attr_id || 'Table';
         callbacks_ = _callbacks;
-        if (iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
-          initReactTable(true);
-        } else {
-          content.update(_selectedSamples);
-        }
+        initReactTable(true);
       };
 
     content.update = function(_selectedSamples, _selectedRows) {
@@ -123,13 +91,13 @@
       var includeMutationCount = false;
       if (_selectedRows !== undefined)
         selectedRows = _selectedRows;
-      if ((!initialized) || (!iViz.util.tableView.compare(selectedSamples, _selectedSamples))) {
+      _selectedSamples.sort();
+      if ((!initialized) || (!iViz.util.compare(selectedSamples, _selectedSamples))) {
         initialized = true;
         selectedSamples = _selectedSamples;
-        selectedSamples.sort();
-        if (!iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
+        if (!iViz.util.compare(allSamplesIds, selectedSamples)) {
           _.each(_selectedSamples, function(caseId) {
-            var caseIndex_ = patientDataIndices[caseId];
+            var caseIndex_ = caseIndices[caseId];
             var caseData_ = data_[caseIndex_];
             var tempData_ = '';
             switch (type_) {
@@ -227,7 +195,7 @@
           datum.gene = item.gene;
           if (_selectedGenesMap !== undefined) {
             if (_selectedGenesMap[item.index] !== undefined) {
-              datum.caseIds = _.uniq(_selectedGenesMap[item.index].caseIds);
+              datum.caseIds =_.uniq(_selectedGenesMap[item.index].caseIds);
               datum.samples = datum.caseIds.length;
               switch (type_) {
                 case 'mutatedGene':
@@ -292,7 +260,7 @@
         attributes: attr_
       };
       var _mutationData = mutatedGenesData(_selectedGenesMap);
-      _.each(_mutationData, function(item, index) {
+      $.each(_mutationData, function(index, item) {
         for (var key in item) {
           var datum = {
             attr_id: key,
