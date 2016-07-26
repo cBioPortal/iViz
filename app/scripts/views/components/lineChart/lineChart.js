@@ -1,13 +1,13 @@
 'use strict';
 (function(iViz, dc, _, $, d3) {
-    iViz.view.component.LineChart = function(ndx, data, opts, attributes){ //must import both ndx (for crossfiltered data) and data (array containing data)
+    iViz.view.component.LineChart = function(ndx, opts, attributes){ //must import both ndx (for crossfiltered data) and data (array containing data)
         var attr_id = attributes.attr_id;
         var content = this;
         //content.downloadData = {};
         
         content.init = function initDCLineChart(){
             var parseDate = d3.time.format("%-m-%-d-%Y").parse; //function to parse the date string (with specific format) to a date object
-            
+            var data = iViz.getAttrData(attributes.group_type);
             data.forEach(function(d){ //parse every date in the data array
                 d[attr_id] = parseDate(d[attr_id]); //d[attr_id] = d.DATE_OF_DIAGNOSIS b/c attr_id is a variable
             }); //each date only has month-date-year; time is removed

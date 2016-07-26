@@ -35,8 +35,8 @@
 'use strict';
 (function(iViz, dc, _, $) {
   // iViz pie chart component. It includes DC pie chart.
-  iViz.view.component.tableView = function() {
-    var content = {};
+  iViz.view.component.TableView = function() {
+    var content = this;
     var chartId_, geneData_, data_;
     var type_ = '';
     var attr_ = [];
@@ -50,9 +50,40 @@
     var initialized = false;
     var patientDataIndices = {};
     var selectedRowData = [];
+    var selectedGeneData = [];
+    var displayName = '';
+
+    /**
+     * Finds the intersection elements between two arrays in a simple fashion.
+     * Should have O(n) operations, where n is n = MIN(a.length, b.length)
+     *
+     * @param a {Array} first array, must already be sorted
+     * @param b {Array} second array, must already be sorted
+     * @returns {Array}
+     */
+    function intersection(a, b) {
+      var result = [], i = 0, j = 0, aL = a.length, bL = b.length, size = 0;
+      while (i < aL && j < bL) {
+        if (a[i] < b[j]) {
+          ++i;
+        }
+        else if (a[i] > b[j]) {
+          ++j;
+        }
+        else /* they're equal */
+        {
+          result.push(a[i]);
+          ++i;
+          ++j;
+        }
+      }
+
+      return result;
+    }
 
     content.getCases = function() {
-      return _.intersection(selectedSamples, sequencedSampleIds);
+      return intersection(selectedSamples, sequencedSampleIds)
+      //return _.intersection(selectedSamples, sequencedSampleIds);
     };
 
     content.getSelectedRowData = function() {
@@ -64,18 +95,21 @@
 
 
     content.init =
-      function(_attributes, _selectedSamples, _selectedGenes, _indices,
+      function(_attributes, _selectedSamples, _selectedGenes,
                _data, _chartId, _callbacks) {
         initialized = false;
-        allSamplesIds = _attributes.options.allCases;
+        allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
+        selectedSamples.sort();
         sequencedSampleIds = _attributes.options.sequencedCases;
+        sequencedSampleIds.sort();
         selectedGenes = _selectedGenes;
         chartId_ = _chartId;
-        patientDataIndices = _indices;
+        patientDataIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
         geneData_ = _attributes.gene_list;
         type_ = _attributes.type;
+        displayName = _attributes.attr_id || 'Table';
         callbacks_ = _callbacks;
         if (iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
           initReactTable(true);
@@ -92,6 +126,7 @@
       if ((!initialized) || (!iViz.util.tableView.compare(selectedSamples, _selectedSamples))) {
         initialized = true;
         selectedSamples = _selectedSamples;
+        selectedSamples.sort();
         if (!iViz.util.tableView.compare(allSamplesIds, _selectedSamples)) {
           _.each(_selectedSamples, function(caseId) {
             var caseIndex_ = patientDataIndices[caseId];
@@ -123,11 +158,11 @@
               }
             });
           });
-          initReactTable(true,selectedGenesMap_);
+          initReactTable(true, selectedGenesMap_);
         } else {
           initReactTable(true);
         }
-      }else{
+      } else {
         initReactTable(false);
       }
     };
@@ -137,8 +172,14 @@
       initReactTable(false);
     };
 
-    function initReactTable(_reloadData,_selectedGenesMap) {
-      if(_reloadData)
+    content.updateDataForDownload = function(fileType) {
+      if (fileType === 'tsv') {
+        initTsvDownloadData();
+      }
+    }
+
+    function initReactTable(_reloadData, _selectedGenesMap) {
+      if (_reloadData)
         reactTableData = initReactData(_selectedGenesMap);
       var _opts = {
         input: reactTableData,
@@ -176,8 +217,10 @@
     }
 
     function mutatedGenesData(_selectedGenesMap) {
-      var genes = [];
       var numOfCases_ = content.getCases().length;
+
+      selectedGeneData.length = 0;
+
       if (geneData_) {
         $.each(geneData_, function(index, item) {
           var datum = {};
@@ -236,11 +279,10 @@
           } else {
             datum.qval = '';
           }
-          genes.push(datum);
+          selectedGeneData.push(datum);
         })
       }
-      return genes;
-
+      return selectedGeneData;
     }
 
     function initReactData(_selectedGenesMap) {
@@ -264,16 +306,16 @@
 
     }
 
-    function reactSubmitClickCallback(){
+    function reactSubmitClickCallback() {
       callbacks_.submitClick(selectedRowData);
     }
 
     function reactRowClickCallback(data, selected, _selectedRows) {
-      if(selected){
+      if (selected) {
         selectedRowData.push(data);
       }
-      else{
-        selectedRowData = _.filter(selectedRowData, function(index,item){
+      else {
+        selectedRowData = _.filter(selectedRowData, function(index, item) {
           return (item.uniqueId === selected.uniqueId);
         });
       }
@@ -282,8 +324,35 @@
     function reactGeneClickCallback(selectedRow, selected) {
       callbacks_.addGeneClick(selectedRow);
     }
-    return content;
-  };
+
+    function initTsvDownloadData() {
+      var attrs = iViz.util.tableView.getAttributes(type_).filter(function(attr) {
+        return attr.attr_id !== 'uniqueId';
+      });
+      var downloadOpts = {
+        fileName: displayName,
+        data: ''
+      };
+
+      if (_.isArray(attrs) && attrs.length > 0) {
+        var data = attrs.map(function(attr) {
+            return attr.display_name;
+          }).join('\t') + '\n';
+
+        _.each(selectedGeneData, function(row) {
+          var _tmp = [];
+          _.each(attrs, function(attr) {
+            _tmp.push(row[attr.attr_id] || '');
+          })
+          data += _tmp.join('\t') + '\n';
+        });
+
+        downloadOpts.data = data;
+      }
+      content.setDownloadData('tsv', downloadOpts);
+    }
+  }
+  iViz.view.component.TableView.prototype = new iViz.view.component.GeneralChart('table');
 
 
   iViz.util.tableView = (function() {
@@ -296,7 +365,7 @@
       }
       return true;
     };
-
+    
     content.getAttributes = function(type) {
       var _attr = [];
       switch (type) {

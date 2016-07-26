@@ -39,10 +39,10 @@
     template: /*'<div v-if="attributes.show">' +*/
     '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
     ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
-    ':ndx="ndx" :attributes.sync="attributes" :data="data" :indices="indices"></component>'
+    ':ndx="ndx" :attributes.sync="attributes"></component>'
     /*'</div>'*/,
     props: [
-      'data', 'ndx', 'attributes', 'groupid', 'indices'
+      'ndx', 'attributes', 'groupid'
     ],
     data: function() {
       var currentView = '';
@@ -80,10 +80,8 @@
     events: {
       'close': function() {
         this.attributes.show = false;
-      }/*,
-      'update-grid':function(){
-        this.$dispatch('update-grid')
-      }*/
+        this.$dispatch('remove-chart',this.attributes.attr_id,this.attributes.group_id)
+      }
     }, ready: function() {
       var _self = this;
       _self.$on('clear-all-filters',function(){

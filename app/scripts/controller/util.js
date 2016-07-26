@@ -170,6 +170,8 @@
         case 'scatterPlot':
           survivalChartDownload(fileType, content);
           break;
+        case 'table':
+          tableDownload(fileType, content);
         default:
           break;
       }
@@ -186,10 +188,20 @@
       return str;
     }
 
+    function tableDownload(fileType, content) {
+      switch (fileType) {
+        case 'tsv':
+          csvDownload(content.fileName, content.data);
+          break;
+        default:
+          break;
+      }
+    }
+
     function pieChartDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
-          csvDownload('test', content);
+          csvDownload(content.fileName || 'data', content.data);
           break;
         case 'svg':
           pieChartCanvasDownload(content, {
@@ -554,7 +566,7 @@
     function barChartDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
-          csvDownload('test', content);
+          csvDownload(content.fileName || 'data', content.data);
           break;
         case 'svg':
           barChartCanvasDownload(content, {

@@ -54,7 +54,7 @@
     '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><span class="text-center chart-title-span">{{displayName}}</span>' +
     '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'filters', 'groupid'
+      'ndx', 'attributes', 'filters', 'groupid'
     ],
     data: function() {
       return {
@@ -100,7 +100,8 @@
         this.showOperations = false;
       },initChart:function(logScaleChecked){
         this.chartInst =
-          this.barChart.init(this.ndx, this.data, {
+          this.barChart.init(this.ndx, {
+            group_type:this.attributes.group_type,
             attrId: this.attributes.attr_id,
             displayName: this.attributes.display_name,
             chartDivId: this.chartDivId,
@@ -132,6 +133,7 @@
     },
     ready: function() {
       this.barChart = new iViz.view.component.BarChart();
+      this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
       settings_.barChart.width = window.style.vars.barchartWidth || 150;
       settings_.barChart.height = window.style.vars.barchartHeight || 150;
       this.initChart();

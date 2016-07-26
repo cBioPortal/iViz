@@ -42,7 +42,6 @@
     var data_;
     var opts_;
 
-    content.dataForDownload = {};
     content.init = function(_data, opts) {
       opts_ = $.extend(true, {}, opts);
       chartId_ = opts_.chartId;
@@ -96,18 +95,27 @@
         },
       };
       Plotly.plot(document.getElementById(chartId_), data, layout);
-      initCanvasDownloadData();
     };
 
     content.update = function(_sampleIds) { // update selected samples (change color)
-      var _selectedData = _.filter(data_, function(_dataObj) {
-        return $.inArray(_dataObj.sample_id, _sampleIds) !== -1;
+      
+      var _selectedData = [], _unselectedData = [];
+
+      var _tmpSelectedSampleIdMap = {};
+      _.each(_sampleIds, function(_sampleId) {
+        _tmpSelectedSampleIdMap[_sampleId] = '';
       });
-      var _unselectedData = _.filter(data_, function(_dataObj) {
-        return $.inArray(_dataObj.sample_id, _sampleIds) === -1;
+      _.each(data_, function(_dataObj) {
+        if (_tmpSelectedSampleIdMap.hasOwnProperty(_dataObj.sample_id)) {
+          _selectedData.push(_dataObj);
+        } else {
+          _unselectedData.push(_dataObj);
+        }
       });
+      
       document.getElementById(chartId_).data = [];
       var _unselectedDataQtips = [], _selectedDataQtips = [];
+      
       _.each(_unselectedData, function(_dataObj) {
         _unselectedDataQtips.push("Sample Id: " + _dataObj.sample_id + "<br>" + "CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
       });
@@ -141,9 +149,14 @@
         }
       };
       Plotly.redraw(document.getElementById(chartId_));
-      initCanvasDownloadData();
     }
 
+    content.updateDataForDownload = function(fileType) {
+      if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
+    }
+    
     function initCanvasDownloadData() {
       content.setDownloadData('svg', {
         title: opts_.title,

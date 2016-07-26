@@ -49,7 +49,7 @@
                  rangeChartTarget: "#" + this.rangeChartId
                 }; 
                 
-                new iViz.view.component.LineChart(this.ndx, this.data, opts, this.attributes).init(); //create new instance of a line chart
+                new iViz.view.component.LineChart(this.ndx, opts, this.attributes).init(); //create new instance of a line chart
                                                                         //each time this function is called - will not 
                                                                       //reference the same one everytime                                                                                                                                                                                                                                      
             }
