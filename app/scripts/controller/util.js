@@ -157,7 +157,7 @@
     };
 
     content.download = function(chartType, fileType, content) {
-      switch (chartType) {
+      switch (chartType) { 
         case 'pieChart':
           pieChartDownload(fileType, content);
           break;
@@ -170,6 +170,9 @@
         case 'scatterPlot':
           survivalChartDownload(fileType, content);
           break;
+        case 'lineChart':
+          lineChartDownload(fileType, content);
+          break;  
         case 'table':
           tableDownload(fileType, content);
         default:
@@ -551,6 +554,152 @@
       cbio.download.initDownload(
         _svgElement, downloadOpts);
     }
+    
+    function lineChartDownload(fileType, content) {
+      switch (fileType) {
+        case 'tsv':
+          csvDownload(content.fileName || 'data', content.data);
+          break;
+        case 'svg':
+          lineChartCanvasDownload(content, {
+            filename: content.fileName + '.svg'
+          });
+          break;
+        case 'pdf':
+          ;omeChartCanvasDownload(content, {
+            filename: content.fileName + '.pdf',
+            contentType: 'application/pdf',
+            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+          });
+          break;
+        default:
+          break;
+      }
+    }
+    
+//    function lineChartCanvasDownload(data, downloadOpts) {
+//      var _svgElement = '';
+//      var _svg = $('#' + data.chartId + ' svg');
+//      var _brush = _svg.find('g.brush');
+//      var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
+//      var i = 0;
+//
+//      if (_brushWidth === 0) {
+//        _brush.css('display', 'none');
+//      }
+//
+//      _brush.find('rect.extent')
+//        .css({
+//          'fill-opacity': '0.2',
+//          'fill': '#2986e2'
+//        });
+//
+//      _brush.find('.resize path')
+//        .css({
+//          'fill': '#eee',
+//          'stroke': '#666'
+//        });
+//
+//      // Change deselected bar chart
+//      var _chartBody = _svg.find('.chart-body');
+//      var _deselectedCharts = _chartBody.find('.bar.deselected');
+//      var _deselectedChartsLength = _deselectedCharts.length;
+//
+//      for (i = 0; i < _deselectedChartsLength; i++) {
+//        $(_deselectedCharts[i]).css({
+//          'stroke': '',
+//          'fill': '#ccc'
+//        });
+//      }
+//
+//      // Change axis style
+//      var _axis = _svg.find('.axis');
+//      var _axisDomain = _axis.find('.domain');
+//      var _axisDomainLength = _axisDomain.length;
+//      var _axisTick = _axis.find('.tick.major line');
+//      var _axisTickLength = _axisTick.length;
+//
+//      for (i = 0; i < _axisDomainLength; i++) {
+//        $(_axisDomain[i]).css({
+//          'fill': 'white',
+//          'fill-opacity': '0',
+//          'stroke': 'black'
+//        });
+//      }
+//
+//      for (i = 0; i < _axisTickLength; i++) {
+//        $(_axisTick[i]).css({
+//          'stroke': 'black'
+//        });
+//      }
+//
+//      //Change x/y axis text size
+//      var _chartText = _svg.find('.axis text'),
+//        _chartTextLength = _chartText.length;
+//
+//      for (i = 0; i < _chartTextLength; i++) {
+//        $(_chartText[i]).css({
+//          'font-size': '12px'
+//        });
+//      }
+//
+//      $('#' + data.chartId + ' svg>g').each(function(i, e) {
+//        _svgElement += cbio.download.serializeHtml(e);
+//      });
+//      $('#' + data.chartId + ' svg>defs').each(function(i, e) {
+//        _svgElement += cbio.download.serializeHtml(e);
+//      });
+//
+//      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="370" height="200">' +
+//        '<g><text x="180" y="20" style="font-weight: bold; text-anchor: middle">' +
+//        data.title + '</text></g>' +
+//        '<g transform="translate(0, 20)">' + _svgElement + '</g></svg>';
+//
+//      cbio.download.initDownload(
+//        svg, downloadOpts);
+//
+//      _brush.css('display', '');
+//
+//      // Remove added styles
+//      _brush.find('rect.extent')
+//        .css({
+//          'fill-opacity': '',
+//          'fill': ''
+//        });
+//
+//      _brush.find('.resize path')
+//        .css({
+//          'fill': '',
+//          'stroke': ''
+//        });
+//
+//      for (i = 0; i < _deselectedChartsLength; i++) {
+//        $(_deselectedCharts[i]).css({
+//          'stroke': '',
+//          'fill': ''
+//        });
+//      }
+//
+//      for (i = 0; i < _axisDomainLength; i++) {
+//        $(_axisDomain[i]).css({
+//          'fill': '',
+//          'fill-opacity': '',
+//          'stroke': ''
+//        });
+//      }
+//
+//      for (i = 0; i < _axisTickLength; i++) {
+//        $(_axisTick[i]).css({
+//          'stroke': ''
+//        });
+//      }
+//
+//      for (i = 0; i < _chartTextLength; i++) {
+//        $(_chartText[i]).css({
+//          'font-size': ''
+//        });
+//      }
+//    }
 
     function csvDownload(fileName, content) {
       fileName = fileName || 'test';

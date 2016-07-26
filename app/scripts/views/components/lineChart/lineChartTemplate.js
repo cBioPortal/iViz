@@ -7,7 +7,7 @@
 (function(Vue, dc, iViz, $){
     Vue.component('lineChart',{
             template:'<div id = "line-chart" class="grid-item grid-item-h-2 grid-item-w-2" class="study-view-dc-chart" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-                     '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :chart-id="chartId" '+ //don't need rangeChartId in chart operations b/c chart operations doesn't handle the range chart
+                     '<chart-operations :chart-ctrl="lineChart"  :has-chart-title="hasChartTitle" :display-name="displayName" :chart-id="chartId" '+ //don't need rangeChartId in chart operations b/c chart operations doesn't handle the range chart
                      ':attributes="attributes" :show-operations="showOperations"></chart-operations><div id={{chartId}}>' +
                      '</div><div id={{rangeChartId}} class= "range-chart-class"></div></div>',  //everything written in template replaces
                                                             //the tag in the html file
@@ -21,7 +21,8 @@
                     hasChartTitle: true,
                     chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
                     showOperations: false,
-                    rangeChartId: 'range-chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, "")
+                    rangeChartId: 'range-chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
+                    lineChart: ''
 //                    charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div'
                 };
             },
@@ -49,9 +50,9 @@
                  rangeChartTarget: "#" + this.rangeChartId
                 }; 
                 
-                new iViz.view.component.LineChart(this.ndx, opts, this.attributes).init(); //create new instance of a line chart
-                                                                        //each time this function is called - will not 
-                                                                      //reference the same one everytime                                                                                                                                                                                                                                      
+                this.lineChart = new iViz.view.component.LineChart(this.ndx, opts, this.attributes); //create new instance of a line chart
+                this.lineChart.init();                                                        //each time this function is called - will not 
+                this.lineChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);                                                      //reference the same one everytime                                                                                                                                                                                                                                      
             }
     });
 })(window.Vue, window.dc, window.iViz,

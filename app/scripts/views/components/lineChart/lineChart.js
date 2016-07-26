@@ -1,23 +1,22 @@
 'use strict';
 (function(iViz, dc, _, $, d3) {
     iViz.view.component.LineChart = function(ndx, opts, attributes){ //must import both ndx (for crossfiltered data) and data (array containing data)
-        var attr_id = attributes.attr_id;
         var content = this;
-        //content.downloadData = {};
+        var attr_id = attributes.attr_id;
+        
+        var parseDate = d3.time.format("%-m-%-d-%Y").parse; //function to parse the date string (with specific format) to a date object
+        var data = iViz.getAttrData(attributes.group_type);
+        data.forEach(function(d){ //parse every date in the data array
+            d[attr_id] = parseDate(d[attr_id]); //d[attr_id] = d.DATE_OF_DIAGNOSIS b/c attr_id is a variable
+        }); //each date only has month-date-year; time is removed
+
+        var dateDimension = ndx.dimension(function(d){ //d refers to each object(the element) in the "data" array
+            return d[attr_id];
+        });//create date dimension
+
+        var dateByFrequency = dateDimension.group();//create date group
         
         content.init = function initDCLineChart(){
-            var parseDate = d3.time.format("%-m-%-d-%Y").parse; //function to parse the date string (with specific format) to a date object
-            var data = iViz.getAttrData(attributes.group_type);
-            data.forEach(function(d){ //parse every date in the data array
-                d[attr_id] = parseDate(d[attr_id]); //d[attr_id] = d.DATE_OF_DIAGNOSIS b/c attr_id is a variable
-            }); //each date only has month-date-year; time is removed
-            
-            var dateDimension = ndx.dimension(function(d){ //d refers to each object(the element) in the "data" array
-                return d[attr_id];
-            });//create date dimension
-            
-            var dateByFrequency = dateDimension.group();//create date group
-        
             var lineChart = dc.lineChart(opts.lineChartTarget, opts.groupid); //initialize line chart; random dates created in util.js
                                                                               //second parameter adds line chart to the chart group
             var rangeChart = dc.barChart(opts.rangeChartTarget, opts.groupid);
@@ -53,6 +52,46 @@
                 .xAxis()
                 .ticks(d3.time.months, 2); //show a tick every 2 months on the range chart      
 //                    lineChart.render(); //no need to render the line chart after adding it to the group of charts (vuecore.js handles rendering)
+        };
+        
+        function initTsvDownloadData(){
+            var data = "";
+            var _dates = dateByFrequency.all();
+            
+            data = "Date of Diagnosis\tNumber of Patients"; 
+            
+            for (var i = 0; i< _dates.length; i++){
+                data += "\n";
+                var cleanDate = _dates[i].key.getMonth()+1 + "/" + _dates[i].key.getDate() + "/" + _dates[i].key.getFullYear()
+                data += cleanDate + "\t" + _dates[i].value; //modify key
+            }
+            content.setDownloadData('tsv', {
+                fileName: attr_id,
+                data: data
+            });
+        };
+        
+        function initCanvasDownloadData(){
+            content.setDownloadData('svg',{
+               title: attr_id, 
+               fileName: attr_id,
+               chartId: opts.lineChartTarget,
+               rangeChartId: opts.rangeChartTarget
+            });
+            content.setDownloadData('pdf',{
+                title: attr_id,
+                fileName: attr_id,
+                chartId: opts.lineChartTarget,
+                rangeChartId: opts.rangeChartTarget
+            });
+        };
+        
+        content.updateDataForDownload = function (fileType){
+          if (fileType === 'tsv'){
+              initTsvDownloadData();
+          } else if (['pdf','svg'].indexOf(fileType) !== -1){
+              initCanvasDownloadData();
+          }
         };
     };
     iViz.view.component.LineChart.prototype = new iViz.view.component.GeneralChart('lineChart'); //prototype of linechart is a new instance of GeneralChart, but with specific functionalities of lineChart
