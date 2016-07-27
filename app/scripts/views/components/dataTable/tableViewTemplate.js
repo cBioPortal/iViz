@@ -36,7 +36,7 @@
 (function(Vue, dc, iViz, $) {
   Vue.component('tableView', {
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-    '<chart-operations :show-operations="showOperations" :display-name="displayName" ' +
+    '<chart-operations :show-operations="showOperations" :display-name="displayName" :chart-ctrl="chartInst"' +
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" ' +
     ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
     '<div class="dc-chart dc-table-plot" :class="{hideLoading: showLoad}" align="center" style="float:none !important;" id={{chartId}} >' +
@@ -102,7 +102,7 @@
         if(this.filters.length === 0 ){
           this.filters = selectedSamplesUnion;
         }else{
-          this.filters = _.intersection(this.filters,selectedSamplesUnion);
+          this.filters = iViz.util.intersection(this.filters.sort(),selectedSamplesUnion.sort());
         }
         this.chartInst.clearSelectedRowData();
       },
@@ -126,7 +126,8 @@
 
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.submitClick = this.submitClick;
-      _self.chartInst = new iViz.view.component.tableView();
+      _self.chartInst = new iViz.view.component.TableView();
+      _self.chartInst.setDownloadDataTypes(['tsv']);
 
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst.init(this.attributes, this.$root.selectedsamples, this.$root.selectedgenes, data, this.chartId, callbacks);
