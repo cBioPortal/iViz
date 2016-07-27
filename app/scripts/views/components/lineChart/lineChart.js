@@ -2,6 +2,8 @@
 (function(iViz, dc, _, $, d3) {
     iViz.view.component.LineChart = function(ndx, opts, attributes){ //must import both ndx (for crossfiltered data) and data (array containing data)
         var content = this;
+        var lineChartInst_;
+        var rangeChartInst_;
         var attr_id = attributes.attr_id;
         
         var parseDate = d3.time.format("%-m-%-d-%Y").parse; //function to parse the date string (with specific format) to a date object
@@ -17,19 +19,18 @@
         var dateByFrequency = dateDimension.group();//create date group
         
         content.init = function initDCLineChart(){
-            var lineChart = dc.lineChart(opts.lineChartTarget, opts.groupid); //initialize line chart; random dates created in util.js
+            lineChartInst_ = dc.lineChart(opts.lineChartTarget, opts.groupid); //initialize line chart; random dates created in util.js
                                                                               //second parameter adds line chart to the chart group
-            var rangeChart = dc.barChart(opts.rangeChartTarget, opts.groupid);
+            rangeChartInst_ = dc.barChart(opts.rangeChartTarget, opts.groupid);
 
-            lineChart.width(375).height(230)
+            lineChartInst_.width(375).height(230)
                 .dimension(dateDimension)
                 .group(dateByFrequency)
                 .transitionDuration(1000)
                 .margins({top: 10, right: 10, bottom: 25, left: 30})
                 .mouseZoomable(true)
                 .brushOn(false)
-                .elasticY(true)
-                .rangeChart(rangeChart)
+                .rangeChart(rangeChartInst_)
                 .x(d3.time.scale().domain(d3.extent(data, function(d) { return d[attr_id]; }))) //d3.extent uses the data array 
                                                                                                 //to determine the min. and max. date to generate scale
                 .round(d3.time.month.round)
@@ -39,7 +40,7 @@
                                                                                                 //TODO: create line chart functionality where 15 days is combined into one data point on the line chart; the value
                                                                                                 //at that date would be the sum of the values of the individual 15 days
 
-            rangeChart.width(375).height(70) //use range chart to select the range of the line chart
+            rangeChartInst_.width(375).height(70) //use range chart to select the range of the line chart
                 .margins({top: 10, right: 10, bottom: 25, left: 30})
                 .dimension(dateDimension)
                 .group(dateByFrequency)
@@ -52,17 +53,19 @@
                 .xAxis()
                 .ticks(d3.time.months, 2); //show a tick every 2 months on the range chart      
 //                    lineChart.render(); //no need to render the line chart after adding it to the group of charts (vuecore.js handles rendering)
+       
+        return lineChartInst_;
         };
         
         function initTsvDownloadData(){
             var data = "";
             var _dates = dateByFrequency.all();
             
-            data = "Date of Diagnosis\tNumber of Patients"; 
+            data = attributes.display_name + "\tNumber of Patients"; 
             
             for (var i = 0; i< _dates.length; i++){
                 data += "\n";
-                var cleanDate = _dates[i].key.getMonth()+1 + "/" + _dates[i].key.getDate() + "/" + _dates[i].key.getFullYear()
+                var cleanDate = _dates[i].key.getMonth()+1 + "/" + _dates[i].key.getDate() + "/" + _dates[i].key.getFullYear();
                 data += cleanDate + "\t" + _dates[i].value; //modify key
             }
             content.setDownloadData('tsv', {
@@ -73,13 +76,13 @@
         
         function initCanvasDownloadData(){
             content.setDownloadData('svg',{
-               title: attr_id, 
+               title: attributes.display_name, 
                fileName: attr_id,
                chartId: opts.lineChartTarget,
                rangeChartId: opts.rangeChartTarget
             });
             content.setDownloadData('pdf',{
-                title: attr_id,
+                title: attributes.display_name,
                 fileName: attr_id,
                 chartId: opts.lineChartTarget,
                 rangeChartId: opts.rangeChartTarget

@@ -555,7 +555,7 @@
         _svgElement, downloadOpts);
     }
     
-    function lineChartDownload(fileType, content) {
+    function lineChartDownload(fileType, content) { //used barchartdownload as an example
       switch (fileType) {
         case 'tsv':
           csvDownload(content.fileName || 'data', content.data);
@@ -566,7 +566,7 @@
           });
           break;
         case 'pdf':
-          ;omeChartCanvasDownload(content, {
+          lineChartCanvasDownload(content, {
             filename: content.fileName + '.pdf',
             contentType: 'application/pdf',
             servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
@@ -577,129 +577,202 @@
       }
     }
     
-//    function lineChartCanvasDownload(data, downloadOpts) {
-//      var _svgElement = '';
-//      var _svg = $('#' + data.chartId + ' svg');
-//      var _brush = _svg.find('g.brush');
-//      var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
-//      var i = 0;
-//
-//      if (_brushWidth === 0) {
-//        _brush.css('display', 'none');
-//      }
-//
-//      _brush.find('rect.extent')
-//        .css({
-//          'fill-opacity': '0.2',
-//          'fill': '#2986e2'
-//        });
-//
-//      _brush.find('.resize path')
-//        .css({
-//          'fill': '#eee',
-//          'stroke': '#666'
-//        });
-//
-//      // Change deselected bar chart
-//      var _chartBody = _svg.find('.chart-body');
-//      var _deselectedCharts = _chartBody.find('.bar.deselected');
-//      var _deselectedChartsLength = _deselectedCharts.length;
-//
-//      for (i = 0; i < _deselectedChartsLength; i++) {
-//        $(_deselectedCharts[i]).css({
-//          'stroke': '',
-//          'fill': '#ccc'
-//        });
-//      }
-//
-//      // Change axis style
-//      var _axis = _svg.find('.axis');
-//      var _axisDomain = _axis.find('.domain');
-//      var _axisDomainLength = _axisDomain.length;
-//      var _axisTick = _axis.find('.tick.major line');
-//      var _axisTickLength = _axisTick.length;
-//
-//      for (i = 0; i < _axisDomainLength; i++) {
-//        $(_axisDomain[i]).css({
-//          'fill': 'white',
-//          'fill-opacity': '0',
-//          'stroke': 'black'
-//        });
-//      }
-//
-//      for (i = 0; i < _axisTickLength; i++) {
-//        $(_axisTick[i]).css({
-//          'stroke': 'black'
-//        });
-//      }
-//
-//      //Change x/y axis text size
-//      var _chartText = _svg.find('.axis text'),
-//        _chartTextLength = _chartText.length;
-//
-//      for (i = 0; i < _chartTextLength; i++) {
-//        $(_chartText[i]).css({
-//          'font-size': '12px'
-//        });
-//      }
-//
-//      $('#' + data.chartId + ' svg>g').each(function(i, e) {
-//        _svgElement += cbio.download.serializeHtml(e);
-//      });
-//      $('#' + data.chartId + ' svg>defs').each(function(i, e) {
-//        _svgElement += cbio.download.serializeHtml(e);
-//      });
-//
-//      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="370" height="200">' +
-//        '<g><text x="180" y="20" style="font-weight: bold; text-anchor: middle">' +
-//        data.title + '</text></g>' +
-//        '<g transform="translate(0, 20)">' + _svgElement + '</g></svg>';
-//
-//      cbio.download.initDownload(
-//        svg, downloadOpts);
-//
-//      _brush.css('display', '');
-//
-//      // Remove added styles
-//      _brush.find('rect.extent')
-//        .css({
-//          'fill-opacity': '',
-//          'fill': ''
-//        });
-//
-//      _brush.find('.resize path')
-//        .css({
-//          'fill': '',
-//          'stroke': ''
-//        });
-//
-//      for (i = 0; i < _deselectedChartsLength; i++) {
-//        $(_deselectedCharts[i]).css({
-//          'stroke': '',
-//          'fill': ''
-//        });
-//      }
-//
-//      for (i = 0; i < _axisDomainLength; i++) {
-//        $(_axisDomain[i]).css({
-//          'fill': '',
-//          'fill-opacity': '',
-//          'stroke': ''
-//        });
-//      }
-//
-//      for (i = 0; i < _axisTickLength; i++) {
-//        $(_axisTick[i]).css({
-//          'stroke': ''
-//        });
-//      }
-//
-//      for (i = 0; i < _chartTextLength; i++) {
-//        $(_chartText[i]).css({
-//          'font-size': ''
-//        });
-//      }
-//    }
+    function lineChartCanvasDownload(data, downloadOpts) {
+      var _svgElement = ''; //will contain the linechart
+      var _svgRangeElement = ''; //will contain the rangechart
+      var _svg = $(data.chartId + ' svg');
+      var _svgRange = $(data.rangeChartId + ' svg');
+      var _brush = _svgRange.find('g.brush');
+      var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
+      var i = 0;
+
+      if (_brushWidth === 0) {
+        _brush.css('display', 'none');
+      }
+
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '0.2',
+          'fill': '#2986e2'
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '#eee',
+          'stroke': '#666'
+        });
+      
+      _svgRange.find('g.y') //remove y axis of range chart
+        .css({
+         'display': 'none'         
+        });
+
+      // Change deselected bar chart
+      var _chartBody = _svgRange.find('.chart-body');
+      var _deselectedCharts = _chartBody.find('.bar.deselected');
+      var _deselectedChartsLength = _deselectedCharts.length;
+
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': '#ccc'
+        });
+      }
+      //change axis style of line chart
+      var _axis = _svg.find('.axis');
+      var _axisDomain = _axis.find('.domain');
+      var _axisDomainLength = _axisDomain.length;
+      var _axisTick = _axis.find('.tick.major line');
+      var _axisTickLength = _axisTick.length;
+
+      for (i = 0; i < _axisDomainLength; i++) {
+        $(_axisDomain[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLength; i++) {
+        $(_axisTick[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      // Change axis style of range chart
+      var _axisRange = _svgRange.find('.axis');
+      var _axisDomainRange = _axisRange.find('.domain');
+      var _axisDomainLengthRange = _axisDomainRange.length;
+      var _axisTickRange = _axisRange.find('.tick.major line');
+      var _axisTickLengthRange = _axisTickRange.length;
+
+      for (i = 0; i < _axisDomainLengthRange; i++) {
+        $(_axisDomainRange[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthRange; i++) {
+        $(_axisTickRange[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      //change x/y axis text size of line chart
+      var _chartText = _svg.find('.axis text'),
+        _chartTextLength = _chartText.length;
+
+      for (i = 0; i < _chartTextLength; i++) {
+        $(_chartText[i]).css({
+          'font-size': '12px'
+        });
+      }
+      
+      //Change x/y axis text size of range chart
+      var _chartTextRange = _svgRange.find('.axis text'),
+        _chartTextLengthRange = _chartTextRange.length;
+
+      for (i = 0; i < _chartTextLengthRange; i++) {
+        $(_chartTextRange[i]).css({
+          'font-size': '12px'
+        });
+      }
+      
+      //change line style of line chart
+      _svg.find('g.chart-body').css({
+         'fill': 'none' 
+      });
+      
+      //convert SVGs to strings
+      $(data.chartId + ' svg>g').each(function(i, e) {
+        _svgElement += cbio.download.serializeHtml(e);
+      });
+      $(data.chartId + ' svg>defs').each(function(i, e) {
+        _svgElement += cbio.download.serializeHtml(e);
+      });
+      $(data.rangeChartId + ' svg>g').each(function(i,e){
+         _svgRangeElement += cbio.download.serializeHtml(e);
+      });
+      $(data.rangeChartId + ' svg>defs').each(function(i,e){
+         _svgRangeElement += cbio.download.serializeHtml(e) ;
+      });
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="375" height="340">' +
+        '<g><text x="180" y="20" style="font-weight: bold; text-anchor: middle">' +
+        data.title + '</text></g>' + //data.title is from initCanvasDownloadData in lineChart.js
+        '<g transform="translate(0, 20)">' + _svgElement + '</g>' +
+        '<g transform="translate(0,260)">' +_svgRangeElement + '</g></svg>';
+
+      cbio.download.initDownload(
+        svg, downloadOpts);
+      
+      // Remove added styles of LINE chart
+      for (i = 0; i < _axisDomainLength; i++) {
+        $(_axisDomain[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLength; i++) {
+        $(_axisTick[i]).css({
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _chartTextLength; i++) {
+        $(_chartText[i]).css({
+          'font-size': ''
+        });
+      }
+    
+      // Remove added styles of RANGE chart
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': ''
+        });
+      }
+      _brush.css('display', '');
+      
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '',
+          'fill': ''
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '',
+          'stroke': ''
+        });
+        
+      _svgRange.find('g.y').css('display', '');
+      
+      for (i = 0; i < _axisDomainLengthRange; i++) {
+        $(_axisDomain[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthRange; i++) {
+        $(_axisTick[i]).css({
+          'stroke': ''
+        });
+      }
+      
+      for (i = 0; i < _chartTextLengthRange; i++) {
+        $(_chartTextRange[i]).css({
+          'font-size': ''
+        });
+      }
+
+    }; 
 
     function csvDownload(fileName, content) {
       fileName = fileName || 'test';
