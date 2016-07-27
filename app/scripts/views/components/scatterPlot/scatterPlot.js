@@ -42,7 +42,6 @@
     var data_;
     var opts_;
 
-    content.dataForDownload = {};
     content.init = function(_data, opts) {
       opts_ = $.extend(true, {}, opts);
       chartId_ = opts_.chartId;
@@ -174,9 +173,14 @@
         }
       };
       Plotly.redraw(document.getElementById(chartId_));
-      initCanvasDownloadData();
     }
 
+    content.updateDataForDownload = function(fileType) {
+      if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
+    }
+    
     function initCanvasDownloadData() {
       content.setDownloadData('svg', {
         title: opts_.title,

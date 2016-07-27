@@ -95,6 +95,7 @@
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(data, _opts);
+      _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
       var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
       if (_selectedSamples.length !== data.length) {
         this.selectedSamples=_selectedSamples;

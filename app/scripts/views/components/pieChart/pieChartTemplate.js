@@ -139,6 +139,7 @@
           height: window.style['piechart-svg-height'] | 130
         };
         _self.piechart = new iViz.view.component.PieChart(_self.ndx, _self.attributes, opts, _cluster);
+        _self.piechart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
         _self.chartInst = _self.piechart.getChart();
         _self.chartInst.on('filtered', function(_chartInst, _filter) {
           if(!_self.filtersUpdated) {
