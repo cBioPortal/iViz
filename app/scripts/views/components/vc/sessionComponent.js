@@ -2,7 +2,7 @@
  * Created by kalletlak on 7/19/16.
  */
 'use strict';
-(function (Vue, dc, $, vcSession) {
+(function (Vue, $, vcSession) {
   Vue.component('sessionComponent', {
     template: '<div id="cohort-component"><button v-if="showSaveButton" type="button" class="btn btn-default" ' +
     '@click="addNewVC = true" id="save_cohort_btn">Save Cohort </button> <button v-if="showManageButton" type="button" ' +
@@ -42,5 +42,5 @@
       }
     }
   });
-})(window.Vue, window.dc,
+})(window.Vue,
   window.$ || window.jQuery, window.vcSession);

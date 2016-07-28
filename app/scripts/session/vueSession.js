@@ -3,7 +3,7 @@
  */
 
 'use strict';
-var vcSession = (function(Vue, dc, _) {
+var vcSessionTemp = (function(Vue, _) {
   var vmInstance_;
 
   return {
@@ -47,4 +47,4 @@ var vcSession = (function(Vue, dc, _) {
       return vmInstance_;
     }
   }
-})(window.Vue, window.dc,window._);
+})(window.Vue, window._);
