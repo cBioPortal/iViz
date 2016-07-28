@@ -56,27 +56,27 @@
 }
 
 
-#study-view-case-select-custom-dialog input[type="radio"] {
+#iviz-case-select-custom-dialog input[type="radio"] {
   margin: 3px;
 }
 
-#study-view-case-select-custom-dialog {
+#iviz-case-select-custom-dialog {
   margin: 3px 0;
 }
 
-.study-view-hidden {
+.iviz-hidden {
   display: none;
 }
 .show {
   display: block;
 }
 
-#study-view-header-right-1 {
+#iviz-header-right-1 {
   /*font-size: 1.1em;
   width: 160px;*/
 }
 
-.study-view-header-button {
+.iviz-header-button {
   float: left;
   margin: 0 5px 0 0;
   font-family: Verdana,Arial,sans-serif;
@@ -93,24 +93,24 @@
   border-color: darkgrey;
   line-height: 18px;
 }
-.study-view-header-button:hover {
+.iviz-header-button:hover {
   cursor: pointer;
 }
 
-#study-view-header-left{
+#iviz-header-left{
   display: inline-block;
 }
-#study-view-header-right {
+#iviz-header-right {
   float: right;
 }
 
-#study_view_add_chart_chosen {
+#iviz_add_chart_chosen {
   margin-top: -3px;
   width: 250px !important;
   background-image: none !important;
 }
 
-#study_view_add_chart_chosen>a {
+#iviz_add_chart_chosen>a {
   background-image: none;
   height: 28px;
   line-height: 28px;
@@ -123,11 +123,11 @@ div.geneAddedNotification{
   font-size: 0.8em;
 }
 
-#study-view-header-left-1 {
+#iviz-header-left-1 {
   font-size: 1.1em;
 }
 
-.study-view-header-left-3 {
+.iviz-header-left-case-name {
   float: left;
   border: 0;
   font-size: 13px;
@@ -143,7 +143,7 @@ div.geneAddedNotification{
   margin-top: 3px;
 }
 
-.study-view-header-left-5 {
+.iviz-header-left-case-number {
   float: left;
   margin: 0 5px 0 0;
   font-family: Verdana,Arial,sans-serif;
@@ -161,11 +161,11 @@ div.geneAddedNotification{
   outline-offset: -2px;
 }
 
-#study-view-header-left-6 {
+#iviz-header-left-download {
   font-size: 1.1em;
 }
 
-.study-view-header-button:hover {
+.iviz-header-button:hover {
   cursor: pointer;
 }
 
@@ -177,6 +177,6 @@ div.geneAddedNotification{
   margin-top: 2px;
 }
 
-.study-view-hover{
+.iviz-button-hover{
   outline:-webkit-focus-ring-color auto 5px;
 }
