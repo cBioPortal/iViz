@@ -7,8 +7,8 @@
     template: '<div id="cohort-component"><button v-if="showSaveButton" type="button" class="btn btn-default" ' +
     '@click="addNewVC = true" id="save_cohort_btn">Save Cohort </button> <button v-if="showManageButton" type="button" ' +
     'class="btn btn-default" @click="manageCohorts()"> <i class="fa fa-bars"></i> </button> ' +
-    '<add-vc :add-new-vc.sync="addNewVC" :from-iViz="true" :selected-samples-num="selectedSamplesNum" ' +
-    ':selected-patients-num="selectedPatientsNum" :userid="userid"></add-vc> ' +
+    '<add-vc :add-new-vc.sync="addNewVC" :selected-samples-num="selectedSamplesNum" ' +
+    ':selected-patients-num="selectedPatientsNum" :userid="userid" :stats="stats"></add-vc> ' +
     '<modaltemplate :show.sync="showVCList" size="modal-xlg"> <div slot="header"> ' +
     '<h4 class="modal-title">Virtual Cohorts</h4> </div> <div slot="body"> ' +
     '<table class="table table-bordered table-hover table-condensed"> ' +
@@ -19,7 +19,7 @@
     'v-for="virtualCohort in virtualCohorts"> </tr> </table> </div> <div slot="footer"> ' +
     '</div> </modaltemplate> </div> </nav> </div>',
     props: [
-    'selectedPatientsNum', 'selectedSamplesNum', 'userid', 'showSaveButton', 'showManageButton'
+    'selectedPatientsNum', 'selectedSamplesNum', 'userid', 'showSaveButton', 'showManageButton','stats'
     ],
     data: function() {
       return{

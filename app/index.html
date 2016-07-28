@@ -5,210 +5,62 @@
 
 
   <!-- build:js(.) scripts/vc-session-vendor.js -->
-  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
-  <script src="/bower_components/qtip2/jquery.qtip.js"></script>
-  <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
-  <script src="/bower_components/vue/dist/vue.js"></script>
-  <script src="/bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
-  <script src="/bower_components/underscore/underscore.js"></script>
-  <script src="/bower_components/clipboard/dist/clipboard.js"></script>
-  <!-- endbuild -->
-  
-  <!-- build:js(.) scripts/iviz-vendor.js -->
   <!-- bower:js -->
   <script src="/bower_components/modernizr/modernizr.js"></script>
-  <script src="/bower_components/chosen/chosen.jquery.min.js"></script>
-  <script src="/bower_components/datatables/media/js/jquery.dataTables.js"></script>
-  <script src="/bower_components/d3/d3.min.js"></script>
-  <script src="/bower_components/crossfilter2/crossfilter.min.js"></script>
-  <script src="/bower_components/dcjs/dc.js"></script>
-  <script src="/bower_components/classie/classie.js"></script>
-  <script src="/bower_components/get-style-property/get-style-property.js"></script>
-  <script src="/bower_components/get-size/get-size.js"></script>
-  <script src="/bower_components/eventie/eventie.js"></script>
-  <script src="/bower_components/eventEmitter/EventEmitter.js"></script>
-  <script src="/bower_components/unipointer/unipointer.js"></script>
-  <script src="/bower_components/unidragger/unidragger.js"></script>
-  <script src="/bower_components/draggabilly/draggabilly.js"></script>
-  <script src="/bower_components/doc-ready/doc-ready.js"></script>
-  <script src="/bower_components/matches-selector/matches-selector.js"></script>
-  <script src="/bower_components/fizzy-ui-utils/utils.js"></script>
-  <script src="/bower_components/outlayer/item.js"></script>
-  <script src="/bower_components/outlayer/outlayer.js"></script>
-  <script src="/bower_components/packery/dist/packery.pkgd.js"></script>
-  <script src="/bower_components/ev-emitter/ev-emitter.js"></script>
-  <script src="/bower_components/imagesloaded/imagesloaded.js"></script>
-  <script src="/bower_components/plotly.js/dist/plotly.js"></script>
-  <script src="/bower_components/react/react.js"></script>
-  <script src="/bower_components/react/react-dom.js"></script>
-  <script src="/bower_components/fixed-data-table/dist/fixed-data-table.min.js"></script>
-  <script src="/bower_components/jstat/dist/jstat.min.js"></script>
+  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="/bower_components/underscore/underscore.js"></script>
+  <script src="/bower_components/vue/dist/vue.js"></script>
+  <script src="/bower_components/clipboard/dist/clipboard.js"></script>
+  <script src="/bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
   <!-- endbower -->
   <!-- endbuild -->
 
   <!-- build:css(.) styles/vc-session-vendor.css -->
-  <link rel="stylesheet" href="/bower_components/qtip2/jquery.qtip.css" />
-  <link rel="stylesheet" href="/bower_components/components-font-awesome/css/font-awesome.css" />
-  <!-- endbuild -->
-  
-  <!-- build:css(.) styles/iviz-vendor.css -->
   <!-- bower:css -->
-  <link rel="stylesheet" href="/bower_components/chosen/chosen.min.css" />
-  <link rel="stylesheet" href="/bower_components/datatables/media/css/jquery.dataTables.css" />
-  <link rel="stylesheet" href="/bower_components/dcjs/dc.css" />
-  <link rel="stylesheet" href="/bower_components/fixed-data-table/dist/fixed-data-table.min.css" />
+  <link rel="stylesheet" href="/bower_components/components-font-awesome/css/font-awesome.css" />
   <!-- endbower -->
   <!-- endbuild -->
 
   <!-- build:css(.tmp) styles/vc-session.css -->
   <link rel="stylesheet" href="styles/main.css"/>
-  <!-- endbuild -->
 
-  <!-- build:css(.tmp) styles/iviz.css -->
-  <link rel="stylesheet" href="styles/main.css"/>
-  <!-- endbuild -->
-  
-  <!-- build:js scripts/iviz.js -->
-  <script src="/bower_components/fixed-data-table/dist/fixed-data-table.js"></script>
-  <script src="/app/_components/FileSaver.min.js"></script>
-  <script src="/app/_components/cbio-util.js"></script>
-  <script src="scripts/main.js"></script>
-  <script src="scripts/vueCore.js"></script>
-  <script src="scripts/controller/util.js"></script>
-  <script src="scripts/controller/sync.js"></script>
-  <script src="scripts/controller/event.js"></script>
-  <script src="scripts/views/mainTemplate.js"></script>
-  <script src="scripts/views/chartGroupTemplate.js"></script>
-  <script src="scripts/views/individualChartTemplate.js"></script>
-  <script src="scripts/views/components/generalChart.js"></script>
-  <script src="scripts/views/components/chartOperationsHeader.js"></script>
-  <script src="scripts/views/components/bridgeChart/bridgeChart.js"></script>
-  <script src="scripts/views/components/header/manageCharts.js"></script>
-  <script src="scripts/views/components/header/breadCrumbTemplate.js"></script>
-  <script src="scripts/views/components/pieChart/pieChart.js"></script>
-  <script src="scripts/views/components/pieChart/pieChartTemplate.js"></script>
-  <script src="scripts/views/components/barChart/barChart.js"></script>
-  <script src="scripts/views/components/barChart/barChartTemplate.js"></script>
-  <script src="scripts/views/components/scatterPlot/scatterPlot.js"></script>
-  <script src="scripts/views/components/scatterPlot/scatterPlotTemplate.js"></script>
-  <script src="scripts/views/components/survivalChart/main.js"></script>
-  <script src="scripts/views/components/survivalChart/template.js"></script>
-  <script src="scripts/views/components/survivalChart/proxy.js"></script>
-  <script src="scripts/views/components/survivalChart/components/curve.js"></script>
-  <script src="scripts/views/components/survivalChart/components/kmEstimator.js"></script>
-  <script src="scripts/views/components/survivalChart/components/logRankTest.js"></script>
-  <script src="scripts/views/components/dataTable/tableView.js"></script>
-  <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
-  <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
-  <script src="scripts/views/components/Notification.js"></script>
-  <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <!-- endbuild -->
 
   <!-- build:js scripts/vc-session.js -->
-  <script src="scripts/session/sessionEvent.js"></script>
-  <script src="scripts/session/sessionUtil.js"></script>
-  <script src="scripts/session/sessionServices.js"></script>
+  <script src="scripts/session/vueSession.js"></script>
   <script src="scripts/views/components/vc/editableFieldComponent.js"></script>
   <script src="scripts/views/components/vc/editableRowComponent.js"></script>
   <script src="scripts/views/components/vc/modalTemplate.js"></script>
   <script src="scripts/views/components/vc/addVCPopup.js"></script>
   <script src="scripts/views/components/vc/sessionComponent.js"></script>
+  <script src="scripts/session/sessionEvent.js"></script>
+  <script src="scripts/session/sessionUtil.js"></script>
+  <script src="scripts/session/sessionServices.js"></script>
 
   <!-- endbuild -->
-  
 </head>
 <body>
 
-<div class="container-fluid" id="complete-screen">
-  <nav class="navbar navbar-default navbar-fixed-top">
-    <div id="main-header">
-      
-      <div id="study-view-header-left">
-        <div style="float:left">
-        <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton" :selected-patients-num="selectedPatientsNum"
-                           :selected-samples-num="selectedSamplesNum" :userid="userid"></session-component>
-        </div>
-        <div style="float:left">
-      <span id="stat">
-          Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
-          Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
-      </span>
-        </div>
-      </div>
-      <div id="study-view-header-right" style="margin-right:30px;">
-        <custom-case-input></custom-case-input>
-      
-      <select id="study-view-add-chart" class="chosen-select"
-              v-select :groups="groups">
-        <option id='' value="">Add Chart</option>
-        <!--<option v-for="attributes in groups[0].attributes"></option>-->
-        <option is="manage-charts" :data.sync="group"
-                v-for="(index,group) in groups" :parent="index"></option>
-      </select>
-      </div>
-
-      <div id="breadcrumbs_container" v-if="hasfilters">
-        <div style="float:left;" >
-          <span class="breadcrumb_container">Your selections: </span>
-        </div>
-
-        <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
-          <span>{{customfilter.display_name}}</span>
-          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">
-        </span>
-          <div style="float:left" v-for="group in groups">
-            <bread-crumb :attributes.sync="item"
-                         :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
-                         v-if="item.filter.length>0" ></bread-crumb>
-            <!--<div v-for="(index1, item) in group.attributes"
-                 v-if="item.filter.length>0">
-              <bread-crumb :attributes.sync="item"
-                           :filters.sync="item.filter"></bread-crumb>
-            </div>-->
-          </div>
-        <div><button type='button' @click="clearAll()">Clear
-          All</button></div>
-      </div>
-
+<div id="cohort-component">
+  <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"  :selected-patients-num="selectedPatientsNum"
+                     :selected-samples-num="selectedSamplesNum" :userid="userid" :stats="stats"></session-component>
     </div>
-  </nav>
-  <div class="grid" id="main-grid" :class="{loading:isloading}">
-    <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
-                   :selectedpatients.sync="selectedpatients" :patientmap="patientmap" :samplemap="samplemap"
-                   :selectedsamples.sync="selectedsamples"
-                   :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
-  </div>
 
 
-</div>
 
 </body>
 <script>
   $(document).ready(function () {
-    //Include style variables
-    window.style = {
-      vars: {}
-    };
-    
-    $.get('resources/vars.json')
-      .then(function(data) {
-        window.style.vars = data;
-        window.style.vars.survivalWidth = 320;
-        window.style.vars.survivalHeight = 320;
-        window.style.vars.barchartWidth = 350;
-        window.style.vars.barchartHeight = 120;
-      })
-
-    var vcId_ = location.search.split('vc_id=')[1];
     vcSession.URL = "http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/";
-    iViz.vue.manage.init();
-    if (typeof vcId_ != 'undefined') {
-      iViz.session.model.getVirtualCohortDetails(vcId_);
-    } else {
-      $.getJSON('/data/sample.json', function(_data) {
-        iViz.init(_data);
-      });
-    }
+    vcSession.init();
+    var obj_ = vcSession.getInstance();
+
+    $.getJSON('/data/sample.json', function(_data) {
+      obj_.stats = _data;
+        obj_.selectedSamplesNum=_data.samplesLength;
+        obj_.selectedPatientsNum=_data.patientsLength;
+    });
+    
   });
 </script>
 </html>

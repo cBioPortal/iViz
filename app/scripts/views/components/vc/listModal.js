@@ -45,7 +45,7 @@
     ' class="vc-list-group-item"><div v-on:click="addNewVC()"' +
     ' class="vc-list-content">Add to New Virtual' +
     ' Cohort</div></li></ul></div></div><add-vc :add-new-vc.sync="showPopup"' +
-    ' :selected-patients-num=0 :from-iViz="false"' +
+    ' :selected-patients-num=0' +
     ' :selected-samples-num=1' +
     ' :cancer-study-id="cancerStudyId" :sample="sample"></add-vc>',
     props: {

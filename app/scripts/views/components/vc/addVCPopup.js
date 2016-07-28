@@ -34,38 +34,9 @@
  */
 
 'use strict';
-(function(Vue, vcSession, iViz) {
+(function(Vue, vcSession) {
   Vue.component('addVc', {
 
-    props: {
-      addNewVc: {
-        type: Boolean
-      },
-      fromIViz: {
-        type: Boolean
-      },
-      selectedSamplesNum: {
-        type: Number
-      },
-      selectedPatientsNum: {
-        type: Number
-      },
-      name: {
-        type: String,
-        default: 'My Virtual Cohort'
-      },
-      description: {
-        type: String
-      },
-      cancerStudyId: {
-        type: String
-      }, sample: {
-        type: String
-      }, userid:{
-        type: String,
-        default: 'DEFAULT'
-      }
-    },
     template: '<modaltemplate :show.sync="addNewVc" size="modal-lg"><div' +
     ' slot="header"><h3 class="modal-title">Save Virtual' +
     ' Cohorts</h3></div><div slot="body"><div' +
@@ -82,6 +53,16 @@
     ' @click="addNewVc = false">Cancel</button><button type="button"' +
     ' class="btn' +
     ' btn-default"@click="saveCohort()">Save</button></div></modaltemplate>',
+    props: [ 'selectedSamplesNum',
+      'selectedPatientsNum',
+      'userid',
+      'stats','addNewVc'],
+    data: function() {
+      return{
+        name:'My Virtual Cohort',
+        description:''
+      }
+    },
     watch: {
       addNewVc: function() {
         this.name = 'My Virtual Cohort';
@@ -91,17 +72,7 @@
     methods: {
       saveCohort: function() {
         if (_.isObject(vcSession)) {
-          var _stats = {};
-          if (this.fromIViz) {
-            _stats = $.extend(true,{},iViz.stat());
-          } else {
-            var _selectedCases = vcSession.utils.buildCaseListObject([],
-              this.cancerStudyId,
-              this.sample);
-            _stats.filters = {patients: {}, samples: {}};
-            _stats.selected_cases = _selectedCases;
-          }
-          vcSession.events.saveCohort(_stats,
+          vcSession.events.saveCohort(this.stats,
             this.selectedPatientsNum, this.selectedSamplesNum, this.userid, this.name,
             this.description || '');
           this.addNewVc = false;
@@ -110,4 +81,4 @@
       }
     }
   });
-})(window.Vue, window.vcSession,window.iViz);
+})(window.Vue, window.vcSession);
