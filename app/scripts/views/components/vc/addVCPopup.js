@@ -56,7 +56,7 @@
     props: [ 'selectedSamplesNum',
       'selectedPatientsNum',
       'userid',
-      'stats','addNewVc'],
+      'stats','addNewVc','updateStats'],
     data: function() {
       return{
         name:'My Virtual Cohort',
@@ -72,11 +72,15 @@
     methods: {
       saveCohort: function() {
         if (_.isObject(vcSession)) {
-          vcSession.events.saveCohort(this.stats,
-            this.selectedPatientsNum, this.selectedSamplesNum, this.userid, this.name,
-            this.description || '');
-          this.addNewVc = false;
-          jQuery.notify('Added to new Virtual Study', 'success');
+          var self_ = this;
+          self_.updateStats = true;
+          self_.$nextTick(function(){
+            vcSession.events.saveCohort(self_.stats,
+              self_.selectedPatientsNum, self_.selectedSamplesNum, self_.userid, self_.name,
+              self_.description || '');
+            self_.addNewVc = false;
+            jQuery.notify('Added to new Virtual Study', 'success');
+          })
         }
       }
     }

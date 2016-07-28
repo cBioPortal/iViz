@@ -17,7 +17,26 @@ var vcSession = (function(Vue, dc, _) {
           showSaveButton : true,
           showManageButton : true,
           cohortData:{},
-          stats:{}
+          stats:{},
+          updateStats:false
+        },
+        watch:{
+          'updateStats':function(newVal){
+            if(newVal){
+              var self_= this;
+              $.ajax({
+                url: '/data/sample.json',
+                dataType: 'json',
+                async: false,
+                success: function(_data) {
+                  self_.stats = {};
+                  self_.selectedSamplesNum=_data.samplesLength;
+                  self_.selectedPatientsNum=_data.patientsLength;
+                  self_.updateStats = false;
+                }
+              });
+            }
+          }
         }
       });
     },

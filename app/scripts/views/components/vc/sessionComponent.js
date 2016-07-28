@@ -2,13 +2,13 @@
  * Created by kalletlak on 7/19/16.
  */
 'use strict';
-(function(Vue, dc, $, vcSession) {
+(function (Vue, dc, $, vcSession) {
   Vue.component('sessionComponent', {
     template: '<div id="cohort-component"><button v-if="showSaveButton" type="button" class="btn btn-default" ' +
     '@click="addNewVC = true" id="save_cohort_btn">Save Cohort </button> <button v-if="showManageButton" type="button" ' +
     'class="btn btn-default" @click="manageCohorts()"> <i class="fa fa-bars"></i> </button> ' +
     '<add-vc :add-new-vc.sync="addNewVC" :selected-samples-num="selectedSamplesNum" ' +
-    ':selected-patients-num="selectedPatientsNum" :userid="userid" :stats="stats"></add-vc> ' +
+    ':selected-patients-num="selectedPatientsNum" :userid="userid" :stats="stats" :update-stats.sync="updateStats"></add-vc> ' +
     '<modaltemplate :show.sync="showVCList" size="modal-xlg"> <div slot="header"> ' +
     '<h4 class="modal-title">Virtual Cohorts</h4> </div> <div slot="body"> ' +
     '<table class="table table-bordered table-hover table-condensed"> ' +
@@ -19,27 +19,27 @@
     'v-for="virtualCohort in virtualCohorts"> </tr> </table> </div> <div slot="footer"> ' +
     '</div> </modaltemplate> </div> </nav> </div>',
     props: [
-    'selectedPatientsNum', 'selectedSamplesNum', 'userid', 'showSaveButton', 'showManageButton','stats'
+      'selectedPatientsNum', 'selectedSamplesNum', 'userid', 'showSaveButton', 'showManageButton', 'stats', 'updateStats'
     ],
-    data: function() {
-      return{
-        showVCList:false,
-        addNewVC:false,
-        virtualCohorts:[]
+    data: function () {
+      return {
+        showVCList: false,
+        addNewVC: false,
+        virtualCohorts: []
       }
-    },events:{
-      'remove-cohort':function(cohort){
+    }, events: {
+      'remove-cohort': function (cohort) {
         this.virtualCohorts.$remove(cohort);
       }
-    }, methods:{
-       manageCohorts : function(){
+    }, methods: {
+      manageCohorts: function () {
         this.showVCList = true;
-          if(this.userid !== undefined && this.userid !== 'DEFAULT'){
-            this.virtualCohorts =  vcSession.model.loadUserVirtualCohorts();
-          }else{
-            this.virtualCohorts = vcSession.utils.getVirtualCohorts();
-          }
-       }
+        if (this.userid !== undefined && this.userid !== 'DEFAULT') {
+          this.virtualCohorts = vcSession.model.loadUserVirtualCohorts();
+        } else {
+          this.virtualCohorts = vcSession.utils.getVirtualCohorts();
+        }
+      }
     }
   });
 })(window.Vue, window.dc,

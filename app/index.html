@@ -26,8 +26,9 @@
 
   <!-- endbuild -->
 
-  <!-- build:js scripts/vc-session.js -->
   <script src="scripts/session/vueSession.js"></script>
+  
+  <!-- build:js scripts/vc-session.js -->
   <script src="scripts/views/components/vc/editableFieldComponent.js"></script>
   <script src="scripts/views/components/vc/editableRowComponent.js"></script>
   <script src="scripts/views/components/vc/modalTemplate.js"></script>
@@ -43,8 +44,8 @@
 
 <div id="cohort-component">
   <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"  :selected-patients-num="selectedPatientsNum"
-                     :selected-samples-num="selectedSamplesNum" :userid="userid" :stats="stats"></session-component>
-    </div>
+                     :selected-samples-num="selectedSamplesNum" :userid="userid" :stats="stats" :update-stats.sync="updateStats"></session-component>
+</div>
 
 
 
@@ -57,10 +58,10 @@
 
     $.getJSON('/data/sample.json', function(_data) {
       obj_.stats = _data;
-        obj_.selectedSamplesNum=_data.samplesLength;
-        obj_.selectedPatientsNum=_data.patientsLength;
+      obj_.selectedSamplesNum=_data.samplesLength;
+      obj_.selectedPatientsNum=_data.patientsLength;
     });
-    
+
   });
 </script>
 </html>
