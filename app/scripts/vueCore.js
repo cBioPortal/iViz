@@ -68,7 +68,9 @@
             initializedSampleSpecialCharts:true,
             initializedPatientSpecialCharts:true,
             charts: {},
-            groupCount:0
+            groupCount:0,
+            highlightAllButtons:false,
+            highlightCaseButtons:false
           }, watch: {
             'redrawgroups':function(newVal,oldVal){
               if(newVal.length>0){
@@ -131,6 +133,114 @@
              };
              this.charts = {};
              },*/
+            openCases:function(){
+              iViz.openCases();
+              
+             /* var studyId = '';
+              var possible = true;
+              var selectedCases_ = this.selectedpatients;
+              var caseIndices_ =iViz.getCaseIndices('patient');
+              var data_ = iViz.getAttrData('patient');
+              
+              $.each(selectedCases_,function(key,caseId){
+                if(key === 0){
+                  studyId = data_[caseIndices_[caseId]]['study_id'];
+                }else{
+                  if(studyId !== data_[caseIndices_[caseId]]['study_id']){
+                    possible = false;
+                    return false;
+                  }
+                }
+              });
+              if(possible){
+                var _selectedPatientIds = selectedCases_.sort();
+                var _url =  window.cbioURL+"/case.do?cancer_study_id="+
+                  studyId+
+                  "&case_id="+_selectedPatientIds[0]+
+                  "#nav_case_ids="+_selectedPatientIds.join(",");
+                window.open(_url);
+              }else{
+                new Notification().createNotification('This feature is not available to multiple studies for now!', {message_type: 'info'});
+              }*/
+            },
+            downloadCaseData:function(){
+              iViz.downloadCaseData();
+             /* var content = '';
+              var sampleIds_ = this.selectedsamples;
+              var data_ = iViz.getCompleteData();
+              var attr = {};
+              
+              attr['CANCER_TYPE_DETAILED']='Cancer Type Detailed';
+              attr['CANCER_TYPE']='Cancer Type';
+              attr['study_id']='Study ID';
+              attr['patient_id']='Patient ID';
+              attr['sample_id']='Sample ID';
+              attr['mutated_genes']='With Mutation Data';
+              attr['cna_details']='With CNA Data';
+              
+              var arr = [];
+              var attrL = 0, arrL = 0;
+              var strA = [];
+              
+              var sampleAttr_ = data_.groups.sample.attr_meta;
+              var patientAttr_ = data_.groups.patient.attr_meta;
+              
+              _.each(sampleAttr_,function(_attr){
+                  if(attr[_attr.attr_id] === undefined && 'scatter_plot' !== _attr.view_type)
+                    attr[_attr.attr_id] = _attr.display_name
+              });
+
+              _.each(patientAttr_,function(_attr){
+                  if(attr[_attr.attr_id] === undefined && 'survival' !== _attr.view_type)
+                    attr[_attr.attr_id] = _attr.display_name
+              });
+              
+              attrL = attr.length;
+              _.each(attr,function(displayName,attrId){
+                strA.push(displayName || 'Unknown');
+              });
+              content = strA.join('\t');
+              strA.length =0;
+              var sampleIndices_ = data_.groups.sample.data_indices.sample_id;
+              var patienIndices_ = data_.groups.patient.data_indices.patient_id;
+              var sampleData_ = data_.groups.sample.data;
+              var patientData_ = data_.groups.patient.data;
+              var samplePatientMapping = data_.groups.group_mapping.sample.patient;
+              _.each(sampleIds_,function(sampleId){
+                var temp = sampleData_[sampleIndices_[sampleId]];
+                var temp1 = $.extend(true,temp,patientData_[patienIndices_[samplePatientMapping[sampleId][0]]]);
+                arr.push(temp1);
+              });
+
+              arrL = arr.length;
+
+              for (var i = 0; i < arrL; i++) {
+                strA.length = 0;
+                _.each(attr,function(displayName,attrId){
+                  if('cna_details' === attrId || 'mutated_genes' === attrId ){
+                    var temp = 'No';
+                    if(arr[i][attrId] !== undefined)
+                     temp = arr[i][attrId].length>0?'Yes':'No';
+                    strA.push(temp);
+                  }else{
+                    strA.push(arr[i][attrId]);
+                  }
+                });
+                content += '\r\n' + strA.join('\t');
+              }
+
+              var downloadOpts = {
+                filename: "study_view_clinical_data.txt",
+                contentType: "text/plain;charset=utf-8",
+                preProcess: false
+              };
+
+              cbio.download.initDownload(content, downloadOpts);*/
+
+            },
+            submitForm:function(){
+              iViz.submitForm();
+            },
             clearAll: function(){
               if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
                 this.customfilter.sampleIds = [];
@@ -262,6 +372,21 @@
                 this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
               }
             });
+            $('.study-view-header-left-5').qtip({
+              content: {text: 'Click to view the selected cases' },
+              style: { classes: 'qtip-light qtip-rounded qtip-shadow' },
+              show: {event: 'mouseover'},
+              hide: {fixed:true, delay: 100, event: 'mouseout'},
+              position: {my:'bottom center', at:'top center', viewport: $(window)}
+            });
+            $('#study-view-header-left-6').qtip({
+              prerender: true,
+              content: {text: 'Click to download the selected cases' },
+              style: { classes: 'qtip-light qtip-rounded qtip-shadow' },
+              show: {event: 'mouseover'},
+              hide: {fixed:true, delay: 100, event: 'mouseout'},
+              position: {my:'bottom center', at:'top center', viewport: $(window)}
+            })
           }
         });
       },

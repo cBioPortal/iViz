@@ -72,14 +72,14 @@
 }
 
 #study-view-header-right-1 {
-  font-size: 1.1em;
-  width: 160px;
+  /*font-size: 1.1em;
+  width: 160px;*/
 }
 
 .study-view-header-button {
   float: left;
   margin: 0 5px 0 0;
- // font-family: Verdana,Arial,sans-serif;
+  font-family: Verdana,Arial,sans-serif;
   font-size: 1.1em;
   border: 1px solid darkgray;
   background: none;
@@ -121,4 +121,62 @@ div.geneAddedNotification{
   width:400px;
   height: 15px;
   font-size: 0.8em;
+}
+
+#study-view-header-left-1 {
+  font-size: 1.1em;
+}
+
+.study-view-header-left-3 {
+  float: left;
+  border: 0;
+  font-size: 13px;
+  margin: 0;
+  z-index: 21;
+  vertical-align: middle;
+  padding: 0 10px 0 0;
+  width: auto;
+  color: black;
+  text-align: center;
+  font-family: Verdana,Arial,sans-serif;
+  font-size: 1.1em;
+  margin-top: 3px;
+}
+
+.study-view-header-left-5 {
+  float: left;
+  margin: 0 5px 0 0;
+  font-family: Verdana,Arial,sans-serif;
+  font-size: 1.1em;
+  border: 1px solid darkgray;
+  background: none;
+  font-weight: normal;
+  color: orange;
+  padding: 5px 10px;
+  margin-top: -3px;
+  margin-right: 10px;
+  border: solid 1px;
+  border-radius: 5px;
+  border-color: darkgrey;
+  outline-offset: -2px;
+}
+
+#study-view-header-left-6 {
+  font-size: 1.1em;
+}
+
+.study-view-header-button:hover {
+  cursor: pointer;
+}
+
+#arrow_studyview{
+  width: 25px;
+  height: 20px;
+  float: left;
+  padding: 0px 10px 0px 0px;
+  margin-top: 2px;
+}
+
+.study-view-hover{
+  outline:-webkit-focus-ring-color auto 5px;
 }
