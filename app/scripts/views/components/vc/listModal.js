@@ -34,7 +34,7 @@
  */
 
 'use strict';
-(function(Vue, iViz) {
+(function(Vue, vcSession) {
   Vue.component('listModal', {
     // template: '#list-modal-template',
     template: '<div class="modal-mask" v-show="show" transition="modal"' +
@@ -45,7 +45,7 @@
     ' class="vc-list-group-item"><div v-on:click="addNewVC()"' +
     ' class="vc-list-content">Add to New Virtual' +
     ' Cohort</div></li></ul></div></div><add-vc :add-new-vc.sync="showPopup"' +
-    ' :selected-patients-num=0 :from-iViz="false"' +
+    ' :selected-patients-num=0' +
     ' :selected-samples-num=1' +
     ' :cancer-study-id="cancerStudyId" :sample="sample"></add-vc>',
     props: {
@@ -73,8 +73,8 @@
         this.show = false;
       },
       addToVC: function(virtualCohortID) {
-        if (_.isObject(iViz.session)) {
-          var _message = iViz.session.events.addSampleToVirtualCohort(
+        if (_.isObject(vcSession)) {
+          var _message = vcSession.events.addSampleToVirtualCohort(
             virtualCohortID,
             this.cancerStudyId, this.sample);
           var msgToShow = 'Error while adding sample';
@@ -101,4 +101,4 @@
       });
     }
   });
-})(window.Vue, window.iViz);
+})(window.Vue, window.vcSession);

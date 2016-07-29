@@ -7,25 +7,10 @@ body {
 }
 
 #complete-screen {
-  @import "partials/mixins";
-  @import "partials/vars";
-  @import "partials/grids";
   @import "partials/global";
-  
-  @import "components/barchart";
-  @import "components/piechart";
-  @import "components/breadcrumb";
-  @import "components/chart-operations";
-  @import "components/scatterplot";
-  @import "components/survivalplot";
+}
+
+#cohort-component{
   @import "components/vc";
+  @import "partials/global";
 }
-
-@import "vendor/dashiboard";
-@import "vendor/efdt";
-
-#study-view-case-select-custom-dialog input[type="radio"] {
-  margin: 3px;
-}
-
-.qtip-wide{max-width:380px !important;}
