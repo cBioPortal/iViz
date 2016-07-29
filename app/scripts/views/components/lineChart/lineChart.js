@@ -8,10 +8,11 @@
         
         var parseDate = d3.time.format("%-m-%-d-%Y").parse; //function to parse the date string (with specific format) to a date object
         var data = iViz.getAttrData(attributes.group_type);
+        if(!(data[0][attr_id] instanceof Date)){ //ensures a Date object will not be parsed into a Date
         data.forEach(function(d){ //parse every date in the data array
             d[attr_id] = parseDate(d[attr_id]); //d[attr_id] = d.DATE_OF_DIAGNOSIS b/c attr_id is a variable
         }); //each date only has month-date-year; time is removed
-
+    }
         var dateDimension = ndx.dimension(function(d){ //d refers to each object(the element) in the "data" array
             return d[attr_id];
         });//create date dimension
@@ -19,6 +20,7 @@
         var dateByFrequency = dateDimension.group();//create date group
         
         content.init = function initDCLineChart(){
+            var chartInstances = {};
             lineChartInst_ = dc.lineChart(opts.lineChartTarget, opts.groupid); //initialize line chart; random dates created in util.js
                                                                               //second parameter adds line chart to the chart group
             rangeChartInst_ = dc.barChart(opts.rangeChartTarget, opts.groupid);
@@ -53,8 +55,9 @@
                 .xAxis()
                 .ticks(d3.time.months, 2); //show a tick every 2 months on the range chart      
 //                    lineChart.render(); //no need to render the line chart after adding it to the group of charts (vuecore.js handles rendering)
-       
-        return lineChartInst_;
+       chartInstances.lineChart = lineChartInst_;
+       chartInstances.rangeChart = rangeChartInst_;
+        return chartInstances;
         };
         
         function initTsvDownloadData(){
