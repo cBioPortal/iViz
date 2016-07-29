@@ -238,7 +238,7 @@
     window.style = {
       vars: {}
     };
-    
+    iViz.vue.manage.init();
     $.get('resources/vars.json')
       .then(function(data) {
         window.style.vars = data;
