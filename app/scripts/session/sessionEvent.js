@@ -34,33 +34,32 @@
  */
 'use strict';
 
-window.iViz = window.iViz ? window.iViz : {};
+window.vcSession = window.vcSession ? window.vcSession : {};
 
-(function(iViz, _) {
-  if (!_.isObject(iViz.session)) {
-    iViz.session = {};
+(function(vcSession, _) {
+  if (!_.isObject(vcSession)) {
+    vcSession = {};
   }
-  iViz.session.events = (function() {
+  vcSession.events = (function() {
     return {
       saveCohort: function(stats, selectedPatientsNum, selectedSamplesNum,
                            userID, name, description) {
-        var _virtualCohort = iViz.session.utils.buildVCObject(stats.filters,
+        var _virtualCohort = vcSession.utils.buildVCObject(stats.filters,
           selectedPatientsNum, selectedSamplesNum, stats.selected_cases,
           userID,
           name, description);
-        iViz.session.model.saveSession(_virtualCohort);
+        vcSession.model.saveSession(_virtualCohort);
       },
       removeVirtualCohort: function(virtualCohort) {
-        iViz.vue.manage.getInstance().virtualCohorts.$remove(virtualCohort);
-        iViz.session.model.removeSession(virtualCohort);
+        vcSession.model.removeSession(virtualCohort);
       },
       editVirtualCohort: function(virtualCohort) {
-        iViz.session.model.editSession(virtualCohort);
+        vcSession.model.editSession(virtualCohort);
       },
       addSampleToVirtualCohort: function(virtualCohortID, cancerStudyID,
                                          sampleID) {
         var _returnString = 'error';
-        var _virtualCohorts = iViz.session.utils.getVirtualCohorts();
+        var _virtualCohorts = vcSession.utils.getVirtualCohorts();
         var _studyMatch = _.findWhere(_virtualCohorts, {
           virtualCohortID: virtualCohortID
         });
@@ -74,7 +73,7 @@ window.iViz = window.iViz ? window.iViz : {};
             studyID: cancerStudyID
           });
           if (typeof _match === 'undefined') {
-            var _selectedCases = iViz.session.utils.buildCaseListObject(
+            var _selectedCases = vcSession.utils.buildCaseListObject(
               _studyMatch.selectedCases, cancerStudyID, sampleID);
             _studyMatch.selectedCases = _selectedCases;
             _studyMatch.samplesLength += 1;
@@ -92,5 +91,5 @@ window.iViz = window.iViz ? window.iViz : {};
       }
     };
   })();
-})(window.iViz,
+})(window.vcSession,
   window._);

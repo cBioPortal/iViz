@@ -34,36 +34,9 @@
  */
 
 'use strict';
-(function(Vue, iViz) {
+(function(Vue, vcSession) {
   Vue.component('addVc', {
 
-    props: {
-      addNewVc: {
-        type: Boolean
-      },
-      fromIViz: {
-        type: Boolean
-      },
-      selectedSamplesNum: {
-        type: Number
-      },
-      selectedPatientsNum: {
-        type: Number
-      },
-      name: {
-        type: String,
-        default: 'My Virtual Cohort'
-      },
-      description: {
-        type: String
-      },
-      cancerStudyId: {
-        type: String
-      }, sample: {
-        type: String
-      }
-
-    },
     template: '<modaltemplate :show.sync="addNewVc" size="modal-lg"><div' +
     ' slot="header"><h3 class="modal-title">Save Virtual' +
     ' Cohorts</h3></div><div slot="body"><div' +
@@ -80,6 +53,16 @@
     ' @click="addNewVc = false">Cancel</button><button type="button"' +
     ' class="btn' +
     ' btn-default"@click="saveCohort()">Save</button></div></modaltemplate>',
+    props: [ 'selectedSamplesNum',
+      'selectedPatientsNum',
+      'userid',
+      'stats','addNewVc','updateStats'],
+    data: function() {
+      return{
+        name:'My Virtual Cohort',
+        description:''
+      }
+    },
     watch: {
       addNewVc: function() {
         this.name = 'My Virtual Cohort';
@@ -88,24 +71,18 @@
     },
     methods: {
       saveCohort: function() {
-        if (_.isObject(iViz.session)) {
-          var _stats = {};
-          if (this.fromIViz) {
-            _stats = iViz.stat();
-          } else {
-            var _selectedCases = iViz.session.utils.buildCaseListObject([],
-              this.cancerStudyId,
-              this.sample);
-            _stats.filters = {patients: {}, samples: {}};
-            _stats.selected_cases = _selectedCases;
-          }
-          iViz.session.events.saveCohort(_stats,
-            this.selectedPatientsNum, this.selectedSamplesNum, null, this.name,
-            this.description || '');
-          this.addNewVc = false;
-          jQuery.notify('Added to new Virtual Study', 'success');
+        if (_.isObject(vcSession)) {
+          var self_ = this;
+          self_.updateStats = true;
+          self_.$nextTick(function(){
+            vcSession.events.saveCohort(self_.stats,
+              self_.selectedPatientsNum, self_.selectedSamplesNum, self_.userid, self_.name,
+              self_.description || '');
+            self_.addNewVc = false;
+            jQuery.notify('Added to new Virtual Study', 'success');
+          })
         }
       }
     }
   });
-})(window.Vue, window.iViz);
+})(window.Vue, window.vcSession);
