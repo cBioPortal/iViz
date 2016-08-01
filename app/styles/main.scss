@@ -56,3 +56,9 @@ body {
 .range-chart-class g.y{  /* hides the y axis on the rangeChart of the line chart*/
     display:none;
 }
+
+#study-view-attributes-panel{
+    position: fixed;
+    top:65px;
+    display:none
+}

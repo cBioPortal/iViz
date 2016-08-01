@@ -7,7 +7,7 @@
         var attr_id = attributes.attr_id;
         
         var parseDate = d3.time.format("%-m-%-d-%Y").parse; //function to parse the date string (with specific format) to a date object
-        var data = iViz.getAttrData(attributes.group_type);
+        var data = iViz.getAttrData(attributes.group_type);//data is an array
         if(!(data[0][attr_id] instanceof Date)){ //ensures a Date object will not be parsed into a Date
         data.forEach(function(d){ //parse every date in the data array
             d[attr_id] = parseDate(d[attr_id]); //d[attr_id] = d.DATE_OF_DIAGNOSIS b/c attr_id is a variable

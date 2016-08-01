@@ -298,12 +298,17 @@
           width: '30%'
         })
         .change(function() {
-              var value = this.el.value;
-              self.params.charts[value].show = true;
-              self.vm.addChart(this.el.value);
-              self.vm.$nextTick(function () {
+            var value = this.el.value;
+            self.params.charts[value].show = true;
+            self.vm.$nextTick(function () {
+                $("#study-view-attributes-panel").show();
+            });
+            $(".panel-button").click(function(){
+                var clickedChart = $(this).attr("id"); 
+                self.vm.addChart(value);
+                $("#study-view-attributes-panel").hide();
                 $("#study-view-add-chart").trigger("chosen:updated");
-              });
+            });      
           }.bind(this)
         );
     }

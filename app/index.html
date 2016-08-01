@@ -129,6 +129,7 @@
           Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
       </span>
       </div>
+      
       <div id="study-view-header-right" style="margin-right:30px;">
         <custom-case-input></custom-case-input>
 
@@ -202,6 +203,16 @@
                    :selectedsamples.sync="selectedsamples"
                    :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
   </div>
+    <div id ="study-view-attributes-panel" style="right:20px">
+            <div><div class = "btn-group" role ="group" aria-label="..." id="panel-charts-1" style="float:left">
+            <button type="button" id="panel-line-chart" class = "panel-button"><img src="images/linechart.png" alt="linechart" style="width:235px;height:156px"></button>
+            <button type="button" id="panel-table" class = "panel-button"><img src="images/tablechart.png" alt="table" style="width:189px;height:161px"></button>
+            </div></div>
+            <div><div class = "btn-group" role ="group" aria-label="..." id="panel-charts-2" style="float:right">
+            <button type="button" id="panel-bar-chart" class = "panel-button"><img src="images/barchart.png" alt="barchart" style="width:235px;height:169px;top:20px"></button>
+            <button type="button" id="panel-pie-chart" class = "panel-button"><img src="images/piechart.png" alt="piechart" style="width:187px;height:171px"></button>  
+            </div></div>    
+    </div>
   <div id="main-bridge" style="display: none;"></div>
 </div>
 
