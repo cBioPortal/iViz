@@ -104,11 +104,11 @@
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(data, _opts);
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
-      var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
+      /*var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
       if (_selectedSamples.length !== data.length) {
         this.selectedSamples=_selectedSamples;
         this.chartInst.update(_selectedSamples);
-      }
+      }*/
       document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];

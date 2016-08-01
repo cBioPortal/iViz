@@ -175,6 +175,55 @@
     },
     methods: {
       updateInvisibleChart: function(val) {
+        var _caseSelect = [];
+
+        //TODO: need to update this logic 
+        $.each(this.attributes, function (index, attributes) {
+          if (attributes.show) {
+            if (attributes.filter.length > 0) {
+              if (attributes.view_type === 'scatter_plot') {
+                if(_caseSelect.length!==0){
+                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
+                }else{
+                  _caseSelect = attributes.filter;
+                }
+              } else if (attributes.view_type === 'table') {
+                if(_caseSelect.length!==0){
+                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
+                }else{
+                  _caseSelect = attributes.filter;
+                }
+              }
+            }
+          }
+        });
+        if(_caseSelect.length>0){
+          val = _.intersection(_caseSelect,val)
+        }        var _caseSelect = [];
+
+        //TODO: need to update this logic 
+        $.each(this.attributes, function (index, attributes) {
+          if (attributes.show) {
+            if (attributes.filter.length > 0) {
+              if (attributes.view_type === 'scatter_plot') {
+                if(_caseSelect.length!==0){
+                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
+                }else{
+                  _caseSelect = attributes.filter;
+                }
+              } else if (attributes.view_type === 'table') {
+                if(_caseSelect.length!==0){
+                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
+                }else{
+                  _caseSelect = attributes.filter;
+                }
+              }
+            }
+          }
+        });
+        if(_caseSelect.length>0){
+          val = _.intersection(_caseSelect,val)
+        }
         this.chartInvisible.replaceFilter([val]);
         this.redrawgroups.push(this.id);
       }
