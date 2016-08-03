@@ -102,7 +102,7 @@
         var selectedSamplesUnion = [];
         var selectedRowsUids = _.pluck(_selectedRowData,'uniqueId');
         this.selectedRows = _.union(this.selectedRows,selectedRowsUids);
-        $.each(_selectedRowData, function(index,item){
+        _.each(_selectedRowData, function(item){
           var casesIds = item.caseIds.split(',');
           selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
         });

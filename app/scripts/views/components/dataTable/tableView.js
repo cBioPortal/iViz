@@ -190,7 +190,7 @@
       selectedGeneData.length = 0;
 
       if (geneData_) {
-        $.each(geneData_, function(index, item) {
+        _.each(geneData_, function(item) {
           var datum = {};
           datum.gene = item.gene;
           if (_selectedGenesMap !== undefined) {
@@ -260,7 +260,7 @@
         attributes: attr_
       };
       var _mutationData = mutatedGenesData(_selectedGenesMap);
-      $.each(_mutationData, function(index, item) {
+      _.each(_mutationData, function(item) {
         for (var key in item) {
           var datum = {
             attr_id: key,

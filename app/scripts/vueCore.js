@@ -140,7 +140,17 @@
                 this.customfilter.patientIds = [];
                 this.$broadcast('update-all-filters');
               }
-              this.$broadcast('clear-all-filters');
+              this.$broadcast('clear-all-groups');
+              var self_ = this;
+              this.hasfilters = false;
+              self_.$nextTick(function () {
+                self_.selectedsamples =  _.keys(iViz.getCasesMap('sample'));
+                self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+                self_.$broadcast('update-special-charts');
+                _.each(this.groups,function(group){
+                  dc.redrawAll(group.id);
+                });
+              });
             },
             addChart: function(attrId){
               var self_ = this;
@@ -240,7 +250,7 @@
                 var self_ = this;
                 Vue.nextTick(function () {
 
-                  $.each(self_.groups,function(key,group){
+                  _.each(self_.groups,function(group){
                     if(group.type === radioVal){
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;

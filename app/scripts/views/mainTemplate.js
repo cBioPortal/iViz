@@ -96,6 +96,11 @@
       }
     },
     events: {
+      'clear-all-groups':function(){
+        this.selectedPatientsByFilters = [];
+        this.selectedSamplesByFilters = [];
+        this.$broadcast('clear-group');
+      },
       'update-grid': function(reload) {
         if(reload){
           this.updateGrid()

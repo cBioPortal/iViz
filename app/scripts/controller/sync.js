@@ -74,7 +74,7 @@
   iViz.sync.selectByCases = function(type_, data_, cases_) {
     var caseIndices = iViz.getCaseIndices(type_);
     var resultData_ = [];
-    $.each(cases_, function(key,val){
+    _.each(cases_, function(val){
       resultData_.push(data_[caseIndices[val]]);
     });
     return resultData_;

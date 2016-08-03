@@ -56,7 +56,8 @@
     data: function() {
       return {
         syncPatient: true,
-        syncSample: true
+        syncSample: true,
+        clearGroup:false
       }
     },
     watch: {
@@ -80,28 +81,48 @@
       }
     },
     events: {
+      'clear-group':function(){
+        this.clearGroup = true;
+        this.invisibleBridgeDimension.filterAll();
+        this.invisibleChartFilters = [];
+        iViz.deleteGroupFilteredCases(this.id);
+        this.$broadcast('clear-chart-filters');
+        var self_ = this;
+        this.$nextTick(function(){
+          self_.clearGroup = false;
+        });
+      },
       'update-filters': function() {
-        this.syncPatient = false;
-        this.syncSample = false;
-        var _filters = [], _caseSelect = [];
-        var attrId = this.type==='patient'?'patient_id':'sample_id';
-        if(this.invisibleChartFilters.length>0) {
-          this.invisibleBridgeDimension.filterAll();
-        }
-        iViz.setGroupFilteredCases(this.id, _.pluck(this.invisibleBridgeDimension.top(Infinity),attrId).sort());
+        if(!this.clearGroup){
+          this.syncPatient = false;
+          this.syncSample = false;
+          var _filters = [], _caseSelect = [];
+          var attrId = this.type==='patient'?'patient_id':'sample_id';
+          if(this.invisibleChartFilters.length>0) {
+            this.invisibleBridgeDimension.filterAll();
+          }
+          var filteredCases = _.pluck(this.invisibleBridgeDimension.top(Infinity),attrId).sort();
+          //hackey way to check if filter selected filter cases is same as original case list
+          if(filteredCases.length !== this.ndx.size()){
+            iViz.setGroupFilteredCases(this.id, filteredCases);
+          }else{
+            iViz.deleteGroupFilteredCases(this.id)
+          }
 
-        if(this.invisibleChartFilters.length>0){
-          var filtersMap = {};
-          _.each(this.invisibleChartFilters,function(filter){
-            if(filtersMap[filter] === undefined){
-              filtersMap[filter] = true;
-            }
-          });
-          this.invisibleBridgeDimension.filterFunction(function(d){
-            return (filtersMap[d] !== undefined);
-          });
+
+          if(this.invisibleChartFilters.length>0){
+            var filtersMap = {};
+            _.each(this.invisibleChartFilters,function(filter){
+              if(filtersMap[filter] === undefined){
+                filtersMap[filter] = true;
+              }
+            });
+            this.invisibleBridgeDimension.filterFunction(function(d){
+              return (filtersMap[d] !== undefined);
+            });
+          }
+          this.$dispatch('update-all-filters', this.type);
         }
-        this.$dispatch('update-all-filters', this.type);
       }
     },
     methods: {

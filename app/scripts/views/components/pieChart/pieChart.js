@@ -117,7 +117,6 @@
               updateQtip = false;
               updatePieLabels();
             }
-            console.log(event)
           },
           render: function() {
             updateCurrentLabels();

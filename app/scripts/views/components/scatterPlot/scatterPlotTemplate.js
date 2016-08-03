@@ -66,9 +66,7 @@
           this.invisibleChart.filterAll();
           dc.redrawAll(this.groupid);
         }
-        if(!_.isEqual(newVal, oldVal)){
-          this.updateFilters();
-        }
+        this.updateFilters();
       }
     },
     events: {
