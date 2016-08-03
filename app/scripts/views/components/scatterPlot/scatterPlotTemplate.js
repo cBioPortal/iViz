@@ -103,18 +103,32 @@
       document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];
-          _.each(_eventData.points, function(_pointObj) {
-            _.each(data, function(_dataObj) {
-              if (_dataObj['cna_fraction'] === _pointObj.x &&
-                _dataObj['mutation_count'] === _pointObj.y) {
-                _selectedData.push(_dataObj);
-              }
-            });
+          // create hash map for (overall) data with cna_fraction + mutation count as key, dataObj as value (performance concern)
+          var _CnaFracMutCntMap = {};
+          _.each(data, function(_dataObj) {
+            var _key = _dataObj['cna_fraction'] + "||" + _dataObj['mutation_count'];
+            _CnaFracMutCntMap[_key] = _dataObj;
           });
-          _self.selectedSamples = _.pluck(_selectedData, "sample_id");
-         // _self.chartInst.update(_self.selectedSamples);
-          _self.filters = _self.selectedSamples;
-          //_self.$dispatch('update-samples', _self.selectedSamples);
+          _.each(_eventData.points, function(_pointObj) {
+            if (_pointObj.x) {
+              _selectedData.push(_CnaFracMutCntMap[_pointObj.x + "||" + _pointObj.y]);
+            }
+          });
+          var _selectedCases =  _.pluck(_selectedData, "sample_id").sort();
+          _self.selectedSamples =_selectedCases;
+          _self.filters =_selectedCases;
+
+          var self_ = this;
+          var filtersMap = {};
+          _.each(_selectedCases,function(filter){
+            if(filtersMap[filter] === undefined){
+              filtersMap[filter] = true;
+            }
+          });
+          _self.invisibleChart.filterFunction(function(d){
+            return (filtersMap[d] !== undefined);
+          });
+          dc.redrawAll(_self.groupid);
         }
       });
       this.$dispatch('data-loaded', true);
