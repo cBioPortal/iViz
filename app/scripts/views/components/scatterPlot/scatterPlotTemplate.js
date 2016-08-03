@@ -57,13 +57,13 @@
         chartInst: {},
         hasFilters:false,
         showLoad:true,
-        invisibleChart:{}
+        invisibleDimension:{}
       };
     },
     watch: {
       'filters': function(newVal,oldVal) {
         if(newVal.length === 0 ){
-          this.invisibleChart.filterAll();
+          this.invisibleDimension.filterAll();
           dc.redrawAll(this.groupid);
         }
         this.updateFilters();
@@ -75,7 +75,7 @@
       },
       'update-special-charts': function() {
         var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-        var _selectedCases = _.pluck(this.invisibleChart.top(Infinity),attrId);
+        var _selectedCases = _.pluck(this.invisibleDimension.top(Infinity),attrId);
         var data = iViz.getAttrData(this.attributes.group_type);
         if (_selectedCases.length !== data.length) {
           this.selectedSamples=_selectedCases;
@@ -113,7 +113,7 @@
         title: this.attributes.display_name
       };
       var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-      this.invisibleChart  = this.ndx.dimension(function (d) { return d[attrId]; });
+      this.invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
       
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst = new iViz.view.component.ScatterPlot();
@@ -150,7 +150,7 @@
               filtersMap[filter] = true;
             }
           });
-          _self.invisibleChart.filterFunction(function(d){
+          _self.invisibleDimension.filterFunction(function(d){
             return (filtersMap[d] !== undefined);
           });
           dc.redrawAll(_self.groupid);

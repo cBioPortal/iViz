@@ -55,13 +55,13 @@
         chartInst: {},
         showLoad:true,
         selectedRows:[],
-        invisibleChart:{}
+        invisibleDimension:{}
       };
     },
     watch: {
       'filters': function(newVal) {
         if(newVal.length === 0 ){
-          this.invisibleChart.filterAll();
+          this.invisibleDimension.filterAll();
           dc.redrawAll(this.groupid);
           this.selectedRows=[];
         }
@@ -78,7 +78,7 @@
       },
       'update-special-charts': function() {
         var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-        var _selectedCases = _.pluck(this.invisibleChart.top(Infinity),attrId);
+        var _selectedCases = _.pluck(this.invisibleDimension.top(Infinity),attrId);
         this.chartInst.update(_selectedCases, this.selectedRows);
         this.setDisplayTitle(this.chartInst.getCases().length);
         this.showLoad = false;
@@ -118,7 +118,7 @@
             filtersMap[filter] = true;
           }
         });
-        this.invisibleChart.filterFunction(function(d){
+        this.invisibleDimension.filterFunction(function(d){
           return (filtersMap[d] !== undefined);
         });
         dc.redrawAll(this.groupid);
@@ -140,7 +140,7 @@
       _self.showLoad = true;
       var callbacks = {};
       var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-      this.invisibleChart  = this.ndx.dimension(function (d) { return d[attrId]; });
+      this.invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
       
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.submitClick = this.submitClick;

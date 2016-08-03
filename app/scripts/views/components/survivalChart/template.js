@@ -57,7 +57,7 @@
         fromFilter: false,
         hasChartTitle:true,
         showLoad:true,
-        invisibleChart:{}
+        invisibleDimension:{}
       };
     },
     events: {
@@ -66,7 +66,7 @@
       },
       'update-special-charts': function() {
         var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-        var _selectedCases = _.pluck(this.invisibleChart.top(Infinity),attrId);
+        var _selectedCases = _.pluck(this.invisibleDimension.top(Infinity),attrId);
         this.chartInst.update(_selectedCases, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
       },
@@ -85,7 +85,7 @@
       var _self = this;
       _self.showLoad = true;
       var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-      this.invisibleChart  = this.ndx.dimension(function (d) { return d[attrId]; });
+      this.invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
       var _opts = {
         width: window.style.vars.survivalWidth,
         height: window.style.vars.survivalHeight,

@@ -82,7 +82,7 @@ var iViz = (function (_, $) {
       group.id = vm_.groupCount;
       group.selectedcases = [];
       group.hasfilters = false;
-      $.each(data_.groups.patient.attr_meta,function(key,attrData){
+      _.each(data_.groups.patient.attr_meta,function(attrData){
         attrData.group_type = group.type;
         if(attrData.view_type=='table'){
           tableData_[attrData.attr_id]=attrData['gene_list'];
@@ -111,7 +111,7 @@ var iViz = (function (_, $) {
       group.id = vm_.groupCount;
       group.selectedcases = [];
       group.hasfilters = false;
-      $.each(data_.groups.sample.attr_meta,function(key,attrData){
+      _.each(data_.groups.sample.attr_meta,function(attrData){
         attrData.group_type = group.type;
         if(attrData.view_type=='table'){
           tableData_[attrData.attr_id]=attrData['gene_list'];
@@ -149,7 +149,7 @@ var iViz = (function (_, $) {
     },
     getGroupFilteredCases : function(groupId_){
       return groupFiltersMap_[groupId_];
-    },deleteGroupFilteredCases : function(groupId){
+    },deleteGroupFilteredCases : function(groupId_){
       groupFiltersMap_[groupId_] = undefined;
     },
     getAttrData : function(type, attr){
@@ -161,7 +161,7 @@ var iViz = (function (_, $) {
         _data = data_.groups.patient.data;
       }
       if(attr !== undefined){
-        $.each(_data,function(key,val){
+        _.each(_data,function(val){
           if(val[attr] !== undefined){
             toReturn_.push(val[attr]);
           }
