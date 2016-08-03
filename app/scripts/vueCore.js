@@ -262,6 +262,8 @@
                 this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
               }
             });
+            
+            
           }
         });
       },
@@ -302,13 +304,16 @@
             self.params.charts[value].show = true;
             self.vm.$nextTick(function () {
                 $("#study-view-attributes-panel").show();
+                
             });
+            $(".panel-button").unbind("click"); //need the unbind to prevent 
+                                                //click from registering multiple times
             $(".panel-button").click(function(){
                 var clickedChart = $(this).attr("id"); 
-                self.vm.addChart(value);
+                            self.vm.addChart(value);
                 $("#study-view-attributes-panel").hide();
-                $("#study-view-add-chart").trigger("chosen:updated");
-            });      
+                $("#study-view-add-chart").trigger("chosen:updated"); 
+            }); 
           }.bind(this)
         );
     }
