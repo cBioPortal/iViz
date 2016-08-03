@@ -65,56 +65,39 @@
               sampleIds:[],
               patientIds:[]
             },
-            initializedSampleSpecialCharts:true,
-            initializedPatientSpecialCharts:true,
             charts: {},
             groupCount:0,
             updateSpecialCharts:false
           }, watch: {
             'updateSpecialCharts':function(newVla,oldVal){
               var self_ =this;
-              setTimeout(function() {
-                self_.$broadcast('selected-sample-update', self_.selectedsamples);
-                self_.$broadcast('survival-update', self_.selectedpatients);
-              }, 300);
+              //TODO: need to update setting timeout
+              var interval = setTimeout(function() {
+                clearInterval(interval);
+                self_.$broadcast('update-special-charts');
+              }, 500);
             },
             'redrawgroups':function(newVal,oldVal){
-              
               if(newVal.length>0){
+                this.$broadcast('show-loader');
                 _.each(newVal, function(groupid){
                   dc.redrawAll(groupid);
                 });
                 this.redrawgroups = [];
-                this.updateSpecialCharts = !this.updateSpecialCharts;
+                var self_ =this;
+                 this.$nextTick(function(){
+                   self_.updateSpecialCharts = !self_.updateSpecialCharts;
+                 });
+                
               }
             },
             'selectedsamples': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
-               
-                if(!this.initializedSampleSpecialCharts) {
-                  this.$broadcast('show-loader')
-                  /*var self_ =this;
-                  this.$nextTick(function(){
-                    self_.$broadcast('selected-sample-update', newVal);
-                 });
-                  */
-                }else{
-                  this.initializedSampleSpecialCharts = false;
-                }
                 this.selectedSamplesNum = newVal.length;
               }
             },
             'selectedpatients': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
-                if(!this.initializedPatientSpecialCharts) {
-                  this.$broadcast('show-loader')
-                 /* var self_ =this;
-                  this.$nextTick(function(){
-                   self_.$broadcast('survival-update', newVal);
-                  });*/
-                }else{
-                  this.initializedPatientSpecialCharts = false;
-                }
                 this.selectedPatientsNum = newVal.length;
               }
             }

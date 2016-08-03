@@ -34,38 +34,23 @@
  */
 'use strict';
 (function(Vue, dc, iViz, $) {
-  var settings_ = {
-    pieChart: {
-      width: 150,
-      height: 150,
-      innerRadius: 15
-    },
-    barChart: {
-      width: 400,
-      height: 180
-    },
-    transitionDuration: iViz.opts.dc.transitionDuration
-  };
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
     ' :ndx="ndx" :groupid="groupid"' +
     ' :attributes.sync="attribute" v-for="attribute in attributes"></div>',
     props: [
       'attributes', 'type', 'mappedsamples', 'id',
-      'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters','customCaseSelect'
+      'mappedpatients', 'groupid', 'redrawgroups'
     ], created: function() {
       //TODO: update this.data
       var data_ = iViz.getAttrData(this.type);
       var ndx_ = crossfilter(data_);
-      var invisibleBridgeChart_ = iViz.bridgeChart.init(ndx_, settings_,
-        this.type, this.id);
+      var attrId = this.type==='patient'?'patient_id':'sample_id';
+      this.invisibleBridgeDimension =  ndx_.dimension(function (d) { return d[attrId]; });
       this.groupid = this.id;
       this.ndx = ndx_;
-      this.chartInvisible = invisibleBridgeChart_;
+      this.invisibleChartFilters = [];
     }, destroyed: function() {
-      this.chartInvisible.resetSvg();
-      var id_ = this.type + '_' + this.id + '_id_chart_div';
-      $('#' + id_).remove();
       dc.chartRegistry.clear(this.groupid);
     },
     data: function() {
@@ -81,12 +66,8 @@
             this.updateInvisibleChart(val);
           }else {
             this.syncSample = true;
-            /*if(!this.hasfilters){
-              this.updateInvisibleChart(val);
-            }*/
           }
         }
-       // this.redrawgroups.push(true);
       },
       'mappedpatients': function(val) {
         if (this.type === 'patient') {
@@ -94,150 +75,52 @@
             this.updateInvisibleChart(val);
           } else {
             this.syncPatient = true;
-            /*if(!this.hasfilters){
-              this.updateInvisibleChart(val);
-            }*/
           }
         }
-     //   this.redrawgroups.push(true);
       }
     },
     events: {
       'update-filters': function() {
         this.syncPatient = false;
         this.syncSample = false;
-        var _hasfilters = false;
         var _filters = [], _caseSelect = [];
-
-        if(this.customCaseSelect.length>0) {
-          _hasfilters = true;
-          _caseSelect = this.customCaseSelect;
-        }
-        $.each(this.attributes, function (index, attributes) {
-          if (attributes.show) {
-            if (attributes.filter.length > 0) {
-              _hasfilters = true;
-              if (attributes.view_type === 'scatter_plot') {
-                if(_caseSelect.length!==0){
-                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
-                }else{
-                  _caseSelect = attributes.filter;
-                }
-              } else if (attributes.view_type === 'table') {
-                if(_caseSelect.length!==0){
-                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
-                }else{
-                  _caseSelect = attributes.filter;
-                }
-              } else {
-                _filters[attributes.attr_id] = attributes.filter;
-              }
-            }
-          }
-        });
-        this.hasfilters = _hasfilters;
-        var filteredCaseData_ = iViz.getAttrData(this.type);
-        if(_caseSelect.length !== 0){
-          filteredCaseData_ = iViz.sync.selectByCases(this.type, filteredCaseData_, _caseSelect)
-        }
-        
-        filteredCaseData_ = iViz.sync.selectByFilters(_filters, filteredCaseData_);
         var attrId = this.type==='patient'?'patient_id':'sample_id';
-        iViz.setGroupFilteredCases(this.id, _.pluck(filteredCaseData_,attrId).sort());
-        this.$dispatch('update-all-filters', this.type);
-      },
-      'update-cases': function(_caseIds) {
-        this.syncPatient = false;
-        this.syncSample = false;
-        if(_caseIds.length>0){
-          this.hasfilters = true;
-        }else{
-          this.hasfilters = false;
+        if(this.invisibleChartFilters.length>0) {
+          this.invisibleBridgeDimension.filterAll();
         }
-        var _selectedCases = iViz.getGroupFilteredCases(this.id);
-        if(_selectedCases !==undefined && _selectedCases.length>0){
-          _selectedCases = iViz.util.intersection(_selectedCases,_caseIds);
-        }else{
-          _selectedCases = _caseIds;
+        iViz.setGroupFilteredCases(this.id, _.pluck(this.invisibleBridgeDimension.top(Infinity),attrId).sort());
+
+        if(this.invisibleChartFilters.length>0){
+          var filtersMap = {};
+          _.each(this.invisibleChartFilters,function(filter){
+            if(filtersMap[filter] === undefined){
+              filtersMap[filter] = true;
+            }
+          });
+          this.invisibleBridgeDimension.filterFunction(function(d){
+            return (filtersMap[d] !== undefined);
+          });
         }
-        if(_selectedCases.length===0){
-          
-        }
-        
-        iViz.setGroupFilteredCases(this.id, _selectedCases);
-        this.chartInvisible.replaceFilter([_selectedCases]);
-        dc.redrawAll(this.id)
-        this.$dispatch('update-all-filters', this.type);
-      },
-      'update-samples-from-table':function() {
         this.$dispatch('update-all-filters', this.type);
       }
     },
     methods: {
       updateInvisibleChart: function(val) {
-
+        this.invisibleChartFilters = val;
         var filtersMap = {};
-        _.each(val,function(filter){
-          if(filtersMap[filter] === undefined){
-            filtersMap[filter] = true;
-          }
-        });
-        this.chartInvisible.filterFunction(function(d){
-          return (filtersMap[d] !== undefined);
-          //self_.filters.indexOf(d)>=0?true:false;
-        });
-        this.redrawgroups.push(this.id);
-        
-        
-       /* var _caseSelect = [];
-        $.each(this.attributes, function (index, attributes) {
-          if (attributes.show) {
-            if (attributes.filter.length > 0) {
-              if (attributes.view_type === 'scatter_plot') {
-                if(_caseSelect.length!==0){
-                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
-                }else{
-                  _caseSelect = attributes.filter;
-                }
-              } else if (attributes.view_type === 'table') {
-                if(_caseSelect.length!==0){
-                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
-                }else{
-                  _caseSelect = attributes.filter;
-                }
-              }
+        if(val.length>0){
+          _.each(val,function(filter){
+            if(filtersMap[filter] === undefined){
+              filtersMap[filter] = true;
             }
-          }
-        });
-        if(_caseSelect.length>0){
-          val = _.intersection(_caseSelect,val)
-        }        var _caseSelect = [];
-
-        //TODO: need to update this logic 
-        $.each(this.attributes, function (index, attributes) {
-          if (attributes.show) {
-            if (attributes.filter.length > 0) {
-              if (attributes.view_type === 'scatter_plot') {
-                if(_caseSelect.length!==0){
-                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
-                }else{
-                  _caseSelect = attributes.filter;
-                }
-              } else if (attributes.view_type === 'table') {
-                if(_caseSelect.length!==0){
-                  _caseSelect = _.intersection(_caseSelect,attributes.filter);
-                }else{
-                  _caseSelect = attributes.filter;
-                }
-              }
-            }
-          }
-        });
-        if(_caseSelect.length>0){
-          val = _.intersection(_caseSelect,val)
+          });
+          this.invisibleBridgeDimension.filterFunction(function(d){
+            return (filtersMap[d] !== undefined);
+          });
+        }else{
+          this.invisibleBridgeDimension.filterAll();
         }
-        this.chartInvisible.replaceFilter([val]);
-        this.redrawgroups.push(this.id);*/
+        this.redrawgroups.push(this.id);
       }
     }
   });

@@ -56,15 +56,18 @@
         fromWatch: false,
         fromFilter: false,
         hasChartTitle:true,
-        showLoad:true
+        showLoad:true,
+        invisibleChart:{}
       };
     },
     events: {
       'show-loader':function(){
         this.showLoad = true;
       },
-      'survival-update': function(_selectedPatients) {
-        this.chartInst.update(_selectedPatients, this.chartId, this.attributes.attr_id);
+      'update-special-charts': function() {
+        var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
+        var _selectedCases = _.pluck(this.invisibleChart.top(Infinity),attrId);
+        this.chartInst.update(_selectedCases, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
       },
       'closeChart':function(){
@@ -81,6 +84,8 @@
     ready: function() {
       var _self = this;
       _self.showLoad = true;
+      var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
+      this.invisibleChart  = this.ndx.dimension(function (d) { return d[attrId]; });
       var _opts = {
         width: window.style.vars.survivalWidth,
         height: window.style.vars.survivalHeight,

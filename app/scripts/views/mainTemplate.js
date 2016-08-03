@@ -35,7 +35,7 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('mainTemplate', {
-    template: ' <chart-group :hasfilters.sync="group.hasfilters"  :redrawgroups.sync="redrawgroups" :custom-case-select="group.type===\'patient\'?customfilter.patientIds:customfilter.sampleIds" :id="group.id" :type="group.type" :mappedpatients="patientsync"' +
+    template: ' <chart-group :redrawgroups.sync="redrawgroups" :id="group.id" :type="group.type" :mappedpatients="patientsync"' +
     ' :mappedsamples="samplesync" :attributes.sync="group.attributes"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
@@ -110,72 +110,98 @@
       'update-all-filters':function(updateType_){
         var _allSelectedPatientIdsByFilters = [];
         var _allSelectedSampleIdsByFilters = [];
-        var hasfilters_ = false;
         var self_ = this;
+        var _hasFilters = false;
 
-        _.each(this.groups, function(group) {
-          hasfilters_ = hasfilters_|| group.hasfilters;
+        if (self_.customfilter.patientIds.length > 0) {
+          _hasFilters = true;
+          _allSelectedPatientIdsByFilters = self_.customfilter.patientIds;
+        }
+        if (self_.customfilter.sampleIds.length > 0) {
+          _hasFilters = true;
+          _allSelectedSampleIdsByFilters = self_.customfilter.sampleIds;
+        }
+
+        _.each(self_.groups, function (group) {
+          _.each(group.attributes, function (attributes) {
+            if (attributes.show) {
+              if (attributes.filter.length > 0) {
+                _hasFilters = true;
+              }
+            }
+          });
+
           var _groupFilteredCases = iViz.getGroupFilteredCases(group.id);
-          if(_groupFilteredCases !== undefined && _groupFilteredCases.length>0){
-            if(updateType_ === group.type){
-              if(updateType_ === 'patient'){
-                if(_groupFilteredCases.length !== self_.completePatientsList.length)
-                  if(_allSelectedPatientIdsByFilters.length === 0){
+          if (_groupFilteredCases !== undefined && _groupFilteredCases.length > 0) {
+            if (updateType_ === group.type) {
+              if (updateType_ === 'patient') {
+                if (_groupFilteredCases.length !== self_.completePatientsList.length)
+                  if (_allSelectedPatientIdsByFilters.length === 0) {
                     _allSelectedPatientIdsByFilters = _groupFilteredCases;
-                  }else{ 
+                  } else {
                     _allSelectedPatientIdsByFilters = iViz.util.intersection(_allSelectedPatientIdsByFilters, _groupFilteredCases);
                   }
-              }else{
-                if(_groupFilteredCases.length !== self_.completeSamplesList.length)
-                  if(_allSelectedSampleIdsByFilters.length === 0){
+              } else {
+                if (_groupFilteredCases.length !== self_.completeSamplesList.length)
+                  if (_allSelectedSampleIdsByFilters.length === 0) {
                     _allSelectedSampleIdsByFilters = _groupFilteredCases;
-                  }else{
+                  } else {
                     _allSelectedSampleIdsByFilters = iViz.util.intersection(_allSelectedSampleIdsByFilters, _groupFilteredCases);
                   }
               }
             }
           }
         });
-        if(updateType_ === 'patient'){
-          if(_allSelectedPatientIdsByFilters.length===0){
-            _allSelectedPatientIdsByFilters = this.completePatientsList
-          }
-        }else{
-          if(_allSelectedSampleIdsByFilters.length===0){
-            _allSelectedSampleIdsByFilters = this.completeSamplesList
-          }
-        }
-        this.hasfilters = hasfilters_;
-
+        self_.hasfilters = _hasFilters;
 
         var _resultSelectedSamples = [];
         var _resultSelectedPatients = [];
         if (updateType_ === 'patient') {
-          this.selectedPatientsByFilters = _allSelectedPatientIdsByFilters;
-          var _mappedSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'),_allSelectedPatientIdsByFilters);
-          _mappedSelectedSamples.sort();
-          var _selectedSamplesByFiltersOnly =  this.selectedSamplesByFilters;
-          //_selectedSamplesByFiltersOnly.sort();
-          _resultSelectedSamples = iViz.util.intersection(_mappedSelectedSamples,
-            _selectedSamplesByFiltersOnly);
-          _resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'),_resultSelectedSamples);
-          this.patientsync = _allSelectedPatientIdsByFilters;
-          this.samplesync = _mappedSelectedSamples;
+          self_.selectedPatientsByFilters = _allSelectedPatientIdsByFilters.sort();
+          var _selectedSamplesByFiltersOnly = self_.selectedSamplesByFilters;
+          if(_selectedSamplesByFiltersOnly.length ===0){
+            _selectedSamplesByFiltersOnly = self_.completeSamplesList;
+          }
+          if (_allSelectedPatientIdsByFilters.length === 0) {
+            self_.patientsync = [];
+            self_.samplesync = [];
+            _resultSelectedSamples = iViz.util.intersection(self_.completeSamplesList,
+              _selectedSamplesByFiltersOnly);
+            _resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _resultSelectedSamples);
+          } else {
+            var _mappedSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _allSelectedPatientIdsByFilters);
+            _mappedSelectedSamples.sort();
+            _resultSelectedSamples = iViz.util.intersection(_mappedSelectedSamples,
+              _selectedSamplesByFiltersOnly);
+            _resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _resultSelectedSamples);
+            self_.patientsync = _allSelectedPatientIdsByFilters;
+            self_.samplesync = _mappedSelectedSamples;
 
+          }
         } else {
-          this.selectedSamplesByFilters = _allSelectedSampleIdsByFilters;
-          var _mappedSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _allSelectedSampleIdsByFilters);
-          _mappedSelectedPatients.sort();
-          var _selectedPatientsByFiltersOnly =  this.selectedPatientsByFilters;
-         // _selectedPatientsByFiltersOnly.sort();
-          _resultSelectedPatients = iViz.util.intersection(_mappedSelectedPatients,
-            _selectedPatientsByFiltersOnly);
-          _resultSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _resultSelectedPatients);
-          this.patientsync = _mappedSelectedPatients;
-          this.samplesync = _allSelectedSampleIdsByFilters;
+          self_.selectedSamplesByFilters = _allSelectedSampleIdsByFilters.sort();
+          var _selectedPatientsByFiltersOnly = self_.selectedPatientsByFilters;
+          if(_selectedPatientsByFiltersOnly.length ===0){
+            _selectedPatientsByFiltersOnly = self_.completePatientsList;
+          }
+          if (_allSelectedSampleIdsByFilters.length === 0) {
+            self_.patientsync = [];
+            self_.samplesync = [];
+            _resultSelectedPatients = iViz.util.intersection(self_.completePatientsList,
+              _selectedPatientsByFiltersOnly);
+            _resultSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _resultSelectedPatients);
+          } else {
+            var _mappedSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _allSelectedSampleIdsByFilters);
+            _mappedSelectedPatients.sort();
+            _resultSelectedPatients = iViz.util.intersection(_mappedSelectedPatients,
+              _selectedPatientsByFiltersOnly);
+            _resultSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _resultSelectedPatients);
+            self_.patientsync = _mappedSelectedPatients;
+            self_.samplesync = _allSelectedSampleIdsByFilters;
+          }
         }
-        var self_ = this;
-        this.$nextTick(function(){
+
+        self_.$nextTick(function () {
           self_.selectedsamples = _resultSelectedSamples;
           self_.selectedpatients = _resultSelectedPatients;
         });

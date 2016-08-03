@@ -54,8 +54,6 @@
         showOperations: false,
         chartInst: {},
         showLoad:true,
-       // showLoading:'show-loading',
-       // hideLoading:'hide-loading',
         selectedRows:[],
         invisibleChart:{}
       };
@@ -78,8 +76,10 @@
         genes = $.extend(true,[],genes);
         this.chartInst.updateGenes(genes);
       },
-      'selected-sample-update': function(_selectedSamples) {
-        this.chartInst.update(_selectedSamples, this.selectedRows);
+      'update-special-charts': function() {
+        var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
+        var _selectedCases = _.pluck(this.invisibleChart.top(Infinity),attrId);
+        this.chartInst.update(_selectedCases, this.selectedRows);
         this.setDisplayTitle(this.chartInst.getCases().length);
         this.showLoad = false;
       },
@@ -132,7 +132,6 @@
       },
       updateFilters: function(){
         this.$dispatch('update-filters');
-       // this.$dispatch('update-cases',this.filters);
       }
 
     },
@@ -140,7 +139,8 @@
       var _self = this;
       _self.showLoad = true;
       var callbacks = {};
-      this.invisibleChart  = this.ndx.dimension(function (d) { return d.sample_id; });
+      var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
+      this.invisibleChart  = this.ndx.dimension(function (d) { return d[attrId]; });
       
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.submitClick = this.submitClick;

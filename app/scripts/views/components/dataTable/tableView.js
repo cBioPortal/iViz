@@ -195,7 +195,7 @@
           datum.gene = item.gene;
           if (_selectedGenesMap !== undefined) {
             if (_selectedGenesMap[item.index] !== undefined) {
-              datum.caseIds =_.uniq(_selectedGenesMap[item.index].caseIds);
+              datum.caseIds =iViz.util.unique(_selectedGenesMap[item.index].caseIds);
               datum.samples = datum.caseIds.length;
               switch (type_) {
                 case 'mutatedGene':
@@ -217,7 +217,7 @@
               return;
             }
           } else {
-            datum.caseIds = _.uniq(item.caseIds);
+            datum.caseIds = iViz.util.unique(item.caseIds);
             datum.samples = datum.caseIds.length;
             switch (type_) {
               case 'mutatedGene':

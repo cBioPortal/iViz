@@ -180,15 +180,17 @@
             return d.key;
           });
         v.chart.on("postRender",function(){
-          initLabels();
-          initReactData();
+          //TODO:commented this because this is taking much time to load chart, need to find different way
+          //initLabels();
+         // initReactData();
         });
         v.chart.on("preRedraw",function(){
           removeMarker();
         });
         v.chart.on("postRedraw",function(){
           if ( $("#"+v.opts.charDivId).length ) {
-            updatePieLabels();
+            //TODO:commented this because this is taking much time to redraw after applying filter, need to find different way
+          //  updatePieLabels();
           }
         });
       } else {
