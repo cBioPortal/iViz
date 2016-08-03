@@ -63,6 +63,7 @@
     var labelMetaData = [];
     var maxLabelValue = 0;
     var currentView = 'pie';
+    var updateQtip = true;
 
     initDCPieChart();
     
@@ -110,6 +111,14 @@
         position: {my:'left center',at:'center right', viewport: $(window)},
         content: '<div id="qtip-' + v.opts.charDivId + '-content-react">Loading....</div>',
         events: {
+          show:function(event){
+            if(updateQtip){
+              labelMetaData = [];
+              updateQtip = false;
+              updatePieLabels();
+            }
+            console.log(event)
+          },
           render: function() {
             updateCurrentLabels();
             initReactData();
@@ -190,6 +199,7 @@
         v.chart.on("postRedraw",function(){
           if ( $("#"+v.opts.charDivId).length ) {
             //TODO:commented this because this is taking much time to redraw after applying filter, need to find different way
+            updateQtip = true;
           //  updatePieLabels();
           }
         });
