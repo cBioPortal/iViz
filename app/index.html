@@ -116,16 +116,24 @@
                              :selected-patients-num="selectedPatientsNum" :selected-samples-num="selectedSamplesNum"
                              :userid="userid" :stats="stats" :update-stats.sync="updateStats"></session-component>
         </div>
-      
-        <div id="stat" style="float: left">
-            Samples Selected <mark>{{ selectedSamplesNum }}</mark> &nbsp;&nbsp;
-            Patients Selected <mark>{{ selectedPatientsNum }}</mark> &nbsp;&nbsp; &nbsp;&nbsp;
-        </div>
+
+        <span class="study-view-header-left-3" style="display: block;">Samples selected: </span>
+        <span id="study-view-header-left-sample-select" @click="openCases()" class="study-view-header-left-5 study-view-header-button" :class="{'study-view-hover':highlightAllButtons||highlightCaseButtons}" role="button" tabindex="0" style="display: block;">{{ selectedSamplesNum }}</span>
+        <span class="study-view-header-left-3" style="display: block;">Patients selected: </span>
+        <span id="study-view-header-left-patient-select" @click="openCases()" class="study-view-header-left-5 study-view-header-button" :class="{'study-view-hover':highlightAllButtons||highlightCaseButtons}" role="button" tabindex="0" style="display: block;">{{ selectedPatientsNum }}</span>
+
+        <span id="study-view-header-left-6" class="study-view-header-button" @click="downloadCaseData()" @mouseenter="highlightCaseButtons=true" @mouseleave="highlightCaseButtons=false" role="button" tabindex="0" data-hasqtip="9" aria-describedby="qtip-9"><img src="images/in.svg" alt="download"></span>
         
         <span id="query-by-gene-span">
           <span id="queryByGeneTextSpan"></span>
-          <textarea id="query-by-gene-textarea" class="expand expandFocusOut" rows="1" cols="10"></textarea>
+          <textarea id="query-by-gene-textarea" class="expand expandFocusOut" :class="{'study-view-hover':highlightAllButtons}" 
+                    rows="1" cols="10"></textarea>
         </span>
+        <img id="arrow_studyview" src="images/arrow_studyview.png" alt="">
+        <form id="study-view-form"  v-on:submit.prevent="submitForm" method="post" action="http://www.cbioportal.org/index.do" target="_blank" style="float: left;">
+          <input type="submit" @mouseenter="highlightAllButtons=true" @mouseleave="highlightAllButtons=false" id="study-view-header-left-1" value="Query" class="study-view-header-button" style="display: block;">
+        </form>
+      
       </div>
       
       
@@ -183,8 +191,11 @@
         window.style.vars.barchartWidth = 350;
         window.style.vars.barchartHeight = 120;
       });
-    
-    iViz.data.init('http://localhost:8080/cbioportal', ['hnsc_tcga'], iViz.init);
+    window.cbioURL = 'http://www.cbioportal.org';
+    window.mutationProfileId ='hnsc_tcga_mutations';
+    window.cnaProfileId = 'hnsc_tcga_gistic';
+    window.case_set_id = '-1';
+    iViz.data.init(window.cbioURL, ['hnsc_tcga'], iViz.init);
     
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
       iViz.vue.manage.getInstance().$broadcast('gene-list-updated',genes);
