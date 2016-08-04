@@ -75,17 +75,16 @@
       }
     },
     events: {
-      'close': function() {
+      'close': function () {
         this.attributes.show = false;
-        this.$dispatch('remove-chart',this.attributes.attr_id,this.attributes.group_id)
-      }
-    }, ready: function() {
-      var _self = this;
-      _self.$on('clear-all-filters',function(){
-        if(_self.attributes.filter.length>0){
+        this.$dispatch('remove-chart', this.attributes.attr_id, this.attributes.group_id)
+      },
+      'clear-chart-filters': function () {
+        var _self = this;
+        if (_self.attributes.filter.length > 0) {
           _self.attributes.filter = [];
         }
-      })
+      }
     }
   });
 })(window.Vue, window.dc, window.iViz,

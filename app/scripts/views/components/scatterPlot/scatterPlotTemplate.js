@@ -40,8 +40,9 @@
     ' :display-name="displayName" :has-chart-title="true" :groupid="groupid"' +
     ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId"' +
     ' :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
-      '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
-      '</div>',
+    ' <div :class="{\'start-loading\': showLoad}" class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} ></div>' +
+    ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    ' <img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
       'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
@@ -54,26 +55,42 @@
         showOperations: false,
         selectedSamples: [],
         chartInst: {},
-        hasFilters:false
+        hasFilters:false,
+        showLoad:true,
+        invisibleDimension:{}
       };
     },
     watch: {
-      'filters': function(newVal) {
-        this.$dispatch('update-samples',newVal);
+      'filters': function(newVal,oldVal) {
+        if(newVal.length === 0 ){
+          this.invisibleDimension.filterAll();
+          dc.redrawAll(this.groupid);
+        }
+        this.updateFilters();
       }
     },
     events: {
-      'selected-sample-update': function(_selectedSamples) {
+      'show-loader':function(){
+        this.showLoad = true;
+      },
+      'update-special-charts': function() {
+        var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
+        var _selectedCases = _.pluck(this.invisibleDimension.top(Infinity),attrId);
         var data = iViz.getAttrData(this.attributes.group_type);
-        if (_selectedSamples.length !== data.length) {
-          this.selectedSamples=_selectedSamples;
-          this.chartInst.update(_selectedSamples);
+        if (_selectedCases.length !== data.length) {
+          this.selectedSamples=_selectedCases;
+          this.chartInst.update(_selectedCases);
         } else {
-          this.selectedSamples=_selectedSamples;
+          this.selectedSamples=_selectedCases;
           this.chartInst.update([]);
         }
+        this.showLoad = false;
       },
       'closeChart':function(){
+        if(this.filters.length>0){
+          this.filters = [];
+          this.updateFilters();
+        }
         this.$dispatch('close');
       }
     },
@@ -82,24 +99,31 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
+      },
+      updateFilters: function(){
+        this.$dispatch('update-filters');
       }
     },
     ready: function() {
       var _self = this;
+      _self.showLoad = true;
       var _opts = {
         chartId: this.chartId,
         chartDivId: this.charDivId,
         title: this.attributes.display_name
       };
+      var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
+      this.invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
+      
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(data, _opts);
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
-      var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
+      /*var _selectedSamples = this.$parent.$parent.$parent.selectedsamples;
       if (_selectedSamples.length !== data.length) {
         this.selectedSamples=_selectedSamples;
         this.chartInst.update(_selectedSamples);
-      }
+      }*/
       document.getElementById(this.chartId).on('plotly_selected', function(_eventData) {
         if (typeof _eventData !== 'undefined') {
           var _selectedData = [];
@@ -117,6 +141,7 @@
           var _selectedCases =  _.pluck(_selectedData, "sample_id").sort();
           _self.selectedSamples =_selectedCases;
           _self.filters =_selectedCases;
+          //_self.$dispatch('update-samples', _self.selectedSamples);
 
           var self_ = this;
           var filtersMap = {};
@@ -125,12 +150,13 @@
               filtersMap[filter] = true;
             }
           });
-          _self.invisibleChart.filterFunction(function(d){
+          _self.invisibleDimension.filterFunction(function(d){
             return (filtersMap[d] !== undefined);
           });
           dc.redrawAll(_self.groupid);
         }
       });
+      _self.showLoad = false;
       this.$dispatch('data-loaded', true);
     }
   });

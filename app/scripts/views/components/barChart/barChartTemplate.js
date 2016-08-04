@@ -77,6 +77,7 @@
           this.filtersUpdated = true;
           if (newVal.length == 0) {
             this.chartInst.filter(null);
+            dc.redrawAll(this.groupid);
             this.$dispatch('update-filters');
           }
         } else{

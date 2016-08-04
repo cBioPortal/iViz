@@ -190,12 +190,12 @@
       selectedGeneData.length = 0;
 
       if (geneData_) {
-        $.each(geneData_, function(index, item) {
+        _.each(geneData_, function(item) {
           var datum = {};
           datum.gene = item.gene;
           if (_selectedGenesMap !== undefined) {
             if (_selectedGenesMap[item.index] !== undefined) {
-              datum.caseIds =_.uniq(_selectedGenesMap[item.index].caseIds);
+              datum.caseIds =iViz.util.unique(_selectedGenesMap[item.index].caseIds);
               datum.samples = datum.caseIds.length;
               switch (type_) {
                 case 'mutatedGene':
@@ -217,7 +217,7 @@
               return;
             }
           } else {
-            datum.caseIds = _.uniq(item.caseIds);
+            datum.caseIds = iViz.util.unique(item.caseIds);
             datum.samples = datum.caseIds.length;
             switch (type_) {
               case 'mutatedGene':
@@ -260,7 +260,7 @@
         attributes: attr_
       };
       var _mutationData = mutatedGenesData(_selectedGenesMap);
-      $.each(_mutationData, function(index, item) {
+      _.each(_mutationData, function(item) {
         for (var key in item) {
           var datum = {
             attr_id: key,

@@ -82,6 +82,7 @@
               this.chartInst.replaceFilter(temp);
             }
           }
+          dc.redrawAll(this.groupid);
           this.$dispatch('update-filters');
         }else{
           this.filtersUpdated = false;
