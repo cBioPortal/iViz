@@ -48,15 +48,11 @@
             groups: [],
             selectedsamples: [],
             selectedpatients: [],
-           // patientmap: [],
-           // samplemap: [],
             selectedgenes: [],
-            showVCList: false,
             addNewVC: false,
             selectedPatientsNum: 0,
             selectedSamplesNum: 0,
             hasfilters: false,
-            virtualCohorts: [],
             isloading: true,
             redrawgroups:[],
             customfilter:{
@@ -65,36 +61,47 @@
               sampleIds:[],
               patientIds:[]
             },
-            initializedSampleSpecialCharts:true,
-            initializedPatientSpecialCharts:true,
             charts: {},
-            groupCount:0
+            groupCount:0,
+            updateSpecialCharts:false,
+            showSaveButton:true,
+            showManageButton:true,
+            userid:'DEFAULT',
+            stats:'',
+            updateStats:false
           }, watch: {
+            'updateSpecialCharts':function(newVla,oldVal) {
+              var self_ = this;
+              //TODO: need to update setting timeout
+              var interval = setTimeout(function () {
+                clearInterval(interval);
+                self_.$broadcast('update-special-charts');
+              }, 500);
+            },
+            'updateStats':function(newVal){
+              this.stats = iViz.stat();
+            },
             'redrawgroups':function(newVal,oldVal){
               if(newVal.length>0){
-                _.each(this.groups, function(group){
-                  dc.redrawAll(group.id);
+                this.$broadcast('show-loader');
+                _.each(newVal, function(groupid){
+                  dc.redrawAll(groupid);
                 });
                 this.redrawgroups = [];
+                var self_ =this;
+                 this.$nextTick(function(){
+                   self_.updateSpecialCharts = !self_.updateSpecialCharts;
+                 });
+                
               }
             },
             'selectedsamples': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
-                if(!this.initializedSampleSpecialCharts) {
-                  this.$broadcast('selected-sample-update', newVal);
-                }else{
-                  this.initializedSampleSpecialCharts = false;
-                }
                 this.selectedSamplesNum = newVal.length;
               }
             },
             'selectedpatients': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
-                if(!this.initializedPatientSpecialCharts) {
-                  this.$broadcast('survival-update', newVal);
-                }else{
-                  this.initializedPatientSpecialCharts = false;
-                }
                 this.selectedPatientsNum = newVal.length;
               }
             }
@@ -109,35 +116,23 @@
               this.removeChart(attrId,groupId)
             }
           },methods: {
-            /*initialize: function() {
-             this.groups = [];
-             this.selectedsamples = [];
-             this.selectedpatients = [];
-             this.selectedgenes = [];
-             this.patientmap = [];
-             this.samplemap = [];
-             this.showVCList = false;
-             this.addNewVC = false;
-             this.selectedPatientsNum = 0;
-             this.selectedSamplesNum = 0;
-             this.hasfilters = false;
-             this.virtualCohorts = [];
-             this.isloading = true;
-             this.customfilter ={
-             display_name:"Custom",
-             type:"",
-             sampleIds:[],
-             patientIds:[]
-             };
-             this.charts = {};
-             },*/
             clearAll: function(){
               if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
                 this.customfilter.sampleIds = [];
                 this.customfilter.patientIds = [];
                 this.$broadcast('update-all-filters');
               }
-              this.$broadcast('clear-all-filters');
+              this.$broadcast('clear-all-groups');
+              var self_ = this;
+              this.hasfilters = false;
+              self_.$nextTick(function () {
+                self_.selectedsamples =  _.keys(iViz.getCasesMap('sample'));
+                self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+                self_.$broadcast('update-special-charts');
+                _.each(this.groups,function(group){
+                  dc.redrawAll(group.id);
+                });
+              });
             },
             addChart: function(attrId){
               var self_ = this;
@@ -237,7 +232,7 @@
                 var self_ = this;
                 Vue.nextTick(function () {
 
-                  $.each(self_.groups,function(key,group){
+                  _.each(self_.groups,function(group){
                     if(group.type === radioVal){
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;
@@ -257,11 +252,6 @@
 
             }
           }, ready: function() {
-            this.$watch('showVCList', function() {
-              if (_.isObject(iViz.session)) {
-                this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
-              }
-            });
           }
         });
       },
@@ -310,7 +300,7 @@
   });
 
   // This is an example to add sample to a virtual cohort from scatter plot
-  iViz.vue.vmScatter = (function() {
+/*  iViz.vue.vmScatter = (function() {
     var vmInstance_;
 
     return {
@@ -339,5 +329,5 @@
         return vmInstance_;
       }
     };
-  })();
+  })();*/
 })(window.Vue, window.iViz, window.dc,window._);

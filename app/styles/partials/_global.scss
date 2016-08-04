@@ -16,10 +16,10 @@
   margin-top: 10px;
 }
 
-.navbar button {
+/*.navbar button {
   margin-top: 10px;
   margin-left: 5px;
-}
+}*/
 
 .view {
   display: none;
@@ -42,6 +42,19 @@
   height: 100px;
   content: "";
   position: relative;
+}
+
+.start-loading{
+  opacity: 0.3;
+}
+.show-loading{
+  display: block !important;
+}
+.chart-loader {
+  width: 100%;
+  display: none;
+  position: absolute;
+  top: 30%;
 }
 
 .chart-title-span {

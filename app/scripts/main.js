@@ -36,6 +36,7 @@ var iViz = (function (_, $) {
   var vm_;
   var grid_;
   var tableData_ = [];
+  var groupFiltersMap_ = {};
 
   return {
 
@@ -79,8 +80,9 @@ var iViz = (function (_, $) {
       // group.data = data_.groups.patient.data;
       group.type = 'patient';
       group.id = vm_.groupCount;
-
-      $.each(data_.groups.patient.attr_meta,function(key,attrData){
+      group.selectedcases = [];
+      group.hasfilters = false;
+      _.each(data_.groups.patient.attr_meta,function(attrData){
         attrData.group_type = group.type;
         if(attrData.view_type=='table'){
           tableData_[attrData.attr_id]=attrData['gene_list'];
@@ -99,7 +101,6 @@ var iViz = (function (_, $) {
       });
       group.attributes = groupAttrs;
       groups.push(group);
-      group = {};
 
       chartsCount = 0;
       groupAttrs = [];
@@ -108,8 +109,9 @@ var iViz = (function (_, $) {
       //group.data = data_.groups.sample.data;
       group.type = 'sample';
       group.id = vm_.groupCount;
-
-      $.each(data_.groups.sample.attr_meta,function(key,attrData){
+      group.selectedcases = [];
+      group.hasfilters = false;
+      _.each(data_.groups.sample.attr_meta,function(attrData){
         attrData.group_type = group.type;
         if(attrData.view_type=='table'){
           tableData_[attrData.attr_id]=attrData['gene_list'];
@@ -142,6 +144,14 @@ var iViz = (function (_, $) {
 
 
     }, // ---- close init function ----groups
+    setGroupFilteredCases : function(groupId_, filters_){
+      groupFiltersMap_[groupId_] = filters_;
+    },
+    getGroupFilteredCases : function(groupId_){
+      return groupFiltersMap_[groupId_];
+    },deleteGroupFilteredCases : function(groupId_){
+      groupFiltersMap_[groupId_] = undefined;
+    },
     getAttrData : function(type, attr){
       var _data = {};
       var toReturn_ = [];
@@ -151,7 +161,7 @@ var iViz = (function (_, $) {
         _data = data_.groups.patient.data;
       }
       if(attr !== undefined){
-        $.each(_data,function(key,val){
+        _.each(_data,function(val){
           if(val[attr] !== undefined){
             toReturn_.push(val[attr]);
           }
@@ -263,54 +273,6 @@ var iViz = (function (_, $) {
         _selectedPatients = _selectedPatients.concat(_arr);
       });
       iViz.init(data_, _selectedSamples, _selectedPatients);
-    },
-    resetAll: function () {
-      var _selectedStudyIds = []
-      var _currentURL = window.location.href;
-      if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") !== -1) {
-        var _vcId;
-        var query = location.search.substr(1);
-        _.each(query.split('&'), function (_part) {
-          var item = _part.split('=');
-          if (item[0] === 'vc_id') {
-            _vcId = item[1];
-          } else if (item[0] === 'study_id') {
-            _selectedStudyIds = _selectedStudyIds.concat(item[1].split(','));
-          }
-        });
-        $.getJSON(URL + _vcId, function (response) {
-          _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
-          var _selectedPatientIds = [];
-          _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function (_patientIds) {
-            _selectedPatientIds = _selectedPatientIds.concat(_patientIds);
-          });
-          var _selectedSampleIds = [];
-          _.each(_.pluck(response.data.virtualCohort.selectedCases, "samples"), function (_sampleIds) {
-            _selectedSampleIds = _selectedSampleIds.concat(_sampleIds);
-          });
-          iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
-        });
-      } else if (_currentURL.indexOf("vc_id") === -1 && _currentURL.indexOf("study_id") !== -1) {
-        _selectedStudyIds = _selectedStudyIds.concat(location.search.split('study_id=')[1].split(','));
-        iViz.init(_selectedStudyIds);
-      } else if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") === -1) {
-        var _vcId = location.search.split('vc_id=')[1];
-        $.getJSON(URL + _vcId, function (response) {
-          _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
-          var _selectedPatientIds = [];
-          _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function (_patientIds) {
-            _selectedPatientIds = _selectedPatientIds.concat(_patientIds);
-          });
-          var _selectedSampleIds = [];
-          _.each(_.pluck(response.data.virtualCohort.selectedCases, "samples"), function (_sampleIds) {
-            _selectedSampleIds = _selectedSampleIds.concat(_sampleIds);
-          });
-          iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
-        });
-      } else {
-        iViz.vue.manage.getInstance().initialize();
-        iViz.init(data_);
-      }
     }
   }
 }(window._, window.$));

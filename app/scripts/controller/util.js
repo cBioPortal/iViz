@@ -114,10 +114,31 @@
     content.idMapping = function(mappingObj, inputCases) {
       var _selectedMappingCases = [];
       _selectedMappingCases.length = 0;
+      var resultArr_ = [];
+      var tempArr_ = {};
       _.each(inputCases, function(_case) {
-        _selectedMappingCases = _selectedMappingCases.concat(mappingObj[_case]);
+        _.each(mappingObj[_case],function(_caseSel){
+          if(tempArr_[_caseSel] === undefined){
+            tempArr_[_caseSel] = true;
+            resultArr_.push(_caseSel)
+          }
+        });
+        //_selectedMappingCases = _selectedMappingCases.concat(mappingObj[_case]);
       });
-      return _.uniq(_selectedMappingCases);
+      return resultArr_;
+      //return content.unique(_selectedMappingCases);
+    };
+    
+    content.unique = function(arr_){
+      var resultArr_ = [];
+      var tempArr_ = {};
+      _.each(arr_,function(obj_){
+        if(tempArr_[obj_] === undefined){
+          tempArr_[obj_] = true;
+          resultArr_.push(obj_);
+        }
+      });
+      return resultArr_;
     };
 
     content.isRangeFilter = function(filterObj) {
