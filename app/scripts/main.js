@@ -312,26 +312,26 @@ var iViz = (function (_, $) {
           type: 'hidden',
           value: studyId_,
           name: 'cancer_study_id'
-        }).appendTo("#study-view-form");
+        }).appendTo("#iviz--form");
 
         $('<input>').attr({
           type: 'hidden',
           value: window.case_set_id,
           name: 'case_set_id'
-        }).appendTo("#study-view-form");
+        }).appendTo("#iviz--form");
 
         $('<input>').attr({
           type: 'hidden',
           value: selectedCases_.join(' '),
           name: 'case_ids'
-        }).appendTo("#study-view-form");
+        }).appendTo("#iviz--form");
         
         window.studyId = studyId_;
         if(!QueryByGeneTextArea.isEmpty()) {
           event.preventDefault();
           QueryByGeneTextArea.validateGenes(this.decideSubmit, false);
         }else{
-          $("#study-view-form").trigger("submit");
+          $("#iviz--form").trigger("submit");
         }
       }else{
         new Notification().createNotification('Querying multiple studies features is not yet ready!', {message_type: 'info'});
@@ -341,7 +341,7 @@ var iViz = (function (_, $) {
       // if all genes are valid, submit, otherwise show a notification
       if(allValid){
         new QueryByGeneUtil().addStudyViewFields(window.studyId, window.mutationProfileId, window.cnaProfileId);
-        $("#study-view-form").trigger("submit");
+        $("#iviz--form").trigger("submit");
       }
       else {
         new Notification().createNotification("There were problems with the selected genes. Please fix.", {message_type: "danger"});
