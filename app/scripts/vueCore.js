@@ -68,8 +68,16 @@
             initializedSampleSpecialCharts:true,
             initializedPatientSpecialCharts:true,
             charts: {},
-            groupCount:0
+            groupCount:0,
+            updateSpecialCharts:false
           }, watch: {
+            'updateSpecialCharts':function(newVla,oldVal){
+              var self_ =this;
+              setTimeout(function() {
+                self_.$broadcast('selected-sample-update', self_.selectedsamples);
+                self_.$broadcast('survival-update', self_.selectedpatients);
+              }, 300);
+            },
             'redrawgroups':function(newVal,oldVal){
               
               if(newVal.length>0){
@@ -77,16 +85,19 @@
                   dc.redrawAll(groupid);
                 });
                 this.redrawgroups = [];
+                this.updateSpecialCharts = !this.updateSpecialCharts;
               }
             },
             'selectedsamples': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
+               
                 if(!this.initializedSampleSpecialCharts) {
-                  var self_ =this;
+                  this.$broadcast('show-loader')
+                  /*var self_ =this;
                   this.$nextTick(function(){
                     self_.$broadcast('selected-sample-update', newVal);
                  });
-                  
+                  */
                 }else{
                   this.initializedSampleSpecialCharts = false;
                 }
@@ -96,10 +107,11 @@
             'selectedpatients': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
                 if(!this.initializedPatientSpecialCharts) {
-                  var self_ =this;
+                  this.$broadcast('show-loader')
+                 /* var self_ =this;
                   this.$nextTick(function(){
                    self_.$broadcast('survival-update', newVal);
-                  });
+                  });*/
                 }else{
                   this.initializedPatientSpecialCharts = false;
                 }

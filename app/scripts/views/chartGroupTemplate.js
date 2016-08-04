@@ -175,9 +175,21 @@
     },
     methods: {
       updateInvisibleChart: function(val) {
-        var _caseSelect = [];
 
-        //TODO: need to update this logic 
+        var filtersMap = {};
+        _.each(val,function(filter){
+          if(filtersMap[filter] === undefined){
+            filtersMap[filter] = true;
+          }
+        });
+        this.chartInvisible.filterFunction(function(d){
+          return (filtersMap[d] !== undefined);
+          //self_.filters.indexOf(d)>=0?true:false;
+        });
+        this.redrawgroups.push(this.id);
+        
+        
+       /* var _caseSelect = [];
         $.each(this.attributes, function (index, attributes) {
           if (attributes.show) {
             if (attributes.filter.length > 0) {
@@ -225,7 +237,7 @@
           val = _.intersection(_caseSelect,val)
         }
         this.chartInvisible.replaceFilter([val]);
-        this.redrawgroups.push(this.id);
+        this.redrawgroups.push(this.id);*/
       }
     }
   });

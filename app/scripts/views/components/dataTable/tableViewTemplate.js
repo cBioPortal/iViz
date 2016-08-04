@@ -39,9 +39,9 @@
     '<chart-operations :show-operations="showOperations" :display-name="displayName" :chart-ctrl="chartInst"' +
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" ' +
     ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
-    '<div class="dc-chart dc-table-plot" :class="{hideLoading: showLoad}" align="center" style="float:none !important;" id={{chartId}} >' +
-
-    '</div>',
+    '<div class="dc-chart dc-table-plot" :class="{\'start-loading\': showLoad}" align="center" style="float:none !important;" id={{chartId}} ></div>' +
+    '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
       'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
@@ -54,20 +54,26 @@
         showOperations: false,
         chartInst: {},
         showLoad:true,
-        showLoading:'show-loading',
-        hideLoading:'hide-loading',
-        selectedRows:[]
+       // showLoading:'show-loading',
+       // hideLoading:'hide-loading',
+        selectedRows:[],
+        invisibleChart:{}
       };
     },
     watch: {
       'filters': function(newVal) {
         if(newVal.length === 0 ){
+          this.invisibleChart.filterAll();
+          dc.redrawAll(this.groupid);
           this.selectedRows=[];
         }
         this.updateFilters();
       }
     },
     events: {
+      'show-loader':function(){
+        this.showLoad = true;
+      },
       'gene-list-updated':function(genes){
         genes = $.extend(true,[],genes);
         this.chartInst.updateGenes(genes);
@@ -75,6 +81,7 @@
       'selected-sample-update': function(_selectedSamples) {
         this.chartInst.update(_selectedSamples, this.selectedRows);
         this.setDisplayTitle(this.chartInst.getCases().length);
+        this.showLoad = false;
       },
       'closeChart':function(){
         if(this.filters.length>0){
@@ -104,6 +111,17 @@
         }else{
           this.filters = iViz.util.intersection(this.filters,selectedSamplesUnion.sort());
         }
+        var self_ = this;
+        var filtersMap = {};
+        _.each(this.filters,function(filter){
+          if(filtersMap[filter] === undefined){
+            filtersMap[filter] = true;
+          }
+        });
+        this.invisibleChart.filterFunction(function(d){
+          return (filtersMap[d] !== undefined);
+        });
+        dc.redrawAll(this.groupid);
         this.chartInst.clearSelectedRowData();
       },
       addGeneClick: function(clickedRowData) {
@@ -113,16 +131,17 @@
         this.displayName = this.attributes.display_name+'('+numOfCases+' profiled samples)';
       },
       updateFilters: function(){
-        this.$dispatch('update-cases',this.filters);
+        this.$dispatch('update-filters');
+       // this.$dispatch('update-cases',this.filters);
       }
 
     },
     ready: function() {
       var _self = this;
+      _self.showLoad = true;
       var callbacks = {};
-    //  var _selectedSampleList = this.$root.selectedsamples;
-     // var _selectedGenes = this.$root.selectedgenes;
-
+      this.invisibleChart  = this.ndx.dimension(function (d) { return d.sample_id; });
+      
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.TableView();
@@ -131,6 +150,7 @@
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst.init(this.attributes, this.$root.selectedsamples, this.$root.selectedgenes, data, this.chartId, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
+      _self.showLoad = false;
       this.$dispatch('data-loaded', true);
     }
   });

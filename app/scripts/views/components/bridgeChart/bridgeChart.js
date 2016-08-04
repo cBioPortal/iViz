@@ -44,19 +44,54 @@
   iViz.bridgeChart.init = function(ndx, settings, type,id) {
     var dimHide, countPerFuncHide;
     if (type === 'patient') {
-      dimHide = ndx.dimension(function (d) { return d.patient_id; }),
-        countPerFuncHide = dimHide.group().reduceCount();
+      dimHide = ndx.dimension(function (d) { return d.patient_id; })
+      //  countPerFuncHide = dimHide.group().reduceCount();
     } else if (type === 'sample') {
-      dimHide = ndx.dimension(function (d) { return d.sample_id; }),
-        countPerFuncHide = dimHide.group().reduceCount();
+      dimHide = ndx.dimension(function (d) { return d.sample_id; })
+       // countPerFuncHide = dimHide.group().reduceCount();
     }
-    var _chartInvisible = dc.pieChart('#' + type +'_'+id+ '_id_chart', type +'-'+id);
+    
+    return dimHide;
+    /*var _chartInvisible = dc.pieChart('#' + type +'_'+id+ '_id_chart', type +'-'+id);
     _chartInvisible.width(settings.pieChart.width)
       .height(settings.pieChart.height)
       .dimension(dimHide)
       .group(countPerFuncHide)
+      .filterHandler(function (dimension, filters) {
+        dimension.filter(null);
+        if (filters.length === 0) {
+          dimension.filter(null);
+        } else {
+          dimension.filterFunction(function (d) {
+            /!*$.each(filters,function(key,val){
+              if(d===val){
+                return true;
+              }
+            })*!/
+            /!*_.each(filters,function(filter){
+              if(d===filter){
+                return true;
+              }
+              return false
+            });*!/
+            if(filters.indexOf(d) !== -1){
+              return true;
+            }
+            /!*for (var i = 0; i < filters.length; i++) {
+              var filter = filters[i];
+              if (filter.isFiltered && filter.isFiltered(d)) {
+                return true;
+              } else if (filter <= d && filter >= d) {
+                return true;
+              }
+            }*!/
+            return false;
+          });
+        }
+        return filters;
+      })
       .innerRadius(settings.pieChart.innerRadius);
-    return _chartInvisible;
+    return _chartInvisible;*/
   }
   return iViz.bridgeChart;
 }(window.$, window.dc));

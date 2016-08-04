@@ -40,8 +40,9 @@
     ' :display-name="displayName" :has-chart-title="true" :groupid="groupid"' +
     ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId"' +
     ' :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
-      '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
-      '</div>',
+    ' <div :class="{\'start-loading\': showLoad}" class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} ></div>' +
+    ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    ' <img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
       'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
@@ -54,17 +55,26 @@
         showOperations: false,
         selectedSamples: [],
         chartInst: {},
-        hasFilters:false
+        hasFilters:false,
+        showLoad:true,
+        invisibleChart:{}
       };
     },
     watch: {
       'filters': function(newVal,oldVal) {
+        if(newVal.length === 0 ){
+          this.invisibleChart.filterAll();
+          dc.redrawAll(this.groupid);
+        }
         if(!_.isEqual(newVal, oldVal)){
           this.updateFilters();
         }
       }
     },
     events: {
+      'show-loader':function(){
+        this.showLoad = true;
+      },
       'selected-sample-update': function(_selectedSamples) {
         var data = iViz.getAttrData(this.attributes.group_type);
         if (_selectedSamples.length !== data.length) {
@@ -74,6 +84,7 @@
           this.selectedSamples=_selectedSamples;
           this.chartInst.update([]);
         }
+        this.showLoad = false;
       },
       'closeChart':function(){
         if(this.filters.length>0){
@@ -90,16 +101,20 @@
         this.showOperations = false;
       },
       updateFilters: function(){
-        this.$dispatch('update-cases',this.filters);
+        this.$dispatch('update-filters');
+        //this.$dispatch('update-cases',this.filters);
       }
     },
     ready: function() {
       var _self = this;
+      _self.showLoad = true;
       var _opts = {
         chartId: this.chartId,
         chartDivId: this.charDivId,
         title: this.attributes.display_name
       };
+      this.invisibleChart  = this.ndx.dimension(function (d) { return d.sample_id; });
+      
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(data, _opts);
@@ -126,6 +141,7 @@
           var _selectedCases =  _.pluck(_selectedData, "sample_id").sort();
           _self.selectedSamples =_selectedCases;
           _self.filters =_selectedCases;
+          //_self.$dispatch('update-samples', _self.selectedSamples);
 
           var self_ = this;
           var filtersMap = {};
@@ -140,6 +156,7 @@
           dc.redrawAll(_self.groupid);
         }
       });
+      _self.showLoad = false;
       this.$dispatch('data-loaded', true);
     }
   });

@@ -155,7 +155,7 @@
           var _mappedSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'),_allSelectedPatientIdsByFilters);
           _mappedSelectedSamples.sort();
           var _selectedSamplesByFiltersOnly =  this.selectedSamplesByFilters;
-          _selectedSamplesByFiltersOnly.sort();
+          //_selectedSamplesByFiltersOnly.sort();
           _resultSelectedSamples = iViz.util.intersection(_mappedSelectedSamples,
             _selectedSamplesByFiltersOnly);
           _resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'),_resultSelectedSamples);
@@ -167,7 +167,7 @@
           var _mappedSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _allSelectedSampleIdsByFilters);
           _mappedSelectedPatients.sort();
           var _selectedPatientsByFiltersOnly =  this.selectedPatientsByFilters;
-          _selectedPatientsByFiltersOnly.sort();
+         // _selectedPatientsByFiltersOnly.sort();
           _resultSelectedPatients = iViz.util.intersection(_mappedSelectedPatients,
             _selectedPatientsByFiltersOnly);
           _resultSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _resultSelectedPatients);

@@ -44,6 +44,19 @@
   position: relative;
 }
 
+.start-loading{
+  opacity: 0.3;
+}
+.show-loading{
+  display: block !important;
+}
+.chart-loader {
+  width: 100%;
+  display: none;
+  position: absolute;
+  top: 30%;
+}
+
 .chart-title-span {
   font-size: 10px;
   color: black;
