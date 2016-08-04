@@ -100,9 +100,9 @@
           selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
         });
         if(this.filters.length === 0 ){
-          this.filters = selectedSamplesUnion;
+          this.filters = selectedSamplesUnion.sort();
         }else{
-          this.filters = iViz.util.intersection(this.filters.sort(),selectedSamplesUnion.sort());
+          this.filters = iViz.util.intersection(this.filters,selectedSamplesUnion.sort());
         }
         this.chartInst.clearSelectedRowData();
       },
@@ -113,7 +113,7 @@
         this.displayName = this.attributes.display_name+'('+numOfCases+' profiled samples)';
       },
       updateFilters: function(){
-        this.$dispatch('update-samples-from-table');
+        this.$dispatch('update-cases',this.filters);
       }
 
     },

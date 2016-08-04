@@ -38,8 +38,7 @@
 (function(iViz, $, _){
   iViz.sync = {};
   // syncing util: select samples or patients based on only samples/patients filters
-  iViz.sync.selectByFilters = function(filters, data, type) { // type: sample or patient
-    var _dupSelectedCasesArr = [];
+  iViz.sync.selectByFilters = function(filters, data) { // type: sample or patient
     var _selectedCasesData = data;
     _.each(Object.keys(filters), function(_filterAttrId) {
     
@@ -71,6 +70,16 @@
     });
     return _selectedCasesData;
   };
+
+  iViz.sync.selectByCases = function(type_, data_, cases_) {
+    var caseIndices = iViz.getCaseIndices(type_);
+    var resultData_ = [];
+    $.each(cases_, function(key,val){
+      resultData_.push(data_[caseIndices[val]]);
+    });
+    return resultData_;
+  };
+  
   return iViz.sync;
 }(window.iViz, window.$, window._));
 

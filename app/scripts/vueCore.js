@@ -71,9 +71,10 @@
             groupCount:0
           }, watch: {
             'redrawgroups':function(newVal,oldVal){
+              
               if(newVal.length>0){
-                _.each(this.groups, function(group){
-                  dc.redrawAll(group.id);
+                _.each(newVal, function(groupid){
+                  dc.redrawAll(groupid);
                 });
                 this.redrawgroups = [];
               }
@@ -81,7 +82,11 @@
             'selectedsamples': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
                 if(!this.initializedSampleSpecialCharts) {
-                  this.$broadcast('selected-sample-update', newVal);
+                  var self_ =this;
+                  this.$nextTick(function(){
+                    self_.$broadcast('selected-sample-update', newVal);
+                 });
+                  
                 }else{
                   this.initializedSampleSpecialCharts = false;
                 }
@@ -91,7 +96,10 @@
             'selectedpatients': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
                 if(!this.initializedPatientSpecialCharts) {
-                  this.$broadcast('survival-update', newVal);
+                  var self_ =this;
+                  this.$nextTick(function(){
+                   self_.$broadcast('survival-update', newVal);
+                  });
                 }else{
                   this.initializedPatientSpecialCharts = false;
                 }

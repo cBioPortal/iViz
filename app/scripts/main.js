@@ -36,6 +36,7 @@ var iViz = (function (_, $) {
   var vm_;
   var grid_;
   var tableData_ = [];
+  var groupFiltersMap_ = {};
 
   return {
 
@@ -79,7 +80,8 @@ var iViz = (function (_, $) {
       // group.data = data_.groups.patient.data;
       group.type = 'patient';
       group.id = vm_.groupCount;
-
+      group.selectedcases = [];
+      group.hasfilters = false;
       $.each(data_.groups.patient.attr_meta,function(key,attrData){
         attrData.group_type = group.type;
         if(attrData.view_type=='table'){
@@ -99,7 +101,6 @@ var iViz = (function (_, $) {
       });
       group.attributes = groupAttrs;
       groups.push(group);
-      group = {};
 
       chartsCount = 0;
       groupAttrs = [];
@@ -108,7 +109,8 @@ var iViz = (function (_, $) {
       //group.data = data_.groups.sample.data;
       group.type = 'sample';
       group.id = vm_.groupCount;
-
+      group.selectedcases = [];
+      group.hasfilters = false;
       $.each(data_.groups.sample.attr_meta,function(key,attrData){
         attrData.group_type = group.type;
         if(attrData.view_type=='table'){
@@ -142,6 +144,14 @@ var iViz = (function (_, $) {
 
 
     }, // ---- close init function ----groups
+    setGroupFilteredCases : function(groupId_, filters_){
+      groupFiltersMap_[groupId_] = filters_;
+    },
+    getGroupFilteredCases : function(groupId_){
+      return groupFiltersMap_[groupId_];
+    },deleteGroupFilteredCases : function(groupId){
+      groupFiltersMap_[groupId_] = undefined;
+    },
     getAttrData : function(type, attr){
       var _data = {};
       var toReturn_ = [];

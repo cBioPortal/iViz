@@ -82,6 +82,7 @@
               this.chartInst.replaceFilter(temp);
             }
           }
+          dc.redrawAll(this.groupid);
           this.$dispatch('update-filters');
         }else{
           this.filtersUpdated = false;
@@ -120,10 +121,10 @@
       var _hasData = false;
       var _attrId = _self.attributes.attr_id;
       var _cluster = _self.ndx.dimension(function(d) {
-        if (typeof d[_attrId] !== 'undefined' && d[_attrId] !== 'NA') {
+        if (typeof d[_attrId] !== undefined && d[_attrId] !== 'NA') {
           _hasData = true;
         }
-        if (typeof d[_attrId] === 'undefined') d[_attrId] = 'NA';
+        if (typeof d[_attrId] === undefined) d[_attrId] = 'NA';
         return d[_attrId];
       });
       

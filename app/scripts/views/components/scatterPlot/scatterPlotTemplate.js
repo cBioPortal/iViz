@@ -58,8 +58,10 @@
       };
     },
     watch: {
-      'filters': function(newVal) {
-        this.$dispatch('update-samples',newVal);
+      'filters': function(newVal,oldVal) {
+        if(!_.isEqual(newVal, oldVal)){
+          this.updateFilters();
+        }
       }
     },
     events: {
@@ -74,6 +76,10 @@
         }
       },
       'closeChart':function(){
+        if(this.filters.length>0){
+          this.filters = [];
+          this.updateFilters();
+        }
         this.$dispatch('close');
       }
     },
@@ -82,6 +88,9 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
+      },
+      updateFilters: function(){
+        this.$dispatch('update-cases',this.filters);
       }
     },
     ready: function() {
