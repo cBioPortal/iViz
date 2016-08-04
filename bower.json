@@ -5,7 +5,7 @@
     "bootstrap": "^3.3.6",
     "chosen": "~1.4.2",
     "datatables": "#1.10.2",
-    "dcjs": "~2.0.0",
+    "dcjs": "2.0.0-beta.31",
     "draggabilly": "~1.2.4",
     "jquery": "#2.1.4",
     "modernizr": "~2.8.2",
