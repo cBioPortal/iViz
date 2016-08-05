@@ -308,6 +308,7 @@ var iViz = (function (_, $) {
         }
       });
       if(possibleTOQuery){
+        $("#iviz-form").get(0).setAttribute('action',window.cbioURL+'/index.do');
         $('<input>').attr({
           type: 'hidden',
           value: studyId_,
