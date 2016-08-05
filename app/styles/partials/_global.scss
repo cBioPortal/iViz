@@ -69,30 +69,30 @@
 }
 
 
-#study-view-case-select-custom-dialog input[type="radio"] {
+#iviz-case-select-custom-dialog input[type="radio"] {
   margin: 3px;
 }
 
-#study-view-case-select-custom-dialog {
+#iviz-case-select-custom-dialog {
   margin: 3px 0;
 }
 
-.study-view-hidden {
+.iviz-hidden {
   display: none;
 }
 .show {
   display: block;
 }
 
-#study-view-header-right-1 {
-  font-size: 1.1em;
-  width: 160px;
+#iviz-header-right-1 {
+  /*font-size: 1.1em;
+  width: 160px;*/
 }
 
-.study-view-header-button {
+.iviz-header-button {
   float: left;
   margin: 0 5px 0 0;
- // font-family: Verdana,Arial,sans-serif;
+  font-family: Verdana,Arial,sans-serif;
   font-size: 1.1em;
   border: 1px solid darkgray;
   background: none;
@@ -106,24 +106,24 @@
   border-color: darkgrey;
   line-height: 18px;
 }
-.study-view-header-button:hover {
+.iviz-header-button:hover {
   cursor: pointer;
 }
 
-#study-view-header-left{
+#iviz-header-left{
   display: inline-block;
 }
-#study-view-header-right {
+#iviz-header-right {
   float: right;
 }
 
-#study_view_add_chart_chosen {
+#iviz_add_chart_chosen {
   margin-top: -3px;
   width: 250px !important;
   background-image: none !important;
 }
 
-#study_view_add_chart_chosen>a {
+#iviz_add_chart_chosen>a {
   background-image: none;
   height: 28px;
   line-height: 28px;
@@ -134,4 +134,62 @@ div.geneAddedNotification{
   width:400px;
   height: 15px;
   font-size: 0.8em;
+}
+
+#iviz-header-left-1 {
+  font-size: 1.1em;
+}
+
+.iviz-header-left-case-name {
+  float: left;
+  border: 0;
+  font-size: 13px;
+  margin: 0;
+  z-index: 21;
+  vertical-align: middle;
+  padding: 0 10px 0 0;
+  width: auto;
+  color: black;
+  text-align: center;
+  font-family: Verdana,Arial,sans-serif;
+  font-size: 1.1em;
+  margin-top: 3px;
+}
+
+.iviz-header-left-case-number {
+  float: left;
+  margin: 0 5px 0 0;
+  font-family: Verdana,Arial,sans-serif;
+  font-size: 1.1em;
+  border: 1px solid darkgray;
+  background: none;
+  font-weight: normal;
+  color: orange;
+  padding: 5px 10px;
+  margin-top: -3px;
+  margin-right: 10px;
+  border: solid 1px;
+  border-radius: 5px;
+  border-color: darkgrey;
+  outline-offset: -2px;
+}
+
+#iviz-header-left-download {
+  font-size: 1.1em;
+}
+
+.iviz-header-button:hover {
+  cursor: pointer;
+}
+
+#arrow_studyview{
+  width: 25px;
+  height: 20px;
+  float: left;
+  padding: 0px 10px 0px 0px;
+  margin-top: 2px;
+}
+
+.iviz-button-hover{
+  outline:-webkit-focus-ring-color auto 5px;
 }

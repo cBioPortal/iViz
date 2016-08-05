@@ -171,8 +171,11 @@ var iViz = (function (_, $) {
       }
       return toReturn_;
     },
-    getTableData : function(attrId){
+    getTableData : function(attrId) {
       return tableData_[attrId];
+    },
+    getCompleteData : function(){
+      return data_;
     },
     getCasesMap : function(type){
       if(type === 'sample'){
@@ -186,6 +189,164 @@ var iViz = (function (_, $) {
         return data_.groups.sample.data_indices.sample_id;
       }else{
         return data_.groups.patient.data_indices.patient_id;
+      }
+    },
+    openCases:function(){
+      var studyId = '';
+      var possible = true;
+      var selectedCases_ = vm_.selectedpatients;
+      var caseIndices_ =this.getCaseIndices('patient');
+      var patientData_ = data_.groups.patient.data;
+
+      $.each(selectedCases_,function(key,caseId){
+        if(key === 0){
+          studyId = patientData_[caseIndices_[caseId]]['study_id'];
+        }else{
+          if(studyId !== patientData_[caseIndices_[caseId]]['study_id']){
+            possible = false;
+            return false;
+          }
+        }
+      });
+      if(possible){
+        var _selectedPatientIds = selectedCases_.sort();
+        var _url =  window.cbioURL+"/case.do?cancer_study_id="+
+          studyId+
+          "&case_id="+_selectedPatientIds[0]+
+          "#nav_case_ids="+_selectedPatientIds.join(",");
+        window.open(_url);
+      }else{
+        new Notification().createNotification('This feature is not available to multiple studies for now!', {message_type: 'info'});
+      }
+    },
+    downloadCaseData:function(){
+      var content = '';
+      var sampleIds_ = vm_.selectedsamples;
+      var attr = {};
+
+      attr['CANCER_TYPE_DETAILED']='Cancer Type Detailed';
+      attr['CANCER_TYPE']='Cancer Type';
+      attr['study_id']='Study ID';
+      attr['patient_id']='Patient ID';
+      attr['sample_id']='Sample ID';
+      attr['mutated_genes']='With Mutation Data';
+      attr['cna_details']='With CNA Data';
+
+      var arr = [];
+      var attrL = 0, arrL = 0;
+      var strA = [];
+
+      var sampleAttr_ = data_.groups.sample.attr_meta;
+      var patientAttr_ = data_.groups.patient.attr_meta;
+
+      _.each(sampleAttr_,function(_attr){
+        if(attr[_attr.attr_id] === undefined && 'scatter_plot' !== _attr.view_type)
+          attr[_attr.attr_id] = _attr.display_name
+      });
+
+      _.each(patientAttr_,function(_attr){
+        if(attr[_attr.attr_id] === undefined && 'survival' !== _attr.view_type)
+          attr[_attr.attr_id] = _attr.display_name
+      });
+
+      attrL = attr.length;
+      _.each(attr,function(displayName,attrId){
+        strA.push(displayName || 'Unknown');
+      });
+      content = strA.join('\t');
+      strA.length =0;
+      var sampleIndices_ = data_.groups.sample.data_indices.sample_id;
+      var patienIndices_ = data_.groups.patient.data_indices.patient_id;
+      var sampleData_ = data_.groups.sample.data;
+      var patientData_ = data_.groups.patient.data;
+      var samplePatientMapping = data_.groups.group_mapping.sample.patient;
+      _.each(sampleIds_,function(sampleId){
+        var temp = sampleData_[sampleIndices_[sampleId]];
+        var temp1 = $.extend(true,temp,patientData_[patienIndices_[samplePatientMapping[sampleId][0]]]);
+        arr.push(temp1);
+      });
+
+      arrL = arr.length;
+
+      for (var i = 0; i < arrL; i++) {
+        strA.length = 0;
+        _.each(attr,function(displayName,attrId){
+          if('cna_details' === attrId || 'mutated_genes' === attrId ){
+            var temp = 'No';
+            if(arr[i][attrId] !== undefined)
+              temp = arr[i][attrId].length>0?'Yes':'No';
+            strA.push(temp);
+          }else{
+            strA.push(arr[i][attrId]);
+          }
+        });
+        content += '\r\n' + strA.join('\t');
+      }
+
+      var downloadOpts = {
+        filename: "study_view_clinical_data.txt",
+        contentType: "text/plain;charset=utf-8",
+        preProcess: false
+      };
+
+      cbio.download.initDownload(content, downloadOpts);
+
+    },
+    submitForm : function(){
+      var selectedCases_ = vm_.selectedsamples;
+      var studyId_ = '';
+      var possibleTOQuery = true;
+      _.each(selectedCases_,function(_caseId,key){
+        var index_ = data_.groups.sample.data_indices.sample_id[_caseId];
+        if(key === 0){
+          studyId_ = data_.groups.sample.data[index_]['study_id'];
+        }else{
+          if(studyId_ !== data_.groups.sample.data[index_]['study_id']){
+            possibleTOQuery = false;
+            return false;
+          }
+        }
+      });
+      if(possibleTOQuery){
+        $("#iviz-form").get(0).setAttribute('action',window.cbioURL+'/index.do');
+        $('<input>').attr({
+          type: 'hidden',
+          value: studyId_,
+          name: 'cancer_study_id'
+        }).appendTo("#iviz-form");
+
+        $('<input>').attr({
+          type: 'hidden',
+          value: window.case_set_id,
+          name: 'case_set_id'
+        }).appendTo("#iviz-form");
+
+        $('<input>').attr({
+          type: 'hidden',
+          value: selectedCases_.join(' '),
+          name: 'case_ids'
+        }).appendTo("#iviz-form");
+        
+        window.studyId = studyId_;
+        if(!QueryByGeneTextArea.isEmpty()) {
+          event.preventDefault();
+          QueryByGeneTextArea.validateGenes(this.decideSubmit, false);
+        }else{
+          $("#iviz-form").trigger("submit");
+        }
+      }else{
+        new Notification().createNotification('Querying multiple studies features is not yet ready!', {message_type: 'info'});
+      }
+    },
+    decideSubmit:function(allValid){
+      // if all genes are valid, submit, otherwise show a notification
+      if(allValid){
+        new QueryByGeneUtil().addStudyViewFields(window.studyId, window.mutationProfileId, window.cnaProfileId);
+        $("#iviz-form").trigger("submit");
+      }
+      else {
+        new Notification().createNotification("There were problems with the selected genes. Please fix.", {message_type: "danger"});
+        $("#query-by-gene-textarea").focus();
       }
     },
     stat: function () {

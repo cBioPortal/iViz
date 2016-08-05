@@ -68,7 +68,9 @@
             showManageButton:true,
             userid:'DEFAULT',
             stats:'',
-            updateStats:false
+            updateStats:false,
+            highlightAllButtons:false,
+            highlightCaseButtons:false
           }, watch: {
             'updateSpecialCharts':function(newVla,oldVal) {
               var self_ = this;
@@ -116,6 +118,15 @@
               this.removeChart(attrId,groupId)
             }
           },methods: {
+            openCases:function(){
+              iViz.openCases();
+            },
+            downloadCaseData:function(){
+              iViz.downloadCaseData();
+            },
+            submitForm:function(){
+              iViz.submitForm();
+            },
             clearAll: function(){
               if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
                 this.customfilter.sampleIds = [];
@@ -172,7 +183,7 @@
 
               self.$nextTick(function () {
                 self.$broadcast('update-grid',true);
-                $("#study-view-add-chart").trigger("chosen:updated");
+                $("#iviz-add-chart").trigger("chosen:updated");
               })
             },
             updateGeneList : function(geneList,reset){
@@ -226,7 +237,7 @@
                 new Notification().createNotification(selectedCaseIds.length + ' case(s) selected.', {message_type: 'info'});
               }
 
-              $('#study-view-header-right-1').qtip('toggle');
+              $('#iviz-header-right-1').qtip('toggle');
               if(selectedCaseIds.length > 0) {
                 this.clearAll();
                 var self_ = this;
@@ -252,6 +263,25 @@
 
             }
           }, ready: function() {
+            this.$watch('showVCList', function() {
+              if (_.isObject(iViz.session)) {
+                this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
+              }
+            });
+            $('.iviz-header-left-5').qtip({
+              content: {text: 'Click to view the selected cases' },
+              style: { classes: 'qtip-light qtip-rounded qtip-shadow' },
+              show: {event: 'mouseover'},
+              hide: {fixed:true, delay: 100, event: 'mouseout'},
+              position: {my:'bottom center', at:'top center', viewport: $(window)}
+            });
+            $('#iviz-header-left-6').qtip({
+              content: {text: 'Click to download the selected cases' },
+              style: { classes: 'qtip-light qtip-rounded qtip-shadow' },
+              show: {event: 'mouseover'},
+              hide: {fixed:true, delay: 100, event: 'mouseout'},
+              position: {my:'bottom center', at:'top center', viewport: $(window)}
+            })
           }
         });
       },
@@ -279,7 +309,7 @@
     params: ['charts'],
     paramWatchers: {
       charts: function (val, oldVal) {
-        $("#study-view-add-chart").trigger("chosen:updated");
+        $("#iviz-add-chart").trigger("chosen:updated");
       }
     },
     bind: function() {
@@ -292,7 +322,7 @@
               self.params.charts[value].show = true;
               self.vm.addChart(this.el.value);
               self.vm.$nextTick(function () {
-                $("#study-view-add-chart").trigger("chosen:updated");
+                $("#iviz-add-chart").trigger("chosen:updated");
               });
           }.bind(this)
         );

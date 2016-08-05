@@ -41,7 +41,7 @@
     props: [
       'data'
     ], ready: function() {
-      $("#study-view-add-chart").trigger("chosen:updated");
+      $("#iviz-add-chart").trigger("chosen:updated");
     }
   });
 })(window.Vue, window.iViz,
