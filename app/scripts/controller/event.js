@@ -41,7 +41,7 @@
   iViz.shared = {};
 
   iViz.shared.resetAll = function(_chartInst, _groupid, _attributes) {
-    if ((_attributes !== undefined) && (_attributes.view_type === 'scatter_plot')) {
+    if ((_attributes !== undefined) && (_attributes.view_type[0] === 'scatter_plot')) {
       _chartInst.reset();
     } else {
       if(_chartInst.filters().length>0){

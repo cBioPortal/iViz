@@ -114,9 +114,9 @@
             if(attributes.show){
               if (attributes.filter.length > 0) {
                 _hasFilters = true;
-                if (attributes.view_type === 'scatter_plot') {
+                if (attributes.view_type[0] === 'scatter_plot') {
                   _sampleSelect.push(attributes.filter);
-                } else if (attributes.view_type === 'table') {
+                } else if (attributes.view_type[0] === 'table') {
                   _sampleSelect.push(attributes.filter);
                 } else{
                   filters_[attributes.attr_id] = attributes.filter;

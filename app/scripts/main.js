@@ -70,6 +70,8 @@ var iViz = (function (_, $) {
       _.each(data_.groups.patient.data, function (_dataObj) {
         _dataObj.DATE_OF_DIAGNOSIS = iViz.util.getRandomDate();
     });
+    //---- change view_type of each attribute into an array
+    
   
       var _patientIds = _.keys(data_.groups.patient.data_indices.patient_id);
       var _sampleIds = _.keys(data_.groups.sample.data_indices.sample_id);
@@ -84,7 +86,7 @@ var iViz = (function (_, $) {
       group.type = 'patient';
       group.id = vm_.groupCount;
 
-      $.each(data_.groups.patient.attr_meta,function(key,attrData){
+      $.each(data_.groups.patient.attr_meta,function(key,attrData){ //for the patient group type
         attrData.group_type = group.type;
         if(chartsCount<31){
           if(attrData.show){
@@ -96,7 +98,28 @@ var iViz = (function (_, $) {
           attrData.show = false;
         }
         charts[attrData.attr_id]=attrData;
+        switch(attrData.datatype){ //replace the view_type with an array containing all possible view_type
+            case 'DATE':
+                attrData.view_type = [attrData.view_type, 'pie_chart', 'bar_chart'];
+                break;
+            case 'STRING':
+                attrData.view_type = [attrData.view_type];
+                break;
+            case 'NUMBER': 
+                attrData.view_type = [attrData.view_type, 'line_chart'];
+                break;
+            case 'SURVIVAL':
+                attrData.view_type = [attrData.view_type];
+                break;
+            default:
+                attrData.view_type = [attrData.view_type];
+                break;
+        }
+        if (attrData.hasOwnProperty("datatype")){
+           attrData.view_type.push('table');
+       };
       });
+      
       group.attributes = groupAttrs;
       groups.push(group);
       group = {};
@@ -121,6 +144,29 @@ var iViz = (function (_, $) {
           attrData.show = false;
         }
         charts[attrData.attr_id]=attrData;
+        switch(attrData.datatype){ //replace the view_type with an array containing all possible view_type
+            case 'DATE':
+                attrData.view_type = [attrData.view_type, 'pie_chart', 'bar_chart'];
+                break;
+            case 'STRING':
+                attrData.view_type = [attrData.view_type];
+                break;
+            case 'NUMBER': 
+                attrData.view_type = [attrData.view_type, 'line_chart'];
+                break;
+            case 'SURVIVAL':
+                attrData.view_type = [attrData.view_type];
+                break;
+            case 'SCATTER_PLOT':
+                attrData.view_type = [attrData.view_type];
+                break;
+            default:
+                attrData.view_type = [attrData.view_type];
+                break;
+        }
+       if (attrData.hasOwnProperty("datatype")){
+           attrData.view_type.push('table');
+       }; 
       });
       vm_.groupCount = vm_.groupCount+1;
       group.attributes = groupAttrs;

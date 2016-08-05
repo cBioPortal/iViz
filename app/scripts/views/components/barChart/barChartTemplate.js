@@ -118,7 +118,7 @@
             self_.filtersUpdated = true;
             var tempFilters_ = $.extend(true, [], self_.filters);
             tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-              self_.attributes.view_type);
+              self_.attributes.view_type[0]);
             if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
               tempFilters_[0] = tempFilters_[0].toFixed(2);
               tempFilters_[1] = tempFilters_[1].toFixed(2);

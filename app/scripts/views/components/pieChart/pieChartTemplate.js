@@ -146,7 +146,7 @@
             _self.filtersUpdated = true;
             var tempFilters_ = $.extend(true, [], _self.filters);
             tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-              _self.attributes.view_type);
+              _self.attributes.view_type[0]);
             _self.filters = tempFilters_;
             _self.$dispatch('update-filters');
           }else{

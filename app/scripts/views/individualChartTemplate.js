@@ -46,7 +46,7 @@
     ],
     data: function() {
       var currentView = '';
-      switch (this.attributes.view_type) {
+      switch (this.attributes.view_type[0]) {
         case 'pie_chart':
           currentView = 'pie-chart';
           break;

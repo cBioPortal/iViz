@@ -71,6 +71,7 @@
   <script src="scripts/views/mainTemplate.js"></script>
   <script src="scripts/views/chartGroupTemplate.js"></script>
   <script src="scripts/views/individualChartTemplate.js"></script>
+  <script src="scripts/views/attributesPanelTemplate.js"></script>
   <script src="scripts/views/components/generalChart.js"></script>
   <script src="scripts/views/components/chartOperationsHeader.js"></script>
   <script src="scripts/views/components/bridgeChart/bridgeChart.js"></script>
@@ -137,7 +138,7 @@
         <!--:selected-samples-num="selectedSamplesNum"-->
         <!--:selected-patients-num="selectedPatientsNum"></add-vc>-->
         <select id="study-view-add-chart" class="chosen-select"
-                v-select :charts="charts">
+                v-select v-bind:charts="charts">
           <option id='' value="">Add Chart</option>
           <!--<option v-for="attributes in groups[0].attributes"></option>-->
             <option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}" v-for="(index,data) in charts">{{data.display_name}}</option>
@@ -203,15 +204,8 @@
                    :selectedsamples.sync="selectedsamples"
                    :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
   </div>
-    <div id ="study-view-attributes-panel" style="right:20px">
-            <div><div class = "btn-group" role ="group" aria-label="..." id="panel-charts-1" style="float:left">
-            <button type="button" id="panel-line-chart" class = "panel-button"><img src="images/linechart.png" alt="linechart" style="width:235px;height:156px"></button>
-            <button type="button" id="panel-table" class = "panel-button"><img src="images/tablechart.png" alt="table" style="width:189px;height:161px"></button>
-            </div></div>
-            <div><div class = "btn-group" role ="group" aria-label="..." id="panel-charts-2" style="float:right">
-            <button type="button" id="panel-bar-chart" class = "panel-button"><img src="images/barchart.png" alt="barchart" style="width:235px;height:169px;top:20px"></button>
-            <button type="button" id="panel-pie-chart" class = "panel-button"><img src="images/piechart.png" alt="piechart" style="width:187px;height:171px"></button>  
-            </div></div>    
+   <attributes-panel></attributes-panel>
+<
     </div>
   <div id="main-bridge" style="display: none;"></div>
 </div>

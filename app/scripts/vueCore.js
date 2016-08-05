@@ -107,6 +107,9 @@
               this.setSelectedCases(selectionType, selectedCases);
             },'remove-chart':function(attrId,groupId){
               this.removeChart(attrId,groupId)
+            }, 'select-chart':function(){
+                var a = 5;
+                console.log(a);
             }
           },methods: {
             /*initialize: function() {
@@ -140,7 +143,7 @@
               this.$broadcast('clear-all-filters');
             },
             addChart: function(attrId){
-              var self_ = this;
+             var self_ = this;
               var attrData = self_.charts[attrId];
               var _attrAdded = false;
               var _group = {};
@@ -295,26 +298,29 @@
       }
     },
     bind: function() {
-      var self = this;
+
       $(this.el).chosen({
           width: '30%'
         })
         .change(function() {
+            var self=this;
             var value = this.el.value;
             self.params.charts[value].show = true;
             self.vm.$nextTick(function () {
-                $("#study-view-attributes-panel").show();
-                
+                $("#study-view-attributes-panel").show();   //put this in ready function in attributes panel
             });
+            
             $(".panel-button").unbind("click"); //need the unbind to prevent 
                                                 //click from registering multiple times
             $(".panel-button").click(function(){
-                var clickedChart = $(this).attr("id"); 
-                            self.vm.addChart(value);
+                //var clickedChart = $(this).attr("id"); 
+                self.vm.addChart(value);
                 $("#study-view-attributes-panel").hide();
-                $("#study-view-add-chart").trigger("chosen:updated"); 
+                $("#study-view-add-chart").trigger("chosen:updated"); //put this in attributes panel in click event
             }); 
-          }.bind(this)
+          }
+                  
+            .bind(this)
         );
     }
   });
