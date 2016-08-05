@@ -46,7 +46,9 @@
 
     var _result = {};
     var PORTAL_INST_URL = _portalInstURL;
-
+    
+    var _hasOSSurvivalData = false, _hasDFSSurvivalData = false, _hasMutationCNAScatterPlotData = false;
+    
     var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
       _ajaxSampleData = [], _ajaxPatientData = [],
       _ajaxPatient2SampleIdMappingObj = {}, _ajaxSample2PatientIdMappingObj = {},
@@ -272,6 +274,10 @@
                           }
                         }
 
+                        if(_ajaxCnaFractionData.length > 0){
+                          _hasMutationCNAScatterPlotData = true;
+                        }
+                        
                         // cna data (for CNA table)
                         var _gisticStudyIdArr = _.filter(_studyIdArr, function (_studyId) {
                           return $.inArray(_studyId + '_gistic', _.pluck(_ajaxGeneticProfiles, 'id')) !== -1;
@@ -323,6 +329,11 @@
                               _patientIdToClinDataMap[_dataObj.patient_id] = {};
                             }
                             _patientIdToClinDataMap[_dataObj.patient_id][_dataObj.attr_id] = _dataObj.attr_val;
+                            if (_dataObj.attr_id === 'DFS_MONTHS' || _dataObj.attr_id === 'DFS_STATUS') {
+                              _hasDFSSurvivalData = true;
+                            } else if (_dataObj.attr_id === "OS_MONTHS" || _dataObj.attr_id === 'OS_STATUS') {
+                              _hasOSSurvivalData = true;
+                            } 
                           });
 
                           // map clinical data to each sample (key: sample ID, value: object of attributes vs. val)
@@ -388,19 +399,20 @@
                               }
 
                               // cna fraction
-                              if (_ajaxCnaFractionData[_sampleId] === undefined || _ajaxCnaFractionData[_sampleId] === null) {
-                                _datum['cna_fraction'] = 0;
-                              } else {
-                                _datum['cna_fraction'] = _ajaxCnaFractionData[_sampleId];
+                              if (_hasMutationCNAScatterPlotData) {
+                                if (_ajaxCnaFractionData[_sampleId] === undefined || _ajaxCnaFractionData[_sampleId] === null) {
+                                  _datum['cna_fraction'] = 0;
+                                } else {
+                                  _datum['cna_fraction'] = _ajaxCnaFractionData[_sampleId];
+                                }                                
                               }
 
-                              //_sampleData.push(_datum);
                               _sampleData[_sampleId]=_datum;
                             });
                           });
 
                           // extract mutation data
-                          var _caseMutGeneMap = {}, _mutGeneMeta = {}, _mutGeneMetaIndex = 0;
+                          var _mutGeneMeta = {}, _mutGeneMetaIndex = 0;
                           _.each(_ajaxMutGenesData, function (_mutGeneDataObj) {
                             var _geneSymbol = _mutGeneDataObj.gene_symbol;
                             _.each(_mutGeneDataObj.caseIds, function (_caseId) {
@@ -430,20 +442,9 @@
                               }
                             });
                           });
-                         /* _.each(_ajaxMutGenesData, function (_mutGeneDataObj) {
-                            _.each(_mutGeneDataObj.caseIds, function (_caseId) {
-                              var _geneSymbol = _mutGeneDataObj.gene_symbol;
-                              if (!_caseMutGeneMap.hasOwnProperty(_caseId)) _caseMutGeneMap[_caseId] = [];
-                              _caseMutGeneMap[_caseId].push(_mutGeneMeta[_geneSymbol].index);
-                            });
-                          });
-                          _.each(_sampleData, function (_sampleDataObj) {
-                            var _sampleId = _sampleDataObj.sample_id;
-                            _sampleDataObj['mutated_genes'] = _caseMutGeneMap[_sampleId];
-                          });*/
 
                           // extract cna data
-                          var _caseCnaMap = {}, _cnaMeta = {}, _cnaMetaIndex = 0;
+                          var _cnaMeta = {}, _cnaMetaIndex = 0;
                           $.each(_ajaxCnaData.caseIds, function (_index, _caseIdsPerGene) {
                             var _geneSymbol = _ajaxCnaData.gene[_index];
                             _.each(_caseIdsPerGene, function (_caseId) {
@@ -486,24 +487,9 @@
                                   
                                   _cnaMetaIndex += 1;
                                 }
-                                
-                                
-                               /* if (_caseCnaMap.hasOwnProperty(_caseId)) {
-                                  _caseCnaMap['cna_details'].push(_cnaMeta[_geneSymbol].index);
-                                } else {
-                                  _caseCnaMap['cna_details'] = [_cnaMeta[_geneSymbol].index];
-                                }*/
                               }
                             });
                           });
-                         /* _.each(_sampleData, function (_sampleDataObj) {
-                            var _sampleId = _sampleDataObj.sample_id;
-                            _sampleDataObj['cna_details'] = _caseCnaMap[_sampleId];
-                          });*/
-
-                          /* 
-                           * apply additional attributes to add special charts
-                           */
 
                           // add mutation count 
                           if (_ajaxMutationCountData.length !== 0) {
@@ -549,40 +535,48 @@
                           }
 
                           // add Mutation count vs. CNA fraction
-                          var _mutCntAttrMeta = {};
-                          _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
-                          _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
-                          _mutCntAttrMeta.view_type = 'scatter_plot';
-                          _mutCntAttrMeta.description = 'Mutation Count vs. CNA';
-                          _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
-                          _ajaxSampleMeta.unshift(_mutCntAttrMeta);
+                          if (_hasMutationCNAScatterPlotData) {
+                            var _mutCntAttrMeta = {};
+                            _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
+                            _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
+                            _mutCntAttrMeta.view_type = 'scatter_plot';
+                            _mutCntAttrMeta.description = 'Mutation Count vs. CNA';
+                            _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
+                            _ajaxSampleMeta.unshift(_mutCntAttrMeta);                            
+                          }
 
                           // add DFS survival
-                          var _dfsSurvivalAttrMeta = {};
-                          _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
-                          _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
-                          _dfsSurvivalAttrMeta.view_type = 'survival';
-                          _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
-                          _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
-                          _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
+                          if (_hasDFSSurvivalData) {
+                            var _dfsSurvivalAttrMeta = {};
+                            _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
+                            _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
+                            _dfsSurvivalAttrMeta.view_type = 'survival';
+                            _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
+                            _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
+                            _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);                            
+                          }
 
                           // add OS survival
-                          var _osSurvivalAttrMeta = {};
-                          _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
-                          _osSurvivalAttrMeta.datatype = 'SURVIVAL';
-                          _osSurvivalAttrMeta.view_type = 'survival';
-                          _osSurvivalAttrMeta.description = 'Overall Survival';
-                          _osSurvivalAttrMeta.display_name = 'Overall Survival';
-                          _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
+                          if (_hasOSSurvivalData) {
+                            var _osSurvivalAttrMeta = {};
+                            _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
+                            _osSurvivalAttrMeta.datatype = 'SURVIVAL';
+                            _osSurvivalAttrMeta.view_type = 'survival';
+                            _osSurvivalAttrMeta.description = 'Overall Survival';
+                            _osSurvivalAttrMeta.display_name = 'Overall Survival';
+                            _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);                            
+                          }
 
                           // add Cancer Study
-                          _ajaxPatientMeta.unshift({
-                            "datatype": "STRING",
-                            "description": "Cancer Studies",
-                            "display_name": "Cancer Studies",
-                            "attr_id": "study_id",
-                            "view_type": "pie_chart"
-                          });
+                          if (_studyIdArr.length > 1) {
+                            _ajaxPatientMeta.unshift({
+                              "datatype": "STRING",
+                              "description": "Cancer Studies",
+                              "display_name": "Cancer Studies",
+                              "attr_id": "study_id",
+                              "view_type": "pie_chart"
+                            });                            
+                          }
 
                           // TODO : temporary fix to show/hide charts
                           var tempCount = 0;
