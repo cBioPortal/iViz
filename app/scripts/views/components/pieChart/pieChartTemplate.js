@@ -118,17 +118,13 @@
       var _self = this;
 
       // check if there's data for this attribute  
-      var _hasData = false;
+      //var _hasData = false;
       var _attrId = _self.attributes.attr_id;
       var _cluster = _self.ndx.dimension(function(d) {
-        if (typeof d[_attrId] !== 'undefined' && d[_attrId] !== 'NA') {
-          _hasData = true;
-        }
         if (typeof d[_attrId] === 'undefined') d[_attrId] = 'NA';
         return d[_attrId];
       });
       
-      if (_hasData) {
         _self.$once('initMainDivQtip', _self.initMainDivQtip);
         var opts = {
           chartId : _self.chartId,
@@ -155,9 +151,6 @@
           }
         });
         _self.$dispatch('data-loaded', true);
-      } else {
-        _self.$dispatch('close', true);
-      }
       
     }
   });

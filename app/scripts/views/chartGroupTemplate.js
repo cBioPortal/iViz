@@ -109,7 +109,6 @@
             iViz.deleteGroupFilteredCases(this.id)
           }
 
-
           if(this.invisibleChartFilters.length>0){
             var filtersMap = {};
             _.each(this.invisibleChartFilters,function(filter){
