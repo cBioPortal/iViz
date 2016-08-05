@@ -97,7 +97,7 @@
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
   <script src="scripts/views/components/Notification.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
-  <script src="/app/_components/vc-session.js"></script>
+  <script src="_components/vc-session.js"></script>
   <!-- endbuild -->
   
   <script src="scripts/model/dataProxy.js"></script>
@@ -160,15 +160,14 @@
 
         <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
           <span>{{customfilter.display_name}}</span>
-          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">
+          <img class="breadcrumb_remove" src="images/remove_breadcrumb_icon.png" @click="clearAll()">
         </span>
         <div style="float:left" v-for="group in groups">
           <bread-crumb :attributes.sync="item"
                        :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
                        v-if="item.filter.length>0" ></bread-crumb>
         </div>
-        <div><button type='button' @click="clearAll()">Clear
-          All</button></div>
+        <div><button type='button' @click="clearAll()" class="btn btn-default btn-xs">Clear All</button></div>
       </div>
     </div>
   </nav>

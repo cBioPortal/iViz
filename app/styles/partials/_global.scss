@@ -3,9 +3,9 @@
 }
 
 #main-header {
-  margin-left: 25px;
+  margin-left: $main-header-margin-left;
   margin-bottom: 15px;
-  margin-top: 10px;
+  margin-top: $main-header-margin-top;
   bottom: -5px;
   left: 10px;
   position: relative;
