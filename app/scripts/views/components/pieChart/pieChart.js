@@ -63,6 +63,7 @@
     var labelMetaData = [];
     var maxLabelValue = 0;
     var currentView = 'pie';
+    var updateQtip = true;
 
     initDCPieChart();
     
@@ -110,6 +111,13 @@
         position: {my:'left center',at:'center right', viewport: $(window)},
         content: '<div id="qtip-' + v.opts.charDivId + '-content-react">Loading....</div>',
         events: {
+          show:function(event){
+            if(updateQtip){
+              labelMetaData = [];
+              updateQtip = false;
+              updatePieLabels();
+            }
+          },
           render: function() {
             updateCurrentLabels();
             initReactData();
@@ -180,15 +188,18 @@
             return d.key;
           });
         v.chart.on("postRender",function(){
-          initLabels();
-          initReactData();
+          //TODO:commented this because this is taking much time to load chart, need to find different way
+          //initLabels();
+         // initReactData();
         });
         v.chart.on("preRedraw",function(){
           removeMarker();
         });
         v.chart.on("postRedraw",function(){
           if ( $("#"+v.opts.charDivId).length ) {
-            updatePieLabels();
+            //TODO:commented this because this is taking much time to redraw after applying filter, need to find different way
+            updateQtip = true;
+          //  updatePieLabels();
           }
         });
       } else {

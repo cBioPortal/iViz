@@ -51,10 +51,10 @@
     data: function() {
       return {
         v: {},
-        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
-        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
-        chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
-        chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)/g, ""),
+        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-div',
+        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-reset',
+        chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
+        chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)| /g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
         component: '',
@@ -82,6 +82,7 @@
               this.chartInst.replaceFilter(temp);
             }
           }
+          dc.redrawAll(this.groupid);
           this.$dispatch('update-filters');
         }else{
           this.filtersUpdated = false;
@@ -117,17 +118,13 @@
       var _self = this;
 
       // check if there's data for this attribute  
-      var _hasData = false;
+      //var _hasData = false;
       var _attrId = _self.attributes.attr_id;
       var _cluster = _self.ndx.dimension(function(d) {
-        if (typeof d[_attrId] !== 'undefined' && d[_attrId] !== 'NA') {
-          _hasData = true;
-        }
         if (typeof d[_attrId] === 'undefined') d[_attrId] = 'NA';
         return d[_attrId];
       });
       
-      if (_hasData) {
         _self.$once('initMainDivQtip', _self.initMainDivQtip);
         var opts = {
           chartId : _self.chartId,
@@ -154,10 +151,6 @@
           }
         });
         _self.$dispatch('data-loaded', true);
-      } else {
-        $('#' + _self.charDivId).qtip('destroy');
-        _self.$dispatch('close');
-      }
       
     }
   });

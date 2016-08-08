@@ -58,11 +58,11 @@
     ],
     data: function() {
       return {
-        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
+        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") +
         '-div',
-        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
+        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") +
         '-reset',
-        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
+        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
         displayName: this.attributes.display_name,
         chartInst:'',
         barChart:'',
@@ -77,6 +77,7 @@
           this.filtersUpdated = true;
           if (newVal.length == 0) {
             this.chartInst.filter(null);
+            dc.redrawAll(this.groupid);
             this.$dispatch('update-filters');
           }
         } else{

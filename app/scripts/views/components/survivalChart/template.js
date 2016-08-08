@@ -37,9 +37,9 @@
   Vue.component('survival', {
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
               '<chart-operations :show-operations="showOperations" :has-chart-title="hasChartTitle" :display-name="displayName" :groupid="groupid" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
-              '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
-              '<div class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} >' +
-              '</div>',
+              '<div :class="{\'start-loading\': showLoad}" class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} ></div>' +
+              '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
       'ndx', 'attributes', 'options', 'filters', 'groupid'
     ],
@@ -47,20 +47,28 @@
     },
     data: function() {
       return {
-        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
-        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
-        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
+        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-div',
+        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-reset',
+        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
         showOperations: false,
         fromWatch: false,
         fromFilter: false,
-        hasChartTitle:true
+        hasChartTitle:true,
+        showLoad:true,
+        invisibleDimension:{}
       };
     },
     events: {
-      'survival-update': function(_selectedPatients) {
-        this.chartInst.update(_selectedPatients, this.chartId, this.attributes.attr_id);
+      'show-loader':function(){
+        this.showLoad = true;
+      },
+      'update-special-charts': function() {
+        var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
+        var _selectedCases = _.pluck(this.invisibleDimension.top(Infinity),attrId);
+        this.chartInst.update(_selectedCases, this.chartId, this.attributes.attr_id);
+        this.showLoad = false;
       },
       'closeChart':function(){
         this.$dispatch('close');
@@ -75,6 +83,9 @@
     },
     ready: function() {
       var _self = this;
+      _self.showLoad = true;
+      var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
+      this.invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
       var _opts = {
         width: window.style.vars.survivalWidth,
         height: window.style.vars.survivalHeight,
@@ -89,6 +100,7 @@
 
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst.init(data, _opts, _selectedPatientList);
+      _self.showLoad = false;
       this.$dispatch('data-loaded', true);
     }
   });

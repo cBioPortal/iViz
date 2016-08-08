@@ -119,17 +119,31 @@
     content.idMapping = function(mappingObj, inputCases) {
       var _selectedMappingCases = [];
       _selectedMappingCases.length = 0;
+      var resultArr_ = [];
+      var tempArr_ = {};
       _.each(inputCases, function(_case) {
-        if (Array.isArray(mappingObj[_case])) {
-          _.each(mappingObj[_case], function(_id) {
-            _selectedMappingCases.push(_id);
-          });
-        } else {
-          _selectedMappingCases.push(mappingObj[_case]);
-
+        _.each(mappingObj[_case],function(_caseSel){
+          if(tempArr_[_caseSel] === undefined){
+            tempArr_[_caseSel] = true;
+            resultArr_.push(_caseSel)
+          }
+        });
+        //_selectedMappingCases = _selectedMappingCases.concat(mappingObj[_case]);
+      });
+      return resultArr_;
+      //return content.unique(_selectedMappingCases);
+    };
+    
+    content.unique = function(arr_){
+      var resultArr_ = [];
+      var tempArr_ = {};
+      _.each(arr_,function(obj_){
+        if(tempArr_[obj_] === undefined){
+          tempArr_[obj_] = true;
+          resultArr_.push(obj_);
         }
       });
-      return _.uniq(_selectedMappingCases);
+      return resultArr_;
     };
 
     content.isRangeFilter = function(filterObj) {
@@ -810,6 +824,46 @@
     function downloadTextFile(content, delimiter) {
 
     }
+
+    /**
+     * Finds the intersection elements between two arrays in a simple fashion.
+     * Should have O(n) operations, where n is n = MIN(a.length, b.length)
+     *
+     * @param a {Array} first array, must already be sorted
+     * @param b {Array} second array, must already be sorted
+     * @returns {Array}
+     */
+    content.intersection = function(a, b) {
+      var result = [], i = 0, j = 0, aL = a.length, bL = b.length, size = 0;
+      while (i < aL && j < bL) {
+        if (a[i] < b[j]) {
+          ++i;
+        }
+        else if (a[i] > b[j]) {
+          ++j;
+        }
+        else /* they're equal */
+        {
+          result.push(a[i]);
+          ++i;
+          ++j;
+        }
+      }
+
+      return result;
+    };
+
+    content.compare = function(arr1, arr2) {
+      if (arr1.length != arr2.length){
+        return false;
+      }else{
+        for (var i = 0; i < arr1.length; i++) {
+          if (arr1[i] !== arr2[i])
+            return false;
+        }
+      }
+      return true;
+    };
 
     return content;
   })();
