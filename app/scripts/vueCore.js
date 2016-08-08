@@ -68,7 +68,9 @@
             initializedSampleSpecialCharts:true,
             initializedPatientSpecialCharts:true,
             charts: {},
-            groupCount:0
+            groupCount:0,
+            viewtypes:[],
+            attrid:''
           }, watch: {
             'redrawgroups':function(newVal,oldVal){
               if(newVal.length>0){
@@ -106,10 +108,7 @@
             },'set-selected-cases' : function(selectionType, selectedCases){
               this.setSelectedCases(selectionType, selectedCases);
             },'remove-chart':function(attrId,groupId){
-              this.removeChart(attrId,groupId)
-            }, 'select-chart':function(){
-                var a = 5;
-                console.log(a);
+              this.removeChart(attrId,groupId);
             }
           },methods: {
             /*initialize: function() {
@@ -182,6 +181,16 @@
                 self.$broadcast('update-grid',true);
                 $("#study-view-add-chart").trigger("chosen:updated");
               })
+            },
+            updateAttributesPanel: function(attrId){
+                var self = this;
+                var attrData = self.charts[attrId];
+                this.attrid = attrId;
+                this.viewtypes = attrData.view_type;
+                this.$nextTick(function(){
+                    self.$broadcast('openPanel');
+                }
+                );
             },
             updateGeneList : function(geneList,reset){
               var self_ = this;
@@ -307,19 +316,9 @@
             var value = this.el.value;
             self.params.charts[value].show = true;
             self.vm.$nextTick(function () {
-                $("#study-view-attributes-panel").show();   //put this in ready function in attributes panel
-            });
-            
-            $(".panel-button").unbind("click"); //need the unbind to prevent 
-                                                //click from registering multiple times
-            $(".panel-button").click(function(){
-                //var clickedChart = $(this).attr("id"); 
-                self.vm.addChart(value);
-                $("#study-view-attributes-panel").hide();
-                $("#study-view-add-chart").trigger("chosen:updated"); //put this in attributes panel in click event
+                self.vm.updateAttributesPanel(value);
             }); 
-          }
-                  
+          }   
             .bind(this)
         );
     }

@@ -35,38 +35,58 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('attributesPanel', {
-    template:     '<div id ="study-view-attributes-panel" style="right:20px" ><button type="button" class = "panel-button" v-for="sampleChart in sampleCharts">'+
-                '<img src={{sampleChart}} alt="linechart" style="width:235px;height:156px"></button>'+ 
-                '</div>',
-//                
-//                '<div id ="study-view-attributes-panel" style="right:20px">'+ 
-//                '<div><div class = "btn-group" role ="group" aria-label="..." id="panel-charts-1" style="float:left">' +
-//                '<button type="button" id="panel-line-chart" class = "panel-button"><img src="images/linechart.png" alt="linechart" style="width:235px;height:156px"></button>' +
-//                '<button type="button" id="panel-table" class = "panel-button"><img src="images/tablechart.png" alt="table" style="width:189px;height:161px"></button>' +
-//                '</div></div>' +
-//                '<div><div class = "btn-group" role ="group" aria-label="..." id="panel-charts-2" style="float:right">' +
-//                '<button type="button" id="panel-bar-chart" class = "panel-button"><img src="images/barchart.png" alt="barchart" style="width:235px;height:169px;top:20px"></button>' +
-//                '<button type="button" id="panel-pie-chart" class = "panel-button"><img src="images/piechart.png" alt="piechart" style="width:187px;height:171px"></button>' +
-//                '</div></div>' +
-//                '</div>',
-    props: [], //bind viewtype here
+    template:     '<div id ="study-view-attributes-panel" style="right:20px" ><button type="button" class = "panel-button" v-on:click="choose_chart" v-for="panelChart in panelCharts">'+
+                '<img v-bind:src="panelChart" alt="panelcharts" style="width:235px;height:156px"></button>'+ 
+                '</div>', //the variable sampleChart is a string, cannot use {{}} to reference a string that contains html code, b/c it will not treat it as html code
+
+    props: ['viewtypes', 'attrid'], //bind viewtype here
     data: function() {
       return {
-          sampleCharts: [
-              'images/linechart.png',
-             'images/barchart.png',
-              'images/piechart.png',
-              'images/tablechart.png'
-          ] 
+          panelCharts: []
       }; //bind data- triggers component
     }, 
     watch: {
 
     }, 
     methods: {
-
+        choose_chart:function(){
+                this.$parent.addChart(this.attrid);
+                $("#study-view-attributes-panel").hide();
+                $("#study-view-add-chart").trigger("chosen:updated"); //put this in attributes panel in click event
+        }
     },
     events: {
+        'openPanel':function(){
+//            make an array of corresponding images based on viewtypes
+            var self = this;
+            var viewtypes = self.viewtypes;
+            
+            _.each(viewtypes, function(_element, index){
+            switch(_element){
+                case 'line_chart':
+                    viewtypes[index] = 'images/linechart.png';
+//                    _element = 'images/linechart.png'
+                    break;
+                case 'pie_chart':
+                    viewtypes[index] = 'images/piechart.png';
+//                    _element = 'images/piechart.png';
+                    break;
+                case 'bar_chart':
+                    viewtypes[index] = 'images/barchart.png';
+//                    _element = 'images/barchart.png';
+                    break;
+                case 'table':
+                    viewtypes[index] = 'images/tablechart.png';
+//                    _element = 'images/tablechart.png';
+                    break;
+                }
+        });   
+            this.panelCharts = viewtypes;
+            $("#study-view-attributes-panel").show();
+        }
+    },
+    ready:function(){
+
     }
   });
 })(window.Vue, window.dc, window.iViz,
