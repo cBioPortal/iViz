@@ -3,7 +3,6 @@ dist
 .tmp
 .sass-cache
 bower_components
-images
 .idea
 test
 _gruntBuild.scss

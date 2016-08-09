@@ -41,18 +41,18 @@
         '<span v-if="(filtersToSkipShowing.indexOf(attributes.attr_id) === -1) && (attributes.view_type ! == \'table\')" class="breadcrumb_items">' +
           '<span v-if="filters.filterType === \'RangedFilter\'">' +
             '<span class="breadcrumb_item">{{filters[0]}} -- {{filters[1]}}</span>' +
-            '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filters)">' +
+            '<i class="fa fa-trash-o breadcrumb_remove" @click="removeFilter()"></i>' +
           '</span>' +
           '<template v-else>' +
             '<span v-for="filter in filters" style="display:inline-block;">' +
               '<span v-if="attributes.view_type === \'table\'"  class="breadcrumb_item">{{filter.uniqueId}}</span>' +
               '<span v-else class="breadcrumb_item">{{filter}}</span>' +
-              '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter(filter)">' +
+              '<i class="fa fa-trash-o breadcrumb_remove" @click="removeFilter(filter)"></i>' +
             '</span>' +
           '</template>' +
         '</span>' +
         '<template v-else>' +
-          '<img class="breadcrumb_remove" src="../../../../images/remove_breadcrumb_icon.png" @click="removeFilter()">' +
+          '<i class="fa fa-trash-o breadcrumb_remove" @click="removeFilter()"></i>' +
         '</template>' +
       '</span>',
     props: [
