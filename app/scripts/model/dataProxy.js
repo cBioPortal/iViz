@@ -551,8 +551,19 @@
                             _ajaxSampleMeta.unshift(_mutCntAttrMeta);
                           }
 
-                          // add DFS survival
-                          if (_hasDFSSurvivalMonths && _hasDFSSurvivalStatus) {
+                          // add survival
+                          var _hasDFS = false, _hasOS = false;
+                          _.each(_patientData, function(_patientDataObj) {
+                            if (_patientDataObj.hasOwnProperty('DFS_STATUS') && _patientDataObj.hasOwnProperty('DFS_MONTHS') &&
+                              _patientDataObj['DFS_STATUS'] !== 'NA' && _patientDataObj['DFS_MONTHS'] !== 'NA') {
+                              _hasDFS = true;
+                            }
+                            if (_patientDataObj.hasOwnProperty('OS_STATUS') && _patientDataObj.hasOwnProperty('OS_MONTHS') &&
+                              _patientDataObj['OS_STATUS'] !== 'NA' && _patientDataObj['OS_MONTHS'] !== 'NA') {
+                              _hasOS = true;
+                            }
+                          });
+                          if (_hasDFS) {
                             var _dfsSurvivalAttrMeta = {};
                             _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
                             _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
@@ -561,9 +572,7 @@
                             _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
                             _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
                           }
-
-                          // add OS survival
-                          if (_hasOSSurvivalMonths && _hasOSSurvivalStatus) {
+                          if (_hasOS) {
                             var _osSurvivalAttrMeta = {};
                             _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
                             _osSurvivalAttrMeta.datatype = 'SURVIVAL';
