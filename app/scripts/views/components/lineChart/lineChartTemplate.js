@@ -42,8 +42,8 @@
                                                             //the tag in the html file
                                                             //create an outer div to hold both the line chart and the range chart
                                                             //chartId creates element id for download button
-            props: ['ndx', 'data', 'groupid', 'attributes', 'filters'], //groupid puts line chart in the same group as the other charts(interactive with other graphs)
-                                                             //attribute contains the 
+            props: ['ndx', 'data', 'groupid', 'attributes', 'filters'], //groupid, a dc mechanism, allows interactivity between charts within the same dc group;
+                                                                            //iviz controls filtering across groups
             data:function() {
                 return {
                     charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
@@ -65,7 +65,7 @@
                 if(!this.filtersUpdated) {
                   this.filtersUpdated = true;
                   if (newVal.length == 0) {
-                    this.chartInst.filter(null);
+                    this.rangeChartInst.filterAll();
                     dc.redrawAll(this.groupid);
                     this.$dispatch('update-filters');
                   }
@@ -109,7 +109,19 @@
                       self_.filtersUpdated = false;
                     }
                   });
-                }
+                  this.chartInst.on('postRedraw', function(_chartInst) {
+                    // This is tempororay fix, may need to find the reason why range chart is not synchronized
+                    if(_chartInst.filters().length !== self_.rangeChartInst.filters().length) {
+                      _chartInst.filterAll();
+                    }
+                  });
+                  // this.rangeChartInst.on('filtered',function(_rangeChartInst, _filter){
+                  //   console.log(_filter);
+                  //   if (!_filter){
+                  //     self_.chartInst.filterAll();
+                  //   }
+                  // });
+                },
                 
    },    
             ready:function(){
