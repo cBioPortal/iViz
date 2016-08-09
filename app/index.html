@@ -205,7 +205,7 @@
     window.mutationProfileId ='hnsc_tcga_mutations';
     window.cnaProfileId = 'hnsc_tcga_gistic';
     window.case_set_id = '-1';
-    iViz.data.init(window.cbioURL, ['hnsc_tcga'], iViz.init);
+    iViz.data.init(window.cbioURL, ['acc_tcga'], iViz.init);
     
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
       iViz.vue.manage.getInstance().$broadcast('gene-list-updated',genes);

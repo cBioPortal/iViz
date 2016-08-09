@@ -60,18 +60,7 @@
             },
             //this = line chart template
             //this.chartInst = dc line chart
-            watch:{    
-//              'filters': function(newVal, oldVal) {
-//        if(!this.filtersUpdated) {
-//          this.filtersUpdated = true;
-//          if (newVal.length === 0) {
-//            this.chartInst.filter(null);
-//            this.$dispatch('update-filters');
-//          }
-//        } else{
-//          this.filtersUpdated = false;
-//        }
-//      }
+            watch:{
 
             },
             events:{  
@@ -92,28 +81,6 @@
                    var chartInstances =  this.lineChart.init();
                    this.rangeChartInst = chartInstances.rangeChart;
                     this.chartInst = chartInstances.lineChart; //returns chartinstances
-//////                   
-//                    var self_ = this;
-////                    
-////        this.rangeChartInst.on('filtered', function(_chartInst, _filter) {
-////////          if(!self_.filtersUpdated) {
-//////            self_.filtersUpdated = true;
-//////            var tempFilters_ = $.extend(true, [], self_.filters);
-//////            tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-//////              'bar_chart');
-////////            if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
-//////              tempFilters_[0] = tempFilters_[0].toFixed(2);
-//////              tempFilters_[1] = tempFilters_[1].toFixed(2);
-//////            }
-////            self_.filters = tempFilters_;
-////            self_.chartInst.render();
-////            self_.$dispatch('update-filters');
-//////          }else{
-//////            self_.filtersUpdated = false;
-//////          }
-//        });
-//
-//                }
                 }
    },    
             ready:function(){
