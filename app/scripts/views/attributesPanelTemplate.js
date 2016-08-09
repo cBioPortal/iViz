@@ -59,8 +59,7 @@
         'openPanel':function(){
 //            make an array of corresponding images based on viewtypes
             var self = this;
-            var viewtypes = $.extend(true, [], self.viewtypes);
-            
+          var viewtypes = $.extend(true, [], self.viewtypes);           
             _.each(viewtypes, function(_element, index){
             switch(_element){
                 case 'line_chart':

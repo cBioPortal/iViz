@@ -59,7 +59,11 @@
         dc.events.trigger(function() {
           filters = filter
         }, 0);
-      } else if (type === 'pie_chart') {
+      }else if (type === 'line_chart') {
+        dc.events.trigger(function() {
+          filters = filter
+        }, 0);
+      }else if (type === 'pie_chart') {
           //add filter
         if(filter instanceof Array){
           filters = filter;

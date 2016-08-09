@@ -70,7 +70,11 @@
       removeFilter: function(val) {
         if (this.attributes.view_type[0] === 'bar_chart') {
           this.filters = [];
-        } else if(this.attributes.view_type[0] === 'pie_chart'){
+        }
+        else if (this.attributes.view_type[0] === 'line_chart'){
+          this.filters =  [];
+        }
+        else if(this.attributes.view_type[0] === 'pie_chart'){
           if(this.filtersToSkipShowing.indexOf(this.attributes.attr_id) !== -1){
             this.filters = [];
           }else{
