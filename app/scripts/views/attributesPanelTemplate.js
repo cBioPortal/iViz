@@ -35,7 +35,7 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('attributesPanel', {
-    template:     '<div id ="study-view-attributes-panel" style="right:20px" ><button type="button" class = "panel-button" v-on:click="choose_chart" v-for="panelChart in panelCharts">'+
+    template:     '<div id ="iviz-attributes-panel" style="right:20px" ><button type="button" class = "panel-button" v-on:click="choose_chart" v-for="panelChart in panelCharts">'+
                 '<img v-bind:src="panelChart" alt="panelcharts" style="width:235px;height:156px"></button>'+ 
                 '</div>', //the variable sampleChart is a string, cannot use {{}} to reference a string that contains html code, b/c it will not treat it as html code
 
@@ -51,15 +51,15 @@
     methods: {
         choose_chart:function(){
                 this.$parent.addChart(this.attrid);
-                $("#study-view-attributes-panel").hide();
-                $("#study-view-add-chart").trigger("chosen:updated"); //put this in attributes panel in click event
+                $("#iviz-attributes-panel").hide();
+                $("#iviz-add-chart").trigger("chosen:updated"); //put this in attributes panel in click event
         }
     },
     events: {
         'openPanel':function(){
 //            make an array of corresponding images based on viewtypes
             var self = this;
-            var viewtypes = self.viewtypes;
+            var viewtypes = $.extend(true, [], self.viewtypes);
             
             _.each(viewtypes, function(_element, index){
             switch(_element){
@@ -82,7 +82,7 @@
                 }
         });   
             this.panelCharts = viewtypes;
-            $("#study-view-attributes-panel").show();
+            $("#iviz-attributes-panel").show();
         }
     },
     ready:function(){
