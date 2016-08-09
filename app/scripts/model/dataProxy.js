@@ -102,16 +102,6 @@
       }
       _ajaxPatientMeta = _ajaxPatientMeta.concat(_.uniq(_results, 'attr_id'));
       
-      _ajaxPatientMeta.push({
-        "attr_id": "DATE_OF_DIAGNOSIS",
-        "datatype": "DATE",
-        "description": "Date of Diagnosis",
-        "display_name": "Date of Diagnosis",
-        "view_type": "line_chart",
-        "filter": [],
-        "show": true
-      });
-
       // sample clinical attribute meta
       $.when.apply($, _studyIdArr.map(function (_studyId) {
         return $.ajax({
@@ -576,6 +566,18 @@
                             _osSurvivalAttrMeta.display_name = 'Overall Survival';
                             _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);                            
                           }
+
+                          // add date of diagnosis
+                          if (_hasOSSurvivalData) {
+                            var _osSurvivalAttrMeta = {};
+                            _osSurvivalAttrMeta.attr_id = 'DATE_OF_DIAGNOSIS';
+                            _osSurvivalAttrMeta.datatype = 'DATE';
+                            _osSurvivalAttrMeta.view_type = 'line_chart';
+                            _osSurvivalAttrMeta.description = 'Date of Diagnosis';
+                            _osSurvivalAttrMeta.display_name = 'Date of Diagnosis';
+                            _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
+                          }
+
 
                           // add Cancer Study
                           if (_studyIdArr.length > 1) {
