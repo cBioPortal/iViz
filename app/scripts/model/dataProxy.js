@@ -46,11 +46,11 @@
 
     var _result = {};
     var PORTAL_INST_URL = _portalInstURL;
-    
-    var _hasOSSurvivalStatus = false, _hasOSSurvivalMonths = false, 
-        _hasDFSSurvivalStatus = false, _hasDFSSurvivalMonths = false,
-        _hasMutationCNAScatterPlotData = false;
-    
+
+    var _hasOSSurvivalStatus = false, _hasOSSurvivalMonths = false,
+      _hasDFSSurvivalStatus = false, _hasDFSSurvivalMonths = false,
+      _hasMutationCNAScatterPlotData = false;
+
     var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
       _ajaxSampleData = [], _ajaxPatientData = [],
       _ajaxPatient2SampleIdMappingObj = {}, _ajaxSample2PatientIdMappingObj = {},
@@ -279,7 +279,7 @@
                         if(_ajaxCnaFractionData.length > 0){
                           _hasMutationCNAScatterPlotData = true;
                         }
-                        
+
                         // cna data (for CNA table)
                         var _gisticStudyIdArr = _.filter(_studyIdArr, function (_studyId) {
                           return $.inArray(_studyId + '_gistic', _.pluck(_ajaxGeneticProfiles, 'id')) !== -1;
@@ -311,7 +311,7 @@
                                 _ajaxCnaData.alter = _ajaxCnaData.alter.concat(arguments[i][0].alter);
                                 _ajaxCnaData.caseIds = _ajaxCnaData.caseIds.concat(arguments[i][0].caseIds);
                               }
-                            }                            
+                            }
                           }
 
                           /* 
@@ -331,15 +331,15 @@
                               _patientIdToClinDataMap[_dataObj.patient_id] = {};
                             }
                             _patientIdToClinDataMap[_dataObj.patient_id][_dataObj.attr_id] = _dataObj.attr_val;
-                            if (_dataObj.attr_id === 'DFS_MONTHS') {
+                            if (_dataObj.attr_id === 'DFS_MONTHS' && _dataObj.attr_val !== 'NA') {
                               _hasDFSSurvivalMonths = true;
-                            } else if (_dataObj.attr_id === 'DFS_STATUS') {
+                            } else if (_dataObj.attr_id === 'DFS_STATUS' && _dataObj.attr_val !== 'NA') {
                               _hasDFSSurvivalStatus = true;
-                            } else if (_dataObj.attr_id === 'OS_MONTHS' ) {
+                            } else if (_dataObj.attr_id === 'OS_MONTHS' && _dataObj.attr_val !== 'NA') {
                               _hasOSSurvivalMonths = true;
-                            } else if (_dataObj.attr_id === 'OS_STATUS') {
+                            } else if (_dataObj.attr_id === 'OS_STATUS'&& _dataObj.attr_val !== 'NA') {
                               _hasOSSurvivalStatus = true;
-                            } 
+                            }
                           });
 
                           // map clinical data to each sample (key: sample ID, value: object of attributes vs. val)
@@ -347,7 +347,7 @@
                           _.each(_ajaxSampleData, function(_dataObj) {
                             if (!_sampleIdToClinDataMap.hasOwnProperty(_dataObj.sample_id)) {
                               _sampleIdToClinDataMap[_dataObj.sample_id] = {};
-                            } 
+                            }
                             _sampleIdToClinDataMap[_dataObj.sample_id][_dataObj.attr_id] = _dataObj.attr_val;
                           });
 
@@ -355,13 +355,13 @@
 
                             var _sampleIdArr = _ajaxPatient2SampleIdMappingObj[_patientId]['sample_ids'];
                             var _studyId = _ajaxPatient2SampleIdMappingObj[_patientId]['study_id'];
-                            
+
                             // construct patient id <-> study id hash map (key: patient id, val: study id)
                             _patientIdStudyIdMap[_patientId] = _studyId;
                             if (!_patientIdStudyIdMap.hasOwnProperty(_patientId)) {
                               _patientIdStudyIdMap[_patientId] = _studyId;
                             }
-                            
+
                             _ajaxPatient2SampleIdMappingObjSimplified[_patientId] = _sampleIdArr;
 
                             // create datum for each patient
@@ -384,7 +384,7 @@
 
                               // map from sample to patient
                               _ajaxSample2PatientIdMappingObj[_sampleId] = [_patientId];
-                              
+
                               // create datum for each sample
                               var _datum = {};
                               if (_sampleIdToClinDataMap.hasOwnProperty(_sampleId)) {
@@ -410,7 +410,7 @@
                                   _datum['cna_fraction'] = 0;
                                 } else {
                                   _datum['cna_fraction'] = _ajaxCnaFractionData[_sampleId];
-                                }                                
+                                }
                               }
 
                               _sampleData[_sampleId]=_datum;
@@ -457,11 +457,11 @@
                               if (_sampleIdStudyIdMap.hasOwnProperty(_caseId)) {
                                 if (_cnaMeta.hasOwnProperty(_geneSymbol)) {
                                   _cnaMeta[_geneSymbol].caseIds.push(_caseId);
-                                    if( _sampleData[_caseId].hasOwnProperty('cna_details')){
-                                      _sampleData[_caseId]['cna_details'].push(_cnaMeta[_geneSymbol].index)
-                                    }else{
-                                      _sampleData[_caseId]['cna_details'] = [_cnaMeta[_geneSymbol].index]
-                                    }
+                                  if( _sampleData[_caseId].hasOwnProperty('cna_details')){
+                                    _sampleData[_caseId]['cna_details'].push(_cnaMeta[_geneSymbol].index)
+                                  }else{
+                                    _sampleData[_caseId]['cna_details'] = [_cnaMeta[_geneSymbol].index]
+                                  }
                                 } else {
                                   _cnaMeta[_geneSymbol] = {};
                                   _cnaMeta[_geneSymbol].gene = _geneSymbol;
@@ -485,12 +485,12 @@
                                     _cnaMeta[_geneSymbol].qval = _ajaxCnaData.gistic[_index][0];
                                   }
                                   _cnaMeta[_geneSymbol].index = _cnaMetaIndex;
-                                    if( _sampleData[_caseId].hasOwnProperty('cna_details')){
-                                      _sampleData[_caseId]['cna_details'].push(_cnaMetaIndex)
-                                    }else{
-                                      _sampleData[_caseId]['cna_details'] = [_cnaMetaIndex]
-                                    }
-                                  
+                                  if( _sampleData[_caseId].hasOwnProperty('cna_details')){
+                                    _sampleData[_caseId]['cna_details'].push(_cnaMetaIndex)
+                                  }else{
+                                    _sampleData[_caseId]['cna_details'] = [_cnaMetaIndex]
+                                  }
+
                                   _cnaMetaIndex += 1;
                                 }
                               }
@@ -548,7 +548,7 @@
                             _mutCntAttrMeta.view_type = 'scatter_plot';
                             _mutCntAttrMeta.description = 'Mutation Count vs. CNA';
                             _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
-                            _ajaxSampleMeta.unshift(_mutCntAttrMeta);                            
+                            _ajaxSampleMeta.unshift(_mutCntAttrMeta);
                           }
 
                           // add DFS survival
@@ -559,7 +559,7 @@
                             _dfsSurvivalAttrMeta.view_type = 'survival';
                             _dfsSurvivalAttrMeta.description = 'Disease Free Survival';
                             _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
-                            _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);                            
+                            _ajaxPatientMeta.unshift(_dfsSurvivalAttrMeta);
                           }
 
                           // add OS survival
@@ -570,7 +570,7 @@
                             _osSurvivalAttrMeta.view_type = 'survival';
                             _osSurvivalAttrMeta.description = 'Overall Survival';
                             _osSurvivalAttrMeta.display_name = 'Overall Survival';
-                            _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);                            
+                            _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
                           }
 
                           // add Cancer Study
@@ -581,7 +581,7 @@
                               "display_name": "Cancer Studies",
                               "attr_id": "study_id",
                               "view_type": "pie_chart"
-                            });                            
+                            });
                           }
 
                           // TODO : temporary fix to show/hide charts
@@ -602,7 +602,7 @@
                             _metaObj.filter = [];
                             _metaObj.show = true;
                             if (_metaObj.datatype === "NUMBER") {
-                              _metaObj.view_type = 'bar_chfart';
+                              _metaObj.view_type = 'bar_chart';
                             } else if (_metaObj.datatype === "STRING") {
                               _metaObj.view_type = 'pie_chart';
                             }
@@ -629,7 +629,7 @@
                           _result.groups.group_mapping.patient = {};
                           _result.groups.group_mapping.sample.patient = _ajaxSample2PatientIdMappingObj;
                           _result.groups.group_mapping.patient.sample = _ajaxPatient2SampleIdMappingObjSimplified;
-                          
+
                           _callbackFunc(_result, _inputSampleList, _inputPatientList);
 
                         });
