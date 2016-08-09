@@ -47,7 +47,9 @@
     var _result = {};
     var PORTAL_INST_URL = _portalInstURL;
     
-    var _hasOSSurvivalData = false, _hasDFSSurvivalData = false, _hasMutationCNAScatterPlotData = false;
+    var _hasOSSurvivalStatus = false, _hasOSSurvivalMonths = false, 
+        _hasDFSSurvivalStatus = false, _hasDFSSurvivalMonths = false,
+        _hasMutationCNAScatterPlotData = false;
     
     var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
       _ajaxSampleData = [], _ajaxPatientData = [],
@@ -329,10 +331,14 @@
                               _patientIdToClinDataMap[_dataObj.patient_id] = {};
                             }
                             _patientIdToClinDataMap[_dataObj.patient_id][_dataObj.attr_id] = _dataObj.attr_val;
-                            if (_dataObj.attr_id === 'DFS_MONTHS' || _dataObj.attr_id === 'DFS_STATUS') {
-                              _hasDFSSurvivalData = true;
-                            } else if (_dataObj.attr_id === "OS_MONTHS" || _dataObj.attr_id === 'OS_STATUS') {
-                              _hasOSSurvivalData = true;
+                            if (_dataObj.attr_id === 'DFS_MONTHS') {
+                              _hasDFSSurvivalMonths = true;
+                            } else if (_dataObj.attr_id === 'DFS_STATUS') {
+                              _hasDFSSurvivalStatus = true;
+                            } else if (_dataObj.attr_id === 'OS_MONTHS' ) {
+                              _hasOSSurvivalMonths = true;
+                            } else if (_dataObj.attr_id === 'OS_STATUS') {
+                              _hasOSSurvivalStatus = true;
                             } 
                           });
 
@@ -546,7 +552,7 @@
                           }
 
                           // add DFS survival
-                          if (_hasDFSSurvivalData) {
+                          if (_hasDFSSurvivalMonths && _hasDFSSurvivalStatus) {
                             var _dfsSurvivalAttrMeta = {};
                             _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
                             _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
@@ -557,7 +563,7 @@
                           }
 
                           // add OS survival
-                          if (_hasOSSurvivalData) {
+                          if (_hasOSSurvivalMonths && _hasOSSurvivalStatus) {
                             var _osSurvivalAttrMeta = {};
                             _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
                             _osSurvivalAttrMeta.datatype = 'SURVIVAL';
@@ -596,7 +602,7 @@
                             _metaObj.filter = [];
                             _metaObj.show = true;
                             if (_metaObj.datatype === "NUMBER") {
-                              _metaObj.view_type = 'bar_chart';
+                              _metaObj.view_type = 'bar_chfart';
                             } else if (_metaObj.datatype === "STRING") {
                               _metaObj.view_type = 'pie_chart';
                             }
