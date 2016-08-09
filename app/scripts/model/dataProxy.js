@@ -47,9 +47,7 @@
     var _result = {};
     var PORTAL_INST_URL = _portalInstURL;
 
-    var _hasOSSurvivalStatus = false, _hasOSSurvivalMonths = false,
-      _hasDFSSurvivalStatus = false, _hasDFSSurvivalMonths = false,
-      _hasMutationCNAScatterPlotData = false;
+    var _hasMutationCNAScatterPlotData = false;
 
     var _ajaxSampleMeta = [], _ajaxPatientMeta = [],
       _ajaxSampleData = [], _ajaxPatientData = [],
@@ -331,15 +329,6 @@
                               _patientIdToClinDataMap[_dataObj.patient_id] = {};
                             }
                             _patientIdToClinDataMap[_dataObj.patient_id][_dataObj.attr_id] = _dataObj.attr_val;
-                            if (_dataObj.attr_id === 'DFS_MONTHS' && _dataObj.attr_val !== 'NA') {
-                              _hasDFSSurvivalMonths = true;
-                            } else if (_dataObj.attr_id === 'DFS_STATUS' && _dataObj.attr_val !== 'NA') {
-                              _hasDFSSurvivalStatus = true;
-                            } else if (_dataObj.attr_id === 'OS_MONTHS' && _dataObj.attr_val !== 'NA') {
-                              _hasOSSurvivalMonths = true;
-                            } else if (_dataObj.attr_id === 'OS_STATUS'&& _dataObj.attr_val !== 'NA') {
-                              _hasOSSurvivalStatus = true;
-                            }
                           });
 
                           // map clinical data to each sample (key: sample ID, value: object of attributes vs. val)
