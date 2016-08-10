@@ -295,7 +295,7 @@
                           _ajaxCnaData.alter = [];
                           _ajaxCnaData.caseIds = [];
                           if (arguments.length !== 0) {
-                            if (_studyIdArr.length === 1) {
+                            if (_gisticStudyIdArr.length === 1) {
                               _ajaxCnaData.gene = arguments[0].gene;
                               _ajaxCnaData.gistic = arguments[0].gistic;
                               _ajaxCnaData.cytoband = arguments[0].cytoband;
