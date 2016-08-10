@@ -274,7 +274,7 @@
                           }
                         }
 
-                        if(_ajaxCnaFractionData.length > 0){
+                        if(_.isObject(_ajaxCnaFractionData) && Object.keys(_ajaxCnaFractionData).length > 0){
                           _hasMutationCNAScatterPlotData = true;
                         }
 
