@@ -55,19 +55,29 @@
   <!-- endbower -->
   <!-- endbuild -->
 
-  <!-- build:css(.tmp) styles/iviz.css -->
-  <link rel="stylesheet" href="styles/main.css"/>
+  <!-- build:css(.tmp) styles/vc-session.css -->
   <link rel="stylesheet" href="styles/vendor/vc-session.css"/>
-
   <!-- endbuild -->
   
-  <!-- build:js scripts/iviz.js -->
+  <!-- build:css(.tmp) styles/iviz.css -->
+  <link rel="stylesheet" href="styles/main.css"/>
+  <!-- endbuild -->
+  
+  <!-- build:js scripts/cbio-vendor.js -->
   <script src="_components/FileSaver.min.js"></script>
   <script src="_components/cbio-util.js"></script>
   <script src="_components/Notification.js"></script>
   <script src="_components/GeneValidator.js"></script>
   <script src="_components/QueryByGeneUtil.js"></script>
   <script src="_components/QueryByGeneTextArea.js"></script>
+  <script src="_components/cbio-util.js"></script>
+  <!-- endbuild -->
+  
+  <!-- build:js scripts/vc-session.js -->
+  <script src="_components/vc-session.js"></script>
+  <!-- endbuild -->
+  
+  <!-- build:js scripts/iviz.js -->
   <script src="scripts/main.js"></script>
   <script src="scripts/vueCore.js"></script>
   <script src="scripts/controller/util.js"></script>
@@ -97,13 +107,10 @@
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
   <script src="scripts/views/components/Notification.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
-  <script src="_components/vc-session.js"></script>
   <!-- endbuild -->
   
   <script src="scripts/model/dataProxy.js"></script>
-  <script src="_components/cbio-util.js"></script>
-
-
+  
 </head>
 <body>
 
