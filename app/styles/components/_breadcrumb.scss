@@ -1,13 +1,15 @@
 
 #breadcrumbs_container {
   font-size: 12px;
+  margin: 10px 0;
+  display: inline-block;
 }
 
 .breadcrumb_container {
   display: inline;
   float: left;
-  padding-bottom: 20px;
-  margin-left: 10px;
+  padding-bottom: 5px;
+  margin-right: 10px;
 }
 
 .breadcrumb_remove {
