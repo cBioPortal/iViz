@@ -112,33 +112,25 @@
     };
 
     content.idMapping = function(mappingObj, inputCases) {
-      var _selectedMappingCases = [];
-      _selectedMappingCases.length = 0;
-      var resultArr_ = [];
-      var tempArr_ = {};
+      var _selectedMappingCases = {};
+
       _.each(inputCases, function(_case) {
-        _.each(mappingObj[_case],function(_caseSel){
-          if(tempArr_[_caseSel] === undefined){
-            tempArr_[_caseSel] = true;
-            resultArr_.push(_caseSel)
-          }
+        _.each(mappingObj[_case], function(_case) {
+          _selectedMappingCases[_case] = '';
         });
-        //_selectedMappingCases = _selectedMappingCases.concat(mappingObj[_case]);
       });
-      return resultArr_;
-      //return content.unique(_selectedMappingCases);
+
+      return Object.keys(_selectedMappingCases);
     };
     
     content.unique = function(arr_){
-      var resultArr_ = [];
       var tempArr_ = {};
       _.each(arr_,function(obj_){
         if(tempArr_[obj_] === undefined){
           tempArr_[obj_] = true;
-          resultArr_.push(obj_);
         }
       });
-      return resultArr_;
+      return Object.keys(tempArr_);
     };
 
     content.isRangeFilter = function(filterObj) {

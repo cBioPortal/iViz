@@ -149,6 +149,8 @@
           }else{
             _self.filtersUpdated = false;
           }
+          // Trigger pie chart filtered event.
+          _self.piechart.filtered();
         });
         _self.$dispatch('data-loaded', true);
       
