@@ -452,7 +452,7 @@ module.exports = function(grunt) {
       grunt.task.run([
         'clean:server',
         'wiredep',
-        'dynamicVars:dev',
+        'dynamicVars:' + (target ? target : 'dev'),
         'concurrent:server',
         'json_to_sass:vars',
         'postcss',
