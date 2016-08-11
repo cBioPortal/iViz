@@ -154,6 +154,7 @@
 
     content.filtered = function() {
       updatePieLabels();
+      updateQtip = false;
     }
 
     /**
