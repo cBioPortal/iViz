@@ -191,7 +191,8 @@
         _.each(v.data.attrKeys, function(attr, index) {
           labelInitData[attr] = {
             attr: attr,
-            color: color[index]
+            color: color[index],
+            id: index
           };
         });
 
@@ -305,7 +306,7 @@
         var _labelDatum = {};
         var _labelValue = Number(label.value);
 
-        _labelDatum.id = index;
+        _labelDatum.id = labelInitData[label.key].id;
         _labelDatum.name = label.key;
         _labelDatum.color = labelInitData[label.key].color;
         _labelDatum.parentID = v.opts.chartId;
