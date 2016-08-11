@@ -10,6 +10,9 @@
   transition: opacity .3s ease;
 }
 
+.modal-dialog {
+  height: auto;
+}
 .modal-wrapper {
   display: table-cell;
   vertical-align: middle;
