@@ -55,19 +55,29 @@
   <!-- endbower -->
   <!-- endbuild -->
 
-  <!-- build:css(.tmp) styles/iviz.css -->
-  <link rel="stylesheet" href="styles/main.css"/>
+  <!-- build:css(.tmp) styles/vc-session.css -->
   <link rel="stylesheet" href="styles/vendor/vc-session.css"/>
-
   <!-- endbuild -->
   
-  <!-- build:js scripts/iviz.js -->
+  <!-- build:css(.tmp) styles/iviz.css -->
+  <link rel="stylesheet" href="styles/main.css"/>
+  <!-- endbuild -->
+  
+  <!-- build:js scripts/cbio-vendor.js -->
   <script src="_components/FileSaver.min.js"></script>
   <script src="_components/cbio-util.js"></script>
   <script src="_components/Notification.js"></script>
   <script src="_components/GeneValidator.js"></script>
   <script src="_components/QueryByGeneUtil.js"></script>
   <script src="_components/QueryByGeneTextArea.js"></script>
+  <script src="_components/cbio-util.js"></script>
+  <!-- endbuild -->
+  
+  <!-- build:js scripts/vc-session.js -->
+  <script src="_components/vc-session.js"></script>
+  <!-- endbuild -->
+  
+  <!-- build:js scripts/iviz.js -->
   <script src="scripts/main.js"></script>
   <script src="scripts/vueCore.js"></script>
   <script src="scripts/controller/util.js"></script>
@@ -97,13 +107,10 @@
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
   <script src="scripts/views/components/Notification.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
-  <script src="/app/_components/vc-session.js"></script>
   <!-- endbuild -->
   
   <script src="scripts/model/dataProxy.js"></script>
-  <script src="_components/cbio-util.js"></script>
-
-
+  
 </head>
 <body>
 
@@ -128,14 +135,14 @@
         
         <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()" 
               @mouseenter="highlightCaseButtons=true" @mouseleave="highlightCaseButtons=false" role="button" 
-              tabindex="0" data-hasqtip="9" aria-describedby="qtip-9"><img src="images/in.svg" alt="download"></span>
+              tabindex="0" data-hasqtip="9" aria-describedby="qtip-9"><i class="fa fa-download" alt="download"></i></span>
       
       <span id="query-by-gene-span">
           <span id="queryByGeneTextSpan"></span>
           <textarea id="query-by-gene-textarea" class="expand expandFocusOut" 
                     :class="{'iviz-button-hover':highlightAllButtons}" rows="1" cols="10"></textarea>
       </span>
-        <img id="arrow_studyview" src="images/arrow_studyview.png" alt="">
+        <i id="arrow_studyview" class="fa fa-arrow-right fa-lg" aria-hidden="true"></i>
         <form id="iviz-form"  v-on:submit.prevent="submitForm" method="post" target="_blank" style="float: left;">
           <input type="submit" @mouseenter="highlightAllButtons=true" @mouseleave="highlightAllButtons=false" 
                  id="iviz-header-left-1" value="Query" class="iviz-header-button" style="display: block;">
@@ -160,15 +167,14 @@
 
         <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
           <span>{{customfilter.display_name}}</span>
-          <img class="breadcrumb_remove" src="../images/remove_breadcrumb_icon.png" @click="clearAll()">
+          <i class="fa fa-times breadcrumb_remove" @click="clearAll()"></i>
         </span>
         <div style="float:left" v-for="group in groups">
           <bread-crumb :attributes.sync="item"
                        :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
                        v-if="item.filter.length>0" ></bread-crumb>
         </div>
-        <div><button type='button' @click="clearAll()">Clear
-          All</button></div>
+        <div><button type='button' @click="clearAll()" class="btn btn-default btn-xs">Clear All</button></div>
       </div>
     </div>
   </nav>

@@ -42,14 +42,14 @@
     '<div style="float:left" v-if="showLogScale"></input style="float:left"><input type="checkbox" value="" id="" ' +
     'class="bar-x-log" v-model="logChecked">' +
     '<span id="scale-span-{{chartId}}" style="float:left; font-size:10px; margin-right: 15px; color: grey">Log Scale X</span></div>' +
-    '<img v-if="showTableIcon" src="images/table.svg" class="icon hover" @click="changeView()"/>' +
-    '<img v-if="showPieIcon" src="images/pie.svg" class="icon hover" @click="changeView()"/>' +
+    '<i v-if="showTableIcon" class="fa fa-table icon hover" aria-hidden="true" @click="changeView()"></i>' +
+    '<i v-if="showPieIcon" class="fa fa-pie-chart icon hover" aria-hidden="true" @click="changeView()"></i>' +
     '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" class="icon hover"/>' +
     '<div id="{{chartId}}-download-icon-wrapper" class="download">' +
-    '<img src="images/in.svg" class="icon hover" id="{{chartId}}-download"/>' +
+    '<i class="fa fa-download icon hover" alt="download" id="{{chartId}}-download"></i>' +
     '</div>' +
-    '<img src="images/move.svg" class="dc-chart-drag icon" class="icon"/>' +
-    '<div style="float:right"><i class="fa fa-times dc-chart-pointer icon" style="margin-top:0px;font-size:16px" @click="close()"></i></div>' +
+    '<i class="fa fa-arrows dc-chart-drag icon" aria-hidden="true"></i>' +
+    '<div style="float:right"><i class="fa fa-times dc-chart-pointer icon" @click="close()"></i></div>' +
     '</div>' +
     '</div>',
     props: [

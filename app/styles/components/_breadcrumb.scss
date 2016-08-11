@@ -6,14 +6,12 @@
 .breadcrumb_container {
   display: inline;
   float: left;
-  margin-top: 10px;
   padding-bottom: 20px;
   margin-left: 10px;
 }
 
 .breadcrumb_remove {
-  vertical-align: middle;
-  margin-top: -2px;
+  margin: 0 5px 0 2px;
 }
 
 .breadcrumb_remove:hover {
