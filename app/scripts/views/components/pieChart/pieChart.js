@@ -152,6 +152,10 @@
       }
     }
 
+    content.filtered = function() {
+      updatePieLabels();
+    }
+
     /**
      * This is the function to initialize dc pie chart instance.
      */
@@ -372,36 +376,18 @@
       var _labels = [];
       currentSampleSize = 0;
 
-      $('#' + v.opts.chartId + '>svg>g>g').each(function(){
-        var _labelText = $(this).find('title').text();
-        var _pointsInfo = $(this).find('path').attr('d').split(/[\s,MLHVCSQTAZ]/);
-        var _labelName = _labelText.substring(0, _labelText.lastIndexOf(":"));
-        var _labelValue = Number(_labelText.substring(_labelText.lastIndexOf(":")+1).trim());
+      _.each(dcGroup_.top(Infinity), function(category) {
+        var _label = findLabel(category.key);
+        if (_label) {
+          _label.samples = category.value;
+          currentSampleSize += Number(category.value);
+          _labels.push(_label);
+        }
 
-        if(_pointsInfo.length >= 10){
-
-          var _x1 = Number( _pointsInfo[1] ),
-            _y1 = Number( _pointsInfo[2] ),
-            _x2 = Number( _pointsInfo[8] ),
-            _y2 = Number( _pointsInfo[9] );
-
-          if(Math.abs(_x1 - _x2) > 0.01 || Math.abs(_y1 - _y2) > 0.01){
-            var _label = findLabel(_labelName);
-            if(_label) {
-              _label.samples = _labelValue;
-              currentSampleSize += _labelValue;
-              _labels.push(_label);
-            }
-
-            if(maxLabelValue < _labelValue) {
-              maxLabelValue = _labelValue;
-            }
-          }
-        }else{
-          //StudyViewUtil.echoWarningMessg("Initial Label Error");
+        if (maxLabelValue < category.value) {
+          maxLabelValue = category.value;
         }
       });
-
       return _labels;
     }
 
