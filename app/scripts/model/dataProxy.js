@@ -577,6 +577,17 @@
                             _osSurvivalAttrMeta.display_name = 'Date of Diagnosis';
                             _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
                           }
+                          
+                          //add overtime date
+                          if (_hasOSSurvivalData) {
+                            var _osSurvivalAttrMeta = {};
+                            _osSurvivalAttrMeta.attr_id = 'DATE_OVERTIME';
+                            _osSurvivalAttrMeta.datatype = 'OVERTIME';
+                            _osSurvivalAttrMeta.view_type = 'overtime_chart';
+                            _osSurvivalAttrMeta.description = 'Date Overtime';
+                            _osSurvivalAttrMeta.display_name = 'Date Overtime';
+                            _ajaxPatientMeta.unshift(_osSurvivalAttrMeta);
+                          }
 
 
                           // add Cancer Study

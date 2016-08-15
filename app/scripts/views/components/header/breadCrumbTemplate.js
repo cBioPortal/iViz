@@ -71,6 +71,9 @@
         if (this.attributes.view_type[0] === 'bar_chart') {
           this.filters = [];
         }
+        else if (this.attributes.view_type[0] === 'overtime_chart'){
+            this.filters = [];
+        }
         else if (this.attributes.view_type[0] === 'line_chart'){
           this.filters =  [];
         }

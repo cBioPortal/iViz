@@ -37,6 +37,9 @@ body {
   @import "components/chart-operations";
   @import "components/scatterplot";
   @import "components/survivalplot";
+  @import "components/linechart";
+  @import "components/overtimechart";
+  @import "components/attributespanel";
 }
 
 @import "vendor/dashiboard";
@@ -48,13 +51,3 @@ body {
 }
 
 .qtip-wide{max-width:380px !important;}
-
-.range-chart-class g.y{  /* hides the y axis on the rangeChart of the line chart*/
-    display:none;
-}
-
-#iviz-attributes-panel{
-    position: fixed;
-    top:65px;
-    display:none
-}

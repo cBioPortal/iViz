@@ -32,7 +32,6 @@
 
 'use strict';
 (function(iViz, dc, _, $, d3) {
-  // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.BarChart = function() {
     var content = this;
 

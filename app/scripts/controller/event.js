@@ -59,6 +59,11 @@
         dc.events.trigger(function() {
           filters = filter
         }, 0);
+      }else if (type === 'overtime_chart') {
+        //delay event trigger for bar charts
+        dc.events.trigger(function() {
+          filters = filter
+        }, 0);
       }else if (type === 'line_chart') {
         dc.events.trigger(function() {
           filters = filter

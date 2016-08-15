@@ -1,0 +1,37 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 10, 2016, 2:32:01 PM
+    Author     : jamesxu
+*/
+.iviz-overtime-chart g.y{
+    display:none;
+}
+
+.iviz-overtime-line-class{
+    font: 10px sans-serif;
+    .axis path, .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+      path { 
+          stroke: steelblue;
+          stroke-width: 1;
+          fill: none;
+      }
+
+      .x.axis path {
+        display: none;
+      }
+
+      .line {
+        fill: none;
+        stroke: steelblue;
+        stroke-width: 1.5;
+      }
+}

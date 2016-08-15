@@ -186,7 +186,10 @@
           break;
         case 'lineChart':
           lineChartDownload(fileType, content);
-          break;  
+          break;
+        case 'overtimeChart':
+            overtimeChartDownload(fileType, content);
+            break;
         case 'table':
           tableDownload(fileType, content);
         default:
@@ -786,7 +789,239 @@
         });
       }
 
-    }; 
+    };
+    
+    function overtimeChartDownload(fileType, content){
+        switch (fileType) {
+        case 'tsv':
+          csvDownload(content.fileName || 'data', content.data);
+          break;
+        case 'svg':
+          overtimeChartCanvasDownload(content, {
+            filename: content.fileName + '.svg'
+          });
+          break;
+        case 'pdf':
+          overtimeCanvasDownload(content, {
+            filename: content.fileName + '.pdf',
+            contentType: 'application/pdf',
+            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+          });
+          break;
+        default:
+          break;
+      }
+    }
+    
+    function overtimeChartCanvasDownload (data, downloadOpts){
+       var _svgBarElement = ''; //will contain the bar chart
+      var _svgOvertimeLineElement = ''; //will contain the overtime line
+      var _svgBar = $(data.chartId + ' svg'); //bar chart
+      var _svgOvertimeLine = $(data.overtimeLineId + ' svg'); //overtime line
+      var _brush = _svgBar.find('g.brush');
+      var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
+      var i = 0;
+
+      if (_brushWidth === 0) {
+        _brush.css('display', 'none');
+      }
+
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '0.2',
+          'fill': '#2986e2'
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '#eee',
+          'stroke': '#666'
+        });
+      
+      _svgOvertimeLine.find('.line')
+        .css({
+            'fill': 'none',
+            'stroke': 'steelblue',
+            'stroke-width': '1.5'     
+        });
+      
+      _svgBar.find('g.y') //remove y axis of bar chart
+        .css({
+         'display': 'none'         
+        });
+
+      // Change deselected bar chart
+      var _chartBody = _svgBar.find('.chart-body');
+      var _deselectedCharts = _chartBody.find('.bar.deselected');
+      var _deselectedChartsLength = _deselectedCharts.length;
+
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': '#ccc'
+        });
+      }
+      //change axis style of overtime line
+      var _axisOvertimeLine = _svgOvertimeLine.find('.axis');
+      var _axisDomainOvertimeLine = _axisOvertimeLine.find('.domain');
+      var _axisDomainLengthOvertimeLine = _axisDomainOvertimeLine.length;
+      var _axisTickOvertimeLine = _axisOvertimeLine.find('.tick.major line');
+      var _axisTickLengthOvertimeLine = _axisTickOvertimeLine.length;
+
+      for (i = 0; i < _axisDomainLengthOvertimeLine; i++) {
+        $(_axisDomainOvertimeLine[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthOvertimeLine; i++) {
+        $(_axisTickOvertimeLine[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      // Change axis style of bar chart
+      var _axisBar = _svgBar.find('.axis');
+      var _axisDomainBar = _axisBar.find('.domain');
+      var _axisDomainLengthBar = _axisDomainBar.length;
+      var _axisTickBar = _axisBar.find('.tick.major line');
+      var _axisTickLengthBar = _axisTickBar.length;
+
+      for (i = 0; i < _axisDomainLengthBar; i++) {
+        $(_axisDomainBar[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthBar; i++) {
+        $(_axisTickBar[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      //change x/y axis text size of overtime chart
+      var _chartTextOvertimeLine = _svgOvertimeLine.find('.axis text'),
+        _chartTextLengthOvertimeLine = _chartTextOvertimeLine.lengthOvertimeLine;
+
+      for (i = 0; i < _chartTextLengthOvertimeLine; i++) {
+        $(_chartTextOvertimeLine[i]).css({
+          'font-size': '12px'
+        });
+      }
+      
+      //Change x/y axis text size of bar chart
+      var _chartTextBar = _svgBar.find('.axis text'),
+        _chartTextLengthBar = _chartTextBar.length;
+
+      for (i = 0; i < _chartTextLengthBar; i++) {
+        $(_chartTextBar[i]).css({
+          'font-size': '12px'
+        });
+      }
+      
+      //change line style of overtimeline 
+      _svgOvertimeLine.find('g.chart-body').css({
+         'fill': 'none' 
+      });
+      
+      //convert SVGs to strings
+      $(data.chartId + ' svg>g').each(function(i, e) {
+        _svgBarElement += cbio.download.serializeHtml(e);
+      });
+      $(data.chartId + ' svg>defs').each(function(i, e) {
+        _svgBarElement += cbio.download.serializeHtml(e);
+      });
+      $(data.overtimeLineId + ' svg>g').each(function(i,e){
+         _svgOvertimeLineElement += cbio.download.serializeHtml(e);
+      });
+      $(data.overtimeLineId + ' svg>defs').each(function(i,e){
+         _svgOvertimeLineElement += cbio.download.serializeHtml(e) ;
+      });
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="375" height="340">' +
+        '<g><text x="180" y="20" style="font-weight: bold; text-anchor: middle">' +
+        data.title + '</text></g>' + //data.title is from initCanvasDownloadData in overtimeChart.js
+        '<g transform="translate(0, 20)">' + _svgOvertimeLineElement + '</g>' +
+        '<g transform="translate(0,260)">' +_svgBarElement + '</g></svg>';
+
+      cbio.download.initDownload(
+        svg, downloadOpts);
+      
+      // Remove added styles of Overtime line
+      for (i = 0; i < _axisDomainLengthOvertimeLine; i++) {
+        $(_axisDomainOvertimeLine[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthOvertimeLine; i++) {
+        $(_axisTickOvertimeLine[i]).css({
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _chartTextLengthOvertimeLine; i++) {
+        $(_chartTextOvertimeLine[i]).css({
+          'font-size': ''
+        });
+      }
+    
+      // Remove added styles of Bar chart
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': ''
+        });
+      }
+      _brush.css('display', '');
+      
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '',
+          'fill': ''
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '',
+          'stroke': ''
+        });
+        
+     _svgOvertimeLine.find('.line')
+        .css({
+            'fill': '',
+            'stroke': '',
+            'stroke-width': ''     
+        });   
+        
+      _svgBar.find('g.y').css('display', '');
+      
+      for (i = 0; i < _axisDomainLengthBar; i++) {
+        $(_axisDomainBar[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthBar; i++) {
+        $(_axisTickBar[i]).css({
+          'stroke': ''
+        });
+      }
+      
+      for (i = 0; i < _chartTextLengthBar; i++) {
+        $(_chartTextBar[i]).css({
+          'font-size': ''
+        });
+      } 
+    }
 
     function csvDownload(fileName, content) {
       fileName = fileName || 'test';

@@ -94,10 +94,50 @@
         return chartInstances;
         };
         
+        function getSelectedDates (){ //same method used in overtimechart's generateAccumulation
+            var sortedData = lineChartInst_.dimension().top(Infinity).sort(function(a,b){
+                return a[attr_id] - b[attr_id];
+            });
+            var sortedDateData = [];
+            for (var i = 0;i<sortedData.length;i++){
+                sortedDateData.push(sortedData[i][attr_id]);
+            }
+
+             //create an array that counts the occurrence of each date; output is this: [{},{}]
+            var dates = [], frequencies = [], prevElement;
+            for (var j = 0; j < sortedDateData.length; j++){
+                //need to use getTime() to compare because cannot compare dates, which are objects normally
+                //prevent undefined.getTime() error
+                if (!(prevElement instanceof Date)){ //for the first element
+                    dates.push(sortedDateData[j]);
+                    frequencies.push(1);
+                    prevElement = sortedDateData[j];
+                }
+                else{
+                    if (sortedDateData[j].getTime()/*current element*/ !== prevElement.getTime()){
+                        dates.push(sortedDateData[j]);
+                        frequencies.push(1);
+                    }
+                    else{frequencies[frequencies.length - 1]++;
+                    };
+                    prevElement = sortedDateData[j];
+                }
+            }
+
+            //concatenate the dates and frequencies arrays into an array of objects
+            var countedDatesArray =[];
+            for (var k = 0; k <dates.length; k++){
+                var countedDatesObj = {};
+                countedDatesObj.key = dates[k];
+                countedDatesObj.value = frequencies [k];
+                countedDatesArray.push(countedDatesObj);
+            }   
+            return countedDatesArray;
+        }
+        
         function initTsvDownloadData(){
             var data = "";
-            var _dates = dateByFrequency.all();
-            
+            var _dates = getSelectedDates();
             data = attributes.display_name + "\tNumber of Patients"; 
             
             for (var i = 0; i< _dates.length; i++){

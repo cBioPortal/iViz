@@ -35,7 +35,7 @@
 'use strict';
 (function(Vue, dc, iViz, $){
     Vue.component('lineChart',{
-            template:'<div id = {{charDivId}} class="grid-item grid-item-h-2 grid-item-w-2" class="study-view-dc-chart" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+            template:'<div id = {{charDivId}} class="grid-item grid-item-h-2 grid-item-w-2"  @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
                      '<chart-operations :chart-ctrl="lineChart"  :has-chart-title="hasChartTitle" :display-name="displayName" :chart-id="chartId" '+ //don't need rangeChartId in chart operations b/c chart operations doesn't handle the range chart
                      ':chart="chartInst" :attributes="attributes" :show-operations="showOperations" :filters.sync="filters"></chart-operations><div id={{chartId}}>' +
                      '</div><div id={{rangeChartId}} class= "range-chart-class"></div></div>',  //everything written in template replaces
@@ -110,17 +110,11 @@
                     }
                   });
                   this.chartInst.on('postRedraw', function(_chartInst) {
-                    // This is tempororay fix, may need to find the reason why range chart is not synchronized
+                    // This is temporary fix, may need to find the reason why range chart is not synchronized
                     if(_chartInst.filters().length !== self_.rangeChartInst.filters().length) {
                       _chartInst.filterAll();
                     }
                   });
-                  // this.rangeChartInst.on('filtered',function(_rangeChartInst, _filter){
-                  //   console.log(_filter);
-                  //   if (!_filter){
-                  //     self_.chartInst.filterAll();
-                  //   }
-                  // });
                 },
                 
    },    

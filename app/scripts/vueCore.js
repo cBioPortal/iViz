@@ -147,9 +147,32 @@
                 });
               });
             },
-            addChart: function(attrId){
-             var self_ = this;
-              var attrData = self_.charts[attrId];
+            addChart: function(attrId, selected_chart){ 
+              var self_ = this;
+              var attrData = self_.charts[attrId]; 
+              var index;
+              function shiftSelectedChart(viewtypeArray, selected_chart){
+                  var index = viewtypeArray.indexOf(selected_chart);
+                  viewtypeArray.splice(index, 1);
+                  viewtypeArray.unshift(selected_chart);
+              };
+                switch (selected_chart){ //modify the attrData.view_type and changed it to selected_chart
+                    case 'overtimechart':
+                        shiftSelectedChart(attrData.view_type, 'overtime_chart');
+                        break;
+                    case 'linechart':
+                        shiftSelectedChart(attrData.view_type, 'line_chart');
+                        break;
+                    case 'piechart':
+                        shiftSelectedChart(attrData.view_type, 'pie_chart');
+                        break;
+                    case 'barchart':
+                        shiftSelectedChart(attrData.view_type, 'bar_chart');
+                        break;
+                    case 'tablechart':
+                        shiftSelectedChart(attrData.view_type, 'table');
+                        break;
+                }
               var _attrAdded = false;
               var _group = {};
               _.each(self_.groups,function(group){

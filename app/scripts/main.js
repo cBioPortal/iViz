@@ -71,6 +71,7 @@ var iViz = (function (_, $) {
       // ---- generating data matrix & fill the empty slots ----
       _.each(data_.groups.patient.data, function (_dataObj) {
         _dataObj.DATE_OF_DIAGNOSIS = iViz.util.getRandomDate();
+        _dataObj.DATE_OVERTIME = iViz.util.getRandomDate();
     });
     //---- change view_type of each attribute into an array
     
@@ -105,18 +106,22 @@ var iViz = (function (_, $) {
           attrData.show = false;
         }
         charts[attrData.attr_id]=attrData;
-        switch(attrData.datatype){ //replace the view_type with an array containing all possible view_type
+        switch(attrData.datatype){ //replace the view_type with an array containing all possible view_type (for patient data)
+            case 'OVERTIME':
+                attrData.view_type = ['overtime_chart', 'pie_chart', 'bar_chart', 'line_chart', 'survival'];
+                break;
             case 'DATE':
-                attrData.view_type = [attrData.view_type, 'pie_chart', 'bar_chart'];
+                attrData.view_type = ['line_chart', 'pie_chart', 'bar_chart', 'overtime_chart'];
                 break;
             case 'STRING':
-                attrData.view_type = [attrData.view_type];
+                attrData.view_type = ['pie_chart'];
                 break;
             case 'NUMBER': 
-                attrData.view_type = [attrData.view_type, 'line_chart'];
+                attrData.view_type = ['bar_chart', 'line_chart'];
                 break;
             case 'SURVIVAL':
-                attrData.view_type = [attrData.view_type];
+                attrData.view_type = ['survival']; //TODO: need to make this into a string, or change how the
+                                                           //switch construct in the addchart looks for the selected viewtype
                 break;
             default:
                 attrData.view_type = [attrData.view_type];
@@ -155,21 +160,22 @@ var iViz = (function (_, $) {
           attrData.show = false;
         }
         charts[attrData.attr_id]=attrData;
-        switch(attrData.datatype){ //replace the view_type with an array containing all possible view_type
+        switch(attrData.datatype){ //replace the view_type with an array containing all possible view_type (for sample data)
+             case 'OVERTIME':
+                attrData.view_type = ['overtime_chart', 'pie_chart', 'bar_chart', 'line_chart', 'survival'];
+                break;
             case 'DATE':
-                attrData.view_type = [attrData.view_type, 'pie_chart', 'bar_chart'];
+                attrData.view_type = ['line_chart', 'pie_chart', 'bar_chart', 'overtime_chart'];
                 break;
             case 'STRING':
-                attrData.view_type = [attrData.view_type];
+                attrData.view_type = ['pie_chart'];
                 break;
             case 'NUMBER': 
-                attrData.view_type = [attrData.view_type, 'line_chart'];
+                attrData.view_type = ['bar_chart', 'line_chart'];
                 break;
             case 'SURVIVAL':
-                attrData.view_type = [attrData.view_type];
-                break;
-            case 'SCATTER_PLOT':
-                attrData.view_type = [attrData.view_type];
+                attrData.view_type = ['survival']; //TODO: need to make this into a string, or change how the
+                                                           //switch construct in the addchart looks for the selected viewtype
                 break;
             default:
                 attrData.view_type = [attrData.view_type];

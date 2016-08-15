@@ -65,6 +65,9 @@
         case 'line_chart':
           currentView = 'line-chart';
           break;
+        case 'overtime_chart':
+          currentView = 'overtime-chart';
+          break;    
       }
       return {
         currentView: currentView
