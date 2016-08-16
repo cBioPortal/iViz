@@ -72,7 +72,8 @@
             highlightAllButtons:false,
             highlightCaseButtons:false,
             viewtypes:[],
-            attrid:''
+            attrid:'', 
+            datatype:''
           }, watch: {
             'updateSpecialCharts':function(newVla,oldVal) {
               var self_ = this;
@@ -156,7 +157,7 @@
                   viewtypeArray.splice(index, 1);
                   viewtypeArray.unshift(selected_chart);
               };
-                switch (selected_chart){ //modify the attrData.view_type and changed it to selected_chart
+                switch (selected_chart){ //modify the attrData.view_type and changed it to selected_chart- modifying the array, need a way to revert changes
                     case 'overtimechart':
                         shiftSelectedChart(attrData.view_type, 'overtime_chart');
                         break;
@@ -216,6 +217,7 @@
                 var attrData = self.charts[attrId];
                 this.attrid = attrId;
                 this.viewtypes = attrData.view_type;
+                this.datatype = attrData.datatype;
                 this.$nextTick(function(){
                     self.$broadcast('openPanel');
                 }

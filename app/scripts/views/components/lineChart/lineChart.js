@@ -53,7 +53,7 @@
 
         var dateByFrequency = dateDimension.group();//create date group
         
-        content.init = function initDCLineChart(){
+        content.init = function (){
             var chartInstances = {};
             lineChartInst_ = dc.lineChart(opts.lineChartTarget, opts.groupid); //initialize line chart; random dates created in util.js
                                                                               //second parameter adds line chart to the chart group
@@ -63,7 +63,7 @@
                 .dimension(dateDimension)
                 .group(dateByFrequency)
                 .transitionDuration(1000)
-                .margins({top: 10, right: 10, bottom: 25, left: 30})
+                .margins({top: 10, right: 10, bottom: 25, left: 40})
                 .mouseZoomable(true)
                 .brushOn(false)
                 .rangeChart(rangeChartInst_)
@@ -94,7 +94,7 @@
         return chartInstances;
         };
         
-        function getSelectedDates (){ //same method used in overtimechart's generateAccumulation
+        function getSelectedDates (){ //same method used in overtimechart's generateAccumulation to get selected dates
             var sortedData = lineChartInst_.dimension().top(Infinity).sort(function(a,b){
                 return a[attr_id] - b[attr_id];
             });

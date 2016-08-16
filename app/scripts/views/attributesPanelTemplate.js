@@ -33,18 +33,22 @@
 // * Created by James Xu on 8/5/16.
 // */
 // 'use strict';
+
 (function(Vue, dc, iViz, $) {
   Vue.component('attributesPanel', {
-    template:     '<div id ="iviz-attributes-panel" style="right:20px" >'+
-                '<div><p>How would you like to visualize your data?</p></div>'+
-                '<div style="width:470px">'+
-                '<img v-on:click="choose_chart(panelChart.selected_chart)" v-for="panelChart in panelCharts" v-bind:src="panelChart.src" alt="panelcharts" style="width:235px;height:156px">'+ 
+    template:     '<div id ="iviz-attributes-panel">'+//TODO: div changes size depending on number of charts/include default option is...
+                '<div id ="iviz-attributes-panel-text"><p>How would you like to visualize your data?</p>' +
+                '<p>The default is: <span>{{default_chart}}</span></p></div>'+
+                '<div id="iviz-attributes-panel-button-template">'+
+                '<img v-on:click="choose_chart(panelChart.selected_chart)" v-for="panelChart in panelCharts" v-bind:src="panelChart.src" alt="panelcharts" '+
+                'id="iviz-attributes-panel-button">'+ 
                 '</div></div>', //the variable sampleChart is a string, cannot use {{}} to reference a string that contains html code, b/c it will not treat it as html code
 
-    props: ['viewtypes', 'attrid'], //bind viewtype here
+    props: ['viewtypes', 'attrid', 'datatype'], //bind viewtype here
     data: function() {
       return {
-          panelCharts: []
+          panelCharts: [],
+          default_chart:''
       }; //bind data- triggers component
     }, 
     watch: {
@@ -61,17 +65,17 @@
         'openPanel':function(){
 //            make an array of corresponding images based on viewtypes
         var self = this;
-        var viewtypes = $.extend(true, [], self.viewtypes); //make a copy of viewtypes, which contains the array of possible viewtypes
+        var viewtypes = $.extend(true, [], self.viewtypes); //make a copy of viewtypes, which contains the array of possible viewtypes, first element is the selected chart
             _.each(viewtypes, function(_element, index){
                 var panelObj = {
                     src: '',
-                    selected_chart: ''
+                    selected_chart: '',
                 };
                 switch(_element){
                 case 'overtime_chart':
                     panelObj.src = 'images/overtimechart.png';
                     panelObj.selected_chart = 'overtimechart';  
-                    viewtypes[index] = panelObj;
+                    viewtypes[index] = panelObj; //this works instead of push it in because this replace the index each time, rather than adding to the array
                     break;
                 case 'line_chart':    
                     panelObj.src = 'images/linechart.png';
@@ -98,7 +102,27 @@
                     panelObj.selected_chart = 'survival';
                     viewtypes[index] = panelObj;
                     break;
-                }      
+                }
+            switch (self.datatype){//default option
+                case 'OVERTIME':
+                    self.default_chart = 'the accumulation line chart';
+                    break;
+                case 'DATE':
+                    self.default_chart = 'the line chart';
+                    break;
+                case 'STRING':
+                    self.default_chart = 'the pie chart';
+                    break;
+                case 'NUMBER':
+                    self.default_chart = 'the bar chart';
+                    break;
+                case 'SURVIVAL':
+                    self.default_chart = 'the survival chart';
+                    break;
+                default:
+                    self.default_chart = 'table';
+                    break;
+            }    
             self.panelCharts = viewtypes; //using push makes panelCharts have more than necessary amount of buttons b/c panelCharts is not being reset each time, but viewtypes is
         });   
             $("#iviz-attributes-panel").show();

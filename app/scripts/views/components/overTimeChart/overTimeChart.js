@@ -68,12 +68,14 @@
                 
       return overtimeChartInst_;
 
-    };
+    }; //lack of x axis might be because of margin
     content.generateAccumulation = function(chartInst_){
         //sortedOvertimeData contains the sorted array of dates
         var sortedOvertimeData = chartInst_.dimension().top(Infinity).sort(function(a,b){
             return a[attr_id] - b[attr_id];
         });
+        console.log(chartInst_.group().top(Infinity))
+        console.log(chartInst_.dimension().top(Infinity))
         var sortedOvertimeDateData = [];
         for (var i = 0;i<sortedOvertimeData.length;i++){
             sortedOvertimeDateData.push(sortedOvertimeData[i][attr_id]);

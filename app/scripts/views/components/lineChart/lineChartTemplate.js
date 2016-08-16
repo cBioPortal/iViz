@@ -38,12 +38,8 @@
             template:'<div id = {{charDivId}} class="grid-item grid-item-h-2 grid-item-w-2"  @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
                      '<chart-operations :chart-ctrl="lineChart"  :has-chart-title="hasChartTitle" :display-name="displayName" :chart-id="chartId" '+ //don't need rangeChartId in chart operations b/c chart operations doesn't handle the range chart
                      ':chart="chartInst" :attributes="attributes" :show-operations="showOperations" :filters.sync="filters"></chart-operations><div id={{chartId}}>' +
-                     '</div><div id={{rangeChartId}} class= "range-chart-class"></div></div>',  //everything written in template replaces
-                                                            //the tag in the html file
-                                                            //create an outer div to hold both the line chart and the range chart
-                                                            //chartId creates element id for download button
-            props: ['ndx', 'data', 'groupid', 'attributes', 'filters'], //groupid, a dc mechanism, allows interactivity between charts within the same dc group;
-                                                                            //iviz controls filtering across groups
+                     '</div><div id={{rangeChartId}} class= "range-chart-class"></div></div>',
+            props: ['ndx', 'data', 'groupid', 'attributes', 'filters'], //groupid, a dc mechanism, allows interactivity between charts within the same dc group; iviz controls filtering across groups
             data:function() {
                 return {
                     charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
@@ -89,9 +85,9 @@
                             },
 
                 initChart: function (){
-                   var chartInstances =  this.lineChart.init();
-                   this.rangeChartInst = chartInstances.rangeChart;
-                    this.chartInst = chartInstances.lineChart; //returns chartinstances
+                  var chartInstances =  this.lineChart.init();
+                  this.rangeChartInst = chartInstances.rangeChart;
+                  this.chartInst = chartInstances.lineChart; //returns chartinstances which contains the instances of the line and range chart
                   var self_ = this;
                   this.chartInst.on('filtered', function(_chartInst, _filter) {
                     if(!self_.filtersUpdated) {

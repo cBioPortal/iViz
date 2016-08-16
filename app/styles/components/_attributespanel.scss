@@ -10,5 +10,27 @@ and open the template in the editor.
 #iviz-attributes-panel{
     position: fixed;
     top:80px;
-    display:none
+    display:none;
+    right:20px;
+    background-color:#cce6ff;
+}
+#iviz-attributes-panel-text{
+    text-align:center;
+    font-family:sans-serif;
+    font-size:25px;
+    color:#1c75cd;
+}
+
+#iviz-attributes-panel-button-template{
+    width:500px;
+    height:200px;
+}
+
+#iviz-attributes-panel-button{
+    width:235px;
+    height:156px;
+    padding-top:5px;
+    padding-right:5px;
+    padding-bottom:5px;
+    padding-left:5px;
 }
