@@ -53,6 +53,10 @@
 
         var dateByFrequency = dateDimension.group();//create date group
         
+        /**
+         * 
+         * @returns {linechart and rangechart instance}
+         */
         content.init = function (){
             var chartInstances = {};
             lineChartInst_ = dc.lineChart(opts.lineChartTarget, opts.groupid); //initialize line chart; random dates created in util.js
@@ -89,11 +93,14 @@
                 .xAxis()
                 .ticks(d3.time.months, 2); //show a tick every 2 months on the range chart      
 //                    lineChart.render(); //no need to render the line chart after adding it to the group of charts (vuecore.js handles rendering)
-       chartInstances.lineChart = lineChartInst_;
-       chartInstances.rangeChart = rangeChartInst_;
+        chartInstances.lineChart = lineChartInst_;
+        chartInstances.rangeChart = rangeChartInst_;
         return chartInstances;
         };
-        
+        /**
+         * 
+         * @returns {Array of selected data}
+         */
         function getSelectedDates (){ //same method used in overtimechart's generateAccumulation to get selected dates
             var sortedData = lineChartInst_.dimension().top(Infinity).sort(function(a,b){
                 return a[attr_id] - b[attr_id];

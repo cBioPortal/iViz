@@ -35,3 +35,7 @@ and open the template in the editor.
         stroke-width: 1.5;
       }
 }
+
+.iviz-overtime-line-class .x.axis path { /*overrides hidden x axis*/
+    display:inherit;
+}

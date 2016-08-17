@@ -29,7 +29,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+/**
+ * Created by James Xu on 8/5/16.
+ */
 'use strict';
 (function(iViz, dc, _, $, d3) {
   iViz.view.component.OvertimeChart = function(ndx, opts, attributes) {
@@ -41,16 +43,18 @@
     var data = iViz.getAttrData(attributes.group_type);//data is an array
     if(!(data[0][attr_id] instanceof Date)){ //ensures a Date object will not be parsed into a Date
       data.forEach(function(d){ //parse every date in the data array
-        d[attr_id] = parseDate(d[attr_id]); //d[attr_id] = d.DATE_OF_DIAGNOSIS b/c attr_id is a variable
+        d[attr_id] = parseDate(d[attr_id]);
       }); //each date only has month-date-year; time is removed
     }
     var dateDimension = ndx.dimension(function(d){ //d refers to each object(the element) in the "data" array
       return d[attr_id];
     });//create date dimension
     var dateByFrequency = dateDimension.group();//create date group
-
+    /**
+     * 
+     * @returns {overtime chart instance}
+     */
     content.init = function (){
-     // var chartInstances = {};
       var overtimeChartInst_ = dc.barChart(opts.overtimeBarChartTarget, opts.groupid);
       
       overtimeChartInst_.width(375).height(70) //use range chart to select the range of the line chart
@@ -68,14 +72,17 @@
                 
       return overtimeChartInst_;
 
-    }; //lack of x axis might be because of margin
+    };
+    /**
+     * 
+     * @param {overtime chart instance} chartInst_
+     * @returns {Array of selected data}
+     */
     content.generateAccumulation = function(chartInst_){
         //sortedOvertimeData contains the sorted array of dates
         var sortedOvertimeData = chartInst_.dimension().top(Infinity).sort(function(a,b){
             return a[attr_id] - b[attr_id];
         });
-        console.log(chartInst_.group().top(Infinity))
-        console.log(chartInst_.dimension().top(Infinity))
         var sortedOvertimeDateData = [];
         for (var i = 0;i<sortedOvertimeData.length;i++){
             sortedOvertimeDateData.push(sortedOvertimeData[i][attr_id]);
@@ -124,7 +131,11 @@
         }
         return accDatesArray;
       }
-    content.drawOvertimeLine = function(chartInst_){
+    /**
+     * 
+     * @param {overtime chart instance} chartInst_
+     */
+     content.drawOvertimeLine = function(chartInst_){
           overtimeLineData = content.generateAccumulation(chartInst_);
         
           var margin = {top: 10, right: 10, bottom: 25, left: 40},
@@ -178,7 +189,8 @@
                   .attr("class", "line")
                   .attr("d", line);
       };
-    function initTsvDownloadData(){
+     
+      function initTsvDownloadData(){
       var data = "";
       var _dates = overtimeLineData;
       data = attributes.display_name + "\tAccumulated Number of Patients";
@@ -217,10 +229,8 @@
       };
     };
   };
-  iViz.view.component.OvertimeChart.prototype = new iViz.view.component.GeneralChart('overtimeChart'); //prototype of linechart is a new instance of GeneralChart, but with specific functionalities of lineChart
-                                                                                               //GeneralChart is defined in generalChart.js
-  iViz.view.component.OvertimeChart.constructor = iViz.view.component.overtimeChart; //constructor is a property that references the function that creates the object iViz..lineChart; assigning iViz...lineChart
-                                                                             //to the constructor ensures that calling it will create a new lineChart each time
+  iViz.view.component.OvertimeChart.prototype = new iViz.view.component.GeneralChart('overtimeChart'); 
+  iViz.view.component.OvertimeChart.constructor = iViz.view.component.overtimeChart; 
 })(window.iViz,
   window.dc,
   window._,

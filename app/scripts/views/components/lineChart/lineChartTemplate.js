@@ -87,7 +87,7 @@
                 initChart: function (){
                   var chartInstances =  this.lineChart.init();
                   this.rangeChartInst = chartInstances.rangeChart;
-                  this.chartInst = chartInstances.lineChart; //returns chartinstances which contains the instances of the line and range chart
+                  this.chartInst = chartInstances.lineChart; //assign chartinstances to the template
                   var self_ = this;
                   this.chartInst.on('filtered', function(_chartInst, _filter) {
                     if(!self_.filtersUpdated) {
@@ -120,8 +120,8 @@
                         lineChartTarget: "#" + this.chartId,
                         rangeChartTarget: "#" + this.rangeChartId
                     }; 
-                this.lineChart = new iViz.view.component.LineChart(this.ndx, opts, this.attributes); //create new instance of a line chart
-                this.initChart();                                                        //each time this function is called - will not 
+                this.lineChart = new iViz.view.component.LineChart(this.ndx, opts, this.attributes); //create new instance of a line/range chart each time this template is called
+                this.initChart();                                                        
                 this.lineChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);   
                 this.$dispatch('data-loaded', true);//loads data into line chart when it is added                                                                                                                                                                                                                                  
             }

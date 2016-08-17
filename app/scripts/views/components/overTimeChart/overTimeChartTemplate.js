@@ -30,16 +30,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * Created by James Xu on 8/5/16.
+ * Created by James Xu on 8/5/16.fr
+ */
+/**
+ * 
  */
 (function(Vue, dc, iViz, $, d3){
   Vue.component('overtimeChart',{
     template:'<div id = {{charDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :chart-ctrl="overtimeChart"  :has-chart-title="hasChartTitle" :display-name="displayName" :chart-id="chartId" '+
     ':chart="chartInst" :attributes="attributes" :show-operations="showOperations" :filters.sync="filters"></chart-operations>' +
-    '<div id = {{overtimeLineId}} class = "iviz-overtime-line-class"></div><div id={{chartId}} class="iviz-overtime-chart"></div></div>',  //everything written in template replaces
+    '<div id = {{overtimeLineId}} class = "iviz-overtime-line-class"></div><div id={{chartId}} class="iviz-overtime-chart"></div></div>',  //everything written in template replaces html
     props: ['ndx', 'data', 'groupid', 'attributes', 'filters'], //groupid, a dc mechanism, allows interactivity between charts within the same dc group;
-    //iviz controls filtering across groups
+                                                                //iviz controls filtering across groups
     data:function() {
       return {
         charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
@@ -123,10 +126,10 @@
         overtimeBarChartTarget: "#" + this.chartId,
         overtimeLineTarget: "#" + this.overtimeLineId
       };
-      this.overtimeChart = new iViz.view.component.OvertimeChart(this.ndx, opts, this.attributes); //create new instance of a line chart //assign everything in overtimeChart.js to this.overtimeChart
-      this.initChart();                                                        //each time this function is called - will not 
+      this.overtimeChart = new iViz.view.component.OvertimeChart(this.ndx, opts, this.attributes); 
+      this.initChart();
       this.overtimeChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
-      this.$dispatch('data-loaded', true);//loads data into line chart when it is added                                                                                                                                                                                                                                  
+      this.$dispatch('data-loaded', true);                                                                                                                                                                                                                                 
     }
   });
 })(window.Vue, window.dc, window.iViz,

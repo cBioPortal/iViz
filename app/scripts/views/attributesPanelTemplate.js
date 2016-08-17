@@ -1,55 +1,59 @@
-///*
-// * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
-// *
-// * This library is distributed in the hope that it will be useful, but WITHOUT
-// * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
-// * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
-// * is on an 'as is' basis, and Memorial Sloan-Kettering Cancer Center has no
-// * obligations to provide maintenance, support, updates, enhancements or
-// * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
-// * liable to any party for direct, indirect, special, incidental or
-// * consequential damages, including lost profits, arising out of the use of this
-// * software and its documentation, even if Memorial Sloan-Kettering Cancer
-// * Center has been advised of the possibility of such damage.
-// */
-//
-///*
-// * This file is part of cBioPortal.
-// *
-// * cBioPortal is free software: you can redistribute it and/or modify
-// * it under the terms of the GNU Affero General Public License as
-// * published by the Free Software Foundation, either version 3 of the
-// * License.
-// *
-// * This program is distributed in the hope that it will be useful,
-// * but WITHOUT ANY WARRANTY; without even the implied warranty of
-// * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// * GNU Affero General Public License for more details.
-// *
-// * You should have received a copy of the GNU Affero General Public License
-// * along with this program.  If not, see <http://www.gnu.org/licenses/>.
-// */
-///**
-// * Created by James Xu on 8/5/16.
-// */
-// 'use strict';
+/*
+ * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
+ * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
+ * is on an 'as is' basis, and Memorial Sloan-Kettering Cancer Center has no
+ * obligations to provide maintenance, support, updates, enhancements or
+ * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
+ * liable to any party for direct, indirect, special, incidental or
+ * consequential damages, including lost profits, arising out of the use of this
+ * software and its documentation, even if Memorial Sloan-Kettering Cancer
+ * Center has been advised of the possibility of such damage.
+ */
 
+/*
+ * This file is part of cBioPortal.
+ *
+ * cBioPortal is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * Created by James Xu on 8/5/16.
+ */
+
+ 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('attributesPanel', {
     template:     '<div id ="iviz-attributes-panel">'+//TODO: div changes size depending on number of charts/include default option is...
                 '<div id ="iviz-attributes-panel-text"><p>How would you like to visualize your data?</p>' +
                 '<p>The default is: <span>{{default_chart}}</span></p></div>'+
-                '<div id="iviz-attributes-panel-button-template">'+
+                '<div id="iviz-attributes-panel-button-template" v-bind:style="panel_size">'+
                 '<img v-on:click="choose_chart(panelChart.selected_chart)" v-for="panelChart in panelCharts" v-bind:src="panelChart.src" alt="panelcharts" '+
                 'id="iviz-attributes-panel-button">'+ 
-                '</div></div>', //the variable sampleChart is a string, cannot use {{}} to reference a string that contains html code, b/c it will not treat it as html code
+                '</div></div>', //cannot use {{}} to reference a string that contains html code, b/c it will not treat it as html code
 
-    props: ['viewtypes', 'attrid', 'datatype'], //bind viewtype here
+    props: ['viewtypes', 'attrid', 'datatype'], //bind viewtype here, component triggers b/c data is bound
     data: function() {
       return {
           panelCharts: [],
-          default_chart:''
-      }; //bind data- triggers component
+          default_chart:'',
+          panel_size: {
+              width:'',
+              height: ''
+          }
+      };
     }, 
     watch: {
 
@@ -58,12 +62,11 @@
         choose_chart:function(selected_chart){
                 this.$parent.addChart(this.attrid, selected_chart);
                 $("#iviz-attributes-panel").hide();
-                $("#iviz-add-chart").trigger("chosen:updated"); //put this in attributes panel in click event
+                $("#iviz-add-chart").trigger("chosen:updated");
         }
     },
     events: {
-        'openPanel':function(){
-//            make an array of corresponding images based on viewtypes
+        'openPanel':function(){//make an array of corresponding chart images based on viewtypes
         var self = this;
         var viewtypes = $.extend(true, [], self.viewtypes); //make a copy of viewtypes, which contains the array of possible viewtypes, first element is the selected chart
             _.each(viewtypes, function(_element, index){
@@ -75,7 +78,7 @@
                 case 'overtime_chart':
                     panelObj.src = 'images/overtimechart.png';
                     panelObj.selected_chart = 'overtimechart';  
-                    viewtypes[index] = panelObj; //this works instead of push it in because this replace the index each time, rather than adding to the array
+                    viewtypes[index] = panelObj;
                     break;
                 case 'line_chart':    
                     panelObj.src = 'images/linechart.png';
@@ -102,8 +105,12 @@
                     panelObj.selected_chart = 'survival';
                     viewtypes[index] = panelObj;
                     break;
-                }
-            switch (self.datatype){//default option
+                }                         
+        });   
+            self.panelCharts = viewtypes; //using push makes panelCharts have too many buttons b/c panelCharts is not being reset each time
+                                          //above method replaces elements in viewtypes each time, so it is updated
+                                          
+            switch (self.datatype){//sets default chart
                 case 'OVERTIME':
                     self.default_chart = 'the accumulation line chart';
                     break;
@@ -123,8 +130,23 @@
                     self.default_chart = 'table';
                     break;
             }    
-            self.panelCharts = viewtypes; //using push makes panelCharts have more than necessary amount of buttons b/c panelCharts is not being reset each time, but viewtypes is
-        });   
+            switch (this.panelCharts.length){ //panel dimensions change based on # of charts
+                case 1:
+                case 2:
+                    this.panel_size.width = '500px';
+                    this.panel_size.height = '200px';
+                    break;
+                case 3:
+                case 4:
+                    this.panel_size.width = '500px';
+                    this.panel_size.height = '350px';
+                    break;
+                case 5:
+                case 6:
+                     this.panel_size.width = '500px';
+                     this.panel_size.height = '500px';
+                     break;
+            }
             $("#iviz-attributes-panel").show();
         }
     },
