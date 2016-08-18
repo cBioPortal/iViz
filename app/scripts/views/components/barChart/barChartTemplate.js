@@ -86,11 +86,13 @@
       }
     },events: {
       'closeChart':function(){
+        dc.deregisterChart(this.chartInst, this.attributes.groupid);
+        this.chartInst.dimension().dispose();
         this.$dispatch('close');
       },
       'changeLogScale':function(logScaleChecked){
         $('#'+this.chartId).find('svg').remove();
-        dc.deregisterChart(this.chartInst, this.groupid);
+        dc.deregisterChart(this.chartInst, this.attributes.groupid);
         this.initChart(logScaleChecked);
       }
     },

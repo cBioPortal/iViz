@@ -91,6 +91,7 @@
           this.filters = [];
           this.updateFilters();
         }
+        this.invisibleDimension.dispose();
         this.$dispatch('close');
       }
     },

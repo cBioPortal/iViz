@@ -71,6 +71,7 @@
         this.showLoad = false;
       },
       'closeChart':function(){
+        this.invisibleDimension.dispose();
         this.$dispatch('close');
       }
     },

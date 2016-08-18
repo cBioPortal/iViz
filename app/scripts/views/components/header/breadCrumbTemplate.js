@@ -62,10 +62,6 @@
         filtersToSkipShowing:['MUT_CNT_VS_CNA','sample_id','patient_id']
       }
     },
-    watch: {
-      'filters': function(val) {
-      }
-    },
     methods: {
       removeFilter: function(val) {
         if (this.attributes.view_type === 'bar_chart') {

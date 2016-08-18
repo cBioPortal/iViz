@@ -95,6 +95,8 @@
       },
       'closeChart':function(){
         $('#' +this.charDivId).qtip('destroy');
+        dc.deregisterChart(this.chartInst, this.attributes.groupid);
+        this.chartInst.dimension().dispose();
         this.$dispatch('close');
       }
     },
