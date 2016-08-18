@@ -110,6 +110,7 @@
   <!-- endbuild -->
   
   <script src="scripts/model/dataProxy.js"></script>
+  <script src="_components/cbioportal-client.js"></script>
   
 </head>
 <body>
@@ -207,7 +208,13 @@
     window.mutationProfileId ='hnsc_tcga_mutations';
     window.cnaProfileId = 'hnsc_tcga_gistic';
     window.case_set_id = '-1';
-    iViz.data.init(window.cbioURL, ['hnsc_tcga'], iViz.init);
+    var studyCasesMap = {};
+    studyCasesMap['hnsc_tcga']={};
+    window.iviz = {};
+    window.iviz.datamanager = new iViz.data.init(window.cbioURL, studyCasesMap, iViz.init);
+    window.iviz.datamanager.initialSetup();
+    //  iViz.data.init(window.cbioURL, ['hnsc_tcga'], iViz.init);
+   
     
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
       iViz.vue.manage.getInstance().$broadcast('gene-list-updated',genes);

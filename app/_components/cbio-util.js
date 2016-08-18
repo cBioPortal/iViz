@@ -37,6 +37,108 @@ if (window.cbio === undefined)
 
 window.cbio.util = (function() {
 
+  var deepCopyObject = function (obj) {
+    return $.extend(true, ($.isArray(obj) ? [] : {}), obj);
+  };
+  var objectValues = function (obj) {
+    return Object.keys(obj).map(function (key) {
+      return obj[key];
+    });
+  };
+  var objectKeyDifference = function (from, by) {
+    var ret = {};
+    var from_keys = Object.keys(from);
+    for (var i = 0; i < from_keys.length; i++) {
+      if (!by[from_keys[i]]) {
+        ret[from_keys[i]] = true;
+      }
+    }
+    return ret;
+  };
+  var objectKeyValuePairs = function (obj) {
+    return Object.keys(obj).map(function (key) {
+      return [key, obj[key]];
+    });
+  };
+  var objectKeyUnion = function (list_of_objs) {
+    var union = {};
+    for (var i = 0; i < list_of_objs.length; i++) {
+      var keys = Object.keys(list_of_objs[i]);
+      for (var j = 0; j < keys.length; j++) {
+        union[keys[j]] = true;
+      }
+    }
+    return union;
+  };
+  var objectKeyIntersection = function(list_of_objs) {
+    var intersection = {};
+    for (var i = 0; i < list_of_objs.length; i++) {
+      if (i === 0) {
+        var keys = Object.keys(list_of_objs[0]);
+        for (var j = 0; j < keys.length; j++) {
+          intersection[keys[j]] = true;
+        }
+      } else {
+        var obj = list_of_objs[i];
+        var keys = Object.keys(intersection);
+        for (var j=0; j<keys.length; j++) {
+          if (!obj[keys[j]]) {
+            delete intersection[keys[j]];
+          }
+        }
+      }
+    }
+    return intersection;
+  };
+  var stringListToObject = function (list) {
+    var ret = {};
+    for (var i = 0; i < list.length; i++) {
+      ret[list[i]] = true;
+    }
+    return ret;
+  };
+  var stringListDifference = function (from, by) {
+    return Object.keys(
+      objectKeyDifference(
+        stringListToObject(from),
+        stringListToObject(by)));
+  };
+  var stringListUnion = function (list_of_string_lists) {
+    return Object.keys(
+      objectKeyUnion(
+        list_of_string_lists.map(function (string_list) {
+          return stringListToObject(string_list);
+        })
+      ));
+  };
+  var stringListUnique = function (list) {
+    return Object.keys(stringListToObject(list));
+  };
+  var flatten = function(list_of_lists) {
+    return list_of_lists.reduce(function(a,b) { return a.concat(b); }, []);
+  };
+
+  var makeCachedPromiseFunction = function (fetcher) {
+    // In: fetcher, a function that takes a promise as an argument, and resolves it with the desired data
+    // Out: a function which returns a promise that resolves with the desired data, deep copied
+    //	The idea is that the fetcher is only ever called once, even if the output function
+    //	of this method is called again while it's still waiting.
+    var fetch_promise = new $.Deferred();
+    var fetch_initiated = false;
+    return function () {
+      var def = new $.Deferred();
+      if (!fetch_initiated) {
+        fetch_initiated = true;
+        fetcher(this, fetch_promise);
+      }
+      fetch_promise.then(function (data) {
+        def.resolve(deepCopyObject(data));
+      });
+      return def.promise();
+    };
+  };
+  
+
     var toPrecision = function(number, precision, threshold) {
         // round to precision significant figures
         // with threshold being the upper bound on the numbers that are
@@ -387,7 +489,9 @@ window.cbio.util = (function() {
 	    getTargetWindow: getTargetWindow,
 	    getTargetDocument: getTargetDocument,
         getLinkToPatientView: getLinkToPatientView,
-        getLinkToSampleView: getLinkToSampleView
+        getLinkToSampleView: getLinkToSampleView,
+      deepCopyObject:deepCopyObject,
+      makeCachedPromiseFunction: makeCachedPromiseFunction
     };
 
 })();
