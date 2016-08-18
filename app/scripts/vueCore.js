@@ -150,13 +150,13 @@
               var attrData = self_.charts[attrId];
               var _attrAdded = false;
               var _group = {};
-              _.each(self_.groups,function(group){
+              _.every(self_.groups,function(group){
                 if(group.type === attrData.group_type){
                   if(group.attributes.length<31){
                     attrData.group_id = group.id;
                     group.attributes.push(attrData);
                     _attrAdded = true;
-                    return false;
+                    return true;
                   }else{
                     _group = group;
                   }
@@ -165,11 +165,12 @@
               if(!_attrAdded){
                 var newgroup_ = {};
                 var groupAttrs = [];
-                groupAttrs.push(attrData);
                 // newgroup_.data = _group.data;
                 newgroup_.type = _group.type;
                 newgroup_.id = self_.groupCount;
+                attrData.group_id = newgroup_.id;
                 self_.groupCount = self_.groupCount+1;
+                groupAttrs.push(attrData);
                 newgroup_.attributes = groupAttrs;
                 self_.groups.push(newgroup_);
               }
