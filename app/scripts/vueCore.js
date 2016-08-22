@@ -156,10 +156,12 @@
                     attrData.group_id = group.id;
                     group.attributes.push(attrData);
                     _attrAdded = true;
-                    return true;
+                    return false;
                   }else{
                     _group = group;
                   }
+                }else{
+                  return true;
                 }
               });
               if(!_attrAdded){
