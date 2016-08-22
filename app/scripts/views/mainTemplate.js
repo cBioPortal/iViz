@@ -72,13 +72,13 @@
         }
       }
     }, methods: {
+      sortByNumber: function(a, b){
+        var aName = Number(a.element.attributes['data-number'].nodeValue);
+        var bName = Number(b.element.attributes['data-number'].nodeValue);
+        return ((aName < bName) ? 1 : ((aName > bName) ? -1 : 0));
+      },
       updateGrid: function(ChartsIds) {
         var self_ = this;
-        function SortByNumber(a, b){
-          var aName = Number(a.element.attributes['data-number'].nodeValue);
-          var bName = Number(b.element.attributes['data-number'].nodeValue);
-          return ((aName < bName) ? 1 : ((aName > bName) ? -1 : 0));
-        }
         if (this.grid_ !== '') {
           _.each(ChartsIds,function(chartId){
             self_.grid_.addItems(  $('#'+chartId) )
@@ -92,7 +92,7 @@
             gutter: 5,
             initLayout: false
           });
-          self_.grid_.items.sort(SortByNumber);
+          self_.grid_.items.sort(this.sortByNumber);
         }
         _.each(self_.grid_.getItemElements(), function(_gridItem) {
           var _draggie = new Draggabilly(_gridItem, {
