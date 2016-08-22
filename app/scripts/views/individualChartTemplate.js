@@ -67,13 +67,6 @@
         currentView: currentView
       }
     },
-    watch: {
-      'attributes.show': function(newVal) {
-        if (!newVal)
-          this.$dispatch('update-grid',true)
-        $("#iviz-add-chart").trigger("chosen:updated");
-      }
-    },
     events: {
       'close': function () {
         this.attributes.show = false;

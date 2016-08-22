@@ -62,30 +62,38 @@
           this.completeSamplesList = _.keys(iViz.getCasesMap('sample')).sort();
         }
       },
-      /*'patientmap':function(val){
-        this.completePatientsList =  _.keys(val);
-      },
-      'samplemap' : function(val){
-        this.completeSamplesList =  _.keys(val);
-      },*/
-      'messages': function(val) {
-        _.each(this.groups, function(group) {
-          dc.renderAll(group.id);
-        });
-        this.updateGrid();
+      'messages': function(ChartsIds) {
+        if(ChartsIds.length>0){
+          _.each(this.groups, function(group) {
+            dc.renderAll(group.id);
+          });
+          this.updateGrid(ChartsIds);
+          this.messages.length=0;
+        }
       }
     }, methods: {
-      updateGrid: function() {
-        if (this.grid_ !== '') {
-          this.grid_.destroy();
-        }
-        this.grid_ = new Packery(document.querySelector('.grid'), {
-          itemSelector: '.grid-item',
-          columnWidth: 190,
-          rowHeight: 170,
-          gutter: 5
-        });
+      updateGrid: function(ChartsIds) {
         var self_ = this;
+        function SortByNumber(a, b){
+          var aName = Number(a.element.attributes['data-number'].nodeValue);
+          var bName = Number(b.element.attributes['data-number'].nodeValue);
+          return ((aName < bName) ? 1 : ((aName > bName) ? -1 : 0));
+        }
+        if (this.grid_ !== '') {
+          _.each(ChartsIds,function(chartId){
+            self_.grid_.addItems(  $('#'+chartId) )
+          });
+          self_.grid_.layout();
+        }else{
+          self_.grid_ = new Packery(document.querySelector('.grid'), {
+            itemSelector: '.grid-item',
+            columnWidth: 190,
+            rowHeight: 170,
+            gutter: 5,
+            initLayout: false
+          });
+          self_.grid_.items.sort(SortByNumber);
+        }
         _.each(self_.grid_.getItemElements(), function(_gridItem) {
           var _draggie = new Draggabilly(_gridItem, {
             handle: '.dc-chart-drag'
@@ -101,12 +109,11 @@
         this.selectedSamplesByFilters = [];
         this.$broadcast('clear-group');
       },
-      'update-grid': function(reload) {
-        if(reload){
-          this.updateGrid()
-        }else{
+      'update-grid': function() {
           this.grid_.layout();
-        }
+      },'remove-grid-item': function(item){
+        this.grid_.remove(item);
+        this.grid_.layout();
       },
       'data-loaded': function(msg) {
         // TODO:check for all charts loaded

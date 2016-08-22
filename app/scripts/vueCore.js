@@ -182,8 +182,8 @@
               var attributes = self.groups[attrData.group_id].attributes;
               attributes.$remove(attrData);
 
+              self.$broadcast('remove-grid-item',$('#chart-'+attrId+'-div'));
               self.$nextTick(function () {
-                self.$broadcast('update-grid',true);
                 $("#iviz-add-chart").trigger("chosen:updated");
               })
             },

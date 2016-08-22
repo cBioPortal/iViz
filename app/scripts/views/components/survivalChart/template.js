@@ -35,7 +35,7 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('survival', {
-    template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+    template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" data-number="9" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
               '<chart-operations :show-operations="showOperations" :has-chart-title="hasChartTitle" :display-name="displayName" :groupid="groupid" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
               '<div :class="{\'start-loading\': showLoad}" class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} ></div>' +
               '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
@@ -102,7 +102,7 @@
       var data = iViz.getAttrData(this.attributes.group_type);
       _self.chartInst.init(data, _opts, _selectedPatientList);
       _self.showLoad = false;
-      this.$dispatch('data-loaded', true);
+      this.$dispatch('data-loaded', this.chartDivId);
     }
   });
 })(window.Vue, window.dc, window.iViz,

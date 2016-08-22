@@ -35,7 +35,7 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('tableView', {
-    template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+    template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" data-number="7" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" :display-name="displayName" :chart-ctrl="chartInst"' +
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" :chart="chartInst" ' +
     ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" :filters.sync="filters"></chart-operations>' +
@@ -153,7 +153,7 @@
       _self.chartInst.init(this.attributes, this.$root.selectedsamples, this.$root.selectedgenes, data, this.chartId, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
       _self.showLoad = false;
-      this.$dispatch('data-loaded', true);
+      this.$dispatch('data-loaded', this.chartDivId);
     }
   });
 })(window.Vue, window.dc, window.iViz,
