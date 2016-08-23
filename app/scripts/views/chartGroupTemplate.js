@@ -50,6 +50,23 @@
       this.groupid = this.id;
       this.ndx = ndx_;
       this.invisibleChartFilters = [];
+      var filtersMap = {};
+      if(this.type === 'sample' && this.mappedsamples !== undefined && this.mappedsamples.length>0){
+        this.invisibleChartFilters = this.mappedsamples;
+      }
+      if(this.type === 'patient' && this.mappedpatients !== undefined && this.mappedpatients.length>0){
+        this.invisibleChartFilters = this.mappedpatients;
+      }
+      if(this.invisibleChartFilters.length>0){
+        _.each(this.invisibleChartFilters,function(filter){
+          if(filtersMap[filter] === undefined){
+            filtersMap[filter] = true;
+          }
+        });
+        this.invisibleBridgeDimension.filterFunction(function(d){
+          return (filtersMap[d] !== undefined);
+        });
+      }
     }, destroyed: function() {
       dc.chartRegistry.clear(this.groupid);
     },
@@ -104,7 +121,7 @@
           var filteredCases = _.pluck(this.invisibleBridgeDimension.top(Infinity),attrId).sort();
           //hackey way to check if filter selected filter cases is same as original case list
           if(filteredCases.length !== this.ndx.size()){
-            iViz.setGroupFilteredCases(this.id, filteredCases);
+            iViz.setGroupFilteredCases(this.id, this.type, filteredCases);
           }else{
             iViz.deleteGroupFilteredCases(this.id)
           }
@@ -126,10 +143,20 @@
     },
     methods: {
       updateInvisibleChart: function(val) {
-        this.invisibleChartFilters = val;
-        var filtersMap = {};
-        if(val.length>0){
-          _.each(val,function(filter){
+        var _groupCases = iViz.getGroupFilteredCases();
+        var _casesTOApply = val;
+        var _self = this;
+        _.each(_groupCases,function(_group, id){
+          if(_group !== undefined && _group.type === _self.type && (_self.id.toString() !== id)){
+            _casesTOApply = iViz.util.intersection(_casesTOApply,_group.cases);
+          }
+        });
+        this.invisibleChartFilters = [];
+        this.invisibleBridgeDimension.filterAll();
+        if(_casesTOApply.length>0){
+          this.invisibleChartFilters = _casesTOApply;
+          var filtersMap = {};
+          _.each(_casesTOApply,function(filter){
             if(filtersMap[filter] === undefined){
               filtersMap[filter] = true;
             }
@@ -137,8 +164,6 @@
           this.invisibleBridgeDimension.filterFunction(function(d){
             return (filtersMap[d] !== undefined);
           });
-        }else{
-          this.invisibleBridgeDimension.filterAll();
         }
         this.redrawgroups.push(this.id);
       }

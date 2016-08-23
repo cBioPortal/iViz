@@ -159,6 +159,7 @@
                     return false;
                   }else{
                     _group = group;
+                    return true;
                   }
                 }else{
                   return true;
