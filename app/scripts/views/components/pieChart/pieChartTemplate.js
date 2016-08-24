@@ -36,7 +36,7 @@
 (function(Vue, dc, iViz, $) {
 
   Vue.component('pieChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" ' +
+    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" data-number="6" ' +
               '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
               '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
               ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
@@ -154,7 +154,7 @@
           // Trigger pie chart filtered event.
           _self.piechart.filtered();
         });
-        _self.$dispatch('data-loaded', true);
+        _self.$dispatch('data-loaded', this.charDivId);
       
     }
   });

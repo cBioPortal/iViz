@@ -283,7 +283,7 @@
         selectedRowData.push(data);
       }
       else {
-        selectedRowData = _.filter(selectedRowData, function(index, item) {
+        selectedRowData = _.filter(selectedRowData, function(item) {
           return (item.uniqueId === selected.uniqueId);
         });
       }

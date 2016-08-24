@@ -35,8 +35,8 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('mainTemplate', {
-    template: ' <chart-group :redrawgroups.sync="redrawgroups" :id="group.id" :type="group.type" :mappedpatients="patientsync"' +
-    ' :mappedsamples="samplesync" :attributes.sync="group.attributes"' +
+    template: ' <chart-group :redrawgroups.sync="redrawgroups" :id="group.id" :type="group.type" :mappedcases="group.type==\'patient\'?patientsync:samplesync" ' +
+    ' :attributes.sync="group.attributes"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'hasfilters', 'redrawgroups', 'customfilter'
@@ -62,30 +62,38 @@
           this.completeSamplesList = _.keys(iViz.getCasesMap('sample')).sort();
         }
       },
-      /*'patientmap':function(val){
-        this.completePatientsList =  _.keys(val);
-      },
-      'samplemap' : function(val){
-        this.completeSamplesList =  _.keys(val);
-      },*/
-      'messages': function(val) {
-        _.each(this.groups, function(group) {
-          dc.renderAll(group.id);
-        });
-        this.updateGrid();
+      'messages': function(ChartsIds) {
+        if(ChartsIds.length>0){
+          _.each(this.groups, function(group) {
+            dc.renderAll(group.id);
+          });
+          this.updateGrid(ChartsIds);
+          this.messages.length=0;
+        }
       }
     }, methods: {
-      updateGrid: function() {
-        if (this.grid_ !== '') {
-          this.grid_.destroy();
-        }
-        this.grid_ = new Packery(document.querySelector('.grid'), {
-          itemSelector: '.grid-item',
-          columnWidth: 190,
-          rowHeight: 170,
-          gutter: 5
-        });
+      sortByNumber: function(a, b){
+        var aName = Number(a.element.attributes['data-number'].nodeValue);
+        var bName = Number(b.element.attributes['data-number'].nodeValue);
+        return ((aName < bName) ? 1 : ((aName > bName) ? -1 : 0));
+      },
+      updateGrid: function(ChartsIds) {
         var self_ = this;
+        if (this.grid_ !== '') {
+          _.each(ChartsIds,function(chartId){
+            self_.grid_.addItems(  $('#'+chartId) )
+          });
+          self_.grid_.layout();
+        }else{
+          self_.grid_ = new Packery(document.querySelector('.grid'), {
+            itemSelector: '.grid-item',
+            columnWidth: 190,
+            rowHeight: 170,
+            gutter: 5,
+            initLayout: false
+          });
+          self_.grid_.items.sort(this.sortByNumber);
+        }
         _.each(self_.grid_.getItemElements(), function(_gridItem) {
           var _draggie = new Draggabilly(_gridItem, {
             handle: '.dc-chart-drag'
@@ -101,32 +109,46 @@
         this.selectedSamplesByFilters = [];
         this.$broadcast('clear-group');
       },
-      'update-grid': function(reload) {
-        if(reload){
-          this.updateGrid()
-        }else{
+      'update-grid': function() {
           this.grid_.layout();
-        }
+      },'remove-grid-item': function(item){
+        this.grid_.remove(item);
+        this.grid_.layout();
       },
       'data-loaded': function(msg) {
         // TODO:check for all charts loaded
         this.messages.push(msg);
       },
+      /*
+      * This method is to find out the selected cases and the cases to be synced between groups
+      * STEPS involve
+      * 
+      * 1. Check if there are any custom case filter. If yes update filter case list
+      * 2. Loop thorough groups and do the following
+      *   a. Check for filters in each attribute and set _hasFilters flag
+      *   b. Capture all filters for that(input) particular type group(patient/sample)
+      * 3. Check of empty selected and counter selected cases and update accordingly
+      * 4. Get the counter mapped cases for the selected cases
+      * 5. Find the result counter selected cases
+      * 6. Find the result selected cases
+      * 7. Find the cases to sync
+      * 8. Set the results according to the type of the update(patient/sample)
+      * 
+      * Note : If the filter update is from patient group then its counter would be sample 
+      * and if filter update is from sample group then its counter would be patient
+       */
       'update-all-filters':function(updateType_){
-        var _allSelectedPatientIdsByFilters = [];
-        var _allSelectedSampleIdsByFilters = [];
+        var _selectedCasesByFilters = [];
+        var _counterSelectedCasesByFilters = [];
         var self_ = this;
         var _hasFilters = false;
+        var _caseType = (updateType_=== 'patient') ? 'patient' : 'sample';
+        var _counterCaseType = (updateType_=== 'patient') ? 'sample' : 'patient';
 
-        if (self_.customfilter.patientIds.length > 0) {
+        if (self_.customfilter.patientIds.length > 0 || self_.customfilter.sampleIds.length > 0) {
           _hasFilters = true;
-          _allSelectedPatientIdsByFilters = self_.customfilter.patientIds;
+          _selectedCasesByFilters = self_.customfilter.patientIds.length > 0 ? self_.customfilter.patientIds : self_.customfilter.sampleIds;
         }
-        if (self_.customfilter.sampleIds.length > 0) {
-          _hasFilters = true;
-          _allSelectedSampleIdsByFilters = self_.customfilter.sampleIds;
-        }
-
         _.each(self_.groups, function (group) {
           _.each(group.attributes, function (attributes) {
             if (attributes.show) {
@@ -135,82 +157,47 @@
               }
             }
           });
-
-          var _groupFilteredCases = iViz.getGroupFilteredCases(group.id);
-          if (_groupFilteredCases !== undefined && _groupFilteredCases.length > 0) {
-            if (updateType_ === group.type) {
-              if (updateType_ === 'patient') {
-                if (_groupFilteredCases.length !== self_.completePatientsList.length)
-                  if (_allSelectedPatientIdsByFilters.length === 0) {
-                    _allSelectedPatientIdsByFilters = _groupFilteredCases;
-                  } else {
-                    _allSelectedPatientIdsByFilters = iViz.util.intersection(_allSelectedPatientIdsByFilters, _groupFilteredCases);
-                  }
+          if(group.type === updateType_){
+            var _groupFilteredCases = iViz.getGroupFilteredCases(group.id) !== undefined ? iViz.getGroupFilteredCases(group.id).cases : [];
+            if (_groupFilteredCases.length > 0) {
+              if (_selectedCasesByFilters.length === 0) {
+                _selectedCasesByFilters = _groupFilteredCases;
               } else {
-                if (_groupFilteredCases.length !== self_.completeSamplesList.length)
-                  if (_allSelectedSampleIdsByFilters.length === 0) {
-                    _allSelectedSampleIdsByFilters = _groupFilteredCases;
-                  } else {
-                    _allSelectedSampleIdsByFilters = iViz.util.intersection(_allSelectedSampleIdsByFilters, _groupFilteredCases);
-                  }
+                _selectedCasesByFilters = iViz.util.intersection(_selectedCasesByFilters, _groupFilteredCases);
               }
             }
           }
         });
         self_.hasfilters = _hasFilters;
-
-        var _resultSelectedSamples = [];
-        var _resultSelectedPatients = [];
         if (updateType_ === 'patient') {
-          self_.selectedPatientsByFilters = _allSelectedPatientIdsByFilters.sort();
-          var _selectedSamplesByFiltersOnly = self_.selectedSamplesByFilters;
-          if(_selectedSamplesByFiltersOnly.length ===0){
-            _selectedSamplesByFiltersOnly = self_.completeSamplesList;
-          }
-          if (_allSelectedPatientIdsByFilters.length === 0) {
-            self_.patientsync = [];
-            self_.samplesync = [];
-            _resultSelectedSamples = iViz.util.intersection(self_.completeSamplesList,
-              _selectedSamplesByFiltersOnly);
-            _resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _resultSelectedSamples);
-          } else {
-            var _mappedSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _allSelectedPatientIdsByFilters);
-            _mappedSelectedSamples.sort();
-            _resultSelectedSamples = iViz.util.intersection(_mappedSelectedSamples,
-              _selectedSamplesByFiltersOnly);
-            _resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _resultSelectedSamples);
-            self_.patientsync = _allSelectedPatientIdsByFilters;
-            self_.samplesync = _mappedSelectedSamples;
-
-          }
-        } else {
-          self_.selectedSamplesByFilters = _allSelectedSampleIdsByFilters.sort();
-          var _selectedPatientsByFiltersOnly = self_.selectedPatientsByFilters;
-          if(_selectedPatientsByFiltersOnly.length ===0){
-            _selectedPatientsByFiltersOnly = self_.completePatientsList;
-          }
-          if (_allSelectedSampleIdsByFilters.length === 0) {
-            self_.patientsync = [];
-            self_.samplesync = [];
-            _resultSelectedPatients = iViz.util.intersection(self_.completePatientsList,
-              _selectedPatientsByFiltersOnly);
-            _resultSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _resultSelectedPatients);
-          } else {
-            var _mappedSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _allSelectedSampleIdsByFilters);
-            _mappedSelectedPatients.sort();
-            _resultSelectedPatients = iViz.util.intersection(_mappedSelectedPatients,
-              _selectedPatientsByFiltersOnly);
-            _resultSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _resultSelectedPatients);
-            self_.patientsync = _mappedSelectedPatients;
-            self_.samplesync = _allSelectedSampleIdsByFilters;
-          }
+          self_.selectedPatientsByFilters = _selectedCasesByFilters.sort();
+          _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ? self_.completePatientsList : _selectedCasesByFilters;
+          _counterSelectedCasesByFilters = this.selectedSamplesByFilters.length === 0 ? self_.completeSamplesList : this.selectedSamplesByFilters;
+        }else{
+          self_.selectedSamplesByFilters = _selectedCasesByFilters.sort();
+          _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ? self_.completeSamplesList : _selectedCasesByFilters;
+          _counterSelectedCasesByFilters = this.selectedPatientsByFilters.length === 0 ? self_.completePatientsList : this.selectedPatientsByFilters;
         }
 
-        self_.$nextTick(function () {
-          self_.selectedsamples = _resultSelectedSamples;
-          self_.selectedpatients = _resultSelectedPatients;
-        });
-       
+        var _mappedCounterSelectedCases = iViz.util.idMapping(iViz.getCasesMap(_caseType), _selectedCasesByFilters);
+        _mappedCounterSelectedCases.sort();
+        var _resultCounterSelectedCases = iViz.util.intersection(_mappedCounterSelectedCases,
+          _counterSelectedCasesByFilters);
+        var _resultSelectedCases = iViz.util.idMapping(iViz.getCasesMap(_counterCaseType), _resultCounterSelectedCases);
+        var _casesSync = iViz.util.idMapping(iViz.getCasesMap(_counterCaseType), _counterSelectedCasesByFilters);
+        var _counterCasesSync = _mappedCounterSelectedCases;
+
+        if (updateType_ === 'patient') {
+          self_.patientsync = _casesSync;
+          self_.samplesync = _counterCasesSync;
+          self_.selectedsamples =  _resultCounterSelectedCases;
+          self_.selectedpatients = _resultSelectedCases;
+        }else{
+          self_.samplesync = _casesSync;
+          self_.patientsync = _counterCasesSync;
+          self_.selectedsamples =  _resultSelectedCases;
+          self_.selectedpatients = _resultCounterSelectedCases;
+        }
       },
       'update-custom-filters': function() {
         if (this.customfilter.type === 'patient') {

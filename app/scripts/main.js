@@ -144,11 +144,16 @@ var iViz = (function (_, $) {
 
 
     }, // ---- close init function ----groups
-    setGroupFilteredCases : function(groupId_, filters_){
-      groupFiltersMap_[groupId_] = filters_;
+    setGroupFilteredCases : function(groupId_, type_, filters_){
+      groupFiltersMap_[groupId_] = {};
+      groupFiltersMap_[groupId_].type = type_;
+      groupFiltersMap_[groupId_].cases = filters_;
     },
     getGroupFilteredCases : function(groupId_){
-      return groupFiltersMap_[groupId_];
+      if(groupId_ !== undefined){
+        return groupFiltersMap_[groupId_];
+      }
+      return groupFiltersMap_;
     },deleteGroupFilteredCases : function(groupId_){
       groupFiltersMap_[groupId_] = undefined;
     },
