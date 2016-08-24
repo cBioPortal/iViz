@@ -117,20 +117,22 @@
         this.showLogScale =this.barChart.hasLogScale();
         var self_ = this;
         this.chartInst.on('filtered', function(_chartInst, _filter) {
-          if(!self_.filtersUpdated) {
-            self_.filtersUpdated = true;
-            var tempFilters_ = $.extend(true, [], self_.filters);
-            tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-              self_.attributes.view_type);
-            if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
-              tempFilters_[0] = tempFilters_[0].toFixed(2);
-              tempFilters_[1] = tempFilters_[1].toFixed(2);
+          dc.events.trigger(function() {
+            if(!self_.filtersUpdated) {
+              self_.filtersUpdated = true;
+              var tempFilters_ = $.extend(true, [], self_.filters);
+              tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
+                self_.attributes.view_type);
+              if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
+                tempFilters_[0] = tempFilters_[0].toFixed(2);
+                tempFilters_[1] = tempFilters_[1].toFixed(2);
+              }
+              self_.filters = tempFilters_;
+              self_.$dispatch('update-filters');
+            }else{
+              self_.filtersUpdated = false;
             }
-            self_.filters = tempFilters_;
-            self_.$dispatch('update-filters');
-          }else{
-            self_.filtersUpdated = false;
-          }
+          }, 400);
         });
       }
     },
