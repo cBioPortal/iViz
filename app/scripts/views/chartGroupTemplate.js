@@ -39,32 +39,21 @@
     ' :ndx="ndx" :groupid="groupid"' +
     ' :attributes.sync="attribute" v-for="attribute in attributes"></div>',
     props: [
-      'attributes', 'type', 'mappedsamples', 'id',
-      'mappedpatients', 'groupid', 'redrawgroups'
+      'attributes', 'type', 'id', 'groupid', 'redrawgroups', 'mappedcases'
     ], created: function() {
       //TODO: update this.data
+      var _self = this;
       var data_ = iViz.getAttrData(this.type);
       var ndx_ = crossfilter(data_);
-      var attrId = this.type==='patient'?'patient_id':'sample_id';
-      this.invisibleBridgeDimension =  ndx_.dimension(function (d) { return d[attrId]; });
+      this.invisibleBridgeDimension =  ndx_.dimension(function (d) { return d[_self.type+'_id']; });
       this.groupid = this.id;
       this.ndx = ndx_;
       this.invisibleChartFilters = [];
       var filtersMap = {};
-      if(this.type === 'sample' && this.mappedsamples !== undefined && this.mappedsamples.length>0){
-        this.invisibleChartFilters = this.mappedsamples;
-      }
-      if(this.type === 'patient' && this.mappedpatients !== undefined && this.mappedpatients.length>0){
-        this.invisibleChartFilters = this.mappedpatients;
-      }
-      if(this.invisibleChartFilters.length>0){
-        _.each(this.invisibleChartFilters,function(filter){
-          if(filtersMap[filter] === undefined){
-            filtersMap[filter] = true;
-          }
-        });
-        this.invisibleBridgeDimension.filterFunction(function(d){
-          return (filtersMap[d] !== undefined);
+     
+      if(this.mappedcases !== undefined && this.mappedcases.length>0){
+        this.$nextTick(function(){
+          _self.updateInvisibleChart(_self.mappedcases);
         });
       }
     }, destroyed: function() {
@@ -72,29 +61,17 @@
     },
     data: function() {
       return {
-        syncPatient: true,
-        syncSample: true,
-        clearGroup:false
+        clearGroup:false,
+        syncCases: true
       }
     },
     watch: {
-      'mappedsamples': function(val) {
-        if (this.type === 'sample') {
-          if (this.syncSample) {
+      'mappedcases': function(val) {
+          if (this.syncCases) {
             this.updateInvisibleChart(val);
           }else {
-            this.syncSample = true;
+            this.syncCases = true;
           }
-        }
-      },
-      'mappedpatients': function(val) {
-        if (this.type === 'patient') {
-          if (this.syncPatient) {
-            this.updateInvisibleChart(val);
-          } else {
-            this.syncPatient = true;
-          }
-        }
       }
     },
     events: {
@@ -109,16 +86,23 @@
           self_.clearGroup = false;
         });
       },
+      /*
+      *This event is invoked whenever there is a filter update on any chart
+      * STEPS involved
+      * 
+      * 1. Clear filters on invisible group bridge chart
+      * 2. Get all the filtered cases fot that particular chart group
+      * 3. If those filtered cases length not same as original cases length then save that case list in the groupFilterMap
+      * 4. Apply back invisible group bridge chart filters
+      * 
+       */
       'update-filters': function() {
         if(!this.clearGroup){
-          this.syncPatient = false;
-          this.syncSample = false;
-          var _filters = [], _caseSelect = [];
-          var attrId = this.type==='patient'?'patient_id':'sample_id';
+          this.syncCases = false;
           if(this.invisibleChartFilters.length>0) {
             this.invisibleBridgeDimension.filterAll();
           }
-          var filteredCases = _.pluck(this.invisibleBridgeDimension.top(Infinity),attrId).sort();
+          var filteredCases = _.pluck(this.invisibleBridgeDimension.top(Infinity),this.type+'_id').sort();
           //hackey way to check if filter selected filter cases is same as original case list
           if(filteredCases.length !== this.ndx.size()){
             iViz.setGroupFilteredCases(this.id, this.type, filteredCases);
@@ -144,19 +128,19 @@
     methods: {
       updateInvisibleChart: function(val) {
         var _groupCases = iViz.getGroupFilteredCases();
-        var _casesTOApply = val;
+        var _selectedCases = val;
         var _self = this;
         _.each(_groupCases,function(_group, id){
           if(_group !== undefined && _group.type === _self.type && (_self.id.toString() !== id)){
-            _casesTOApply = iViz.util.intersection(_casesTOApply,_group.cases);
+            _selectedCases = iViz.util.intersection(_selectedCases,_group.cases);
           }
         });
         this.invisibleChartFilters = [];
         this.invisibleBridgeDimension.filterAll();
-        if(_casesTOApply.length>0){
-          this.invisibleChartFilters = _casesTOApply;
+        if(_selectedCases.length>0){
+          this.invisibleChartFilters = _selectedCases;
           var filtersMap = {};
-          _.each(_casesTOApply,function(filter){
+          _.each(_selectedCases,function(filter){
             if(filtersMap[filter] === undefined){
               filtersMap[filter] = true;
             }

@@ -36,11 +36,9 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('individualChart', {
-    template: /*'<div v-if="attributes.show">' +*/
-    '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
+    template: '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
     ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
-    ':ndx="ndx" :attributes.sync="attributes"></component>'
-    /*'</div>'*/,
+    ':ndx="ndx" :attributes.sync="attributes"></component>',
     props: [
       'ndx', 'attributes', 'groupid'
     ],

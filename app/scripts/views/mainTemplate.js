@@ -35,8 +35,8 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('mainTemplate', {
-    template: ' <chart-group :redrawgroups.sync="redrawgroups" :id="group.id" :type="group.type" :mappedpatients="patientsync"' +
-    ' :mappedsamples="samplesync" :attributes.sync="group.attributes"' +
+    template: ' <chart-group :redrawgroups.sync="redrawgroups" :id="group.id" :type="group.type" :mappedcases="group.type==\'patient\'?patientsync:samplesync" ' +
+    ' :attributes.sync="group.attributes"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'hasfilters', 'redrawgroups', 'customfilter'
@@ -119,21 +119,36 @@
         // TODO:check for all charts loaded
         this.messages.push(msg);
       },
+      /*
+      * This method is to find out the selected cases and the cases to be synced between groups
+      * STEPS involve
+      * 
+      * 1. Check if there are any custom case filter. If yes update filter case list
+      * 2. Loop thorough groups and do the following
+      *   a. Check for filters in each attribute and set _hasFilters flag
+      *   b. Capture all filters for that(input) particular type group(patient/sample)
+      * 3. Check of empty selected and counter selected cases and update accordingly
+      * 4. Get the counter mapped cases for the selected cases
+      * 5. Find the result counter selected cases
+      * 6. Find the result selected cases
+      * 7. Find the cases to sync
+      * 8. Set the results according to the type of the update(patient/sample)
+      * 
+      * Note : If the filter update is from patient group then its counter would be sample 
+      * and if filter update is from sample group then its counter would be patient
+       */
       'update-all-filters':function(updateType_){
-        var _allSelectedPatientIdsByFilters = [];
-        var _allSelectedSampleIdsByFilters = [];
+        var _selectedCasesByFilters = [];
+        var _counterSelectedCasesByFilters = [];
         var self_ = this;
         var _hasFilters = false;
+        var _caseType = (updateType_=== 'patient') ? 'patient' : 'sample';
+        var _counterCaseType = (updateType_=== 'patient') ? 'sample' : 'patient';
 
-        if (self_.customfilter.patientIds.length > 0) {
+        if (self_.customfilter.patientIds.length > 0 || self_.customfilter.sampleIds.length > 0) {
           _hasFilters = true;
-          _allSelectedPatientIdsByFilters = self_.customfilter.patientIds;
+          _selectedCasesByFilters = self_.customfilter.patientIds.length > 0 ? self_.customfilter.patientIds : self_.customfilter.sampleIds;
         }
-        if (self_.customfilter.sampleIds.length > 0) {
-          _hasFilters = true;
-          _allSelectedSampleIdsByFilters = self_.customfilter.sampleIds;
-        }
-
         _.each(self_.groups, function (group) {
           _.each(group.attributes, function (attributes) {
             if (attributes.show) {
@@ -142,64 +157,47 @@
               }
             }
           });
-
-          var _groupFilteredCases = iViz.getGroupFilteredCases(group.id) !== undefined?iViz.getGroupFilteredCases(group.id).cases:[];
-          if (_groupFilteredCases.length > 0) {
-            if (updateType_ === group.type) {
-              if (updateType_ === 'patient') {
-                if (_groupFilteredCases.length !== self_.completePatientsList.length)
-                  if (_allSelectedPatientIdsByFilters.length === 0) {
-                    _allSelectedPatientIdsByFilters = _groupFilteredCases;
-                  } else {
-                    _allSelectedPatientIdsByFilters = iViz.util.intersection(_allSelectedPatientIdsByFilters, _groupFilteredCases);
-                  }
+          if(group.type === updateType_){
+            var _groupFilteredCases = iViz.getGroupFilteredCases(group.id) !== undefined ? iViz.getGroupFilteredCases(group.id).cases : [];
+            if (_groupFilteredCases.length > 0) {
+              if (_selectedCasesByFilters.length === 0) {
+                _selectedCasesByFilters = _groupFilteredCases;
               } else {
-                if (_groupFilteredCases.length !== self_.completeSamplesList.length)
-                  if (_allSelectedSampleIdsByFilters.length === 0) {
-                    _allSelectedSampleIdsByFilters = _groupFilteredCases;
-                  } else {
-                    _allSelectedSampleIdsByFilters = iViz.util.intersection(_allSelectedSampleIdsByFilters, _groupFilteredCases);
-                  }
+                _selectedCasesByFilters = iViz.util.intersection(_selectedCasesByFilters, _groupFilteredCases);
               }
             }
           }
         });
         self_.hasfilters = _hasFilters;
         if (updateType_ === 'patient') {
-          self_.selectedPatientsByFilters = _allSelectedPatientIdsByFilters.sort();
-          _allSelectedSampleIdsByFilters = this.selectedSamplesByFilters;
+          self_.selectedPatientsByFilters = _selectedCasesByFilters.sort();
+          _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ? self_.completePatientsList : _selectedCasesByFilters;
+          _counterSelectedCasesByFilters = this.selectedSamplesByFilters.length === 0 ? self_.completeSamplesList : this.selectedSamplesByFilters;
         }else{
-          self_.selectedSamplesByFilters = _allSelectedSampleIdsByFilters.sort();
-          _allSelectedPatientIdsByFilters = this.selectedPatientsByFilters;
-        }
-        if(_allSelectedSampleIdsByFilters.length ===0){
-          _allSelectedSampleIdsByFilters = self_.completeSamplesList;
-        }
-        if (_allSelectedPatientIdsByFilters.length === 0) {
-          _allSelectedPatientIdsByFilters = self_.completePatientsList;
+          self_.selectedSamplesByFilters = _selectedCasesByFilters.sort();
+          _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ? self_.completeSamplesList : _selectedCasesByFilters;
+          _counterSelectedCasesByFilters = this.selectedPatientsByFilters.length === 0 ? self_.completePatientsList : this.selectedPatientsByFilters;
         }
 
-        var _resultSelectedSamples = [];
-        var _resultSelectedPatients = [];
+        var _mappedCounterSelectedCases = iViz.util.idMapping(iViz.getCasesMap(_caseType), _selectedCasesByFilters);
+        _mappedCounterSelectedCases.sort();
+        var _resultCounterSelectedCases = iViz.util.intersection(_mappedCounterSelectedCases,
+          _counterSelectedCasesByFilters);
+        var _resultSelectedCases = iViz.util.idMapping(iViz.getCasesMap(_counterCaseType), _resultCounterSelectedCases);
+        var _casesSync = iViz.util.idMapping(iViz.getCasesMap(_counterCaseType), _counterSelectedCasesByFilters);
+        var _counterCasesSync = _mappedCounterSelectedCases;
+
         if (updateType_ === 'patient') {
-          var _mappedSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _allSelectedPatientIdsByFilters);
-          _mappedSelectedSamples.sort();
-          _resultSelectedSamples = iViz.util.intersection(_mappedSelectedSamples,
-            _allSelectedSampleIdsByFilters);
-          _resultSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _resultSelectedSamples);
-          self_.patientsync = iViz.util.idMapping(iViz.getCasesMap('sample'), _allSelectedSampleIdsByFilters);
-          self_.samplesync = _mappedSelectedSamples;
-        } else {
-          var _mappedSelectedPatients = iViz.util.idMapping(iViz.getCasesMap('sample'), _allSelectedSampleIdsByFilters);
-          _mappedSelectedPatients.sort();
-          _resultSelectedPatients = iViz.util.intersection(_mappedSelectedPatients,
-            _allSelectedPatientIdsByFilters);
-          _resultSelectedSamples = iViz.util.idMapping(iViz.getCasesMap('patient'), _resultSelectedPatients);
-          self_.patientsync = _mappedSelectedPatients;
-          self_.samplesync = iViz.util.idMapping(iViz.getCasesMap('patient'), _allSelectedPatientIdsByFilters);
+          self_.patientsync = _casesSync;
+          self_.samplesync = _counterCasesSync;
+          self_.selectedsamples =  _resultCounterSelectedCases;
+          self_.selectedpatients = _resultSelectedCases;
+        }else{
+          self_.samplesync = _casesSync;
+          self_.patientsync = _counterCasesSync;
+          self_.selectedsamples =  _resultSelectedCases;
+          self_.selectedpatients = _resultCounterSelectedCases;
         }
-          self_.selectedsamples = _resultSelectedSamples;
-          self_.selectedpatients = _resultSelectedPatients;
       },
       'update-custom-filters': function() {
         if (this.customfilter.type === 'patient') {
