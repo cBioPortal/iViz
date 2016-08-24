@@ -117,7 +117,7 @@
         this.showLogScale =this.barChart.hasLogScale();
         var self_ = this;
         this.chartInst.on('filtered', function(_chartInst, _filter) {
-          dc.events.trigger(function() {
+          self_.chartInst.select('.brush').on("mouseup", function() {
             if(!self_.filtersUpdated) {
               self_.filtersUpdated = true;
               var tempFilters_ = $.extend(true, [], self_.filters);
@@ -132,7 +132,7 @@
             }else{
               self_.filtersUpdated = false;
             }
-          }, 400);
+          });
         });
       }
     },
