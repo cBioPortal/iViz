@@ -117,6 +117,8 @@
         this.showLogScale =this.barChart.hasLogScale();
         var self_ = this;
         this.chartInst.on('filtered', function(_chartInst, _filter) {
+          //TODO : Right now we are manually checking for brush mouseup event. This should be updated one latest dc.js is released
+          // https://github.com/dc-js/dc.js/issues/627
           self_.chartInst.select('.brush').on("mouseup", function() {
             if(!self_.filtersUpdated) {
               self_.filtersUpdated = true;
