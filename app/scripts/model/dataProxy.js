@@ -12,8 +12,6 @@
                                                                                        _sampleAttributes,
                                                                                        _patientAttributes,
                                                                                        _cnaFractionData) {
-        _patientAttributes = _.values(_patientAttributes);
-        _sampleAttributes = _.values(_sampleAttributes);
 
         /* Uncomment this to laod limited number of clinical attributes data
          var _selectedpatientAttrs = _patientAttributes.slice(0, 10);
@@ -22,10 +20,8 @@
          var _selectedsampleAttrIds = _.pluck(_selectedSampleAttrs,'attr_id');*/
 
         /* Comment this  to laod limited number of clinical attributes data */
-        var _selectedpatientAttrs = _patientAttributes;
-        var _selectedSampleAttrs = _sampleAttributes;
-        var _selectedpatientAttrIds = _.pluck(_selectedpatientAttrs, 'attr_id');
-        var _selectedsampleAttrIds = _.pluck(_selectedSampleAttrs, 'attr_id');
+        var _selectedpatientAttrIds = _.pluck(_.values(_patientAttributes), 'attr_id');
+        var _selectedsampleAttrIds = _.pluck(_.values(_sampleAttributes), 'attr_id');
         $.when(self.getPatientClinicalData(_selectedpatientAttrIds), self.getSampleClinicalData(_selectedsampleAttrIds),
           self.getCnaData(), self.getMutationCount(), self.getMutData()).then(function (_patientClinicalData,
                                                                                         _sampleClinicalData,
@@ -46,6 +42,9 @@
           // define view type from data type
           _.each(_sampleAttributes, function (_metaObj) {
             _metaObj.filter = [];
+            _metaObj.keys = {};
+            _metaObj.numOfDatum = 0;
+            _metaObj.priority = -1;
             _metaObj.show = true;
             if (_metaObj.datatype === "NUMBER") {
               _metaObj.view_type = 'bar_chart';
@@ -55,7 +54,10 @@
           });
           _.each(_patientAttributes, function (_metaObj) {
             _metaObj.filter = [];
+            _metaObj.keys = {};
+            _metaObj.numOfDatum = 0;
             _metaObj.show = true;
+            _metaObj.priority = -1;
             if (_metaObj.datatype === "NUMBER") {
               _metaObj.view_type = 'bar_chart';
             } else if (_metaObj.datatype === "STRING") {
@@ -78,6 +80,11 @@
                 _patientIdToClinDataMap[_dataObj.patient_id] = {};
               }
               _patientIdToClinDataMap[_dataObj.patient_id][_dataObj.attr_id] = _dataObj.attr_val;
+              if (!_patientAttributes[_dataObj.attr_id].keys.hasOwnProperty(_dataObj.attr_val)) {
+                _patientAttributes[_dataObj.attr_id].keys[_dataObj.attr_val] = 0;
+              }
+              ++_patientAttributes[_dataObj.attr_id].keys[_dataObj.attr_val];
+              ++_patientAttributes[_dataObj.attr_id].numOfDatum;
             });
           });
 
@@ -89,6 +96,11 @@
                 _sampleIdToClinDataMap[_dataObj.sample_id] = {};
               }
               _sampleIdToClinDataMap[_dataObj.sample_id][_dataObj.attr_id] = _dataObj.attr_val;
+              if (!_sampleAttributes[_dataObj.attr_id].keys.hasOwnProperty(_dataObj.attr_val)) {
+                _sampleAttributes[_dataObj.attr_id].keys[_dataObj.attr_val] = 0;
+              }
+              ++_sampleAttributes[_dataObj.attr_id].keys[_dataObj.attr_val];
+              ++_sampleAttributes[_dataObj.attr_id].numOfDatum;
             });
           });
 
@@ -255,8 +267,9 @@
             _MutationCountMeta.attr_id = "mutation_count";
             _MutationCountMeta.view_type = 'bar_chart';
             _MutationCountMeta.filter = [];
+            _MutationCountMeta.priority = 4;
             _MutationCountMeta.show = true;
-            _sampleAttributes.unshift(_MutationCountMeta);
+            _sampleAttributes[_MutationCountMeta.attr_id] = (_MutationCountMeta);
           }
 
           // add CNA details
@@ -270,11 +283,12 @@
             _cnaAttrMeta.attr_id = 'cna_details';
             _cnaAttrMeta.filter = [];
             _cnaAttrMeta.show = true;
+            _cnaAttrMeta.priority = 3;
             _cnaAttrMeta.options = {
               allCases: _caseLists.allSampleIds,
               sequencedCases: _caseLists.cnaSampleIds.length > 0 ? _caseLists.cnaSampleIds : _caseLists.allSampleIds
             };
-            _sampleAttributes.unshift(_cnaAttrMeta);
+            _sampleAttributes[_cnaAttrMeta.attr_id] = _cnaAttrMeta;
           }
 
           // add Gene Mutation Info
@@ -288,11 +302,12 @@
             _mutDataAttrMeta.attr_id = 'mutated_genes';
             _mutDataAttrMeta.filter = [];
             _mutDataAttrMeta.show = true;
+            _mutDataAttrMeta.priority = 3;
             _mutDataAttrMeta.options = {
               allCases: _caseLists.allSampleIds,
               sequencedCases: _caseLists.sequencedSampleIds.length > 0 ? _caseLists.sequencedSampleIds : _caseLists.allSampleIds
             };
-            _sampleAttributes.unshift(_mutDataAttrMeta);
+            _sampleAttributes[_mutDataAttrMeta.attr_id] = _mutDataAttrMeta;
           }
 
           // add Mutation count vs. CNA fraction
@@ -305,7 +320,8 @@
             _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
             _mutCntAttrMeta.filter = [];
             _mutCntAttrMeta.show = true;
-            _sampleAttributes.unshift(_mutCntAttrMeta);
+            _mutCntAttrMeta.priority = 2;
+            _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
           }
 
           // add survival
@@ -329,7 +345,8 @@
             _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
             _dfsSurvivalAttrMeta.filter = [];
             _dfsSurvivalAttrMeta.show = true;
-            _patientAttributes.unshift(_dfsSurvivalAttrMeta);
+            _dfsSurvivalAttrMeta.priority = 1;
+            _patientAttributes[_dfsSurvivalAttrMeta.attr_id] = _dfsSurvivalAttrMeta;
           }
           if (_hasOS) {
             var _osSurvivalAttrMeta = {};
@@ -340,12 +357,13 @@
             _osSurvivalAttrMeta.display_name = 'Overall Survival';
             _osSurvivalAttrMeta.filter = [];
             _osSurvivalAttrMeta.show = true;
-            _patientAttributes.unshift(_osSurvivalAttrMeta);
+            _osSurvivalAttrMeta.priority = 1;
+            _patientAttributes[_osSurvivalAttrMeta.attr_id] = _osSurvivalAttrMeta;
           }
 
           // add Cancer Study
           if (self.getCancerStudyIds().length > 1) {
-            _patientAttributes.unshift({
+            _patientAttributes['study_id'] = {
               "datatype": "STRING",
               "description": "Cancer Studies",
               "display_name": "Cancer Studies",
@@ -353,15 +371,25 @@
               "view_type": "pie_chart",
               "filter": [],
               "show": true
-            });
+            };
           }
-
+          _.each(iViz.util.sortClinicalAttrs(_.values(_.extend({}, _patientAttributes, _sampleAttributes))), function(attr, index) {
+            var attrId = attr.attr_id;
+            if (attr.priority === -1) {
+              if (_patientAttributes.hasOwnProperty(attrId)) {
+                _patientAttributes[attrId].priority = 10 + index;
+              } else {
+                _sampleAttributes[attrId].priority = 10 + index;
+              }
+            }
+          });
+          
           _result.groups = {};
           _result.groups.patient = {};
           _result.groups.sample = {};
           _result.groups.group_mapping = {};
-          _result.groups.patient.attr_meta = _patientAttributes;
-          _result.groups.sample.attr_meta = _sampleAttributes;
+          _result.groups.patient.attr_meta = iViz.util.sortClinicalAttrs(_.values(_patientAttributes));
+          _result.groups.sample.attr_meta = iViz.util.sortClinicalAttrs(_.values(_sampleAttributes));
           _result.groups.patient.data = _patientData;
           _result.groups.sample.data = _sampleData;
           _result.groups.patient.data_indices = {};

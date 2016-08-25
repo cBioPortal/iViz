@@ -33,6 +33,8 @@
 'use strict';
 (function(iViz, _, cbio) {
   iViz.util = (function() {
+    var clinicalAttrsPriority = ['cancer_type', 'cancer_type_detailed',
+      'gender', 'age', 'sequenced', 'has_cna_data', 'sample_count_patient']; // DESC, all lowercase
     var content = {};
 
     /**
@@ -629,6 +631,158 @@
       }
       return true;
     };
+
+    /**
+     * General pick clinical attributes based on predesigned Regex
+     * This filter is the same one which used in previous Google Charts Version,
+     * should be revised later.
+     * 
+     * @param {string} attr Clinical attribute ID.
+     * @return {boolean} Whether input attribute passed the criteria.
+     */
+    content.isPreSelectedClinicalAttr = function(attr) {
+      return attr.toLowerCase().match(/(os_survival)|(dfs_survival)|(mut_cnt_vs_cna)|(mutated_genes)|(cna_details)|(^age)|(gender)|(sex)|(darwin_vital_status)|(darwin_patient_age)|(os_status)|(os_months)|(dfs_status)|(dfs_months)|(race)|(ethnicity)|(.*type.*)|(.*site.*)|(.*grade.*)|(.*stage.*)|(histology)|(tumor_type)|(subtype)|(tumor_site)|(.*score.*)|(mutation_count)|(copy_number_alterations)|(sequenced)|(has_cna_data)|(sample_count_patient)/);
+    };
+
+    /**
+     * This is the function to define study specific priority clinical
+     * attributes list.
+     * TODO: need to work with priority.
+     * 
+     * @param {string} attr Clinical attribute ID
+     * @param {string} studyId Study ID.
+     * @return {boolean} Whether input attribute is prioritized clinical attribute.
+     */
+    content.isPriorityClinicalAttr = function(attr, studyId) {
+      // Should be all lower case
+      var studySpecific = {
+        mskimpact: []
+      };
+
+      if (_.isString(attr)) {
+        attr = attr.toLowerCase();
+        if (_.isString(studyId) && studySpecific.hasOwnProperty(studyId) &&
+          studySpecific[studyId].indexOf(attr) !== -1) {
+          return true;
+        }
+        if (clinicalAttrsPriority.indexOf(attr) !== -1) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    /**
+     * Compare based on data availability.
+     * Notice that: attribute with only one category will be moved to end.
+     * Number of keys in this attribute is more than half numOfDatum
+     * will be moved to end as well.
+     *
+     * @param {object} a Attribute meta item A.
+     * @param {object} b Attribute meta item B.
+     * @return {number} Indicator which item is selected.
+     */
+    content.compareClinicalAvailability = function(a, b) {
+      if (!a.keys || !a.numOfDatum) {
+        return 1;
+      }
+      if (!b.keys || !b.numOfDatum) {
+        return -1;
+      }
+
+      var numOfKeysA = Object.keys(a.keys).length;
+      var numOfKeysB = Object.keys(b.keys).length;
+      if (numOfKeysA === 1 && numOfKeysB !== 1) {
+        return 1;
+      }
+      if (numOfKeysA !== 1 && numOfKeysB === 1) {
+        return -1;
+      }
+
+      if (numOfKeysA / a.numOfDatum > 0.5 && numOfKeysB / b.numOfDatum <= 0.5) {
+        return 1;
+      }
+      if (numOfKeysA / a.numOfDatum <= 0.5 && numOfKeysB / b.numOfDatum > 0.5) {
+        return -1;
+      }
+
+      return b.numOfDatum - a.numOfDatum;
+    };
+
+    /**
+     * Compare items within clinical priority list.
+     *
+     * @param {string} a Attribute ID A.
+     * @param {string} b Attribute ID B.
+     * @return {number} Indicator which item is selected.
+     */
+    content.compareClinicalAttrsPriority = function(a, b) {
+      if (!_.isString(a)) {
+        return 1;
+      }
+      if (!_.isString(b)) {
+        return -1;
+      }
+      var aI = clinicalAttrsPriority.indexOf(a.toLowerCase());
+      var bI = clinicalAttrsPriority.indexOf(b.toLowerCase());
+      return aI - bI;
+    };
+
+    /**
+     * There are few steps to detemine the priority.
+     * Step 1: whether it is in clinicalAttrsPriority list
+     * Step 2: whether it will pass preSelectedAttr Regex check
+     * Step 3: Sort the rest based on data availability. Notice that: at this
+     * Step, attribute with only one category will be moved to end. Number of
+     * keys in this attribute is more than half numOfDatum will be moved to end
+     * as well.
+     *
+     * @param {array} array All clinical attributes.
+     * @return {array} Sorted clinical attributes.
+     */
+    content.sortClinicalAttrs = function(array) {
+      array = array.sort(function(a, b) {
+        var priority = 0;
+        if (content.isPriorityClinicalAttr(a.attr_id)) {
+          if (content.isPriorityClinicalAttr(b.attr_id)) {
+            priority = content.compareClinicalAttrsPriority(a.attr_id, b.attr_id);
+            if (priority === 0) {
+              priority = content.compareClinicalAvailability(a, b);
+            }
+          } else {
+            priority = -1;
+          }
+        } else if (content.isPriorityClinicalAttr(b.attr_id)) {
+          priority = 1;
+        } else {
+          priority = 0;
+        }
+
+        if (priority !== 0) {
+          return priority;
+        }
+
+        if (content.isPreSelectedClinicalAttr(a.attr_id)) {
+          if (content.isPreSelectedClinicalAttr(b.attr_id)) {
+            priority = content.compareClinicalAvailability(a, b);
+          } else {
+            priority = -1;
+          }
+        } else if (content.isPreSelectedClinicalAttr(b.attr_id)) {
+          priority = 1;
+        } else {
+          priority = 0;
+        }
+
+        if (priority !== 0) {
+          return priority;
+        }
+
+        return content.compareClinicalAvailability(a, b);
+      });
+      return array;
+    }
 
     return content;
   })();
