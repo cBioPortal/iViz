@@ -196,6 +196,11 @@
       vars: {}
     };
     iViz.vue.manage.init();
+    
+    // This is used to indicate how to disable two buttons. By default, they are set to true.
+    iViz.vue.manage.getInstance().showManageButton = true;
+    iViz.vue.manage.getInstance().showSaveButton = true;
+    
     $.get('resources/vars.json')
       .then(function(data) {
         window.style.vars = data;
