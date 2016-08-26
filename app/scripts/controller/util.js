@@ -782,7 +782,31 @@
         return content.compareClinicalAvailability(a, b);
       });
       return array;
-    }
+    };
+
+    /**
+     * Sort clinical attributes by priority.
+     * @param {array} array Clinical attributes.
+     * @return {array} Sorted clinical attibutes.
+     */
+    content.sortByClinicalPriority = function(array) {
+      if (_.isArray(array)) {
+        array = array.sort(function(a, b) {
+          var priorityA = a.priority || -1;
+          var priorityB = b.priority || -1;
+
+          if (priorityA === -1) {
+            return 1;
+          }
+          if (priorityB === -1) {
+            return -1;
+          }
+
+          return priorityA - priorityB;
+        });
+      }
+      return array;
+    };
 
     return content;
   })();

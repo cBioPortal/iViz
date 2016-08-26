@@ -388,8 +388,8 @@
           _result.groups.patient = {};
           _result.groups.sample = {};
           _result.groups.group_mapping = {};
-          _result.groups.patient.attr_meta = iViz.util.sortClinicalAttrs(_.values(_patientAttributes));
-          _result.groups.sample.attr_meta = iViz.util.sortClinicalAttrs(_.values(_sampleAttributes));
+          _result.groups.patient.attr_meta = iViz.util.sortByClinicalPriority(_.values(_patientAttributes));
+          _result.groups.sample.attr_meta = iViz.util.sortByClinicalPriority(_.values(_sampleAttributes));
           _result.groups.patient.data = _patientData;
           _result.groups.sample.data = _sampleData;
           _result.groups.patient.data_indices = {};
