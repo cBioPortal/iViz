@@ -37,6 +37,46 @@
           var _indexSample = 0, _sampleDataIndicesObj = {};
           var _indexPatient = 0, _patientDataIndicesObj = {};
           var _hasDFS = false, _hasOS = false;
+          
+          var addAttr = function(data, group) {
+            if (!_.isObject(data) || !data.attr_id || !group) {
+              return null;
+            }
+
+            var datum = {
+              attr_id: '',
+              datatype: 'STRING',
+              description: '',
+              display_name: ''
+            };
+
+            datum = _.extend(datum, data);
+
+            if (group === 'patient') {
+              _patientAttributes[datum.attr_id] = datum;
+            } else if (group === 'sample') {
+              _sampleAttributes[datum.attr_id] = datum;
+            }
+          };
+
+          // Add three additional attributes for all studies.
+          addAttr({
+            attr_id: 'SEQUENCED',
+            display_name: 'With Mutation Data',
+            description: 'If the sample got sequenced'
+          }, 'sample');
+
+          addAttr({
+            attr_id: 'HAS_CNA_DATA',
+            display_name: 'With CNA Data',
+            description: 'If the sample has CNA data'
+          }, 'sample');
+
+          addAttr({
+            attr_id: 'SAMPLE_COUNT_PATIENT',
+            display_name: '# of Samples Per Patient',
+            description: ''
+          }, 'patient');
 
           // TODO : temporary fix to show/hide charts
           // define view type from data type
@@ -71,7 +111,7 @@
            _.each(_selectedSampleAttrs,function(_metaObj){
            _metaObj.show = true;
            });*/
-
+          
           // map clinical data to each patient (key: patient ID, value: object of attributes vs. val)
           var _patientIdToClinDataMap = {};
           _.each(_patientClinicalData, function (_patientAttributeData) {
@@ -155,18 +195,26 @@
               if (_hasMutationCountData) {
                 if (_mutationCountData[_sampleId] === undefined || _mutationCountData[_sampleId] === null) {
                   _sampleDatum['mutation_count'] = 'NA';
+                  _sampleDatum['SEQUENCED'] = 'NO';
                 } else {
                   _sampleDatum['mutation_count'] = _mutationCountData[_sampleId];
+                  _sampleDatum['SEQUENCED'] = 'YES';
                 }
+              }else {
+                _sampleDatum['SEQUENCED'] = 'NO';
               }
 
               // cna fraction
               if (_hasMutationCNAScatterPlotData) {
                 if (_cnaFractionData[_sampleId] === undefined || _cnaFractionData[_sampleId] === null) {
                   _sampleDatum['cna_fraction'] = 0;
+                  _sampleDatum['HAS_CNA_DATA'] = 'NO';
                 } else {
                   _sampleDatum['cna_fraction'] = _cnaFractionData[_sampleId];
+                  _sampleDatum['HAS_CNA_DATA'] = 'YES';
                 }
+              }else {
+                _sampleDatum['HAS_CNA_DATA'] = 'NO';
               }
               _sampleData.push(_sampleDatum);
               // indices
@@ -175,6 +223,13 @@
             });
           });
 
+          // Add SAMPLE_COUNT_PATIENT data
+          _.each(_patientData, function(datum) {
+            if (_patientToSampleMap.hasOwnProperty(datum.patient_id)) {
+              datum['SAMPLE_COUNT_PATIENT'] = _patientToSampleMap[datum.patient_id].length.toString();
+            }
+          });
+          
           // extract mutation data
           var _mutGeneMeta = {}, _mutGeneMetaIndex = 0;
           _.each(_mutationData, function (_mutGeneDataObj) {
@@ -360,7 +415,7 @@
             _osSurvivalAttrMeta.priority = 1;
             _patientAttributes[_osSurvivalAttrMeta.attr_id] = _osSurvivalAttrMeta;
           }
-
+          
           // add Cancer Study
           if (self.getCancerStudyIds().length > 1) {
             _patientAttributes['study_id'] = {
