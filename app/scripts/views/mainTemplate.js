@@ -75,7 +75,7 @@
       sortByNumber: function(a, b){
         var aName = Number(a.element.attributes['data-number'].nodeValue);
         var bName = Number(b.element.attributes['data-number'].nodeValue);
-        return ((aName < bName) ? 1 : ((aName > bName) ? -1 : 0));
+        return ((aName > bName) ? 1 : ((aName < bName) ? -1 : 0));
       },
       updateGrid: function(ChartsIds) {
         var self_ = this;
@@ -83,7 +83,6 @@
           _.each(ChartsIds,function(chartId){
             self_.grid_.addItems(  $('#'+chartId) )
           });
-          self_.grid_.layout();
         }else{
           self_.grid_ = new Packery(document.querySelector('.grid'), {
             itemSelector: '.grid-item',

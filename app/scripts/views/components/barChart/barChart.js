@@ -47,24 +47,36 @@
      * Create DC chart with linear scale.
      * @private
      */
-    var regularDc_ = function() {
+    var initDc_ = function(logScale) {
       var tickVal = [];
       var barColor = {};
+      var i = 0;
 
       var cluster = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
         if (typeof val === 'undefined' || val === 'NA' || val === '' || val === 'NaN') {
           hasEmptyValue_ = true;
-          val = opts_.emptyMappingVal;
+          val = opts_.xDomain[opts_.xDomain.length - 1];
+        } else if (logScale) {
+          for (i = 1; i < opts_.xDomain.length; i++) {
+            if (d[data_.attrId] < opts_.xDomain[i] &&
+              d[data_.attrId] >= opts_.xDomain[i - 1]) {
+              val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
+              break;
+            }
+          }
         } else {
-          val = d[data_.attrId] >= 0 ? parseInt(
-            (d[data_.attrId] - opts_.startPoint) /
-            opts_.gutter, 10) *
-          opts_.gutter + opts_.startPoint + opts_.gutter / 2 :
-          (parseInt(
-            d[data_.attrId] /
-            opts_.gutter, 10) - 1) *
-          opts_.gutter + opts_.gutter / 2;
+          if (d[data_.attrId] <= opts_.xDomain[1]) {
+            val = opts_.xDomain[0];
+          } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+            val = opts_.xDomain[opts_.xDomain.length - 2];
+          } else {
+            // minus half of seperateDistance to make the margin values
+            // always map to the left side. Thus for any value x, it is in the
+            // range of (a, b] which means a < x <= b
+            val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
+              opts_.gutter + opts_.startPoint - opts_.gutter / 2;
+          }
         }
 
         if (tickVal.indexOf(val) === -1) {
@@ -80,16 +92,11 @@
 
       var tickL = tickVal.length - 1;
 
-      for (var i = 0; i < tickL; i++) {
+      for (i = 0; i < tickL; i++) {
         barColor[tickVal[i]] = colors_[i];
       }
 
       if (hasEmptyValue_) {
-        opts_.xDomain.push(Number(
-          iViz.util.toPrecision(
-            Number(opts_.emptyMappingVal), 3, 0.1)
-          )
-        );
         barColor.NA = '#CCCCCC';
       } else {
         barColor[tickVal[tickL]] = colors_[tickL];
@@ -111,143 +118,57 @@
         .renderHorizontalGridLines(false)
         .renderVerticalGridLines(false);
 
-      chartInst_.x(d3.scale.linear()
-        .domain([
-          opts_.xDomain[0] - opts_.gutter,
-          opts_.xDomain[opts_.xDomain.length - 1] + opts_.gutter
-        ]));
+      if (logScale) {
+        chartInst_.x(d3.scale.log().nice()
+          .domain([0.7, opts_.maxDomain]));
+      } else {
+        chartInst_.x(d3.scale.linear()
+          .domain([
+            opts_.xDomain[0] - opts_.gutter,
+            opts_.xDomain[opts_.xDomain.length - 1] + opts_.gutter
+          ]));
+      }
 
       chartInst_.yAxis().ticks(6);
       chartInst_.yAxis().tickFormat(d3.format('d'));
       chartInst_.xAxis().tickFormat(function(v) {
-        return v === opts_.emptyMappingVal ? 'NA' : v;
+        return getTickFormat(v, logScale);
       });
 
       chartInst_.xAxis().tickValues(opts_.xDomain);
-      //chartInst_.xAxisLabel(data_.displayName);
       chartInst_.xUnits(function() {
         return opts_.xDomain.length * 1.3 <= 5 ? 5 : opts_.xDomain.length * 1.3;
       });
     };
 
-    /**
-     * Create DC chart with log scale.
-     * @private
-     */
-    var logDc_ = function() {
-      var _domainLength,
-        _maxDomain = 10000;
-
-      var emptyValueMapping = "1000";//Will be changed later based on maximum
-      // value
-      var xDomain = [];
-
-      for (var i = 0; ; i += 0.5) {
-        var _tmpValue = parseInt(Math.pow(10, i));
-
-        xDomain.push(_tmpValue);
-        if (_tmpValue > data_.max) {
-
-          emptyValueMapping = Math.pow(10, i + 0.5);
-          xDomain.push(emptyValueMapping);
-          _maxDomain = Math.pow(10, i + 1);
-          break;
-        }
-      }
-
-      _domainLength = xDomain.length;
-
-      var tickVal = [];
-      var barColor = {};
-
-      var cluster = ndx_.dimension(function(d) {
-
-        var i, val = Number(d[data_.attrId]);
-
-        if (isNaN(val)) {
-          hasEmptyValue_ = true;
-          val = emptyValueMapping;
-        } else {
-          for (i = 1; i < _domainLength; i++) {
-            if (d[data_.attrId] < xDomain[i] &&
-              d[data_.attrId] >= xDomain[i - 1]) {
-
-              val = parseInt(Math.pow(10, i / 2 - 0.25));
-            }
-          }
-        }
-
-        if (tickVal.indexOf(val) === -1) {
-          tickVal.push(Number(val));
-        }
-
-        return val;
-      });
-
-      tickVal.sort(function(a, b) {
-        return a < b ? -1 : 1;
-      });
-
-      var tickL = tickVal.length - 1;
-
-      for (var i = 0; i < tickL; i++) {
-        barColor[tickVal[i]] = colors_[i];
-      }
-
-      if (hasEmptyValue_) {
-        barColor.NA = '#CCCCCC';
-      } else {
-        barColor[tickVal[tickL]] = colors_[tickL];
-      }
-
-      chartInst_
-        .width(opts_.width)
-        .height(opts_.height)
-        .margins({top: 10, right: 20, bottom: 30, left: 40})
-        .dimension(cluster)
-        .group(cluster.group())
-        .centerBar(true)
-        .elasticY(true)
-        .elasticX(false)
-        .turnOnControls(true)
-        .mouseZoomable(false)
-        .brushOn(true)
-        .transitionDuration(iViz.opts.transitionDuration || 400)
-        .renderHorizontalGridLines(false)
-        .renderVerticalGridLines(false);
-
-      chartInst_.x(d3.scale.log().nice()
-        .domain([0.7, _maxDomain]));
-
-      chartInst_.yAxis().ticks(6);
-      chartInst_.yAxis().tickFormat(d3.format('d'));
-      chartInst_.xAxis().tickFormat(function(v) {
-        var _returnValue = v;
-        if (v === emptyValueMapping) {
+    function getTickFormat(v, logScale) {
+      var _returnValue = v;
+      if (logScale) {
+        if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
         } else {
-          var index = xDomain.indexOf(v);
-          if (index % 2 === 0) {
-            return v.toString();
-          } else {
-            return '';
+          var index = opts_.xDomain.indexOf(v);
+          if (index % 2 !== 0) {
+            _returnValue = '';
           }
         }
-        return _returnValue;
-      });
-
-      chartInst_.xAxis().tickValues(xDomain);
-      //chartInst_.xAxisLabel(data_.displayName);
-      chartInst_.xUnits(function() {
-        return xDomain.length * 1.3 <= 5 ? 5 : xDomain.length * 1.3;
-      });
-    };
+      } else {
+        if (v === opts_.xDomain[0]) {
+          return '<=' + opts_.xDomain[1];
+        } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
+          return '>' + opts_.xDomain[opts_.xDomain.length - 3];
+        } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
+          return 'NA';
+        }
+      }
+      return _returnValue;
+    }
 
     function initTsvDownloadData() {
       var data = '';
       var _cases = chartInst_.dimension().top(Infinity);
 
-      data = 'Sample ID\tPatient ID\t' + data_.displayName;
+      data = 'Sample ID\tPatient ID\t' + opts_.displayName;
 
       for (var i = 0; i < _cases.length; i++) {
         data += '\r\n';
@@ -256,55 +177,33 @@
         data += iViz.util.restrictNumDigits(_cases[i][data_.attrId]);
       }
       content.setDownloadData('tsv', {
-        fileName: data_.displayName,
+        fileName: opts_.displayName,
         data: data
       });
     }
 
     function initCanvasDownloadData() {
       content.setDownloadData('svg', {
-        title: data_.displayName,
+        title: opts_.displayName,
         chartDivId: opts_.chartDivId,
         chartId: opts_.chartId,
-        fileName: data_.displayName
+        fileName: opts_.displayName
       });
       content.setDownloadData('pdf', {
-        title: data_.displayName,
+        title: opts_.displayName,
         chartDivId: opts_.chartDivId,
         chartId: opts_.chartId,
-        fileName: data_.displayName
+        fileName: opts_.displayName
       });
     }
 
-    content.hasLogScale = function() {
-      if (data_ !== undefined) {
-        if (data_.min !== null && data_.max !== null) {
-          return ((data_.max - data_.min) > 1000) && (data_.min > 1) ? true : false;
-        }
-      }
-      return false;
-    };
-
-    content.init = function(ndx, opts) {
-      //TODO: need to update logic of getting min and max
-      var data = iViz.getAttrData(opts.group_type);
-      data_.meta = _.map(_.filter(_.pluck(data, opts.attrId), function(d) {
-        return d !== 'NA';
-      }), function(d) {
-        return parseFloat(d);
-      });
-      data_.min = d3.min(data_.meta);
-      data_.max = d3.max(data_.meta);
-      opts_ = iViz.util.barChart.getDcConfig({
-        min: d3.min(data_.meta),
-        max: d3.max(data_.meta)
-      });
-      data_.attrId = opts.attrId;
-      data_.displayName = opts.displayName;
-      opts_.width = opts.width;
-      opts_.height = opts.height;
-      opts_.chartDivId = opts.chartDivId;
-      opts_.chartId = opts.chartId;
+    content.init = function(ndx, data, opts) {
+      opts_ = _.extend({}, opts);
+      data_ = data;
+      opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
+        min: data_.min,
+        max: data_.max
+      }, opts.logScaleChecked));
       ndx_ = ndx;
       hasEmptyValue_ = false;
 
@@ -312,29 +211,19 @@
 
       chartInst_ = dc.barChart('#' + opts.chartId, opts.groupid);
 
-      if (opts.logScaleChecked !== undefined) {
-        if (opts.logScaleChecked) {
-          logDc_();
-        } else {
-          regularDc_();
-        }
-      } else {
-        if (((data_.max - data_.min) > 1000) && (data_.min > 0.1)) {
-          logDc_();
-        } else {
-          regularDc_();
-        }
-      }
+      initDc_(opts.logScaleChecked)
+
       chartInst_.render();
       return chartInst_;
     };
 
     content.redraw = function(logScaleChecked) {
-      if (logScaleChecked) {
-        regularDc_();
-      } else {
-        logDc_();
-      }
+      opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
+        min: data_.min,
+        max: data_.max
+      }, logScaleChecked));
+
+      initDc_(logScaleChecked);
     };
 
     content.updateDataForDownload = function(fileType) {
@@ -359,7 +248,7 @@
      * @param {object} data Data should inlude two parameters: min and max. They should all be number.
      * @return {{xDomain: Array, divider: number, numOfGroups: number, emptyMappingVal: string, gutter: number, startPoint: number, maxVal: string}} The customized configure options.
      */
-    content.getDcConfig = function(data) {
+    content.getDcConfig = function(data, logScale) {
       var config = {
         xDomain: [],
         divider: 1,
@@ -367,7 +256,8 @@
         emptyMappingVal: '',
         gutter: 0.2,
         startPoint: -1,
-        maxVal: ''
+        maxVal: '',
+        maxDomain: 10000 // Design specifically for log scale
       };
 
       if (!_.isUndefined(data.min) && !_.isUndefined(data.max)) {
@@ -413,35 +303,54 @@
           config.emptyMappingVal = config.maxVal + 0.1;
         }
 
-        for (i = 0; i <= config.numOfGroups; i++) {
-          var _tmpValue = i * config.gutter + config.startPoint;
+        if (logScale) {
+          for (i = 0; ; i += 0.5) {
+            var _tmpValue = parseInt(Math.pow(10, i), 10);
 
-          _tmpValue = Number(iViz.util.toPrecision(Number(_tmpValue), 3, 0.1));
+            config.xDomain.push(_tmpValue);
+            if (_tmpValue > data.max) {
+              config.emptyMappingVal = Math.pow(10, i + 0.5);
+              config.xDomain.push(config.emptyMappingVal);
+              config.maxDomain = Math.pow(10, i + 1);
+              break;
+            }
+          }
+        } else {
+          for (i = 0; i <= config.numOfGroups; i++) {
+            var _tmpValue = i * config.gutter + config.startPoint;
 
-          // If the current _tmpValue already bigger than maximum number, the
-          // function should decrease the number of bars and also reset the
-          // mapped empty value.
-          if (_tmpValue > max) {
-            // if i = 0 and tmpValue bigger than maximum number, that means
-            // all data fall into NA category.
-            if (i !== 0) {
+            _tmpValue = Number(iViz.util.toPrecision(Number(_tmpValue), 3, 0.1));
+
+            // If the current _tmpValue already bigger than maximum number, the
+            // function should decrease the number of bars and also reset the
+            // mapped empty value.
+            if (_tmpValue >= max) {
+              // if i = 0 and tmpValue bigger than maximum number, that means
+              // all data fall into NA category.
+              if (i !== 0) {
+                config.xDomain.push(_tmpValue);
+              }
+              // Reset the empty mapping value
+              if (range > 1000 || range < 1) {
+                config.emptyMappingVal = (i + 1) * config.gutter + config.startPoint;
+              }
+
+              // If the distance of Max and Min value is smaller than 1, give
+              // a more precise value
+              if (range < 1) {
+                config.emptyMappingVal = Number(iViz.util.toPrecision(Number(config.emptyMappingVal), 3, 0.1));
+              }
+
+              break;
+            } else {
               config.xDomain.push(_tmpValue);
             }
-            // Reset the empty mapping value
-            if (range > 1000 || range < 1) {
-              config.emptyMappingVal = (i + 1) * config.gutter + config.startPoint;
-            }
-
-            // If the distance of Max and Min value is smaller than 1, give
-            // a more precise value
-            if (range < 1) {
-              config.emptyMappingVal = Number(iViz.util.toPrecision(Number(config.emptyMappingVal), 3, 0.1));
-            }
-
-            break;
-          } else {
-            config.xDomain.push(_tmpValue);
           }
+          // currently we always add ">max" and "NA" marker 
+          // add marker for greater than maximum
+          config.xDomain.push(Number(cbio.util.toPrecision(Number(config.xDomain[config.xDomain.length - 1] + config.gutter), 3, 0.1)));
+          // add marker for NA values
+          config.xDomain.push(Number(cbio.util.toPrecision(Number(config.xDomain[config.xDomain.length - 1] + config.gutter), 3, 0.1)));
         }
       }
       return config;

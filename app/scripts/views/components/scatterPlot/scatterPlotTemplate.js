@@ -35,7 +35,7 @@
 'use strict';
 (function(Vue, dc, iViz) {
   Vue.component('scatterPlot', {
-    template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" data-number="8" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+    template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" :data-number="attributes.priority" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
       '<chart-operations :show-operations="showOperations"' +
     ' :display-name="displayName" :has-chart-title="true" :groupid="groupid"' +
     ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId"' +

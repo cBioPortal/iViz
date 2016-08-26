@@ -36,7 +36,7 @@
 (function(Vue, dc, iViz, $) {
 
   Vue.component('pieChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" data-number="6" ' +
+    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" :data-number="attributes.priority" ' +
               '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
               '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
               ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +

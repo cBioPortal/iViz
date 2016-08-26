@@ -66,11 +66,11 @@
   <!-- build:js scripts/cbio-vendor.js -->
   <script src="_components/FileSaver.min.js"></script>
   <script src="_components/cbio-util.js"></script>
+  <script src="_components/download-util.js"></script>
   <script src="_components/Notification.js"></script>
   <script src="_components/GeneValidator.js"></script>
   <script src="_components/QueryByGeneUtil.js"></script>
   <script src="_components/QueryByGeneTextArea.js"></script>
-  <script src="_components/cbio-util.js"></script>
   <!-- endbuild -->
   
   <!-- build:js scripts/vc-session.js -->
@@ -196,6 +196,11 @@
       vars: {}
     };
     iViz.vue.manage.init();
+    
+    // This is used to indicate how to disable two buttons. By default, they are set to true.
+    iViz.vue.manage.getInstance().showManageButton = true;
+    iViz.vue.manage.getInstance().showSaveButton = true;
+    
     $.get('resources/vars.json')
       .then(function(data) {
         window.style.vars = data;
