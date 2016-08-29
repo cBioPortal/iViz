@@ -3,12 +3,13 @@
 
   iViz.data = {};
 
-  iViz.data.init = function (_portalUrl, _study_cases_map, _callbackFunc) {
+  iViz.data.init = function (_portalUrl, _study_cases_map) {
     var initialSetup = function () {
+      var _def = new $.Deferred();
       var self = this;
       $.when(this.getGeneticProfiles(), this.getCaseLists(), this.getStudyToSampleToPatientdMap(), this.getSampleClinicalAttributes(),
         this.getPatientClinicalAttributes(), this.getCnaFractionData()).then(function (_geneticProfiles, _caseLists,
-                                                                                       _studyToSampleToPatientdMap,
+                                                                                       _studyToSampleToPatientMap,
                                                                                        _sampleAttributes,
                                                                                        _patientAttributes,
                                                                                        _cnaFractionData) {
@@ -32,6 +33,8 @@
           var _hasCNAData = false;
           var _hasMutationData = false;
           var _result = {};
+          var _hasMutSigData = false;
+          var _hasGisticData = false;
 
           var _patientData = [], _sampleData = [];
           var _indexSample = 0, _sampleDataIndicesObj = {};
@@ -147,7 +150,7 @@
           var _samplesToPatientMap = {};
           var _patientToSampleMap = {};
 
-          _.each(_studyToSampleToPatientdMap, function (_sampleToPatientMap, _studyId) {
+          _.each(_studyToSampleToPatientMap, function (_sampleToPatientMap, _studyId) {
             _.each(_sampleToPatientMap, function (_patientId, _sampleId) {
               if (_samplesToPatientMap[_sampleId] === undefined) {
                 _samplesToPatientMap[_sampleId] = [_patientId];
@@ -251,7 +254,9 @@
                   _mutGeneMeta[_geneSymbol].gene = _geneSymbol;
                   _mutGeneMeta[_geneSymbol].num_muts = 1;
                   _mutGeneMeta[_geneSymbol].caseIds = [_caseId];
-                  _mutGeneMeta[_geneSymbol].qval = (self.getCancerStudyIds().length === 1 && _mutGeneDataObj.hasOwnProperty('qval')) ? _mutGeneDataObj.qval : null;
+                  var _hasMutSigDataTemp = self.getCancerStudyIds().length === 1 && _mutGeneDataObj.hasOwnProperty('qval');
+                  _hasMutSigData = _hasMutSigData || _hasMutSigDataTemp;
+                  _mutGeneMeta[_geneSymbol].qval = _hasMutSigDataTemp ? _mutGeneDataObj.qval : null;
                   _mutGeneMeta[_geneSymbol].index = _mutGeneMetaIndex;
                   if (_sampleData[_caseIdIndex]['mutated_genes'] !== undefined) {
                     _sampleData[_caseIdIndex]['mutated_genes'].push(_mutGeneMetaIndex)
@@ -296,11 +301,14 @@
                   _cnaMeta[_geneSymbol].cna = _altType;
                   _cnaMeta[_geneSymbol].cytoband = _cnaData.cytoband[_index];
                   _cnaMeta[_geneSymbol].caseIds = [_caseId];
+                  var _hasGisticDataTemp = false;
                   if ((self.getCancerStudyIds().length !== 1) || _cnaData.gistic[_index] === null) {
                     _cnaMeta[_geneSymbol].qval = null;
                   } else {
                     _cnaMeta[_geneSymbol].qval = _cnaData.gistic[_index][0];
+                    _hasGisticDataTemp = true;
                   }
+                  _hasGisticData = _hasGisticData || _hasGisticDataTemp;
                   _cnaMeta[_geneSymbol].index = _cnaMetaIndex;
                   if (_sampleData[_caseIdIndex]['cna_details'] !== undefined) {
                     _sampleData[_caseIdIndex]['cna_details'].push(_cnaMetaIndex)
@@ -457,9 +465,12 @@
           _result.groups.group_mapping.patient.sample = _patientToSampleMap;
 
           self.initialSetupResult = _result;
-          self.callbackFunc(_result);
+          self.hasMutSigData = _hasMutSigData;
+          self.hasGisticData = _hasGisticData;
+          _def.resolve(_result)
         });
       });
+      return _def.promise();
     };
 
     var getPatientClinicalData = function (self, attr_ids) {
@@ -562,8 +573,9 @@
     return {
       'initialSetupResult': '',
       'cancerStudyIds': [],
+      'hasMutSigData': false,
+      'hasGisticData': false,
       'portalUrl': _portalUrl,
-      'callbackFunc' : _callbackFunc,
       'studyCasesMap': _study_cases_map,
       'initialSetup': initialSetup,
       'getCancerStudyIds': function () {
