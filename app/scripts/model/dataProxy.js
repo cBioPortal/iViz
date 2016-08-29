@@ -12,7 +12,7 @@
         this.getPatientClinicalAttributes(),
         this.getCnaFractionData())
         .then(function(_geneticProfiles, _caseLists,
-                       _studyToSampleToPatientdMap,
+                       _studyToSampleToPatientMap,
                        _sampleAttributes,
                        _patientAttributes,
                        _cnaFractionData) {
@@ -155,7 +155,7 @@
               var _samplesToPatientMap = {};
               var _patientToSampleMap = {};
 
-              _.each(_studyToSampleToPatientdMap, function(_sampleToPatientMap, _studyId) {
+              _.each(_studyToSampleToPatientMap, function(_sampleToPatientMap, _studyId) {
                 _.each(_sampleToPatientMap, function(_patientId, _sampleId) {
                   if (_samplesToPatientMap[_sampleId] === undefined) {
                     _samplesToPatientMap[_sampleId] = [_patientId];
@@ -472,9 +472,10 @@
               self.initialSetupResult = _result;
               self.hasMutSigData = _hasMutSigData;
               self.hasGisticData = _hasGisticData;
-              _def.resolve(_result)
+              _def.resolve(_result);
             });
         });
+      return _def.promise();
     };
 
     var getPatientClinicalData = function(self, attr_ids) {
