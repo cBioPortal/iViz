@@ -1,0 +1,7 @@
+/app/_components/*
+/app/scripts/views/components/dataTable/MutatedGeneCNATable.js
+.idea/*
+.tmp/*
+bower_components/*
+dist/*
+node_modules/*

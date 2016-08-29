@@ -1,35 +1,3 @@
-/*
- * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
- * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
- * is on an 'as is' basis, and Memorial Sloan-Kettering Cancer Center has no
- * obligations to provide maintenance, support, updates, enhancements or
- * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
- * liable to any party for direct, indirect, special, incidental or
- * consequential damages, including lost profits, arising out of the use of this
- * software and its documentation, even if Memorial Sloan-Kettering Cancer
- * Center has been advised of the possibility of such damage.
- */
-
-/*
- * This file is part of cBioPortal.
- *
- * cBioPortal is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 'use strict';
 (function(iViz, _, cbio) {
   iViz.util = (function() {
@@ -124,11 +92,11 @@
 
       return Object.keys(_selectedMappingCases);
     };
-    
-    content.unique = function(arr_){
+
+    content.unique = function(arr_) {
       var tempArr_ = {};
-      _.each(arr_,function(obj_){
-        if(tempArr_[obj_] === undefined){
+      _.each(arr_, function(obj_) {
+        if (tempArr_[obj_] === undefined) {
           tempArr_[obj_] = true;
         }
       });
@@ -175,6 +143,7 @@
           break;
         case 'table':
           tableDownload(fileType, content);
+          break;
         default:
           break;
       }
@@ -189,7 +158,7 @@
         }
       }
       return str;
-    }
+    };
 
     function tableDownload(fileType, content) {
       switch (fileType) {
@@ -226,15 +195,18 @@
     function getPieWidthInfo(data) {
       var length = data.title.length;
       var labels = data.labels;
-      var labelMaxName = _.last(_.sortBy(_.pluck(labels, 'name'), function(item) {
-        return item.toString().length;
-      })).toString().length;
-      var labelMaxNumber = _.last(_.sortBy(_.pluck(labels, 'samples'), function(item) {
-        return item.toString().length;
-      })).toString().length;
-      var labelMaxFreq = _.last(_.sortBy(_.pluck(labels, 'sampleRate'), function(item) {
-        return item.toString().length;
-      })).toString().length;
+      var labelMaxName = _.last(_.sortBy(_.pluck(labels, 'name'),
+        function(item) {
+          return item.toString().length;
+        })).toString().length;
+      var labelMaxNumber = _.last(_.sortBy(_.pluck(labels, 'samples'),
+        function(item) {
+          return item.toString().length;
+        })).toString().length;
+      var labelMaxFreq = _.last(_.sortBy(_.pluck(labels, 'sampleRate'),
+        function(item) {
+          return item.toString().length;
+        })).toString().length;
 
       if (labelMaxName > length) {
         length = labelMaxName;
@@ -243,7 +215,8 @@
 
       return {
         svg: length,
-        name: labelMaxName > data.title.length ? labelMaxName : data.title.length,
+        name: labelMaxName > data.title.length ? labelMaxName :
+          data.title.length,
         number: labelMaxNumber,
         freq: labelMaxFreq
       };
@@ -253,7 +226,6 @@
       var _svgElement;
 
       var _width = getPieWidthInfo(data);
-      var _valueXCo = 0;
       var _pieLabelString = '';
       var _pieLabelYCoord = 0;
       var _svg = $('#' + data.chartId + ' svg');
@@ -308,11 +280,14 @@
         'style="font-size:12px; font-weight:bold">#</text>' +
         '<text x="' + (_width.name + _width.number) * 10 + '" y="10" ' +
         'style="font-size:12px; font-weight:bold">Freq</text>' +
-        '<line x1="0" y1="14" x2="' + ((_width.name + _width.number) * 10 - 20) + '" y2="14" ' +
+        '<line x1="0" y1="14" x2="' +
+        ((_width.name + _width.number) * 10 - 20) + '" y2="14" ' +
         'style="stroke:black;stroke-width:2"></line>' +
-        '<line x1="' + (_width.name * 10 - 10) + '" y1="14" x2="' + (_width.svg - 20) + '" y2="14" ' +
+        '<line x1="' + (_width.name * 10 - 10) + '" y1="14" x2="' +
+        (_width.svg - 20) + '" y2="14" ' +
         'style="stroke:black;stroke-width:2"></line>' +
-        '<line x1="' + ((_width.name + _width.number) * 10 - 10) + '" y1="14" x2="' + (_width.svg - 20) + '" y2="14" ' +
+        '<line x1="' + ((_width.name + _width.number) * 10 - 10) +
+        '" y1="14" x2="' + (_width.svg - 20) + '" y2="14" ' +
         'style="stroke:black;stroke-width:2"></line>' +
         '</g>';
 
@@ -323,8 +298,8 @@
         var _label = _pieLabel[i];
 
         _pieLabelString += '<g transform="translate(0, ' +
-          _pieLabelYCoord + ')"><rect height="10" width="10" fill="' + _label.color +
-          '"></rect><text x="13" y="10" ' +
+          _pieLabelYCoord + ')"><rect height="10" width="10" fill="' +
+           _label.color + '"></rect><text x="13" y="10" ' +
           'style="font-size:15px">' + _label.name + '</text>' +
           '<text x="' + _width.name * 10 + '" y="10" ' +
           'style="font-size:15px">' + _label.samples + '</text>' +
@@ -335,12 +310,17 @@
         _pieLabelYCoord += 15;
       }
 
-      _svgElement = cbio.download.serializeHtml($('#' + data.chartId + ' svg>g')[0]);
+      _svgElement = cbio.download.serializeHtml(
+        $('#' + data.chartId + ' svg>g')[0]);
 
-      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + _width.svg + '" height="' + (180 + _pieLabelYCoord) + '">' +
-        '<g><text x="' + (_width.svg / 2) + '" y="20" style="font-weight: bold;" text-anchor="middle">' +
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" ' +
+        'version="1.1" width="' + _width.svg + '" height="' +
+        (180 + _pieLabelYCoord) + '">' +
+        '<g><text x="' + (_width.svg / 2) + '" y="20" ' +
+        'style="font-weight: bold;" text-anchor="middle">' +
         data.title + '</text></g>' +
-        '<g transform="translate(' + (_width.svg / 2 - 65) + ', 20)">' + _svgElement + '</g>' +
+        '<g transform="translate(' + (_width.svg / 2 - 65) + ', 20)">' +
+        _svgElement + '</g>' +
         '<g transform="translate(10, ' + (_svgHeight + 20) + ')">' +
         _pieLabelString + '</g></svg>';
 
@@ -384,8 +364,8 @@
 
       _brush.find('.resize path')
         .css({
-          'fill': '#eee',
-          'stroke': '#666'
+          fill: '#eee',
+          stroke: '#666'
         });
 
       // Change deselected bar chart
@@ -395,8 +375,8 @@
 
       for (i = 0; i < _deselectedChartsLength; i++) {
         $(_deselectedCharts[i]).css({
-          'stroke': '',
-          'fill': '#ccc'
+          stroke: '',
+          fill: '#ccc'
         });
       }
 
@@ -417,13 +397,13 @@
 
       for (i = 0; i < _axisTickLength; i++) {
         $(_axisTick[i]).css({
-          'stroke': 'black'
+          stroke: 'black'
         });
       }
 
-      //Change x/y axis text size
-      var _chartText = _svg.find('.axis text'),
-        _chartTextLength = _chartText.length;
+      // Change x/y axis text size
+      var _chartText = _svg.find('.axis text');
+      var _chartTextLength = _chartText.length;
 
       for (i = 0; i < _chartTextLength; i++) {
         $(_chartText[i]).css({
@@ -438,8 +418,10 @@
         _svgElement += cbio.download.serializeHtml(e);
       });
 
-      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="370" height="200">' +
-        '<g><text x="180" y="20" style="font-weight: bold; text-anchor: middle">' +
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ' +
+        'width="370" height="200">' +
+        '<g><text x="180" y="20" ' +
+        'style="font-weight: bold; text-anchor: middle">' +
         data.title + '</text></g>' +
         '<g transform="translate(0, 20)">' + _svgElement + '</g></svg>';
 
@@ -457,14 +439,14 @@
 
       _brush.find('.resize path')
         .css({
-          'fill': '',
-          'stroke': ''
+          fill: '',
+          stroke: ''
         });
 
       for (i = 0; i < _deselectedChartsLength; i++) {
         $(_deselectedCharts[i]).css({
-          'stroke': '',
-          'fill': ''
+          stroke: '',
+          fill: ''
         });
       }
 
@@ -478,7 +460,7 @@
 
       for (i = 0; i < _axisTickLength; i++) {
         $(_axisTick[i]).css({
-          'stroke': ''
+          stroke: ''
         });
       }
 
@@ -509,29 +491,15 @@
     }
 
     function survivalChartCanvasDownload(data, downloadOpts) {
-      var _svgElement, _svgLabels, _svgTitle,
-        _labelTextMaxLength = 0,
-        _numOfLabels = 0,
-        _svgWidth = 360,
-        _svgheight = 360;
+      var _svgElement;
+      var _svgTitle;
+      var _labelTextMaxLength = 0;
+      var _numOfLabels = 0;
+      var _svgWidth = 360;
+      var _svgheight = 360;
 
-      _svgElement = cbio.download.serializeHtml($('#' + data.chartDivId + ' svg')[0]);
-      // _svgLabels = $('#' + data.labelDivId + ' svg');
-      //
-      // _svgLabels.find('image').remove();
-      // _svgLabels.find('text').each(function(i, obj) {
-      //   var _value = $(obj).attr('oValue');
-      //
-      //   if (typeof _value === 'undefined') {
-      //     _value = $(obj).text();
-      //   }
-      //
-      //   if (_value.length > _labelTextMaxLength) {
-      //     _labelTextMaxLength = _value.length;
-      //   }
-      //   $(obj).text(_value);
-      //   _numOfLabels++;
-      // });
+      _svgElement = cbio.download.serializeHtml(
+        $('#' + data.chartDivId + ' svg')[0]);
 
       _svgWidth += _labelTextMaxLength * 14;
 
@@ -544,7 +512,9 @@
       _svgTitle = '<g><text text-anchor="middle" x="210" y="30" ' +
         'style="font-weight:bold">' + data.title + '</text></g>';
 
-      _svgElement = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + _svgWidth + 'px" height="' + _svgheight + 'px" style="font-size:14px">' +
+      _svgElement = '<svg xmlns="http://www.w3.org/2000/svg" ' +
+        'version="1.1" width="' + _svgWidth + 'px" height="' + _svgheight +
+        'px" style="font-size:14px">' +
         _svgTitle + '<g transform="translate(0,40)">' +
         _svgElement + '</g>' +
         // '<g transform="translate(370,50)">' +
@@ -588,29 +558,26 @@
       }
     }
 
-    function downloadTextFile(content, delimiter) {
-
-    }
-
     /**
      * Finds the intersection elements between two arrays in a simple fashion.
      * Should have O(n) operations, where n is n = MIN(a.length, b.length)
      *
-     * @param a {Array} first array, must already be sorted
-     * @param b {Array} second array, must already be sorted
-     * @returns {Array}
+     * @param {array} a First array, must already be sorted
+     * @param {array} b Second array, must already be sorted
+     * @return {array} The interaction elements between a and b
      */
     content.intersection = function(a, b) {
-      var result = [], i = 0, j = 0, aL = a.length, bL = b.length, size = 0;
+      var result = [];
+      var i = 0;
+      var j = 0;
+      var aL = a.length;
+      var bL = b.length;
       while (i < aL && j < bL) {
         if (a[i] < b[j]) {
           ++i;
-        }
-        else if (a[i] > b[j]) {
+        } else if (a[i] > b[j]) {
           ++j;
-        }
-        else /* they're equal */
-        {
+        } else {
           result.push(a[i]);
           ++i;
           ++j;
@@ -621,22 +588,21 @@
     };
 
     content.compare = function(arr1, arr2) {
-      if (arr1.length != arr2.length){
-        return false;
-      }else{
+      if (arr1.length === arr2.length) {
         for (var i = 0; i < arr1.length; i++) {
-          if (arr1[i] !== arr2[i])
+          if (arr1[i] !== arr2[i]) {
             return false;
+          }
         }
       }
-      return true;
+      return false;
     };
 
     /**
      * General pick clinical attributes based on predesigned Regex
      * This filter is the same one which used in previous Google Charts Version,
      * should be revised later.
-     * 
+     *
      * @param {string} attr Clinical attribute ID.
      * @return {boolean} Whether input attribute passed the criteria.
      */
@@ -648,7 +614,7 @@
      * This is the function to define study specific priority clinical
      * attributes list.
      * TODO: need to work with priority.
-     * 
+     *
      * @param {string} attr Clinical attribute ID
      * @param {string} studyId Study ID.
      * @return {boolean} Whether input attribute is prioritized clinical attribute.

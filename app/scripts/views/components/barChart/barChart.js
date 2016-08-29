@@ -1,37 +1,5 @@
-/*
- * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
- * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
- * is on an 'as is' basis, and Memorial Sloan-Kettering Cancer Center has no
- * obligations to provide maintenance, support, updates, enhancements or
- * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
- * liable to any party for direct, indirect, special, incidental or
- * consequential damages, including lost profits, arising out of the use of this
- * software and its documentation, even if Memorial Sloan-Kettering Cancer
- * Center has been advised of the possibility of such damage.
- */
-
-/*
- * This file is part of cBioPortal.
- *
- * cBioPortal is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 'use strict';
-(function(iViz, dc, _, $, d3) {
+(function(iViz, dc, _, $, d3, cbio) {
   // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.BarChart = function() {
     var content = this;
@@ -43,10 +11,6 @@
     var ndx_;
     var hasEmptyValue_ = false;
 
-    /**
-     * Create DC chart with linear scale.
-     * @private
-     */
     var initDc_ = function(logScale) {
       var tickVal = [];
       var barColor = {};
@@ -54,7 +18,8 @@
 
       var cluster = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
-        if (typeof val === 'undefined' || val === 'NA' || val === '' || val === 'NaN') {
+        if (typeof val === 'undefined' || val === 'NA' || val === '' ||
+          val === 'NaN') {
           hasEmptyValue_ = true;
           val = opts_.xDomain[opts_.xDomain.length - 1];
         } else if (logScale) {
@@ -65,18 +30,16 @@
               break;
             }
           }
+        } else if (d[data_.attrId] <= opts_.xDomain[1]) {
+          val = opts_.xDomain[0];
+        } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+          val = opts_.xDomain[opts_.xDomain.length - 2];
         } else {
-          if (d[data_.attrId] <= opts_.xDomain[1]) {
-            val = opts_.xDomain[0];
-          } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
-            val = opts_.xDomain[opts_.xDomain.length - 2];
-          } else {
-            // minus half of seperateDistance to make the margin values
-            // always map to the left side. Thus for any value x, it is in the
-            // range of (a, b] which means a < x <= b
-            val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
-              opts_.gutter + opts_.startPoint - opts_.gutter / 2;
-          }
+          // minus half of seperateDistance to make the margin values
+          // always map to the left side. Thus for any value x, it is in the
+          // range of (a, b] which means a < x <= b
+          val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
+            opts_.gutter + opts_.startPoint - opts_.gutter / 2;
         }
 
         if (tickVal.indexOf(val) === -1) {
@@ -152,14 +115,12 @@
             _returnValue = '';
           }
         }
-      } else {
-        if (v === opts_.xDomain[0]) {
-          return '<=' + opts_.xDomain[1];
-        } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
-          return '>' + opts_.xDomain[opts_.xDomain.length - 3];
-        } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
-          return 'NA';
-        }
+      } else if (v === opts_.xDomain[0]) {
+        return '<=' + opts_.xDomain[1];
+      } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
+        return '>' + opts_.xDomain[opts_.xDomain.length - 3];
+      } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
+        return 'NA';
       }
       return _returnValue;
     }
@@ -211,7 +172,7 @@
 
       chartInst_ = dc.barChart('#' + opts.chartId, opts.groupid);
 
-      initDc_(opts.logScaleChecked)
+      initDc_(opts.logScaleChecked);
 
       chartInst_.render();
       return chartInst_;
@@ -232,11 +193,12 @@
       } else if (['pdf', 'svg'].indexOf(fileType) !== -1) {
         initCanvasDownloadData();
       }
-    }
+    };
     // return content;
   };
 
-  iViz.view.component.BarChart.prototype = new iViz.view.component.GeneralChart('barChart');
+  iViz.view.component.BarChart.prototype =
+    new iViz.view.component.GeneralChart('barChart');
   iViz.view.component.BarChart.constructor = iViz.view.component.BarChart;
 
   iViz.util.barChart = (function() {
@@ -245,8 +207,11 @@
     /**
      * Customize the bar chart configuration options according to
      * the data range.
-     * @param {object} data Data should inlude two parameters: min and max. They should all be number.
-     * @return {{xDomain: Array, divider: number, numOfGroups: number, emptyMappingVal: string, gutter: number, startPoint: number, maxVal: string}} The customized configure options.
+     * @param {object} data Data should include two parameters: min and max.
+     * They should all be number.
+     * @param {boolean} logScale Whether to generate
+     * log scale bar chart options.
+     * @return {object} The customized configure options
      */
     content.getDcConfig = function(data, logScale) {
       var config = {
@@ -266,6 +231,7 @@
         var range = max - min;
         var rangeL = parseInt(range, 10).toString().length - 2;
         var i = 0;
+        var _tmpValue;
 
         // Set divider based on the number m in 10(m)
         for (i = 0; i < rangeL; i++) {
@@ -284,7 +250,8 @@
         }
 
         if (max <= 1 && max > 0 && min >= -1 && min < 0) {
-          config.maxVal = (parseInt(max / config.divider, 10) + 1) * config.divider;
+          config.maxVal = (parseInt(max / config.divider, 10) + 1) *
+            config.divider;
           config.gutter = 0.2;
           config.startPoint = (parseInt(min / 0.2, 10) - 1) * 0.2;
           config.emptyMappingVal = config.maxVal + 0.2;
@@ -293,9 +260,13 @@
           config.startPoint = 0;
           config.emptyMappingVal = 1.1;
         } else if (range >= 1) {
-          config.gutter = (parseInt(range / (config.numOfGroups * config.divider), 10) + 1) * config.divider;
-          config.maxVal = (parseInt(max / config.gutter, 10) + 1) * config.gutter;
-          config.startPoint = parseInt(min / config.gutter, 10) * config.gutter;
+          config.gutter = (
+              parseInt(range / (config.numOfGroups * config.divider), 10) + 1
+            ) * config.divider;
+          config.maxVal = (parseInt(max / config.gutter, 10) + 1) *
+            config.gutter;
+          config.startPoint = parseInt(min / config.gutter, 10) *
+            config.gutter;
           config.emptyMappingVal = config.maxVal + config.gutter;
         } else {
           config.gutter = 0.1;
@@ -305,7 +276,7 @@
 
         if (logScale) {
           for (i = 0; ; i += 0.5) {
-            var _tmpValue = parseInt(Math.pow(10, i), 10);
+            _tmpValue = parseInt(Math.pow(10, i), 10);
 
             config.xDomain.push(_tmpValue);
             if (_tmpValue > data.max) {
@@ -317,9 +288,10 @@
           }
         } else {
           for (i = 0; i <= config.numOfGroups; i++) {
-            var _tmpValue = i * config.gutter + config.startPoint;
+            _tmpValue = i * config.gutter + config.startPoint;
 
-            _tmpValue = Number(iViz.util.toPrecision(Number(_tmpValue), 3, 0.1));
+            _tmpValue =
+              Number(iViz.util.toPrecision(Number(_tmpValue), 3, 0.1));
 
             // If the current _tmpValue already bigger than maximum number, the
             // function should decrease the number of bars and also reset the
@@ -332,13 +304,16 @@
               }
               // Reset the empty mapping value
               if (range > 1000 || range < 1) {
-                config.emptyMappingVal = (i + 1) * config.gutter + config.startPoint;
+                config.emptyMappingVal = (i + 1) * config.gutter +
+                  config.startPoint;
               }
 
               // If the distance of Max and Min value is smaller than 1, give
               // a more precise value
               if (range < 1) {
-                config.emptyMappingVal = Number(iViz.util.toPrecision(Number(config.emptyMappingVal), 3, 0.1));
+                config.emptyMappingVal =
+                  Number(iViz.util.toPrecision(
+                    Number(config.emptyMappingVal), 3, 0.1));
               }
 
               break;
@@ -346,11 +321,15 @@
               config.xDomain.push(_tmpValue);
             }
           }
-          // currently we always add ">max" and "NA" marker 
+          // currently we always add ">max" and "NA" marker
           // add marker for greater than maximum
-          config.xDomain.push(Number(cbio.util.toPrecision(Number(config.xDomain[config.xDomain.length - 1] + config.gutter), 3, 0.1)));
+          config.xDomain.push(Number(cbio.util.toPrecision(
+            Number(config.xDomain[config.xDomain.length - 1] +
+              config.gutter), 3, 0.1)));
           // add marker for NA values
-          config.xDomain.push(Number(cbio.util.toPrecision(Number(config.xDomain[config.xDomain.length - 1] + config.gutter), 3, 0.1)));
+          config.xDomain.push(Number(cbio.util.toPrecision(
+            Number(config.xDomain[config.xDomain.length - 1] +
+              config.gutter), 3, 0.1)));
         }
       }
       return config;
@@ -361,4 +340,6 @@
   window.dc,
   window._,
   window.$ || window.jQuery,
-  window.d3);
+  window.d3,
+  window.cbio
+);
