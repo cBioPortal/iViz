@@ -87,6 +87,7 @@
   <script src="scripts/views/chartGroupTemplate.js"></script>
   <script src="scripts/views/individualChartTemplate.js"></script>
   <script src="scripts/views/components/generalChart.js"></script>
+  <script src="scripts/views/components/invisibleChart.js"></script>
   <script src="scripts/views/components/chartOperationsHeader.js"></script>
   <script src="scripts/views/components/header/manageCharts.js"></script>
   <script src="scripts/views/components/header/breadCrumbTemplate.js"></script>
@@ -183,7 +184,7 @@
     <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
                    :selectedpatients.sync="selectedpatients"
                    :selectedsamples.sync="selectedsamples"
-                   :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
+                   :hasfilters.sync="hasfilters" :customfilter.sync="customfilter" :clear-group-flag="clearGroupFlag"></main-template>
   </div>
 
 </div>
@@ -212,7 +213,9 @@
     studyCasesMap['hnsc_tcga']={};
     window.iviz = {};
     window.iviz.datamanager = new iViz.data.init(window.cbioURL, studyCasesMap, iViz.init);
-    window.iviz.datamanager.initialSetup();
+    $.when(window.iviz.datamanager.initialSetup()).then(function(_result){
+      iViz.init(_result);
+    });
     //  iViz.data.init(window.cbioURL, ['hnsc_tcga'], iViz.init);
    
     

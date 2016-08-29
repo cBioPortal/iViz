@@ -36,14 +36,13 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('individualChart', {
-    template: '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
-    ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
-    ':ndx="ndx" :attributes.sync="attributes"></component>',
+    template: '<component :is="currentView" v-if="attributes.show" :ndx="ndx" :attributes.sync="attributes"></component>',
     props: [
-      'ndx', 'attributes', 'groupid'
+      'ndx', 'attributes'
     ],
     data: function() {
       var currentView = '';
+      this.attributes.filter  =[];
       switch (this.attributes.view_type) {
         case 'pie_chart':
           currentView = 'pie-chart';
@@ -69,12 +68,6 @@
       'close': function () {
         this.attributes.show = false;
         this.$dispatch('remove-chart', this.attributes.attr_id, this.attributes.group_id)
-      },
-      'clear-chart-filters': function () {
-        var _self = this;
-        if (_self.attributes.filter.length > 0) {
-          _self.attributes.filter = [];
-        }
       }
     }
   });

@@ -36,28 +36,28 @@
 (function(Vue, dc, iViz, $) {
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
-    ' :ndx="ndx" :groupid="groupid"' +
-    ' :attributes.sync="attribute" v-for="attribute in attributes"></div>',
+    ' :ndx="ndx" ' +
+    ' :attributes.sync="attribute" v-for="attribute in attributes"></div>' +
+    ' <div id={{invisibleChartDivId}} style="display: none;"></div>',
     props: [
-      'attributes', 'type', 'id', 'groupid', 'redrawgroups', 'mappedcases'
+      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroupFlag'
     ], created: function() {
       //TODO: update this.data
       var _self = this;
-      var data_ = iViz.getAttrData(this.type);
-      var ndx_ = crossfilter(data_);
-      this.invisibleBridgeDimension =  ndx_.dimension(function (d) { return d[_self.type+'_id']; });
-      this.groupid = this.id;
+      var ndx_ = crossfilter(iViz.getGroupNdx(this.id));
+      var invisibleBridgeDimension =  ndx_.dimension(function (d) { return d[_self.type+'_id']; });
+      this.invisibleChartDivId = 'chart-' + this.id + 'invisible-div';
+      this.invisibleGroupChart = new iViz.invisibleChart(invisibleBridgeDimension,this.invisibleChartDivId, this.id);
       this.ndx = ndx_;
-      this.invisibleChartFilters = [];
-      var filtersMap = {};
-     
+
       if(this.mappedcases !== undefined && this.mappedcases.length>0){
         this.$nextTick(function(){
           _self.updateInvisibleChart(_self.mappedcases);
         });
       }
-    }, destroyed: function() {
-      dc.chartRegistry.clear(this.groupid);
+    },
+    destroyed: function() {
+      dc.chartRegistry.clear(this.id);
     },
     data: function() {
       return {
@@ -66,25 +66,27 @@
       }
     },
     watch: {
-      'mappedcases': function(val) {
-          if (this.syncCases) {
-            this.updateInvisibleChart(val);
-          }else {
-            this.syncCases = true;
-          }
+      'mappedcases': function (val) {
+        if (this.syncCases) {
+          this.updateInvisibleChart(val);
+        } else {
+          this.syncCases = true;
+        }
       }
     },
     events: {
-      'clear-group':function(){
-        this.clearGroup = true;
-        this.invisibleBridgeDimension.filterAll();
-        this.invisibleChartFilters = [];
-        iViz.deleteGroupFilteredCases(this.id);
-        this.$broadcast('clear-chart-filters');
-        var self_ = this;
-        this.$nextTick(function(){
-          self_.clearGroup = false;
-        });
+      'add-chart-to-group': function(groupId,attrId){
+        if(this.id === groupId){
+          this.$broadcast('adding-chart', this.id, true);
+          var attrFilter = {};
+          var _invisibleGroupChartFilters = this.invisibleGroupChart.filters();
+          this.invisibleGroupChart.filterAll();
+          this.ndx.remove();
+          var _self = this;
+          _self.ndx.add(iViz.getGroupNdx(this.id));
+          _self.invisibleGroupChart.replaceFilter([_invisibleGroupChartFilters]);
+          _self.$broadcast('adding-chart',_self.id,false);
+        }
       },
       /*
       *This event is invoked whenever there is a filter update on any chart
@@ -97,12 +99,13 @@
       * 
        */
       'update-filters': function() {
-        if(!this.clearGroup){
+        if(!this.clearGroupFlag){
           this.syncCases = false;
-          if(this.invisibleChartFilters.length>0) {
-            this.invisibleBridgeDimension.filterAll();
+          var _invisibleChartFilters = this.invisibleGroupChart.filters(); 
+          if(_invisibleChartFilters.length>0) {
+            this.invisibleGroupChart.filterAll();
           }
-          var filteredCases = _.pluck(this.invisibleBridgeDimension.top(Infinity),this.type+'_id').sort();
+          var filteredCases = _.pluck(this.invisibleGroupChart.dimension().top(Infinity),this.type+'_id').sort();
           //hackey way to check if filter selected filter cases is same as original case list
           if(filteredCases.length !== this.ndx.size()){
             iViz.setGroupFilteredCases(this.id, this.type, filteredCases);
@@ -110,16 +113,8 @@
             iViz.deleteGroupFilteredCases(this.id)
           }
 
-          if(this.invisibleChartFilters.length>0){
-            var filtersMap = {};
-            _.each(this.invisibleChartFilters,function(filter){
-              if(filtersMap[filter] === undefined){
-                filtersMap[filter] = true;
-              }
-            });
-            this.invisibleBridgeDimension.filterFunction(function(d){
-              return (filtersMap[d] !== undefined);
-            });
+          if(_invisibleChartFilters.length>0){
+            this.invisibleGroupChart.replaceFilter([_invisibleChartFilters]);
           }
           this.$dispatch('update-all-filters', this.type);
         }
@@ -135,19 +130,9 @@
             _selectedCases = iViz.util.intersection(_selectedCases,_group.cases);
           }
         });
-        this.invisibleChartFilters = [];
-        this.invisibleBridgeDimension.filterAll();
+        this.invisibleGroupChart.filterAll();
         if(_selectedCases.length>0){
-          this.invisibleChartFilters = _selectedCases;
-          var filtersMap = {};
-          _.each(_selectedCases,function(filter){
-            if(filtersMap[filter] === undefined){
-              filtersMap[filter] = true;
-            }
-          });
-          this.invisibleBridgeDimension.filterFunction(function(d){
-            return (filtersMap[d] !== undefined);
-          });
+          this.invisibleGroupChart.replaceFilter([_selectedCases]);
         }
         this.redrawgroups.push(this.id);
       }

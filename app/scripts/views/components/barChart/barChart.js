@@ -287,7 +287,7 @@
 
     content.init = function(ndx, opts) {
       //TODO: need to update logic of getting min and max
-      var data = iViz.getAttrData(opts.group_type);
+      var data = iViz.getGroupNdx(opts.groupid);
       data_.meta = _.map(_.filter(_.pluck(data, opts.attrId), function(d) {
         return d !== 'NA';
       }), function(d) {

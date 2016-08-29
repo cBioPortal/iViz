@@ -70,7 +70,8 @@
             stats:'',
             updateStats:false,
             highlightAllButtons:false,
-            highlightCaseButtons:false
+            highlightCaseButtons:false,
+            clearGroupFlag:false
           }, watch: {
             'updateSpecialCharts':function(newVla,oldVal) {
               var self_ = this;
@@ -128,14 +129,32 @@
               iViz.submitForm();
             },
             clearAll: function(){
+              var self_ = this;
+              self_.clearGroupFlag = true;
+              this.hasfilters = false;
               if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
+                this.customfilter.sampleIds = [];
+                this.customfilter.patientIds = [];
+              }
+              self_.$broadcast('show-loader');
+              self_.$nextTick(function () {
+                _.each(self_.groups,function(group){
+                  dc.filterAll(group.id);
+                  dc.redrawAll(group.id);
+                  iViz.deleteGroupFilteredCases(group.id);
+                });
+                self_.selectedsamples =  _.keys(iViz.getCasesMap('sample'));
+                self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+                self_.$broadcast('update-special-charts');
+                self_.clearGroupFlag = false;
+              });
+             /* if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
                 this.customfilter.sampleIds = [];
                 this.customfilter.patientIds = [];
                 this.$broadcast('update-all-filters');
               }
               this.$broadcast('clear-all-groups');
-              var self_ = this;
-              this.hasfilters = false;
+             
               self_.$nextTick(function () {
                 self_.selectedsamples =  _.keys(iViz.getCasesMap('sample'));
                 self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
@@ -143,18 +162,19 @@
                 _.each(this.groups,function(group){
                   dc.redrawAll(group.id);
                 });
-              });
+              });*/
             },
             addChart: function(attrId){
               var self_ = this;
               var attrData = self_.charts[attrId];
               var _attrAdded = false;
               var _group = {};
+              var _groupIdToPush = 0;
               _.every(self_.groups,function(group){
                 if(group.type === attrData.group_type){
                   if(group.attributes.length<31){
                     attrData.group_id = group.id;
-                    group.attributes.push(attrData);
+                    _groupIdToPush = group.id;
                     _attrAdded = true;
                     return false;
                   }else{
@@ -175,9 +195,24 @@
                 self_.groupCount = self_.groupCount+1;
                 groupAttrs.push(attrData);
                 newgroup_.attributes = groupAttrs;
-                self_.groups.push(newgroup_);
+                $.when(iViz.createGroupNdx(newgroup_)).then(function(){
+                  self_.groups.push(newgroup_);
+                  self_.$nextTick(function () {
+                    $("#iviz-add-chart").trigger("chosen:updated");
+                  });
+                });
+              }else{
+                $.when(iViz.updateGroupNdx(attrData.group_id,attrData.attr_id)).then(function(){
+                  self_.groups[_groupIdToPush].attributes.push(attrData);
+                  self_.$broadcast('add-chart-to-group',attrData.group_id,attrData.attr_id);
+                  self_.$nextTick(function () {
+                    $("#iviz-add-chart").trigger("chosen:updated");
+                  });
+                });
+                
               }
 
+              
             },
             removeChart: function(attrId){
               var self = this;
@@ -322,12 +357,9 @@
           width: '30%'
         })
         .change(function() {
-              var value = this.el.value;
+              var value = self.el.value;
               self.params.charts[value].show = true;
               self.vm.addChart(this.el.value);
-              self.vm.$nextTick(function () {
-                $("#iviz-add-chart").trigger("chosen:updated");
-              });
           }.bind(this)
         );
     }

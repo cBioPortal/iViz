@@ -118,7 +118,7 @@
 
     content.changeView = function(vm,toTableView){
       currentView = toTableView?'table':'pie';
-      var chartDivDom = $("#"+v.opts.charDivId);
+      var chartDivDom = $("#"+v.opts.chartDivId);
       chartDivDom.css('z-index', 16000);
 
       //qtip wont be needed in table view
@@ -126,22 +126,22 @@
 
       if(currentView === 'table'){
           updateReactTable();
-        animateTable("#"+v.opts.charDivId, 'table', function() {
+        animateTable("#"+v.opts.chartDivId, 'table', function() {
           vm.$dispatch('update-grid');
-          $("#"+v.opts.charDivId).css('z-index', '');
+          $("#"+v.opts.chartDivId).css('z-index', '');
         });
       }else{
-        animateTable("#"+v.opts.charDivId, 'pie', function() {
+        animateTable("#"+v.opts.chartDivId, 'pie', function() {
           vm.$dispatch('update-grid');
-          $("#"+v.opts.charDivId).css('z-index', '1');
+          $("#"+v.opts.chartDivId).css('z-index', '1');
         });
         content.initMainDivQtip();
       }
     };
 
     content.initMainDivQtip = function(){
-      $('#' +v.opts.charDivId).qtip({
-        id: v.opts.charDivId+'-qtip',
+      $('#' +v.opts.chartDivId).qtip({
+        id: v.opts.chartDivId+'-qtip',
         style: {
           classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width iviz-pie-qtip iviz-pie-label-qtip'
         },
@@ -149,7 +149,7 @@
         hide: {fixed:true, delay: 300, event: "mouseleave"},
         // hide: false,
         position: {my:'left center',at:'center right', viewport: $(window)},
-        content: '<div id="qtip-' + v.opts.charDivId + '-content-react">Loading....</div>',
+        content: '<div id="qtip-' + v.opts.chartDivId + '-content-react">Loading....</div>',
         events: {
           show:function(){
             if(qtipRendered){
@@ -180,7 +180,9 @@
     };
 
     content.filtered = function() {
-      updateTables();
+      if(qtipRendered) {
+        updateTables();
+      }
       isFiltered = true;
       updateQtip = false;
     };
@@ -284,14 +286,14 @@
     function initCanvasDownloadData() {
       content.setDownloadData('svg', {
         title: v.data.display_name,
-        chartDivId: v.opts.charDivId,
+        chartDivId: v.opts.chartDivId,
         chartId: v.opts.chartId,
         fileName: v.data.display_name,
         labels: labels
       });
       content.setDownloadData('pdf', {
         title: v.data.display_name,
-        chartDivId: v.opts.charDivId,
+        chartDivId: v.opts.chartDivId,
         chartId: v.opts.chartId,
         fileName: v.data.display_name,
         labels: labels
@@ -342,7 +344,7 @@
     function updateQtipReactTable() {
       var data = $.extend(true, {}, reactTableData);
       data.attributes[0].column_width = 140;
-      initReactTable('qtip-' + v.opts.charDivId + '-content-react', data, {
+      initReactTable('qtip-' + v.opts.chartDivId + '-content-react', data, {
         tableWidth: 300,
         pieLabelMouseEnterFunc: pieLabelMouseEnter,
         pieLabelMouseLeaveFunc: pieLabelMouseLeave

@@ -36,22 +36,22 @@
 (function(Vue, dc, iViz, $) {
 
   Vue.component('pieChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item-h-1 grid-item-w-1" data-number="6" ' +
+    template: '<div id={{chartDivId}} class="grid-item grid-item-h-1 grid-item-w-1" data-number="6" ' +
               '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
               '<chart-operations :has-chart-title="hasChartTitle" :display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
-              ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="groupid" ' +
-              ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" :chart="chartInst" :filters.sync="filters" :attributes="attributes"></chart-operations>' +
+              ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" :show-operations="showOperations" :groupid="attributes.group_id" ' +
+              ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" :chart="chartInst" :filters.sync="attributes.filter" :attributes="attributes"></chart-operations>' +
               '<div class="dc-chart dc-pie-chart" :class="{view: showPieIcon}" align="center" style="float:none' +
               ' !important;" id={{chartId}} ></div>' +
               '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
               '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid','options'
+      'ndx', 'attributes'
     ],
     data: function() {
       return {
         v: {},
-        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-div',
+        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-div',
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-reset',
         chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
         chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)| /g, ""),
@@ -64,11 +64,12 @@
         hasChartTitle:true,
         showTableIcon:true,
         showPieIcon:false,
-        filtersUpdated:false
+        filtersUpdated:false,
+        addingChart:false
       }
     },
     watch: {
-      'filters': function(newVal, oldVal) {
+      'attributes.filter': function(newVal, oldVal) {
         if(!this.filtersUpdated) {
           this.filtersUpdated = true;
           if (newVal.length === 0) {
@@ -82,7 +83,7 @@
               this.chartInst.replaceFilter(temp);
             }
           }
-          dc.redrawAll(this.groupid);
+          dc.redrawAll(this.attributes.group_id);
           this.$dispatch('update-filters');
         }else{
           this.filtersUpdated = false;
@@ -94,10 +95,23 @@
         this.piechart.changeView(this, !this.showTableIcon);
       },
       'closeChart':function(){
-        $('#' +this.charDivId).qtip('destroy');
-        dc.deregisterChart(this.chartInst, this.attributes.groupid);
+        $('#' +this.chartDivId).qtip('destroy');
+        dc.deregisterChart(this.chartInst, this.attributes.group_id);
         this.chartInst.dimension().dispose();
         this.$dispatch('close');
+      },
+      'adding-chart':function(groupId,val){
+        if(this.attributes.group_id === groupId){
+          if(this.attributes.filter.length>0){
+            if(val){
+              this.addingChart=val;
+              this.chartInst.filter(null);
+            }else{
+              this.chartInst.filter([this.attributes.filter]);
+              this.addingChart=val;
+            }
+          }
+        }
       }
     },
     methods: {
@@ -130,8 +144,8 @@
         _self.$once('initMainDivQtip', _self.initMainDivQtip);
         var opts = {
           chartId : _self.chartId,
-          charDivId : _self.charDivId,
-          groupid : _self.groupid,
+          chartDivId : _self.chartDivId,
+          groupid : _self.attributes.group_id,
           chartTableId : _self.chartTableId,
           transitionDuration : iViz.opts.dc.transitionDuration,
           width: window.style['piechart-svg-width'] | 130,
@@ -141,21 +155,22 @@
         _self.piechart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
         _self.chartInst = _self.piechart.getChart();
         _self.chartInst.on('filtered', function(_chartInst, _filter) {
-          if(!_self.filtersUpdated) {
-            _self.filtersUpdated = true;
-            var tempFilters_ = $.extend(true, [], _self.filters);
-            tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-              _self.attributes.view_type);
-            _self.filters = tempFilters_;
-            _self.$dispatch('update-filters');
-          }else{
-            _self.filtersUpdated = false;
+          if(!_self.addingChart){
+            if(!_self.filtersUpdated) {
+              _self.filtersUpdated = true;
+              var tempFilters_ = $.extend(true, [], _self.attributes.filter);
+              tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
+                _self.attributes.view_type);
+              _self.attributes.filter = tempFilters_;
+              _self.$dispatch('update-filters');
+            }else{
+              _self.filtersUpdated = false;
+            }
           }
           // Trigger pie chart filtered event.
           _self.piechart.filtered();
         });
-        _self.$dispatch('data-loaded', this.charDivId);
-      
+        _self.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(window.Vue, window.dc, window.iViz,

@@ -36,18 +36,20 @@
 (function(Vue, dc, iViz, $) {
   Vue.component('survival', {
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" data-number="9" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
-              '<chart-operations :show-operations="showOperations" :has-chart-title="hasChartTitle" :display-name="displayName" :groupid="groupid" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
+              '<chart-operations :show-operations="showOperations" :has-chart-title="hasChartTitle" :display-name="displayName" :groupid="attributes.group_id" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
               '<div :class="{\'start-loading\': showLoad}" class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} ></div>' +
               '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    ' <div id={{invisibleChartDivId}} style="display: none;"></div>' +
     '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
-      'ndx', 'attributes', 'options', 'filters', 'groupid'
+      'ndx', 'attributes', 'options'
     ],
     created: function() {
     },
     data: function() {
       return {
         chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-div',
+        invisibleChartDivId:'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + 'invisible-div',
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
         displayName: this.attributes.display_name,
@@ -57,7 +59,8 @@
         fromFilter: false,
         hasChartTitle:true,
         showLoad:true,
-        invisibleDimension:{}
+        invisibleChart:{},
+        addingChart:false
       };
     },
     events: {
@@ -66,13 +69,27 @@
       },
       'update-special-charts': function() {
         var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-        var _selectedCases = _.pluck(this.invisibleDimension.top(Infinity),attrId);
+        var _selectedCases = _.pluck(this.invisibleChart.dimension().top(Infinity),attrId);
         this.chartInst.update(_selectedCases, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
       },
       'closeChart':function(){
-        this.invisibleDimension.dispose();
+        dc.deregisterChart(this.invisibleChart, this.attributes.group_id);
+        this.invisibleChart.dimension().dispose();
         this.$dispatch('close');
+      },
+      'adding-chart':function(groupId,val){
+        if(this.attributes.group_id === groupId){
+          if(this.attributes.filter.length>0){
+            if(val){
+              this.addingChart=val;
+              this.chartInst.filter(null);
+            }else{
+              this.chartInst.filter([this.attributes.filter]);
+              this.addingChart=val;
+            }
+          }
+        }
       }
     },
     methods: {
@@ -86,7 +103,8 @@
       var _self = this;
       _self.showLoad = true;
       var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-      this.invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
+      var invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
+      this.invisibleChart = new iViz.invisibleChart(invisibleDimension,this.invisibleChartDivId, this.attributes.group_id);
       var _opts = {
         width: window.style.vars.survivalWidth,
         height: window.style.vars.survivalHeight,
@@ -99,10 +117,10 @@
       _self.chartInst = new iViz.view.component.Survival();
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
-      var data = iViz.getAttrData(this.attributes.group_type);
+      var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst.init(data, _opts, _selectedPatientList);
       _self.showLoad = false;
-      this.$dispatch('data-loaded', this.chartDivId);
+      this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(window.Vue, window.dc, window.iViz,

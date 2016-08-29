@@ -34,40 +34,26 @@ var iViz = (function (_, $) {
 
   var data_;
   var vm_;
-  var grid_;
   var tableData_ = [];
   var groupFiltersMap_ = {};
+  var groupNdxMap_ = {};
+  var hasSampleAttrDataMap = {};
+  var hasPatientAttrDataMap = {};
+  var patientData;
+  var sampleData;
 
   return {
 
-    init: function (_rawDataJSON, _inputSampleList, _inputPatientList) {
+    init: function (_rawDataJSON) {
 
       vm_ = iViz.vue.manage.getInstance();
 
       data_ = _rawDataJSON;
-
-      if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
-        var _sampleData = _.filter(_data.groups.sample.data, function (_dataObj) {
-          return $.inArray(_dataObj['sample_id'], _inputSampleList) !== -1
-        });
-        var _sampleDataIndices = {};
-        for (var _i = 0; _i < _sampleData.length; _i++) {
-          _sampleDataIndices[_sampleData[_i].sample_id] = _i;
-        }
-        var _patientData = _.filter(_data.groups.patient.data, function (_dataObj) {
-          return $.inArray(_dataObj['patient_id'], _inputPatientList) !== -1
-        });
-        var _patientDataIndices = {};
-        for (var _j = 0; _j < _patientData.length; _j++) {
-          _patientDataIndices[_patientData[_j].patient_id] = _j;
-        }
-
-        data_.groups.patient.data = _patientData;
-        data_.groups.sample.data = _sampleData;
-        data_.groups.patient.data_indices.patient_id = _patientDataIndices;
-        data_.groups.sample.data_indices.sample_id = _sampleDataIndices;
-      }
-
+      
+      hasPatientAttrDataMap = data_.groups.patient.hasAttrData;
+      hasSampleAttrDataMap = data_.groups.sample.hasAttrData;
+      patientData = data_.groups.patient.data;
+      sampleData = data_.groups.sample.data;
       var _patientIds = _.keys(data_.groups.patient.data_indices.patient_id);
       var _sampleIds = _.keys(data_.groups.sample.data_indices.sample_id);
 
@@ -131,20 +117,59 @@ var iViz = (function (_, $) {
       vm_.groupCount = vm_.groupCount+1;
       group.attributes = groupAttrs;
       groups.push(group);
-
-
-
-      vm_.isloading = false;
-      vm_.selectedsamples = _sampleIds;
-      vm_.selectedpatients = _patientIds;
-      // vm_.patientmap = data_.groups.group_mapping.patient.sample;
-      // vm_.samplemap = data_.groups.group_mapping.sample.patient;
-      vm_.groups = groups;
-      vm_.charts = charts;
-
-
+      var _self = this;
+      var requests = groups.map(function (group) {
+        var _def = new $.Deferred();
+        _self.createGroupNdx(group).then(function () {
+          _def.resolve();
+        }).fail(function () {
+          _def.reject();
+        });
+        return _def.promise();
+      });
+      $.when.apply($, requests).then(function () {
+        vm_.isloading = false;
+        vm_.selectedsamples = _sampleIds;
+        vm_.selectedpatients = _patientIds;
+        // vm_.patientmap = data_.groups.group_mapping.patient.sample;
+        // vm_.samplemap = data_.groups.group_mapping.sample.patient;
+        vm_.groups = groups;
+        vm_.charts = charts;
+      });
     }, // ---- close init function ----groups
-    setGroupFilteredCases : function(groupId_, type_, filters_){
+    createGroupNdx : function(group){
+      var def = new $.Deferred();
+      var _caseAttrId = group.type==='patient'?'patient_id':'sample_id';
+      var _attrIds = [_caseAttrId];
+      _attrIds = _attrIds.concat(_.pluck(group.attributes,'attr_id'));
+      $.when(iViz.getDataWithAttrs(group.type, _attrIds)).then(function(selectedData_){
+        groupNdxMap_[group.id]={};
+        groupNdxMap_[group.id].type = group.type;
+        groupNdxMap_[group.id].data = selectedData_;
+        groupNdxMap_[group.id].attributes = _attrIds;
+        def.resolve();
+      });
+      return def.promise();
+    },
+    updateGroupNdx : function(groupId, attrId){
+      var def = new $.Deferred();
+      var groupNdxData_ = groupNdxMap_[groupId];
+      var attrIds = groupNdxData_.attributes;
+      if(attrIds.indexOf(attrId) !== -1){
+        def.resolve(groupNdxData_.data);
+      }else{
+        attrIds.push(attrId);
+        $.when(iViz.getDataWithAttrs(groupNdxData_.type, attrIds)).then(function(selectedData_){
+          groupNdxData_.data = selectedData_;
+          def.resolve(selectedData_);
+        });
+      }
+      return def.promise();
+    },
+    getGroupNdx : function(groupId){
+      return groupNdxMap_[groupId].data;
+    },
+    setGroupFilteredCases : function(groupId_, type_, filters_) {
       groupFiltersMap_[groupId_] = {};
       groupFiltersMap_[groupId_].type = type_;
       groupFiltersMap_[groupId_].cases = filters_;
@@ -154,33 +179,86 @@ var iViz = (function (_, $) {
         return groupFiltersMap_[groupId_];
       }
       return groupFiltersMap_;
-    },deleteGroupFilteredCases : function(groupId_){
+    },
+    deleteGroupFilteredCases : function(groupId_){
       groupFiltersMap_[groupId_] = undefined;
     },
-    getAttrData : function(type, attr){
-      var _data = {};
-      var toReturn_ = [];
-      if(type === 'sample'){
-        _data = data_.groups.sample.data;
-      }else if(type === 'patient'){
-        _data = data_.groups.patient.data;
-      }
-      if(attr !== undefined){
-        _.each(_data,function(val){
-          if(val[attr] !== undefined){
-            toReturn_.push(val[attr]);
-          }
+    getDataWithAttrs : function(type, attrIds){
+      var def = new $.Deferred();
+      var isPatientAttributes = (type === 'patient');
+      var hasAttrDataMap = isPatientAttributes? hasPatientAttrDataMap : hasSampleAttrDataMap;
+      var attrDataToGet = [];
+      var updatedAttrIds = [];
+      _.each(attrIds, function(_attrId){
+        if(_attrId === 'MUT_CNT_VS_CNA'){
+          updatedAttrIds.push('cna_fraction')
+        }
+        else if(_attrId === 'DFS_SURVIVAL'){
+          updatedAttrIds.push('DFS_STATUS');
+          updatedAttrIds.push('DFS_MONTHS');
+        }else if(_attrId === 'OS_SURVIVAL'){
+          updatedAttrIds.push('OS_STATUS');
+          updatedAttrIds.push('OS_MONTHS');
+        }else{
+          updatedAttrIds.push(_attrId);
+        }
+      });
+      
+      _.each(updatedAttrIds,function(attrId){
+        if(hasAttrDataMap[attrId] === undefined){
+          attrDataToGet.push(attrId);
+        }
+      });
+      var _def = new $.Deferred();
+      $.when(_def).done(function(){
+        var _data = isPatientAttributes?patientData:sampleData;
+        var toReturn = [];
+        _.each(_data,function(_caseData, _index){
+          toReturn[_index] = _.pick(_caseData,updatedAttrIds);
+        });
+        def.resolve(toReturn);
+      });
+      if(attrDataToGet.length>0){
+        $.when(this.updateDataObject(type, attrDataToGet)).then(function(){
+          _def.resolve();
         });
       }else{
-        toReturn_ = _data
+        _def.resolve();
       }
-      return toReturn_;
+      return def.promise();
+      
+    },
+    updateDataObject : function(type, attrIds){
+      var def = new $.Deferred();
+      var self_ = this;
+      var isPatientAttributes = (type === 'patient');
+      var _data = isPatientAttributes?patientData:sampleData;
+      var hasAttrDataMap = isPatientAttributes? hasPatientAttrDataMap : hasSampleAttrDataMap;
+      
+        $.when(window.iviz.datamanager.getClinicalData(attrIds,isPatientAttributes)).then(function(clinicalData){
+          var _caseIdToClinDataMap = {};
+          var idType = isPatientAttributes?'patient_id':'sample_id';
+          _.each(clinicalData, function (_clinicalAttributeData, _attrId) {
+            hasAttrDataMap[_attrId]='';
+            _.each(_clinicalAttributeData, function (_dataObj) {
+              if (_caseIdToClinDataMap[_dataObj[idType]] === undefined) {
+                _caseIdToClinDataMap[_dataObj[idType]] = {};
+              }
+              _caseIdToClinDataMap[_dataObj[idType]][_dataObj.attr_id] = _dataObj.attr_val;
+            });
+          });
+          var type = isPatientAttributes?'patient':'sample';
+          var caseIndices = self_.getCaseIndices(type)
+          _.each(_caseIdToClinDataMap,function(_clinicalData,_caseId){
+            var _caseIndex = caseIndices[_caseId];
+            _.extend(_data[_caseIndex],_clinicalData);
+          });
+          def.resolve();
+        });
+      return def.promise();
     },
     getTableData : function(attrId) {
       return tableData_[attrId];
-    },
-    getCompleteData : function(){
-      return data_;
     },
     getCasesMap : function(type){
       if(type === 'sample'){
@@ -201,13 +279,12 @@ var iViz = (function (_, $) {
       var possible = true;
       var selectedCases_ = vm_.selectedpatients;
       var caseIndices_ =this.getCaseIndices('patient');
-      var patientData_ = data_.groups.patient.data;
 
       $.each(selectedCases_,function(key,caseId){
         if(key === 0){
-          studyId = patientData_[caseIndices_[caseId]]['study_id'];
+          studyId = patientData[caseIndices_[caseId]]['study_id'];
         }else{
-          if(studyId !== patientData_[caseIndices_[caseId]]['study_id']){
+          if(studyId !== patientData[caseIndices_[caseId]]['study_id']){
             possible = false;
             return false;
           }
@@ -262,12 +339,10 @@ var iViz = (function (_, $) {
       strA.length =0;
       var sampleIndices_ = data_.groups.sample.data_indices.sample_id;
       var patienIndices_ = data_.groups.patient.data_indices.patient_id;
-      var sampleData_ = data_.groups.sample.data;
-      var patientData_ = data_.groups.patient.data;
       var samplePatientMapping = data_.groups.group_mapping.sample.patient;
       _.each(sampleIds_,function(sampleId){
-        var temp = sampleData_[sampleIndices_[sampleId]];
-        var temp1 = $.extend(true,temp,patientData_[patienIndices_[samplePatientMapping[sampleId][0]]]);
+        var temp = sampleData[sampleIndices_[sampleId]];
+        var temp1 = $.extend(true,temp,patientData[patienIndices_[samplePatientMapping[sampleId][0]]]);
         arr.push(temp1);
       });
 
@@ -414,15 +489,7 @@ var iViz = (function (_, $) {
       return vm_;
     },
     view: {
-      component: {},
-      grid: {
-        get: function () {
-          return grid_;
-        },
-        layout: function () {
-          grid_.layout();
-        }
-      }
+      component: {}
     },
     util: {},
     opts: {

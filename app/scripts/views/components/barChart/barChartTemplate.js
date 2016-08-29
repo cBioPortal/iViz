@@ -48,13 +48,13 @@
   };
 
   Vue.component('barChart', {
-    template: '<div id={{charDivId}} class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" data-number="6" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
+    template: '<div id={{chartDivId}} class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" data-number="6" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="showLogScale"' +
-    ':show-operations="showOperations" :groupid="groupid" :reset-btn-id="resetBtnId" :chart-ctrl="barChart" :chart="chartInst" :chart-id="chartId" :show-log-scale="showLogScale" :filters.sync="filters"></chart-operations>' +
+    ':show-operations="showOperations" :groupid="attributes.group_id" :reset-btn-id="resetBtnId" :chart-ctrl="barChart" :chart="chartInst" :chart-id="chartId" :show-log-scale="showLogScale" :filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><span class="text-center chart-title-span">{{displayName}}</span>' +
     '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid'
+      'ndx', 'attributes'
     ],
     data: function() {
       return {
@@ -69,15 +69,16 @@
         showOperations: false,
         filtersUpdated:false,
         showLogScale:false,
-        showSurvivalIcon:true
+        showSurvivalIcon:true,
+        addingChart:false
       }
     }, watch: {
-      'filters': function(newVal, oldVal) {
+      'attributes.filter': function(newVal, oldVal) {
         if(!this.filtersUpdated) {
           this.filtersUpdated = true;
           if (newVal.length == 0) {
             this.chartInst.filter(null);
-            dc.redrawAll(this.groupid);
+            dc.redrawAll(this.attributes.group_id);
             this.$dispatch('update-filters');
           }
         } else{
@@ -86,14 +87,28 @@
       }
     },events: {
       'closeChart':function(){
-        dc.deregisterChart(this.chartInst, this.attributes.groupid);
+        dc.deregisterChart(this.chartInst, this.attributes.group_id);
         this.chartInst.dimension().dispose();
         this.$dispatch('close');
       },
       'changeLogScale':function(logScaleChecked){
         $('#'+this.chartId).find('svg').remove();
-        dc.deregisterChart(this.chartInst, this.attributes.groupid);
+        dc.deregisterChart(this.chartInst, this.attributes.group_id);
         this.initChart(logScaleChecked);
+      },
+      'adding-chart':function(groupId,val){
+        if(this.attributes.group_id === groupId){
+          if(this.attributes.filter.length>0){
+            if(val){
+              this.addingChart=val;
+              this.chartInst.filter(null);
+            }else{
+              var filter_ = new dc.filters.RangedFilter(this.attributes.filter[0],this.attributes.filter[1]);
+              this.chartInst.filter(filter_);
+              this.addingChart=val;
+            }
+          }
+        }
       }
     },
     methods: {
@@ -109,7 +124,7 @@
             displayName: this.attributes.display_name,
             chartDivId: this.chartDivId,
             chartId: this.chartId,
-            groupid: this.groupid,
+            groupid: this.attributes.group_id,
             width: settings_.barChart.width,
             height: settings_.barChart.height,
             logScaleChecked: logScaleChecked
@@ -119,22 +134,24 @@
         this.chartInst.on('filtered', function(_chartInst, _filter) {
           //TODO : Right now we are manually checking for brush mouseup event. This should be updated one latest dc.js is released
           // https://github.com/dc-js/dc.js/issues/627
-          self_.chartInst.select('.brush').on("mouseup", function() {
-            if(!self_.filtersUpdated) {
-              self_.filtersUpdated = true;
-              var tempFilters_ = $.extend(true, [], self_.filters);
-              tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-                self_.attributes.view_type);
-              if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
-                tempFilters_[0] = tempFilters_[0].toFixed(2);
-                tempFilters_[1] = tempFilters_[1].toFixed(2);
+          if(!self_.addingChart){
+            self_.chartInst.select('.brush').on("mouseup", function() {
+              if(!self_.filtersUpdated) {
+                self_.filtersUpdated = true;
+                var tempFilters_ = $.extend(true, [], self_.attributes.filter);
+                tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
+                  self_.attributes.view_type);
+                if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
+                  tempFilters_[0] = tempFilters_[0].toFixed(2);
+                  tempFilters_[1] = tempFilters_[1].toFixed(2);
+                }
+                self_.attributes.filter = tempFilters_;
+                self_.$dispatch('update-filters');
+              }else{
+                self_.filtersUpdated = false;
               }
-              self_.filters = tempFilters_;
-              self_.$dispatch('update-filters');
-            }else{
-              self_.filtersUpdated = false;
-            }
-          });
+            });
+          }
         });
       }
     },
@@ -144,7 +161,7 @@
       settings_.barChart.width = window.style.vars.barchartWidth || 150;
       settings_.barChart.height = window.style.vars.barchartHeight || 150;
       this.initChart();
-      this.$dispatch('data-loaded', this.chartDivId);
+      this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(window.Vue, window.dc, window.iViz,
