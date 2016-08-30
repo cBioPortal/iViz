@@ -167,52 +167,52 @@
         _.each(geneData_, function(item) {
           var datum = {};
           datum.gene = item.gene;
-          if (_selectedGenesMap !== undefined) {
+          if (_selectedGenesMap === undefined) {
+            datum.caseIds = iViz.util.unique(item.caseIds);
+            datum.samples = datum.caseIds.length;
+            switch (type_) {
+              case 'mutatedGene':
+                datum.numOfMutations = item.num_muts;
+                datum.sampleRate = (numOfCases_ <= 0 ? 0 :
+                    ((datum.samples / Number(numOfCases_) * 100).toFixed(1))) +
+                  '%';
+                datum.uniqueId = datum.gene;
+                break;
+              case 'cna':
+                datum.cytoband = item.cytoband;
+                datum.altType = item.cna;
+                datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
+                    (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
+                datum.uniqueId = datum.gene + '-' + datum.altType;
+                break;
+              default:
+                break;
+            }
+          } else {
             if (_selectedGenesMap[item.index] === undefined) {
               return;
-            } else {
-              datum.caseIds =
-                iViz.util.unique(_selectedGenesMap[item.index].caseIds);
-              datum.samples = datum.caseIds.length;
-              switch (type_) {
-                case 'mutatedGene':
-                  datum.numOfMutations = _selectedGenesMap[item.index].num_muts;
-                  datum.sampleRate = (numOfCases_ <= 0 ? 0 :
-                      ((datum.samples / Number(numOfCases_) * 100).toFixed(
-                        1))) + '%';
-                  datum.uniqueId = datum.gene;
-                  break;
-                case 'cna':
-                  datum.cytoband = item.cytoband;
-                  datum.altType = item.cna;
-                  datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
-                      (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
-                  datum.uniqueId = datum.gene + '-' + datum.altType;
-                  break;
-                default:
-                  break;
-              }
             }
-          }
-          datum.caseIds = iViz.util.unique(item.caseIds);
-          datum.samples = datum.caseIds.length;
-          switch (type_) {
-            case 'mutatedGene':
-              datum.numOfMutations = item.num_muts;
-              datum.sampleRate = (numOfCases_ <= 0 ? 0 :
-                  ((datum.samples / Number(numOfCases_) * 100).toFixed(1))) +
-                '%';
-              datum.uniqueId = datum.gene;
-              break;
-            case 'cna':
-              datum.cytoband = item.cytoband;
-              datum.altType = item.cna;
-              datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
-                  (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
-              datum.uniqueId = datum.gene + '-' + datum.altType;
-              break;
-            default:
-              break;
+            datum.caseIds =
+              iViz.util.unique(_selectedGenesMap[item.index].caseIds);
+            datum.samples = datum.caseIds.length;
+            switch (type_) {
+              case 'mutatedGene':
+                datum.numOfMutations = _selectedGenesMap[item.index].num_muts;
+                datum.sampleRate = (numOfCases_ <= 0 ? 0 :
+                    ((datum.samples / Number(numOfCases_) * 100).toFixed(
+                      1))) + '%';
+                datum.uniqueId = datum.gene;
+                break;
+              case 'cna':
+                datum.cytoband = item.cytoband;
+                datum.altType = item.cna;
+                datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
+                    (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
+                datum.uniqueId = datum.gene + '-' + datum.altType;
+                break;
+              default:
+                break;
+            }
           }
 
           if (item.qval === null) {
