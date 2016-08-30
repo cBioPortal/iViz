@@ -38,8 +38,7 @@
     template: '<div id={{chartDivId}} class="grid-item grid-item-h-2 grid-item-w-2" data-number="9" @mouseenter="mouseEnter" @mouseleave="mouseLeave">' +
               '<chart-operations :show-operations="showOperations" :has-chart-title="hasChartTitle" :display-name="displayName" :groupid="attributes.group_id" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId" :attributes="attributes"></chart-operations>' +
               '<div :class="{\'start-loading\': showLoad}" class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} ></div>' +
-              '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
-    ' <div id={{invisibleChartDivId}} style="display: none;"></div>' +
+    '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
     '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
       'ndx', 'attributes', 'options'
@@ -49,7 +48,6 @@
     data: function() {
       return {
         chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-div',
-        invisibleChartDivId:'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + 'invisible-div',
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
         displayName: this.attributes.display_name,
@@ -59,7 +57,7 @@
         fromFilter: false,
         hasChartTitle:true,
         showLoad:true,
-        invisibleChart:{},
+        invisibleDimension:'',
         addingChart:false
       };
     },
@@ -69,24 +67,29 @@
       },
       'update-special-charts': function() {
         var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-        var _selectedCases = _.pluck(this.invisibleChart.dimension().top(Infinity),attrId);
+        var _selectedCases = _.pluck(this.invisibleDimension.top(Infinity),attrId);
         this.chartInst.update(_selectedCases, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
       },
       'closeChart':function(){
-        dc.deregisterChart(this.invisibleChart, this.attributes.group_id);
-        this.invisibleChart.dimension().dispose();
+        this.invisibleDimension.dispose();
         this.$dispatch('close');
       },
       'adding-chart':function(groupId,val){
         if(this.attributes.group_id === groupId){
           if(this.attributes.filter.length>0){
             if(val){
-              this.addingChart=val;
-              this.chartInst.filter(null);
+              this.invisibleDimension.filterAll();
             }else{
-              this.chartInst.filter([this.attributes.filter]);
-              this.addingChart=val;
+              var filtersMap = {};
+              _.each(this.attributes.filter,function(filter){
+                if(filtersMap[filter] === undefined){
+                  filtersMap[filter] = true;
+                }
+              });
+              this.invisibleDimension.filterFunction(function(d){
+                return (filtersMap[d] !== undefined);
+              });
             }
           }
         }
@@ -103,8 +106,7 @@
       var _self = this;
       _self.showLoad = true;
       var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-      var invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
-      this.invisibleChart = new iViz.invisibleChart(invisibleDimension,this.invisibleChartDivId, this.attributes.group_id);
+      this.invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
       var _opts = {
         width: window.style.vars.survivalWidth,
         height: window.style.vars.survivalHeight,

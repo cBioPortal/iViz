@@ -41,7 +41,6 @@
     ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" :chart-id="chartId"' +
     ' :attributes="attributes" :filters.sync="attributes.filter"></chart-operations>' +
     ' <div :class="{\'start-loading\': showLoad}" class="dc-chart dc-scatter-plot" align="center" style="float:none !important;" id={{chartId}} ></div>' +
-    ' <div id={{invisibleChartDivId}} style="display: none;"></div>' +
     ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
@@ -50,7 +49,6 @@
     data: function() {
       return {
         chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-div',
-        invisibleChartDivId:'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + 'invisible-div',
         resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
         displayName: this.attributes.display_name,
@@ -60,13 +58,14 @@
         hasFilters:false,
         showLoad:true,
         invisibleChart:{},
+        invisibleDimension:'',
         addingChart:false
       };
     },
     watch: {
       'attributes.filter': function(newVal,oldVal) {
         if(newVal.length === 0 ){
-          this.invisibleChart.filterAll();
+          this.invisibleDimension.filterAll();
           dc.redrawAll(this.attributes.group_id);
         }
         this.updateFilters();
@@ -78,7 +77,7 @@
       },
       'update-special-charts': function() {
         var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-        var _selectedCases = _.pluck(this.invisibleChart.dimension().top(Infinity),attrId);
+        var _selectedCases = _.pluck(this.invisibleDimension.top(Infinity),attrId);
         var data = iViz.getGroupNdx(this.attributes.group_id);
         if (_selectedCases.length !== data.length) {
           this.selectedSamples=_selectedCases;
@@ -94,19 +93,24 @@
           this.attributes.filter = [];
           this.updateFilters();
         }
-        dc.deregisterChart(this.invisibleChart, this.attributes.group_id);
-        this.invisibleChart.dimension().dispose();
+        this.invisibleDimension.dispose();
         this.$dispatch('close');
       },
       'adding-chart':function(groupId,val){
         if(this.attributes.group_id === groupId){
           if(this.attributes.filter.length>0){
             if(val){
-              this.addingChart=val;
-              this.chartInst.filter(null);
+              this.invisibleDimension.filterAll();
             }else{
-              this.chartInst.filter([this.attributes.filter]);
-              this.addingChart=val;
+              var filtersMap = {};
+              _.each(this.attributes.filter,function(filter){
+                if(filtersMap[filter] === undefined){
+                  filtersMap[filter] = true;
+                }
+              });
+              this.invisibleDimension.filterFunction(function(d){
+                return (filtersMap[d] !== undefined);
+              });
             }
           }
         }
@@ -132,8 +136,7 @@
         title: this.attributes.display_name
       };
       var attrId = this.attributes.group_type==='patient'?'patient_id':'sample_id';
-      var invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
-      this.invisibleChart = new iViz.invisibleChart(invisibleDimension,this.invisibleChartDivId, this.attributes.group_id);
+      this.invisibleDimension  = this.ndx.dimension(function (d) { return d[attrId]; });
       var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(data, _opts);
@@ -156,7 +159,16 @@
           _self.selectedSamples =_selectedCases;
           _self.attributes.filter =_selectedCases;
 
-          _self.invisibleChart.replaceFilter([_self.attributes.filter]);
+          var filtersMap = {};
+          _.each(_self.attributes.filter,function(filter){
+            if(filtersMap[filter] === undefined){
+              filtersMap[filter] = true;
+            }
+          });
+          _self.invisibleDimension.filterFunction(function(d){
+            return (filtersMap[d] !== undefined);
+          });
+          
           dc.redrawAll(_self.attributes.group_id);
         }
       });

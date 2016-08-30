@@ -37,18 +37,16 @@
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
     ' :ndx="ndx" ' +
-    ' :attributes.sync="attribute" v-for="attribute in attributes"></div>' +
-    ' <div id={{invisibleChartDivId}} style="display: none;"></div>',
+    ' :attributes.sync="attribute" v-for="attribute in attributes"></div>',
     props: [
       'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroupFlag'
     ], created: function() {
       //TODO: update this.data
       var _self = this;
       var ndx_ = crossfilter(iViz.getGroupNdx(this.id));
-      var invisibleBridgeDimension =  ndx_.dimension(function (d) { return d[_self.type+'_id']; });
-      this.invisibleChartDivId = 'chart-' + this.id + 'invisible-div';
-      this.invisibleGroupChart = new iViz.invisibleChart(invisibleBridgeDimension,this.invisibleChartDivId, this.id);
+      this.invisibleBridgeDimension =  ndx_.dimension(function (d) { return d[_self.type+'_id']; });
       this.ndx = ndx_;
+      this.invisibleChartFilters = [];
 
       if(this.mappedcases !== undefined && this.mappedcases.length>0){
         this.$nextTick(function(){
@@ -78,14 +76,23 @@
       'add-chart-to-group': function(groupId,attrId){
         if(this.id === groupId){
           this.$broadcast('adding-chart', this.id, true);
-          var attrFilter = {};
-          var _invisibleGroupChartFilters = this.invisibleGroupChart.filters();
-          this.invisibleGroupChart.filterAll();
+          if(this.invisibleChartFilters.length>0) {
+            this.invisibleBridgeDimension.filterAll();
+          }
           this.ndx.remove();
-          var _self = this;
-          _self.ndx.add(iViz.getGroupNdx(this.id));
-          _self.invisibleGroupChart.replaceFilter([_invisibleGroupChartFilters]);
-          _self.$broadcast('adding-chart',_self.id,false);
+          this.ndx.add(iViz.getGroupNdx(this.id));
+          if(this.invisibleChartFilters.length>0){
+            var filtersMap = {};
+            _.each(this.invisibleChartFilters,function(filter){
+              if(filtersMap[filter] === undefined){
+                filtersMap[filter] = true;
+              }
+            });
+            this.invisibleBridgeDimension.filterFunction(function(d){
+              return (filtersMap[d] !== undefined);
+            });
+          }
+          this.$broadcast('adding-chart',this.id,false);
         }
       },
       /*
@@ -101,11 +108,10 @@
       'update-filters': function() {
         if(!this.clearGroupFlag){
           this.syncCases = false;
-          var _invisibleChartFilters = this.invisibleGroupChart.filters(); 
-          if(_invisibleChartFilters.length>0) {
-            this.invisibleGroupChart.filterAll();
+          if(this.invisibleChartFilters.length>0) {
+            this.invisibleBridgeDimension.filterAll();
           }
-          var filteredCases = _.pluck(this.invisibleGroupChart.dimension().top(Infinity),this.type+'_id').sort();
+          var filteredCases = _.pluck(this.invisibleBridgeDimension.top(Infinity),this.type+'_id').sort();
           //hackey way to check if filter selected filter cases is same as original case list
           if(filteredCases.length !== this.ndx.size()){
             iViz.setGroupFilteredCases(this.id, this.type, filteredCases);
@@ -113,8 +119,16 @@
             iViz.deleteGroupFilteredCases(this.id)
           }
 
-          if(_invisibleChartFilters.length>0){
-            this.invisibleGroupChart.replaceFilter([_invisibleChartFilters]);
+          if(this.invisibleChartFilters.length>0){
+            var filtersMap = {};
+            _.each(this.invisibleChartFilters,function(filter){
+              if(filtersMap[filter] === undefined){
+                filtersMap[filter] = true;
+              }
+            });
+            this.invisibleBridgeDimension.filterFunction(function(d){
+              return (filtersMap[d] !== undefined);
+            });
           }
           this.$dispatch('update-all-filters', this.type);
         }
@@ -130,9 +144,19 @@
             _selectedCases = iViz.util.intersection(_selectedCases,_group.cases);
           }
         });
-        this.invisibleGroupChart.filterAll();
+        this.invisibleChartFilters = [];
+        this.invisibleBridgeDimension.filterAll();
         if(_selectedCases.length>0){
-          this.invisibleGroupChart.replaceFilter([_selectedCases]);
+          this.invisibleChartFilters = _selectedCases;
+          var filtersMap = {};
+          _.each(_selectedCases,function(filter){
+            if(filtersMap[filter] === undefined){
+              filtersMap[filter] = true;
+            }
+          });
+          this.invisibleBridgeDimension.filterFunction(function(d){
+            return (filtersMap[d] !== undefined);
+          });
         }
         this.redrawgroups.push(this.id);
       }
