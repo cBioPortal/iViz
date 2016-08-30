@@ -1,41 +1,9 @@
-/*
- * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
- * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
- * is on an 'as is' basis, and Memorial Sloan-Kettering Cancer Center has no
- * obligations to provide maintenance, support, updates, enhancements or
- * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
- * liable to any party for direct, indirect, special, incidental or
- * consequential damages, including lost profits, arising out of the use of this
- * software and its documentation, even if Memorial Sloan-Kettering Cancer
- * Center has been advised of the possibility of such damage.
- */
-
-/*
- * This file is part of cBioPortal.
- *
- * cBioPortal is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * Created by Yichao Sun on 5/11/16.
  */
 
 'use strict';
-(function(iViz, _, d3, $) {
+(function(iViz, _, d3, $, Plotly, cbio) {
   iViz.view.component.ScatterPlot = function() {
     var content = this;
     var chartId_;
@@ -46,11 +14,13 @@
       opts_ = $.extend(true, {}, opts);
       chartId_ = opts_.chartId;
       data_ = _data;
-      var _xArr = _.pluck(data_, 'cna_fraction'),
-        _yArr = _.pluck(data_, 'mutation_count');
+      var _xArr = _.pluck(data_, 'cna_fraction');
+      var _yArr = _.pluck(data_, 'mutation_count');
       var _qtips = [];
       _.each(data_, function(_dataObj) {
-        _qtips.push("Cancer Study:" + _dataObj.study_id +  "<br>" + "Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _qtips.push('Cancer Study:' + _dataObj.study_id + '<br>Sample Id: ' +
+          _dataObj.sample_id + '<br>CNA fraction: ' + _dataObj.cna_fraction +
+          '<br>Mutation count: ' + _dataObj.mutation_count);
       });
       var trace = {
         x: _xArr,
@@ -68,19 +38,19 @@
         }
       };
       var data = [trace];
-      var _marginX = (d3.max(_xArr) - d3.min(_xArr)) * 0.05, 
-          _marginY = (d3.max(_yArr) - d3.min(_yArr)) * 0.05;
+      var _marginX = (d3.max(_xArr) - d3.min(_xArr)) * 0.05;
+      var _marginY = (d3.max(_yArr) - d3.min(_yArr)) * 0.05;
       var layout = {
         xaxis: {
           title: 'Fraction of copy number altered genome',
-          range: [ d3.min(_xArr) - _marginX, d3.max(_xArr) + _marginX ],
+          range: [d3.min(_xArr) - _marginX, d3.max(_xArr) + _marginX],
           fixedrange: true,
           zeroline: false,
           showline: true
         },
         yaxis: {
           title: '# of mutations',
-          range: [ d3.min(_yArr) - _marginY, d3.max(_yArr) + _marginY ],
+          range: [d3.min(_yArr) - _marginY, d3.max(_yArr) + _marginY],
           zeroline: false,
           showline: true
         },
@@ -94,32 +64,28 @@
           b: 50,
           t: 50,
           pad: 0
-        },
+        }
       };
       Plotly.plot(document.getElementById(chartId_), data, layout);
 
-      //link to sample view
+      // link to sample view
       var _plotsElem = document.getElementById(chartId_);
-      _plotsElem.on('plotly_click', function(data){
-        var _pts_study_id = data.points[0].data.study_id[data.points[0].pointNumber];
-        var _pts_sample_id = data.points[0].data.sample_id[data.points[0].pointNumber];
-        window.open(cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_id));
+      _plotsElem.on('plotly_click', function(data) {
+        var _pts_study_id =
+          data.points[0].data.study_id[data.points[0].pointNumber];
+        var _pts_sample_id =
+          data.points[0].data.sample_id[data.points[0].pointNumber];
+        window.open(
+          cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_id));
       });
 
-      //link to sample view
-      var _plotsElem = document.getElementById(chartId_);
-      _plotsElem.on('plotly_click', function(data){
-        var _pts_study_id = data.points[0].data.study_id[data.points[0].pointNumber];
-        var _pts_sample_id = data.points[0].data.sample_id[data.points[0].pointNumber];
-        window.open(cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_id));
-      });
-      
       initCanvasDownloadData();
     };
 
-    content.update = function(_sampleIds) { // update selected samples (change color)
-      
-      var _selectedData = [], _unselectedData = [];
+    // update selected samples (change color)
+    content.update = function(_sampleIds) {
+      var _selectedData = [];
+      var _unselectedData = [];
 
       var _tmpSelectedSampleIdMap = {};
       _.each(_sampleIds, function(_sampleId) {
@@ -132,15 +98,22 @@
           _unselectedData.push(_dataObj);
         }
       });
-      
+
       document.getElementById(chartId_).data = [];
-      var _unselectedDataQtips = [], _selectedDataQtips = [];
-      
+      var _unselectedDataQtips = [];
+      var _selectedDataQtips = [];
+
       _.each(_unselectedData, function(_dataObj) {
-        _unselectedDataQtips.push("Cancer Study:" + _dataObj.study_id + "<br>" + "Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _unselectedDataQtips.push('Cancer Study:' + _dataObj.study_id +
+          '<br>Sample Id: ' + _dataObj.sample_id + '<br>CNA fraction: ' +
+          _dataObj.cna_fraction + '<br>Mutation count: ' +
+          _dataObj.mutation_count);
       });
       _.each(_selectedData, function(_dataObj) {
-        _selectedDataQtips.push("Cancer Study:" + _dataObj.study_id + "<br>" + "Sample Id: " +  _dataObj.sample_id + "<br>" +"CNA fraction: " + _dataObj.cna_fraction + "<br>" + "Mutation count: " + _dataObj.mutation_count);
+        _selectedDataQtips.push('Cancer Study:' + _dataObj.study_id +
+          '<br>Sample Id: ' + _dataObj.sample_id + '<br>CNA fraction: ' +
+          _dataObj.cna_fraction + '<br>Mutation count: ' +
+          _dataObj.mutation_count);
       });
       document.getElementById(chartId_).data[0] = {
         x: _.pluck(_unselectedData, 'cna_fraction'),
@@ -167,20 +140,20 @@
         study_id: _.pluck(data_, 'study_id'),
         sample_id: _.pluck(data_, 'sample_id'),
         marker: {
-          size: 6, 
+          size: 6,
           color: 'red',
           line: {color: 'white'}
         }
       };
       Plotly.redraw(document.getElementById(chartId_));
-    }
+    };
 
     content.updateDataForDownload = function(fileType) {
       if (['pdf', 'svg'].indexOf(fileType) !== -1) {
         initCanvasDownloadData();
       }
-    }
-    
+    };
+
     function initCanvasDownloadData() {
       content.setDownloadData('svg', {
         title: opts_.title,
@@ -193,12 +166,18 @@
         fileName: opts_.title
       });
     }
-
-    // return content;
   };
 
-  iViz.view.component.ScatterPlot.prototype = new iViz.view.component.GeneralChart('scatterPlot');
-  iViz.view.component.ScatterPlot.constructor = iViz.view.component.ScatterPlot;
+  iViz.view.component.ScatterPlot.prototype =
+    new iViz.view.component.GeneralChart('scatterPlot');
+  iViz.view.component.ScatterPlot.constructor =
+    iViz.view.component.ScatterPlot;
   iViz.util.scatterPlot = (function() {
   })();
-})(window.iViz, window._, window.d3, window.jQuery || window.$);
+})(window.iViz,
+  window._,
+  window.d3,
+  window.jQuery || window.$,
+  window.Plotly,
+  window.cbio
+);

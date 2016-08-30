@@ -37,36 +37,6 @@
     "test": "grunt test",
     "lint": "eslint ."
   },
-  "eslintConfig": {
-    "extends": "google",
-    "env": {
-      "node": true,
-      "browser": true,
-      "es6": true,
-      "jquery": true,
-      "mocha": true
-    },
-    "rules": {
-      "quotes": [
-        2,
-        "single"
-      ],
-      "indent": [
-        2,
-        2
-      ],
-      "no-warning-comments": [
-        1,
-        {
-          "terms": [
-            "fixme"
-          ],
-          "location": "start"
-        }
-      ],
-      "block-scoped-var": 0
-    }
-  },
   "dependencies": {
     "grunt-clearcache": "0.0.4"
   }

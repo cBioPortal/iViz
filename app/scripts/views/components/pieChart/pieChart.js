@@ -35,7 +35,7 @@
  */
 
 'use strict';
-(function(iViz, dc, _, $) {
+(function(iViz, d3, dc, _, $, React, ReactDOM) {
   // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.PieChart = function(ndx, attributes, opts, cluster) {
     var content = this;
@@ -54,48 +54,40 @@
     v.opts = $.extend(true, v.opts, opts);
     v.data = $.extend(true, v.data, attributes);
     v.data.ndx = ndx;
-    
+
     var labels = [];
     var reactTableData = {};
-    reactTableData.attributes = [
-      {
-        "attr_id": "name",
-        "display_name": v.data.display_name,
-        "datatype": "STRING",
-        "column_width": 213
-      },
-      {
-        "attr_id": "color",
-        "display_name": "Color",
-        "datatype": "STRING",
-        "show": false
-      },
-      {
-        "attr_id": "samples",
-        "display_name": "#",
-        "datatype": "NUMBER",
-        "column_width": 70
-      },
-      {
-        "attr_id": "sampleRate",
-        "display_name": "Freq",
-        "datatype": "PERCENTAGE",
-        "column_width": 90
-      },
-      {
-        "attr_id": "caseIds",
-        "display_name": "Cases",
-        "datatype": "STRING",
-        "show": false
-      },
-      {
-        "attr_id": "uniqueId",
-        "display_name": "uniqueId",
-        "datatype": "STRING",
-        "show": false
-      }
-    ];
-    var labelMetaData = null;
+    reactTableData.attributes = [{
+      attr_id: 'name',
+      display_name: v.data.display_name,
+      datatype: 'STRING',
+      column_width: 213
+    }, {
+      attr_id: 'color',
+      display_name: 'Color',
+      datatype: 'STRING',
+      show: false
+    }, {
+      attr_id: 'samples',
+      display_name: '#',
+      datatype: 'NUMBER',
+      column_width: 70
+    }, {
+      attr_id: 'sampleRate',
+      display_name: 'Freq',
+      datatype: 'PERCENTAGE',
+      column_width: 90
+    }, {
+      attr_id: 'caseIds',
+      display_name: 'Cases',
+      datatype: 'STRING',
+      show: false
+    }, {
+      attr_id: 'uniqueId',
+      display_name: 'uniqueId',
+      datatype: 'STRING',
+      show: false
+    }];
     var currentView = 'pie';
     var updateQtip = false;
     var qtipRendered = false;
@@ -116,51 +108,48 @@
       return v.chart;
     };
 
-    content.changeView = function(vm,toTableView){
-      currentView = toTableView?'table':'pie';
-      var chartDivDom = $("#"+v.opts.charDivId);
+    content.changeView = function(vm, toTableView) {
+      currentView = toTableView ? 'table' : 'pie';
+      var chartDivDom = $('#' + v.opts.charDivId);
       chartDivDom.css('z-index', 16000);
 
-      //qtip wont be needed in table view
+      // qtip wont be needed in table view
       chartDivDom.qtip('destroy', true);
 
-      if(currentView === 'table'){
-          updateReactTable();
-        animateTable("#"+v.opts.charDivId, 'table', function() {
+      if (currentView === 'table') {
+        updateReactTable();
+        animateTable('#' + v.opts.charDivId, 'table', function() {
           vm.$dispatch('update-grid');
-          $("#"+v.opts.charDivId).css('z-index', '');
+          $('#' + v.opts.charDivId).css('z-index', '');
         });
-      }else{
-        animateTable("#"+v.opts.charDivId, 'pie', function() {
+      } else {
+        animateTable('#' + v.opts.charDivId, 'pie', function() {
           vm.$dispatch('update-grid');
-          $("#"+v.opts.charDivId).css('z-index', '1');
+          $('#' + v.opts.charDivId).css('z-index', '1');
         });
         content.initMainDivQtip();
       }
     };
 
-    content.initMainDivQtip = function(){
-      $('#' +v.opts.charDivId).qtip({
-        id: v.opts.charDivId+'-qtip',
+    content.initMainDivQtip = function() {
+      $('#' + v.opts.charDivId).qtip({
+        id: v.opts.charDivId + '-qtip',
         style: {
           classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width iviz-pie-qtip iviz-pie-label-qtip'
         },
-        show: {event: "mouseover", solo: true, delay: 0, ready: true},
-        hide: {fixed:true, delay: 300, event: "mouseleave"},
+        show: {event: 'mouseover', solo: true, delay: 0, ready: true},
+        hide: {fixed: true, delay: 300, event: 'mouseleave'},
         // hide: false,
-        position: {my:'left center',at:'center right', viewport: $(window)},
+        position: {my: 'left center', at: 'center right', viewport: $(window)},
         content: '<div id="qtip-' + v.opts.charDivId + '-content-react">Loading....</div>',
         events: {
-          show:function(){
-            if(qtipRendered){
+          show: function() {
+            if (qtipRendered) {
               qtipRendered = false;
               updateQtip = false;
-            }else{
-              if(updateQtip){
-                labelMetaData = null;
-                updateQtip = false;
-                updatePieLabels();
-              }
+            } else if (updateQtip) {
+              updateQtip = false;
+              updatePieLabels();
             }
           },
           render: function() {
@@ -221,7 +210,7 @@
             attr: attr,
             color: color[index],
             id: attr,
-            index:index
+            index: index
           };
         });
 
@@ -242,17 +231,18 @@
           .ordering(function(d) {
             return d.key;
           });
-        v.chart.on("preRedraw",function(){
+        v.chart.on('preRedraw', function() {
           removeMarker();
         });
-        v.chart.on("postRedraw",function(){
-            //TODO:commented this because this is taking much time to redraw after applying filter, need to find different way
-          if(isFiltered){
+        v.chart.on('postRedraw', function() {
+          // TODO:commented this because this is taking much time to redraw
+          // after applying filter, need to find different way
+          if (isFiltered) {
             updateQtip = false;
             isFiltered = false;
-          }else{
+          } else {
             updateQtip = true;
-            if(currentView == 'table'){
+            if (currentView === 'table') {
               updatePieLabels();
             }
           }
@@ -326,10 +316,10 @@
     }
 
     function updateTables() {
-      if(currentView === 'pie') {
+      if (currentView === 'pie') {
         updateQtipReactTable();
       }
-      if(currentView === 'table') {
+      if (currentView === 'table') {
         updateReactTable();
       }
     }
@@ -349,21 +339,20 @@
       });
     }
 
-
     function updateCurrentLabels() {
       var _labels = {};
       var _currentSampleSize = 0;
       _.each(dcGroup_.top(Infinity), function(label) {
         var _labelDatum = {};
         var _labelValue = Number(label.value);
-        if(_labelValue > 0){
+        if (_labelValue > 0) {
           _labelDatum.id = labelInitData[label.key].id;
           _labelDatum.index = labelInitData[label.key].index;
           _labelDatum.name = label.key;
           _labelDatum.color = labelInitData[label.key].color;
           _labelDatum.samples = _labelValue;
           _currentSampleSize += _labelValue;
-          _labels[_labelDatum.id ] = _labelDatum;
+          _labels[_labelDatum.id] = _labelDatum;
         }
       });
 
@@ -377,101 +366,102 @@
       var _data = [];
       _.each(labels, function(item) {
         for (var key in item) {
-          var datum = {
-            'attr_id': key,
-            'uniqueId': item.id,
-            'attr_val': item[key]
-          };
-          _data.push(datum);
+          if (item.hasOwnProperty(key)) {
+            var datum = {
+              attr_id: key,
+              uniqueId: item.id,
+              attr_val: item[key]
+            };
+            _data.push(datum);
+          }
         }
       });
       reactTableData.data = _data;
     }
 
     function removeMarker() {
-      $("#" + v.opts.chartId).find('svg g .mark').remove();
+      $('#' + v.opts.chartId).find('svg g .mark').remove();
     }
 
-    function drawMarker(_childID,_fatherID) {
-      var _path = $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + _childID+')')
+    function drawMarker(_childID, _fatherID) {
+      var _path = $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + _childID + ')')
         .find('path');
       var _pointsInfo = _path
-          .attr('d')
-          .split(/[\s,MLHVCSQTAZ]/);
+        .attr('d')
+        .split(/[\s,MLHVCSQTAZ]/);
 
-      var _pointsInfo1 =_path
-          .attr('d')
-          .split(/[A]/);
+      var _pointsInfo1 = _path
+        .attr('d')
+        .split(/[A]/);
 
-      var _fill =_path
-          .attr('fill');
+      var _fill = _path
+        .attr('fill');
 
-      var _x1 = Number(_pointsInfo[1]),
-        _y1 = Number(_pointsInfo[2]),
-      //_largeArc = Number(_pointsInfo[6]),
-        _x2 = Number(_pointsInfo[8]),
-        _y2 = Number(_pointsInfo[9]),
-        _r = Number(_pointsInfo[3]);
+      var _x1 = Number(_pointsInfo[1]);
+      var _y1 = Number(_pointsInfo[2]);
+      var _x2 = Number(_pointsInfo[8]);
+      var _y2 = Number(_pointsInfo[9]);
+      var _r = Number(_pointsInfo[3]);
 
-      if((_x1 - _x2!==0 || _y1 - _y2!==0) && _pointsInfo1.length === 2){
-        var _pointOne = Math.atan2(_y1,_x1);
-        var _pointTwo = Math.atan2(_y2,_x2);
+      if ((_x1 - _x2 !== 0 || _y1 - _y2 !== 0) && _pointsInfo1.length === 2) {
+        var _pointOne = Math.atan2(_y1, _x1);
+        var _pointTwo = Math.atan2(_y2, _x2);
 
-        if(_pointOne < -Math.PI/2){
-          _pointOne = Math.PI/2 + Math.PI *2 +_pointOne;
-        }else{
-          _pointOne = Math.PI/2 +_pointOne;
+        if (_pointOne < -Math.PI / 2) {
+          _pointOne = Math.PI / 2 + Math.PI * 2 + _pointOne;
+        } else {
+          _pointOne = Math.PI / 2 + _pointOne;
         }
 
-        if(_pointTwo < -Math.PI/2){
-          _pointTwo = Math.PI/2 + Math.PI*2 +_pointTwo;
-        }else{
-          _pointTwo = Math.PI/2 +_pointTwo;
+        if (_pointTwo < -Math.PI / 2) {
+          _pointTwo = Math.PI / 2 + Math.PI * 2 + _pointTwo;
+        } else {
+          _pointTwo = Math.PI / 2 + _pointTwo;
         }
 
-        //The value of point two should always bigger than the value
-        //of point one. If the point two close to 12 oclick, we should
-        //change it value close to 2PI instead of close to 0
-        if(_pointTwo > 0 && _pointTwo < 0.0000001){
-          _pointTwo = 2*Math.PI-_pointTwo;
+        // The value of point two should always bigger than the value
+        // of point one. If the point two close to 12 oclick, we should
+        // change it value close to 2PI instead of close to 0
+        if (_pointTwo > 0 && _pointTwo < 0.0000001) {
+          _pointTwo = 2 * Math.PI - _pointTwo;
         }
 
-        if(_pointTwo < _pointOne){
+        if (_pointTwo < _pointOne) {
           console.log('%cError: the end angle should always bigger' +
             ' than start angle.', 'color: red');
         }
 
-        var _arcID = "arc-" +_fatherID+"-"+(Number(_childID)-1);
+        var _arcID = 'arc-' + _fatherID + '-' + (Number(_childID) - 1);
         var _arc = d3.svg.arc()
           .innerRadius(_r + 3)
           .outerRadius(_r + 5)
           .startAngle(_pointOne)
           .endAngle(_pointTwo);
 
-        d3.select("#" + v.opts.chartId + " svg g").append("path")
-          .attr("d", _arc)
-          .attr('fill',_fill)
-          .attr('id',_arcID)
-          .attr('class','mark');
+        d3.select('#' + v.opts.chartId + ' svg g').append('path')
+          .attr('d', _arc)
+          .attr('fill', _fill)
+          .attr('id', _arcID)
+          .attr('class', 'mark');
       }
     }
 
     function pieLabelMouseEnter(data) {
-      var childID = Number(data.index) + 1,
-        fatherID = v.opts.chartId;
+      var childID = Number(data.index) + 1;
+      var fatherID = v.opts.chartId;
 
-      $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + childID+')').css({
+      $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + childID + ')').css({
         'fill-opacity': '.5',
         'stroke-width': '3'
       });
 
-      drawMarker(childID,fatherID);
+      drawMarker(childID, fatherID);
     }
 
     function pieLabelMouseLeave(data) {
       var childID = Number(data.index) + 1;
 
-      $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + childID+')').css({
+      $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + childID + ')').css({
         'fill-opacity': '1',
         'stroke-width': '1px'
       });
@@ -484,9 +474,9 @@
 
       var opts_ = $.extend({
         input: inputData,
-        filter: "ALL",
-        download: "NONE",
-        downloadFileName: "data.txt",
+        filter: 'ALL',
+        download: 'NONE',
+        downloadFileName: 'data.txt',
         showHide: false,
         hideFilter: true,
         scroller: true,
@@ -562,6 +552,9 @@
     return util;
   })();
 })(window.iViz,
+  window.d3,
   window.dc,
   window._,
-  window.$ || window.jQuery);
+  window.$ || window.jQuery,
+  window.React,
+  window.ReactDOM);

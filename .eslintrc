@@ -1,0 +1,34 @@
+{
+  "extends": "google",
+  "env": {
+    "node": true,
+    "browser": true,
+    "es6": true,
+    "jquery": true,
+    "mocha": true
+  },
+  "rules": {
+    "quotes": [
+      2,
+      "single"
+    ],
+    "indent": [
+      2,
+      2,
+      {
+        "SwitchCase": 1
+      }
+    ],
+    "no-warning-comments": [
+      1,
+      {
+        "terms": [
+          "fixme"
+        ],
+        "location": "start"
+      }
+    ],
+    "block-scoped-var": 0,
+    "camelcase": 0
+  }
+}
