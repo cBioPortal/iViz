@@ -40,34 +40,10 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
   return {
 
-    init: function(_rawDataJSON, _inputSampleList, _inputPatientList) {
+    init: function(_rawDataJSON) {
       vm_ = iViz.vue.manage.getInstance();
 
       data_ = _rawDataJSON;
-
-      if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
-        var _sampleData = _.filter(_data.groups.sample.data,
-          function(_dataObj) {
-            return $.inArray(_dataObj.sample_id, _inputSampleList) !== -1;
-          });
-        var _sampleDataIndices = {};
-        for (var _i = 0; _i < _sampleData.length; _i++) {
-          _sampleDataIndices[_sampleData[_i].sample_id] = _i;
-        }
-        var _patientData = _.filter(_data.groups.patient.data,
-          function(_dataObj) {
-            return $.inArray(_dataObj.patient_id, _inputPatientList) !== -1;
-          });
-        var _patientDataIndices = {};
-        for (var _j = 0; _j < _patientData.length; _j++) {
-          _patientDataIndices[_patientData[_j].patient_id] = _j;
-        }
-
-        data_.groups.patient.data = _patientData;
-        data_.groups.sample.data = _sampleData;
-        data_.groups.patient.data_indices.patient_id = _patientDataIndices;
-        data_.groups.sample.data_indices.sample_id = _sampleDataIndices;
-      }
 
       var _patientIds = _.keys(data_.groups.patient.data_indices.patient_id);
       var _sampleIds = _.keys(data_.groups.sample.data_indices.sample_id);

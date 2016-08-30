@@ -35,7 +35,7 @@
     '</div>' +
     '</div>',
     props: [
-      'showOperations', 'resetBtnId', 'chart', 'chartCtrl', 'groupid',
+      'showOperations', 'resetBtnId', 'chartCtrl', 'groupid',
       'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon',
       'showTableIcon', 'showLogScale', 'showSurvivalIcon', 'filters'
     ],
@@ -59,22 +59,18 @@
     },
     methods: {
       reset: function() {
-        if (this.chart.hasOwnProperty('hasFilter')) {
-          if (this.filters.length > 0) {
-            iViz.shared.resetAll(this.chart, this.groupid);
-          }
-        } else if (this.filters.length > 0) {
+        if (this.filters.length > 0) {
           this.filters = [];
         }
       },
       close: function() {
-        if (this.chart.hasOwnProperty('hasFilter')) {
-          if (this.filters.length > 0) {
-            iViz.shared.resetAll(this.chart, this.groupid);
-          }
-          dc.deregisterChart(this.chart, this.groupid);
+        if (this.filters && this.filters.length > 0) {
+          this.filters = [];
         }
-        this.$dispatch('closeChart');
+        var self_ = this;
+        self_.$nextTick(function(){
+          self_.$dispatch('closeChart');
+        });
       },
       changeView: function() {
         this.showTableIcon = !this.showTableIcon;
@@ -124,7 +120,7 @@
             var content = [];
             _.each(downloadFileTypes, function(item) {
               content.push('<div style="display:inline-block;"><button id="' + self.chartId + '-' + item + '" style="width:50px">' + item.toUpperCase() + '</button></div>');
-            })
+            });
 
             api.set('content.text', content.join('<br/>'));
             $('#' + chartId + '-pdf', api.elements.tooltip).click(function() {

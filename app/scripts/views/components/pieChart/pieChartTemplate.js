@@ -4,7 +4,7 @@
 'use strict';
 (function(Vue, dc, iViz, $) {
   Vue.component('pieChart', {
-    template: '<div id={{charDivId}} ' +
+    template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-h-1 grid-item-w-1" ' +
     ':data-number="attributes.priority" ' +
     '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
@@ -13,7 +13,7 @@
     ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" ' +
     ':show-operations="showOperations" :groupid="groupid" ' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" ' +
-    ':chart="chartInst" :filters.sync="filters" ' +
+    ' :filters.sync="filters" ' +
     ':attributes="attributes"></chart-operations>' +
     '<div class="dc-chart dc-pie-chart" ' +
     ':class="{view: showPieIcon}" align="center" style="float:none' +
@@ -26,7 +26,7 @@
     data: function() {
       return {
         v: {},
-        charDivId: 'chart-' +
+        chartDivId: 'chart-' +
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-div',
         resetBtnId: 'chart-' +
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
@@ -53,11 +53,8 @@
           this.filtersUpdated = true;
           if (newVal.length === 0) {
             this.chartInst.filterAll();
-          } else if (newVal.length === oldVal.length) {
-            this.chartInst.filter(newVal);
           } else {
-            var temp = newVal.length > 1 ? [newVal] : newVal;
-            this.chartInst.replaceFilter(temp);
+            this.chartInst.replaceFilter([newVal]);
           }
           dc.redrawAll(this.groupid);
           this.$dispatch('update-filters');
@@ -69,7 +66,7 @@
         this.piechart.changeView(this, !this.showTableIcon);
       },
       closeChart: function() {
-        $('#' + this.charDivId).qtip('destroy');
+        $('#' + this.chartDivId).qtip('destroy');
         dc.deregisterChart(this.chartInst, this.attributes.groupid);
         this.chartInst.dimension().dispose();
         this.$dispatch('close');
@@ -104,7 +101,7 @@
       _self.$once('initMainDivQtip', _self.initMainDivQtip);
       var opts = {
         chartId: _self.chartId,
-        charDivId: _self.charDivId,
+        chartDivId: _self.chartDivId,
         groupid: _self.groupid,
         chartTableId: _self.chartTableId,
         transitionDuration: iViz.opts.dc.transitionDuration,
@@ -120,16 +117,22 @@
           _self.filtersUpdated = false;
         } else {
           _self.filtersUpdated = true;
-          var tempFilters_ = $.extend(true, [], _self.filters);
-          tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-            _self.attributes.view_type);
-          _self.filters = tempFilters_;
+
+          if (_filter instanceof Array) {
+            _self.filters = _filter;
+          } else if ($.inArray(_filter, _self.filters) === -1) {
+            _self.filters.push(_filter);
+          } else {
+            _self.filters = _.filter( _self.filters, function(d) {
+              return d !== _filter;
+            });
+          }
           _self.$dispatch('update-filters');
         }
         // Trigger pie chart filtered event.
         _self.piechart.filtered();
       });
-      _self.$dispatch('data-loaded', this.charDivId);
+      _self.$dispatch('data-loaded', this.chartDivId);
     }
   });
 })(
