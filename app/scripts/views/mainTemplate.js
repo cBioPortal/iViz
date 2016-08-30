@@ -72,8 +72,8 @@
           });
         } else {
           _.each(ChartsIds, function(chartId) {
-            self_.grid_.addItems($('#' + chartId));
-            var _draggie = new Draggabilly(_gridItem, {
+            self_.grid_.addItems(document.getElementById(chartId));
+            var _draggie = new Draggabilly(document.getElementById(chartId), {
               handle: '.dc-chart-drag'
             });
             self_.grid_.bindDraggabillyEvents(_draggie);
