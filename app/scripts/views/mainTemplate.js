@@ -64,17 +64,22 @@
             initLayout: false
           });
           self_.grid_.items.sort(this.sortByNumber);
+          _.each(self_.grid_.getItemElements(), function(_gridItem) {
+            var _draggie = new Draggabilly(_gridItem, {
+              handle: '.dc-chart-drag'
+            });
+            self_.grid_.bindDraggabillyEvents(_draggie);
+          });
         } else {
           _.each(ChartsIds, function(chartId) {
             self_.grid_.addItems($('#' + chartId));
+            var _draggie = new Draggabilly(_gridItem, {
+              handle: '.dc-chart-drag'
+            });
+            self_.grid_.bindDraggabillyEvents(_draggie);
           });
         }
-        _.each(self_.grid_.getItemElements(), function(_gridItem) {
-          var _draggie = new Draggabilly(_gridItem, {
-            handle: '.dc-chart-drag'
-          });
-          self_.grid_.bindDraggabillyEvents(_draggie);
-        });
+       
         self_.grid_.layout();
       }
     },

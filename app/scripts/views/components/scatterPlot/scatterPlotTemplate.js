@@ -10,7 +10,7 @@
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations"' +
     ' :display-name="displayName" :has-chart-title="true" :groupid="groupid"' +
-    ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" :chart="chartInst" ' +
+    ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" ' +
     ':chart-id="chartId"' +
     ' :attributes="attributes" :filters.sync="filters" ' +
     ':filters.sync="filters"></chart-operations>' +
@@ -25,7 +25,7 @@
     ],
     data: function() {
       return {
-        charDivId: 'chart-' +
+        chartDivId: 'chart-' +
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-div',
         resetBtnId: 'chart-' +
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
@@ -91,7 +91,7 @@
       _self.showLoad = true;
       var _opts = {
         chartId: this.chartId,
-        chartDivId: this.charDivId,
+        chartDivId: this.chartDivId,
         title: this.attributes.display_name
       };
       var attrId =

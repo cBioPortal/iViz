@@ -11,7 +11,6 @@
     '<chart-operations :show-operations="showOperations" ' +
     ':display-name="displayName" :chart-ctrl="chartInst"' +
     ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" ' +
-    ':chart="chartInst" ' +
     ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" ' +
     ':filters.sync="filters"></chart-operations>' +
     '<div class="dc-chart dc-table-plot" ' +
@@ -25,7 +24,7 @@
     ],
     data: function() {
       return {
-        charDivId: 'chart-' +
+        chartDivId: 'chart-' +
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-div',
         resetBtnId: 'chart-' +
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',

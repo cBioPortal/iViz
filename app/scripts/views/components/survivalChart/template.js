@@ -11,7 +11,7 @@
     '<chart-operations :show-operations="showOperations" ' +
     ':has-chart-title="hasChartTitle" :display-name="displayName" ' +
     ':groupid="groupid" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" ' +
-    ':chart="chartInst" :chart-id="chartId" ' +
+    ' :chart-id="chartId" ' +
     ':attributes="attributes"></chart-operations>' +
     '<div :class="{\'start-loading\': showLoad}" ' +
     'class="dc-chart dc-scatter-plot" align="center" ' +

@@ -4,13 +4,13 @@
 'use strict';
 (function(Vue, d3, dc, iViz, _, $, cbio) {
   Vue.component('barChart', {
-    template: '<div id={{charDivId}} ' +
+    template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" ' +
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
     ':show-operations="showOperations" :groupid="groupid" ' +
-    ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" :chart="chartInst" ' +
+    ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
     ':filters.sync="filters"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
@@ -83,23 +83,21 @@
           // TODO : Right now we are manually checking for brush mouseup event.
           // This should be updated one latest dc.js is released
           // https://github.com/dc-js/dc.js/issues/627
-          self_.chartInst.select('.brush').on('mouseup', function() {
-            if (self_.filtersUpdated) {
-              self_.filtersUpdated = false;
-            } else {
+          if (self_.filtersUpdated) {
+            self_.filtersUpdated = false;
+          }else {
+            self_.chartInst.select('.brush').on('mouseup', function() {
               self_.filtersUpdated = true;
-              var tempFilters_ = $.extend(true, [], self_.filters);
-              tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-                self_.attributes.view_type);
-              if (typeof tempFilters_ !== 'undefined' &&
-                tempFilters_.length !== 0) {
-                tempFilters_[0] = tempFilters_[0].toFixed(2);
-                tempFilters_[1] = tempFilters_[1].toFixed(2);
+              if (typeof _filter !== 'undefined' &&
+                _filter.length > 1) {
+                var tempFilters_ = [];
+                tempFilters_[0] = _filter[0].toFixed(2);
+                tempFilters_[1] = _filter[1].toFixed(2);
+                self_.filters = tempFilters_;
               }
-              self_.filters = tempFilters_;
               self_.$dispatch('update-filters');
+            });
             }
-          });
         });
       }
     },
