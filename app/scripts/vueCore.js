@@ -1,4 +1,3 @@
-
 'use strict';
 (function(Vue, iViz, dc, _) {
   iViz.vue = {};
@@ -104,7 +103,7 @@
               }
               if (includeNextTickFlag) {
                 self_.$nextTick(function() {
-                  self_.selectedsamples =  _.keys(iViz.getCasesMap('sample'));
+                  self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
                   self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
                   self_.$broadcast('update-special-charts');
                   self_.clearAll = false;
@@ -310,8 +309,8 @@
     bind: function() {
       var self = this;
       $(this.el).chosen({
-        width: '30%'
-      })
+          width: '30%'
+        })
         .change(
           function() {
             var value = self.el.value;

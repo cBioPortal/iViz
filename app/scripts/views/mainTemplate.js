@@ -11,7 +11,7 @@
     ' v-for="group in groups"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'hasfilters',
-      'redrawgroups', 'customfilter','clearAll'
+      'redrawgroups', 'customfilter', 'clearAll'
     ], data: function() {
       return {
         patientsync: [],
@@ -39,10 +39,10 @@
             _.keys(iViz.getCasesMap('sample')).sort();
         }
       },
-      renderGroups: function(groupIds){
+      renderGroups: function(groupIds) {
         var _keys = window.cbio.util.uniqueElementsOfArray(groupIds);
         if (_keys.length > 0) {
-          _.each(_keys, function (groupid) {
+          _.each(_keys, function(groupid) {
             dc.renderAll(groupid);
           });
           this.renderGroups = [];
@@ -55,7 +55,7 @@
           this.chartsGrid = [];
         }
       },
-      clearAll: function(flag){
+      clearAll: function(flag) {
         if (flag) {
           this.selectedPatientsByFilters = [];
           this.selectedSamplesByFilters = [];
@@ -103,7 +103,7 @@
         this.grid_.remove(item);
         this.grid_.layout();
       },
-      'data-loaded': function(groupId,chartDivId) {
+      'data-loaded': function(groupId, chartDivId) {
         this.chartsGrid.push(chartDivId);
         this.renderGroups.push(groupId);
       },
