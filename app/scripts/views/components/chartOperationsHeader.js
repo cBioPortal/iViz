@@ -68,7 +68,7 @@
           this.filters = [];
         }
         var self_ = this;
-        self_.$nextTick(function(){
+        self_.$nextTick(function() {
           self_.$dispatch('closeChart');
         });
       },

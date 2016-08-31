@@ -172,7 +172,8 @@
                        :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
                        v-if="item.filter.length>0" ></bread-crumb>
         </div>
-        <div><button type='button' @click="clearAll()" class="btn btn-default btn-xs">Clear All</button></div>
+        <div><button type='button' @click="clearAllCharts(true)" 
+                     class="btn btn-default btn-xs">Clear All</button></div>
       </div>
     </div>
   </nav>
@@ -180,7 +181,9 @@
     <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
                    :selectedpatients.sync="selectedpatients"
                    :selectedsamples.sync="selectedsamples"
-                   :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
+                   :hasfilters.sync="hasfilters" 
+                   :customfilter.sync="customfilter" 
+                   :clear-all="clearAll"></main-template>
   </div>
 
 </div>

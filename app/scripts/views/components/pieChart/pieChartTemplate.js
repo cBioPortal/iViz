@@ -57,8 +57,7 @@
           } else {
             this.chartInst.replaceFilter([newVal]);
           }
-          dc.redrawAll(this.attributes.group_id);
-          this.$dispatch('update-filters');
+          this.$dispatch('update-filters', true);
         }
       }
     },
@@ -133,8 +132,8 @@
           } else {
             _self.filtersUpdated = true;
 
-            if (_filter instanceof Array) {
-              _self.attributes.filter = _filter;
+            if (_filter === null) {
+              _self.attributes.filter = [];
             } else if ($.inArray(_filter, _self.attributes.filter) === -1) {
               _self.attributes.filter.push(_filter);
             } else {

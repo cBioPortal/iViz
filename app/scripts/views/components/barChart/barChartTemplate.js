@@ -50,9 +50,8 @@
         } else {
           this.filtersUpdated = true;
           if (newVal.length === 0) {
-            this.chartInst.filter(null);
-            dc.redrawAll(this.attributes.group_id);
-            this.$dispatch('update-filters');
+            this.chartInst.filterAll();
+            this.$dispatch('update-filters', true);
           }
         }
       }

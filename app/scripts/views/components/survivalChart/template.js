@@ -2,7 +2,7 @@
  * @author Yichao Sun on 5/18/16.
  */
 'use strict';
-(function(Vue, dc, iViz) {
+(function(Vue, dc, iViz, _) {
   Vue.component('survival', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-h-2 grid-item-w-2" ' +
@@ -113,4 +113,4 @@
   });
 })(window.Vue,
   window.dc,
-  window.iViz);
+  window.iViz, window._);

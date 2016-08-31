@@ -4,11 +4,10 @@
 'use strict';
 (function(Vue, dc, iViz, crossfilter, _) {
   Vue.component('chartGroup', {
-    template: ' <div is="individual-chart"' +
-    ' :ndx="ndx" ' +
-    ' :attributes.sync="attribute" v-for="attribute in attributes"></div>',
+    template: ' <div is="individual-chart" ' +
+    ':clear-chart="clearGroup" :ndx="ndx"   :attributes.sync="attribute"   v-for="attribute in attributes"></div>',
     props: [
-      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases'
+      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup'
     ], created: function() {
       // TODO: update this.data
       var _self = this;
@@ -29,7 +28,6 @@
     },
     data: function() {
       return {
-        clearGroup: false,
         syncCases: true
       };
     },
@@ -39,6 +37,14 @@
           this.updateInvisibleChart(val);
         } else {
           this.syncCases = true;
+        }
+      },
+      clearGroup: function(flag) {
+        if (flag) {
+          var self_ = this;
+          self_.invisibleBridgeDimension.filterAll();
+          self_.invisibleChartFilters = [];
+          iViz.deleteGroupFilteredCases(self_.id);
         }
       }
     },
@@ -65,17 +71,6 @@
           this.$broadcast('adding-chart', this.id, false);
         }
       },
-      'clear-group': function() {
-        this.clearGroup = true;
-        this.invisibleBridgeDimension.filterAll();
-        this.invisibleChartFilters = [];
-        iViz.deleteGroupFilteredCases(this.id);
-        this.$broadcast('clear-chart-filters');
-        var self_ = this;
-        this.$nextTick(function() {
-          self_.clearGroup = false;
-        });
-      },
       /*
        *This event is invoked whenever there is a filter update on any chart
        * STEPS involved
@@ -86,8 +81,11 @@
        *    then save that case list in the groupFilterMap
        * 4. Apply back invisible group bridge chart filters
        */
-      'update-filters': function() {
+      'update-filters': function(redrawGroup) {
         if (!this.clearGroup) {
+          if (redrawGroup) {
+            dc.redrawAll(this.id);
+          }
           this.syncCases = false;
           if (this.invisibleChartFilters.length > 0) {
             this.invisibleBridgeDimension.filterAll();

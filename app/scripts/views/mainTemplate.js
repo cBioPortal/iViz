@@ -7,11 +7,11 @@
     template: '<chart-group :redrawgroups.sync="redrawgroups" :id="group.id" ' +
     ':type="group.type" ' +
     ':mappedcases="group.type==\'patient\'?patientsync:samplesync" ' +
-    ' :attributes.sync="group.attributes"' +
+    ' :attributes.sync="group.attributes" :clear-group="clearAll"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'hasfilters',
-      'redrawgroups', 'customfilter'
+      'redrawgroups', 'customfilter','clearAll'
     ], data: function() {
       return {
         patientsync: [],
@@ -54,6 +54,12 @@
           this.updateGrid(_keys);
           this.chartsGrid = [];
         }
+      },
+      clearAll: function(flag){
+        if (flag) {
+          this.selectedPatientsByFilters = [];
+          this.selectedSamplesByFilters = [];
+        }
       }
     }, methods: {
       sortByNumber: function(a, b) {
@@ -91,11 +97,6 @@
       }
     },
     events: {
-      'clear-all-groups': function() {
-        this.selectedPatientsByFilters = [];
-        this.selectedSamplesByFilters = [];
-        this.$broadcast('clear-group');
-      },
       'update-grid': function() {
         this.grid_.layout();
       }, 'remove-grid-item': function(item) {

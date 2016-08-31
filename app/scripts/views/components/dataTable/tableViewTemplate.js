@@ -41,10 +41,9 @@
       'attributes.filter': function(newVal) {
         if (newVal.length === 0) {
           this.invisibleDimension.filterAll();
-          dc.redrawAll(this.attributes.group_id);
           this.selectedRows = [];
         }
-        this.updateFilters();
+        this.$dispatch('update-filters', true);
       }
     },
     events: {
@@ -65,10 +64,6 @@
         this.showLoad = false;
       },
       'closeChart': function() {
-        if (this.attributes.filter.length > 0) {
-          this.attributes.filter = [];
-          this.updateFilters();
-        }
         this.invisibleDimension.dispose();
         this.$dispatch('close', true);
       },
@@ -122,7 +117,6 @@
         this.invisibleDimension.filterFunction(function(d) {
           return (filtersMap[d] !== undefined);
         });
-        dc.redrawAll(this.attributes.group_id);
         this.chartInst.clearSelectedRowData();
       },
       addGeneClick: function(clickedRowData) {
@@ -132,11 +126,7 @@
       setDisplayTitle: function(numOfCases) {
         this.displayName = this.attributes.display_name +
           '(' + numOfCases + ' profiled samples)';
-      },
-      updateFilters: function() {
-        this.$dispatch('update-filters');
       }
-
     },
     ready: function() {
       var _self = this;

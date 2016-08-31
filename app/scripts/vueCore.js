@@ -36,7 +36,8 @@
             stats: '',
             updateStats: false,
             highlightAllButtons: false,
-            highlightCaseButtons: false
+            highlightCaseButtons: false,
+            clearAll: false
           }, watch: {
             updateSpecialCharts: function() {
               var self_ = this;
@@ -92,24 +93,28 @@
             submitForm: function() {
               iViz.submitForm();
             },
-            clearAll: function() {
-              if (this.customfilter.patientIds.length > 0 ||
-                this.customfilter.sampleIds.length > 0) {
-                this.customfilter.sampleIds = [];
-                this.customfilter.patientIds = [];
-                this.$broadcast('update-all-filters');
-              }
-              this.$broadcast('clear-all-groups');
+            clearAllCharts: function(includeNextTickFlag) {
               var self_ = this;
+              self_.clearAll = true;
               this.hasfilters = false;
-              self_.$nextTick(function() {
-                self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
-                self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
-                self_.$broadcast('update-special-charts');
-                _.each(this.groups, function(group) {
-                  dc.redrawAll(group.id);
+              if (self_.customfilter.patientIds.length > 0 ||
+                self_.customfilter.sampleIds.length > 0) {
+                self_.customfilter.sampleIds = [];
+                self_.customfilter.patientIds = [];
+              }
+              if (includeNextTickFlag) {
+                self_.$nextTick(function() {
+                  self_.selectedsamples =  _.keys(iViz.getCasesMap('sample'));
+                  self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+                  self_.$broadcast('update-special-charts');
+                  self_.clearAll = false;
+                  _.each(this.groups, function(group) {
+                    dc.redrawAll(group.id);
+                  });
                 });
-              });
+              } else {
+                self_.clearAll = false;
+              }
             },
             addChart: function(attrId) {
               var self_ = this;
@@ -224,7 +229,7 @@
 
               $('#iviz-header-right-1').qtip('toggle');
               if (selectedCaseIds.length > 0) {
-                this.clearAll();
+                this.clearAllCharts(false);
                 var self_ = this;
                 Vue.nextTick(function() {
                   _.each(self_.groups, function(group) {

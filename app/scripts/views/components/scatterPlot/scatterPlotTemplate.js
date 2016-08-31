@@ -42,9 +42,8 @@
       'attributes.filter': function(newVal) {
         if (newVal.length === 0) {
           this.invisibleDimension.filterAll();
-          dc.redrawAll(this.attributes.group_id);
         }
-        this.updateFilters();
+        this.$dispatch('update-filters', true);
       }
     },
     events: {
@@ -67,10 +66,6 @@
         this.showLoad = false;
       },
       'closeChart': function() {
-        if (this.attributes.filter.length > 0) {
-          this.attributes.filter = [];
-          this.updateFilters();
-        }
         this.invisibleDimension.dispose();
         this.$dispatch('close');
       },
@@ -99,9 +94,6 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
-      },
-      updateFilters: function() {
-        this.$dispatch('update-filters');
       }
     },
     ready: function() {
