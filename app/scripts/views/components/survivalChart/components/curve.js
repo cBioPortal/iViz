@@ -94,8 +94,7 @@
       .style('font-weight', 'bold')
       .text('Surviving');
 
-    _self.elem_.dots = [];
-    _self.elem_.line = [];
+    _self.elem_.curves = {};
   };
 
   iViz.view.component.SurvivalCurve.prototype.addCurve = function(_data,
@@ -114,21 +113,35 @@
       }
     }
 
-    // init line elem
-    _self.elem_.line[_curveIndex] = d3.svg.line()
-      .interpolate('step-after')
-      .x(function(d) {
-        return _self.elem_.xScale(d.time);
-      })
-      .y(function(d) {
-        return _self.elem_.yScale(d.survival_rate);
-      });
+    if (!_self.elem_.curves.hasOwnProperty(_curveIndex)) {
+      _self.elem_.curves[_curveIndex] = {};
+      _self.elem_.curves[_curveIndex].curve = _self.elem_.svg.append('g')
+        .attr('id', _self.divId_ + '-curve-' + _curveIndex);
+      _self.elem_.curves[_curveIndex].line = _self.elem_
+        .curves[_curveIndex].curve.append('g')
+        .attr('class', 'line');
+      _self.elem_.curves[_curveIndex].dots = _self.elem_
+        .curves[_curveIndex].curve.append('g')
+        .attr('class', 'dots');
+      _self.elem_.curves[_curveIndex].invisibleDots = _self.elem_
+        .curves[_curveIndex].curve.append('g')
+        .attr('class', 'invisibleDots');
+
+      // init line elem
+      _self.elem_.curves[_curveIndex].lineElem = d3.svg.line()
+        .interpolate('step-after')
+        .x(function(d) {
+          return _self.elem_.xScale(d.time);
+        })
+        .y(function(d) {
+          return _self.elem_.yScale(d.survival_rate);
+        });
+    }
 
     // draw line
     if (_data !== null && _data.length > 0) {
-      _self.elem_.svg.append('path')
-        .attr('id', _self.divId_ + '-line')
-        .attr('d', _self.elem_.line[_curveIndex](_data))
+      _self.elem_.curves[_curveIndex].line.append('path')
+        .attr('d', _self.elem_.curves[_curveIndex].lineElem(_data))
         .attr('class', 'curve')
         .style('fill', 'none')
         .style('stroke', _lineColor);
@@ -137,32 +150,27 @@
     // draw censored dots
     // crossDots specifically for the curve for easier deletion
     // changed two separate lines to a single cross symbol
-    _self.elem_.svg.selectAll('path')
+    _self.elem_.curves[_curveIndex].dots.selectAll('path')
       .data(_data)
       .enter()
-      .append('line')
+      .append('path')
       .filter(function(d) {
         return d.status === 0;
       })
-      .attr('x1', function(d) {
-        return _self.elem_.xScale(d.time);
+      .attr('transform', function(d) {
+        return 'translate(' + _self.elem_.xScale(d.time) + ',' +
+          _self.elem_.yScale(d.survival_rate) + ')';
       })
-      .attr('y1', function(d) {
-        return _self.elem_.yScale(d.survival_rate) - 5;
-      })
-      .attr('x2', function(d) {
-        return _self.elem_.xScale(d.time);
-      })
-      .attr('y2', function(d) {
-        return _self.elem_.yScale(d.survival_rate) + 5;
-      })
+      .attr('d', d3.svg.symbol().type('cross')
+        .size(function() {
+          return 25;
+        })
+      )
       .attr('class', 'curve')
-      .style('stroke-width', 1)
-      .style('stroke', _lineColor);
+      .attr('fill', _lineColor);
 
     // draw invisible dots
-    _self.elem_.dots[_curveIndex] = _self.elem_.svg.append('g');
-    _self.elem_.dots[_curveIndex].selectAll('path')
+    _self.elem_.curves[_curveIndex].invisibleDots.selectAll('path')
       .data(_data)
       .enter()
       .append('svg:path')
@@ -228,8 +236,12 @@
 
   iViz.view.component.SurvivalCurve.prototype.removeCurves = function() {
     var _self = this;
-    _self.elem_.svg.selectAll('.curve').remove();
-    _self.elem_.svg.selectAll('.invisible_dots').remove();
+    for (var key in _self.elem_.curves) {
+      if (_self.elem_.curves.hasOwnProperty(key)) {
+        _self.elem_.curves[key].curve.remove();
+        delete _self.elem_.curves[key];
+      }
+    }
   };
 
   iViz.view.component.SurvivalCurve.prototype.addPval =

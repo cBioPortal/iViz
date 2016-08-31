@@ -50,11 +50,11 @@
 
       // add curves
       if (_unselectedDataProxy.get().length === 0) {
-        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, '#006bb3');
+        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, '#2986e2');
         this.chartInst_.removePval();
       } else {
         this.chartInst_.addCurve(_selectedDataProxy.get(), 0, 'red');
-        this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, '#006bb3');
+        this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, '#2986e2');
         this.chartInst_.addPval(
           _selectedDataProxy.get(), _unselectedDataProxy.get());
       }
