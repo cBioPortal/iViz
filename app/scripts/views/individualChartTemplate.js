@@ -4,15 +4,14 @@
 'use strict';
 (function(Vue) {
   Vue.component('individualChart', {
-    template: '<component :is="currentView" :groupid="groupid"  ' +
-    'v-show="attributes.show"' +
-    ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
-    ':ndx="ndx" :attributes.sync="attributes"></component>',
+    template: '<component :is="currentView" v-if="attributes.show" :ndx="ndx" ' +
+    ':attributes.sync="attributes"></component>',
     props: [
-      'ndx', 'attributes', 'groupid'
+      'ndx', 'attributes'
     ],
     data: function() {
       var currentView = '';
+      this.attributes.filter  =[];
       switch (this.attributes.view_type) {
         case 'pie_chart':
           currentView = 'pie-chart';

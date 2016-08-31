@@ -169,7 +169,9 @@
     };
 
     content.filtered = function() {
-      updateTables();
+      if(qtipRendered) {
+        updateTables();
+      }
       isFiltered = true;
       updateQtip = false;
     };

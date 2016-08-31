@@ -116,11 +116,12 @@
               var attrData = self_.charts[attrId];
               var _attrAdded = false;
               var _group = {};
+              var _groupIdToPush = 0;
               _.every(self_.groups, function(group) {
                 if (group.type === attrData.group_type) {
                   if (group.attributes.length < 31) {
                     attrData.group_id = group.id;
-                    group.attributes.push(attrData);
+                    _groupIdToPush = group.id;
                     _attrAdded = true;
                     return false;
                   }
@@ -129,7 +130,15 @@
                 }
                 return true;
               });
-              if (!_attrAdded) {
+              if (_attrAdded) {
+                $.when(iViz.updateGroupNdx(attrData.group_id, attrData.attr_id)).then(function() {
+                  self_.groups[_groupIdToPush].attributes.push(attrData);
+                  self_.$broadcast('add-chart-to-group', attrData.group_id, attrData.attr_id);
+                  self_.$nextTick(function() {
+                    $('#iviz-add-chart').trigger('chosen:updated');
+                  });
+                });
+              } else {
                 var newgroup_ = {};
                 var groupAttrs = [];
                 // newgroup_.data = _group.data;
@@ -139,7 +148,12 @@
                 self_.groupCount += 1;
                 groupAttrs.push(attrData);
                 newgroup_.attributes = groupAttrs;
-                self_.groups.push(newgroup_);
+                $.when(iViz.createGroupNdx(newgroup_)).then(function() {
+                  self_.groups.push(newgroup_);
+                  self_.$nextTick(function() {
+                    $('#iviz-add-chart').trigger('chosen:updated');
+                  });
+                });
               }
             },
             removeChart: function(attrId) {
@@ -295,7 +309,7 @@
       })
         .change(
           function() {
-            var value = this.el.value;
+            var value = self.el.value;
             self.params.charts[value].show = true;
             self.vm.addChart(this.el.value);
             self.vm.$nextTick(function() {

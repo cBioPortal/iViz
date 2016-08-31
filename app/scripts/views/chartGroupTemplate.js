@@ -5,19 +5,17 @@
 (function(Vue, dc, iViz, crossfilter, _) {
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
-    ' :ndx="ndx" :groupid="groupid"' +
+    ' :ndx="ndx" ' +
     ' :attributes.sync="attribute" v-for="attribute in attributes"></div>',
     props: [
-      'attributes', 'type', 'id', 'groupid', 'redrawgroups', 'mappedcases'
+      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases'
     ], created: function() {
       // TODO: update this.data
       var _self = this;
-      var data_ = iViz.getAttrData(this.type);
-      var ndx_ = crossfilter(data_);
+      var ndx_ = crossfilter(iViz.getGroupNdx(this.id));
       this.invisibleBridgeDimension = ndx_.dimension(function(d) {
         return d[_self.type + '_id'];
       });
-      this.groupid = this.id;
       this.ndx = ndx_;
       this.invisibleChartFilters = [];
 
@@ -45,6 +43,28 @@
       }
     },
     events: {
+      'add-chart-to-group': function(groupId) {
+        if (this.id === groupId) {
+          this.$broadcast('adding-chart', this.id, true);
+          if (this.invisibleChartFilters.length > 0) {
+            this.invisibleBridgeDimension.filterAll();
+          }
+          this.ndx.remove();
+          this.ndx.add(iViz.getGroupNdx(this.id));
+          if (this.invisibleChartFilters.length > 0) {
+            var filtersMap = {};
+            _.each(this.invisibleChartFilters, function(filter) {
+              if (filtersMap[filter] === undefined) {
+                filtersMap[filter] = true;
+              }
+            });
+            this.invisibleBridgeDimension.filterFunction(function(d) {
+              return (filtersMap[d] !== undefined);
+            });
+          }
+          this.$broadcast('adding-chart', this.id, false);
+        }
+      },
       'clear-group': function() {
         this.clearGroup = true;
         this.invisibleBridgeDimension.filterAll();
