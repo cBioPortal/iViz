@@ -1,5 +1,5 @@
 'use strict';
-var LogRankTest = (function(jStat) {
+window.LogRankTest = (function(jStat) {
   var datum = {
     time: '',  // num of months
     num_of_failure_1: 0,
@@ -111,6 +111,6 @@ var LogRankTest = (function(jStat) {
       return calcPval();
     }
   };
-}(
+})(
   window.jStat
-));
+);

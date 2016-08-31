@@ -96,10 +96,10 @@
   <script src="scripts/views/components/scatterPlot/scatterPlotTemplate.js"></script>
   <script src="scripts/views/components/survivalChart/main.js"></script>
   <script src="scripts/views/components/survivalChart/template.js"></script>
-  <script src="scripts/views/components/survivalChart/proxy.js"></script>
-  <script src="scripts/views/components/survivalChart/components/curve.js"></script>
   <script src="scripts/views/components/survivalChart/components/kmEstimator.js"></script>
   <script src="scripts/views/components/survivalChart/components/logRankTest.js"></script>
+  <script src="scripts/views/components/survivalChart/components/curve.js"></script>
+  <script src="scripts/views/components/survivalChart/proxy.js"></script>
   <script src="scripts/views/components/dataTable/tableView.js"></script>
   <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
   <script src="scripts/views/components/dataTable/MutatedGeneCNATable.js"></script>
@@ -223,7 +223,7 @@
     var studyCasesMap = {};
     studyCasesMap['hnsc_tcga']={};
     window.iviz = {};
-    window.iviz.datamanager = new iViz.data.init(window.cbioURL, studyCasesMap);
+    window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
     $.when(window.iviz.datamanager.initialSetup()).then(function(_data){
       iViz.init(_data);
     });

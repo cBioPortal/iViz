@@ -1,5 +1,5 @@
-'use strict'
-var kmEstimator = (function() {
+'use strict';
+window.kmEstimator = (function(_) {
   return {
     calc: function(_inputArr) {
       // calculate the survival rate for each time point
@@ -20,4 +20,6 @@ var kmEstimator = (function() {
       });
     }
   };
-})(); // Close KmEstimator
+})(
+  window._
+); // Close KmEstimator

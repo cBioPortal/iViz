@@ -13,8 +13,10 @@
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
       data_ = _data;
-      var _dataProxy = new survivalChartProxy(_data, opts_.attrId);
-      this.chartInst_ = new survivalCurve(opts_.chartId, _dataProxy.get(), opts_);
+      var _dataProxy = new iViz.data.SurvivalChartProxy(_data, opts_.attrId);
+      this.chartInst_ =
+        new iViz.view.component
+          .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
       this.update(_selectedPatientList, opts_.chartId, opts_.attrId);
     };
 
@@ -41,8 +43,10 @@
         });
 
       // settings for different curves
-      var _selectedDataProxy = new survivalChartProxy(_selectedData, _attrId);
-      var _unselectedDataProxy = new survivalChartProxy(_unselectedData, _attrId);
+      var _selectedDataProxy =
+        new iViz.data.SurvivalChartProxy(_selectedData, _attrId);
+      var _unselectedDataProxy =
+        new iViz.data.SurvivalChartProxy(_unselectedData, _attrId);
 
       // add curves
       if (_unselectedDataProxy.get().length === 0) {

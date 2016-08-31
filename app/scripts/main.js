@@ -511,6 +511,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         transitionDuration: 400
       }
     },
+    data: {},
     applyVC: function(_vc) {
       var _selectedSamples = [];
       var _selectedPatients = [];
