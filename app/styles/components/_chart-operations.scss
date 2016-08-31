@@ -15,6 +15,9 @@
     float: left;
     margin: 0 2px;
   }
+  .icon.fa.fa-undo {
+    color: #2986e2;
+  }
   .icon:hover {
     cursor: pointer;
   }
@@ -34,7 +37,7 @@
     float: right;
   }
   .chart-title-active {
-    width: 60%;
+    width: 55%;
     float: left;
   }
 

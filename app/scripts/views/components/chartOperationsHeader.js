@@ -11,8 +11,8 @@
     '<span class="chart-title-span" id="{{chartId}}-title">{{displayName}}' +
     '</span></div>' +
     '<div :class="[showOperations?chartOperationsActive:chartOperations]">' +
-    '<img v-show="hasFilters" src="images/reload-alt.svg" @click="reset()" ' +
-    'class="icon hover"/>' +
+    '<i v-show="hasFilters" class="fa fa-undo icon hover" ' +
+    'aria-hidden="true" @click="reset()"></i>' +
     '<div style="float:left" v-if="showLogScale"></input style="float:left">' +
     '<input type="checkbox" value="" id="" ' +
     'class="bar-x-log" v-model="logChecked">' +
