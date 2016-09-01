@@ -19,7 +19,8 @@
       var _qtips = [];
       _.each(data_, function(_dataObj) {
         _qtips.push('Cancer Study:' + _dataObj.study_id + '<br>Sample Id: ' +
-          _dataObj.sample_id + '<br>CNA fraction: ' + _dataObj.cna_fraction +
+          _dataObj.sample_id + '<br>CNA fraction: ' +
+          cbio.util.toPrecision(_dataObj.cna_fraction, 2, 0.001) +
           '<br>Mutation count: ' + _dataObj.mutation_count);
       });
       var trace = {
@@ -33,7 +34,7 @@
         sample_id: _.pluck(data_, 'sample_id'),
         marker: {
           size: 7,
-          color: '#006bb3',
+          color: '#2986e2',
           line: {color: 'white'}
         }
       };
@@ -59,14 +60,19 @@
         width: 370,
         height: 320,
         margin: {
-          l: 50,
-          r: 50,
+          l: 60,
+          r: 10,
           b: 50,
-          t: 50,
+          t: 30,
           pad: 0
         }
       };
-      Plotly.plot(document.getElementById(chartId_), data, layout);
+      Plotly.plot(document.getElementById(chartId_), data, layout, {
+        displaylogo: false,
+        modeBarButtonsToRemove: ['sendDataToCloud', 'pan2d',
+          'zoomIn2d', 'zoomOut2d', 'resetScale2d',
+          'hoverClosestCartesian', 'hoverCompareCartesian']
+      });
 
       // link to sample view
       var _plotsElem = document.getElementById(chartId_);
@@ -106,14 +112,14 @@
       _.each(_unselectedData, function(_dataObj) {
         _unselectedDataQtips.push('Cancer Study:' + _dataObj.study_id +
           '<br>Sample Id: ' + _dataObj.sample_id + '<br>CNA fraction: ' +
-          _dataObj.cna_fraction + '<br>Mutation count: ' +
-          _dataObj.mutation_count);
+          cbio.util.toPrecision(_dataObj.cna_fraction, 2, 0.001) +
+          '<br>Mutation count: ' + _dataObj.mutation_count);
       });
       _.each(_selectedData, function(_dataObj) {
         _selectedDataQtips.push('Cancer Study:' + _dataObj.study_id +
           '<br>Sample Id: ' + _dataObj.sample_id + '<br>CNA fraction: ' +
-          _dataObj.cna_fraction + '<br>Mutation count: ' +
-          _dataObj.mutation_count);
+          cbio.util.toPrecision(_dataObj.cna_fraction, 2, 0.001) +
+          '<br>Mutation count: ' + _dataObj.mutation_count);
       });
       document.getElementById(chartId_).data[0] = {
         x: _.pluck(_unselectedData, 'cna_fraction'),
@@ -126,7 +132,7 @@
         sample_id: _.pluck(data_, 'sample_id'),
         marker: {
           size: 6,
-          color: '#006bb3',
+          color: '#2986e2',
           line: {color: 'white'}
         }
       };

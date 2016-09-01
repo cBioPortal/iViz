@@ -111,6 +111,9 @@
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
-})(window.Vue,
+})(
+  window.Vue,
   window.dc,
-  window.iViz, window._);
+  window.iViz,
+  window._
+);

@@ -13,8 +13,10 @@
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
       data_ = _data;
-      var _dataProxy = new survivalChartProxy(_data, opts_.attrId);
-      this.chartInst_ = new survivalCurve(opts_.chartId, _dataProxy.get(), opts_);
+      var _dataProxy = new iViz.data.SurvivalChartProxy(_data, opts_.attrId);
+      this.chartInst_ =
+        new iViz.view.component
+          .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
       this.update(_selectedPatientList, opts_.chartId, opts_.attrId);
     };
 
@@ -41,16 +43,18 @@
         });
 
       // settings for different curves
-      var _selectedDataProxy = new survivalChartProxy(_selectedData, _attrId);
-      var _unselectedDataProxy = new survivalChartProxy(_unselectedData, _attrId);
+      var _selectedDataProxy =
+        new iViz.data.SurvivalChartProxy(_selectedData, _attrId);
+      var _unselectedDataProxy =
+        new iViz.data.SurvivalChartProxy(_unselectedData, _attrId);
 
       // add curves
       if (_unselectedDataProxy.get().length === 0) {
-        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, '#006bb3');
+        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, '#2986e2');
         this.chartInst_.removePval();
       } else {
         this.chartInst_.addCurve(_selectedDataProxy.get(), 0, 'red');
-        this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, '#006bb3');
+        this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, '#2986e2');
         this.chartInst_.addPval(
           _selectedDataProxy.get(), _unselectedDataProxy.get());
       }

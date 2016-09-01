@@ -77,6 +77,7 @@
         .turnOnControls(true)
         .mouseZoomable(false)
         .brushOn(true)
+        .colors('#2986e2')
         .transitionDuration(iViz.opts.transitionDuration || 400)
         .renderHorizontalGridLines(false)
         .renderVerticalGridLines(false);
