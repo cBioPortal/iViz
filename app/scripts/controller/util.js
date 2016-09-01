@@ -493,8 +493,8 @@
       var _svgTitle;
       var _labelTextMaxLength = 0;
       var _numOfLabels = 0;
-      var _svgWidth = 360;
-      var _svgheight = 360;
+      var _svgWidth = 380;
+      var _svgheight = 380;
 
       _svgElement = cbio.download.serializeHtml(
         $('#' + data.chartDivId + ' svg')[0]);
