@@ -7,14 +7,13 @@
     template: '<chart-group :redrawgroups.sync="redrawgroups" :id="group.id" ' +
     ':type="group.type" ' +
     ':mappedcases="group.type==\'patient\'?patientsync:samplesync" ' +
-    ' :attributes.sync="group.attributes"' +
+    ' :attributes.sync="group.attributes" :clear-group="clearAll"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'hasfilters',
-      'redrawgroups', 'customfilter'
+      'redrawgroups', 'customfilter', 'clearAll'
     ], data: function() {
       return {
-        messages: [],
         patientsync: [],
         samplesync: [],
         grid_: '',
@@ -22,7 +21,9 @@
         completeSamplesList: [],
         selectedPatientsByFilters: [],
         selectedSamplesByFilters: [],
-        initialized: false
+        initialized: false,
+        renderGroups: [],
+        chartsGrid: []
       };
     }, watch: {
       groups: function() {
@@ -38,13 +39,26 @@
             _.keys(iViz.getCasesMap('sample')).sort();
         }
       },
-      messages: function(ChartsIds) {
-        if (ChartsIds.length > 0) {
-          _.each(this.groups, function(group) {
-            dc.renderAll(group.id);
+      renderGroups: function(groupIds) {
+        var _keys = window.cbio.util.uniqueElementsOfArray(groupIds);
+        if (_keys.length > 0) {
+          _.each(_keys, function(groupid) {
+            dc.renderAll(groupid);
           });
-          this.updateGrid(ChartsIds);
-          this.messages.length = 0;
+          this.renderGroups = [];
+        }
+      },
+      chartsGrid: function(ChartsIds) {
+        var _keys = window.cbio.util.uniqueElementsOfArray(ChartsIds);
+        if (_keys.length > 0) {
+          this.updateGrid(_keys);
+          this.chartsGrid = [];
+        }
+      },
+      clearAll: function(flag) {
+        if (flag) {
+          this.selectedPatientsByFilters = [];
+          this.selectedSamplesByFilters = [];
         }
       }
     }, methods: {
@@ -79,25 +93,19 @@
             self_.grid_.bindDraggabillyEvents(_draggie);
           });
         }
-       
         self_.grid_.layout();
       }
     },
     events: {
-      'clear-all-groups': function() {
-        this.selectedPatientsByFilters = [];
-        this.selectedSamplesByFilters = [];
-        this.$broadcast('clear-group');
-      },
       'update-grid': function() {
         this.grid_.layout();
       }, 'remove-grid-item': function(item) {
         this.grid_.remove(item);
         this.grid_.layout();
       },
-      'data-loaded': function(msg) {
-        // TODO:check for all charts loaded
-        this.messages.push(msg);
+      'data-loaded': function(groupId, chartDivId) {
+        this.chartsGrid.push(chartDivId);
+        this.renderGroups.push(groupId);
       },
       /*
        * This method is to find out the selected cases and the cases

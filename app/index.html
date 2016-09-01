@@ -81,7 +81,6 @@
   <script src="scripts/main.js"></script>
   <script src="scripts/vueCore.js"></script>
   <script src="scripts/controller/util.js"></script>
-  <script src="scripts/controller/event.js"></script>
   <script src="scripts/views/mainTemplate.js"></script>
   <script src="scripts/views/chartGroupTemplate.js"></script>
   <script src="scripts/views/individualChartTemplate.js"></script>
@@ -114,6 +113,10 @@
 <body>
 
 <div class="container-fluid" id="complete-screen">
+  <div id="complete-screen-loader" 
+       :class="{'show-loading': showScreenLoad}" 
+       class="chart-loader" style="top: 30%; left: 30%; display: none;"><img
+    src="images/ajax-loader.gif" alt="loading"></div>
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header">
       <div id="iviz-header-left">
@@ -173,15 +176,21 @@
                        :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
                        v-if="item.filter.length>0" ></bread-crumb>
         </div>
-        <div><button type='button' @click="clearAll()" class="btn btn-default btn-xs">Clear All</button></div>
+        <div><button type='button' @click="clearAllCharts(true)" 
+                     class="btn btn-default btn-xs">Clear All</button></div>
       </div>
     </div>
   </nav>
-  <div class="grid" id="main-grid" :class="{loading:isloading}">
+  <div :class="{'start-loading': showScreenLoad}">
+  <div class="grid" id="main-grid" 
+       :class="{loading:isloading}">
     <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
                    :selectedpatients.sync="selectedpatients"
                    :selectedsamples.sync="selectedsamples"
-                   :hasfilters.sync="hasfilters" :customfilter.sync="customfilter"></main-template>
+                   :hasfilters.sync="hasfilters" 
+                   :customfilter.sync="customfilter" 
+                   :clear-all="clearAll"></main-template>
+  </div>
   </div>
 
 </div>

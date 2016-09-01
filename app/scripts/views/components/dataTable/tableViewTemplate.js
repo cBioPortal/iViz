@@ -10,17 +10,16 @@
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':display-name="displayName" :chart-ctrl="chartInst"' +
-    ':has-chart-title="true" :groupid="groupid" :reset-btn-id="resetBtnId" ' +
-    ':chart-id="chartId" :attributes="attributes" :filters.sync="filters" ' +
-    ':filters.sync="filters"></chart-operations>' +
-    '<div class="dc-chart dc-table-plot" ' +
+    ':has-chart-title="true" :groupid="attributes.group_id" :reset-btn-id="resetBtnId" ' +
+    ':chart-id="chartId" :attributes="attributes" :filters.sync="attributes.filter"> ' +
+    '</chart-operations><div class="dc-chart dc-table-plot" ' +
     ':class="{\'start-loading\': showLoad}" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
     '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
     '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
-      'ndx', 'attributes', 'options', 'filters', 'groupid'
+      'ndx', 'attributes', 'options'
     ],
     data: function() {
       return {
@@ -39,13 +38,12 @@
       };
     },
     watch: {
-      filters: function(newVal) {
+      'attributes.filter': function(newVal) {
         if (newVal.length === 0) {
           this.invisibleDimension.filterAll();
-          dc.redrawAll(this.groupid);
           this.selectedRows = [];
         }
-        this.updateFilters();
+        this.$dispatch('update-filters', true);
       }
     },
     events: {
@@ -66,12 +64,27 @@
         this.showLoad = false;
       },
       'closeChart': function() {
-        if (this.filters.length > 0) {
-          this.filters = [];
-          this.updateFilters();
-        }
         this.invisibleDimension.dispose();
         this.$dispatch('close', true);
+      },
+      'addingChart': function(groupId, val) {
+        if (this.attributes.group_id === groupId) {
+          if (this.attributes.filter.length > 0) {
+            if (val) {
+              this.invisibleDimension.filterAll();
+            } else {
+              var filtersMap = {};
+              _.each(this.attributes.filter, function(filter) {
+                if (filtersMap[filter] === undefined) {
+                  filtersMap[filter] = true;
+                }
+              });
+              this.invisibleDimension.filterFunction(function(d) {
+                return (filtersMap[d] !== undefined);
+              });
+            }
+          }
+        }
       }
     },
     methods: {
@@ -89,14 +102,14 @@
           var casesIds = item.caseIds.split(',');
           selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
         });
-        if (this.filters.length === 0) {
-          this.filters = selectedSamplesUnion.sort();
+        if (this.attributes.filter.length === 0) {
+          this.attributes.filter = selectedSamplesUnion.sort();
         } else {
-          this.filters =
-            iViz.util.intersection(this.filters, selectedSamplesUnion.sort());
+          this.attributes.filter =
+            iViz.util.intersection(this.attributes.filter, selectedSamplesUnion.sort());
         }
         var filtersMap = {};
-        _.each(this.filters, function(filter) {
+        _.each(this.attributes.filter, function(filter) {
           if (filtersMap[filter] === undefined) {
             filtersMap[filter] = true;
           }
@@ -104,7 +117,6 @@
         this.invisibleDimension.filterFunction(function(d) {
           return (filtersMap[d] !== undefined);
         });
-        dc.redrawAll(this.groupid);
         this.chartInst.clearSelectedRowData();
       },
       addGeneClick: function(clickedRowData) {
@@ -114,11 +126,7 @@
       setDisplayTitle: function(numOfCases) {
         this.displayName = this.attributes.display_name +
           '(' + numOfCases + ' profiled samples)';
-      },
-      updateFilters: function() {
-        this.$dispatch('update-filters');
       }
-
     },
     ready: function() {
       var _self = this;
@@ -135,12 +143,12 @@
       _self.chartInst = new iViz.view.component.TableView();
       _self.chartInst.setDownloadDataTypes(['tsv']);
 
-      var data = iViz.getAttrData(this.attributes.group_type);
+      var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst.init(this.attributes, this.$root.selectedsamples,
         this.$root.selectedgenes, data, this.chartId, callbacks);
       this.setDisplayTitle(this.chartInst.getCases().length);
       _self.showLoad = false;
-      this.$dispatch('data-loaded', this.chartDivId);
+      this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(

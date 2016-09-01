@@ -2,7 +2,7 @@
  * Created by Karthik Kalletla on 4/6/16.
  */
 'use strict';
-(function(Vue, dc, iViz, $) {
+(function(Vue, dc, iViz, $, _) {
   Vue.component('pieChart', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-h-1 grid-item-w-1" ' +
@@ -11,9 +11,9 @@
     '<chart-operations :has-chart-title="hasChartTitle" ' +
     ':display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
     ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" ' +
-    ':show-operations="showOperations" :groupid="groupid" ' +
+    ':show-operations="showOperations" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" ' +
-    ' :filters.sync="filters" ' +
+    ' :filters.sync="attributes.filter" ' +
     ':attributes="attributes"></chart-operations>' +
     '<div class="dc-chart dc-pie-chart" ' +
     ':class="{view: showPieIcon}" align="center" style="float:none' +
@@ -21,7 +21,7 @@
     '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>' +
     '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid', 'options'
+      'ndx', 'attributes'
     ],
     data: function() {
       return {
@@ -42,11 +42,12 @@
         hasChartTitle: true,
         showTableIcon: true,
         showPieIcon: false,
-        filtersUpdated: false
+        filtersUpdated: false,
+        addingChart: false
       };
     },
     watch: {
-      filters: function(newVal, oldVal) {
+      'attributes.filter': function(newVal) {
         if (this.filtersUpdated) {
           this.filtersUpdated = false;
         } else {
@@ -56,8 +57,7 @@
           } else {
             this.chartInst.replaceFilter([newVal]);
           }
-          dc.redrawAll(this.groupid);
-          this.$dispatch('update-filters');
+          this.$dispatch('update-filters', true);
         }
       }
     },
@@ -67,9 +67,22 @@
       },
       closeChart: function() {
         $('#' + this.chartDivId).qtip('destroy');
-        dc.deregisterChart(this.chartInst, this.attributes.groupid);
+        dc.deregisterChart(this.chartInst, this.attributes.group_id);
         this.chartInst.dimension().dispose();
         this.$dispatch('close');
+      },
+      addingChart: function(groupId, val) {
+        if (this.attributes.group_id === groupId) {
+          if (this.attributes.filter.length > 0) {
+            if (val) {
+              this.addingChart = val;
+              this.chartInst.filter(null);
+            } else {
+              this.chartInst.filter([this.attributes.filter]);
+              this.addingChart = val;
+            }
+          }
+        }
       }
     },
     methods: {
@@ -102,7 +115,7 @@
       var opts = {
         chartId: _self.chartId,
         chartDivId: _self.chartDivId,
-        groupid: _self.groupid,
+        groupid: _self.attributes.group_id,
         chartTableId: _self.chartTableId,
         transitionDuration: iViz.opts.dc.transitionDuration,
         width: window.style['piechart-svg-width'] | 130,
@@ -113,30 +126,32 @@
       _self.piechart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
       _self.chartInst = _self.piechart.getChart();
       _self.chartInst.on('filtered', function(_chartInst, _filter) {
-        if (_self.filtersUpdated) {
-          _self.filtersUpdated = false;
-        } else {
-          _self.filtersUpdated = true;
-
-          if (_filter instanceof Array) {
-            _self.filters = _filter;
-          } else if ($.inArray(_filter, _self.filters) === -1) {
-            _self.filters.push(_filter);
+        if (!_self.addingChart) {
+          if (_self.filtersUpdated) {
+            _self.filtersUpdated = false;
           } else {
-            _self.filters = _.filter( _self.filters, function(d) {
-              return d !== _filter;
-            });
+            _self.filtersUpdated = true;
+
+            if (_filter === null) {
+              _self.attributes.filter = [];
+            } else if ($.inArray(_filter, _self.attributes.filter) === -1) {
+              _self.attributes.filter.push(_filter);
+            } else {
+              _self.attributes.filter = _.filter(_self.attributes.filter, function(d) {
+                return d !== _filter;
+              });
+            }
+            _self.$dispatch('update-filters');
           }
-          _self.$dispatch('update-filters');
+          // Trigger pie chart filtered event.
+          _self.piechart.filtered();
         }
-        // Trigger pie chart filtered event.
-        _self.piechart.filtered();
       });
-      _self.$dispatch('data-loaded', this.chartDivId);
+      _self.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(
   window.Vue,
   window.dc,
   window.iViz,
-  window.$ || window.jQuery);
+  window.$ || window.jQuery, window._);

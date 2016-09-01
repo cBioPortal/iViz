@@ -2,7 +2,7 @@
  * @author Yichao Sun on 5/18/16.
  */
 'use strict';
-(function(Vue, dc, iViz) {
+(function(Vue, dc, iViz, _) {
   Vue.component('survival', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-h-2 grid-item-w-2" ' +
@@ -10,7 +10,7 @@
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':has-chart-title="hasChartTitle" :display-name="displayName" ' +
-    ':groupid="groupid" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" ' +
+    ':groupid="attributes.group_id" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" ' +
     ' :chart-id="chartId" ' +
     ':attributes="attributes"></chart-operations>' +
     '<div :class="{\'start-loading\': showLoad}" ' +
@@ -20,7 +20,7 @@
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
     '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
-      'ndx', 'attributes', 'options', 'filters', 'groupid'
+      'ndx', 'attributes'
     ],
     created: function() {
     },
@@ -57,6 +57,25 @@
       'closeChart': function() {
         this.invisibleDimension.dispose();
         this.$dispatch('close');
+      },
+      'adding-chart': function(groupId, val) {
+        if (this.attributes.group_id === groupId) {
+          if (this.attributes.filter.length > 0) {
+            if (val) {
+              this.invisibleDimension.filterAll();
+            } else {
+              var filtersMap = {};
+              _.each(this.attributes.filter, function(filter) {
+                if (filtersMap[filter] === undefined) {
+                  filtersMap[filter] = true;
+                }
+              });
+              this.invisibleDimension.filterFunction(function(d) {
+                return (filtersMap[d] !== undefined);
+              });
+            }
+          }
+        }
       }
     },
     methods: {
@@ -86,12 +105,12 @@
       _self.chartInst = new iViz.view.component.Survival();
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
-      var data = iViz.getAttrData(this.attributes.group_type);
+      var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst.init(data, _opts, _selectedPatientList);
       _self.showLoad = false;
-      this.$dispatch('data-loaded', this.chartDivId);
+      this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(window.Vue,
   window.dc,
-  window.iViz);
+  window.iViz, window._);

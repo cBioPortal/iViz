@@ -23,16 +23,12 @@
            var _selectedsampleAttrIds = _.pluck(_selectedSampleAttrs,'attr_id');*/
 
           /* Comment this  to laod limited number of clinical attributes data */
-          var _selectedpatientAttrIds =
-            _.pluck(_.values(_patientAttributes), 'attr_id');
-          var _selectedsampleAttrIds =
-            _.pluck(_.values(_sampleAttributes), 'attr_id');
-          $.when(self.getPatientClinicalData(_selectedpatientAttrIds),
-            self.getSampleClinicalData(_selectedsampleAttrIds),
-            self.getCnaData(), self.getMutationCount(), self.getMutData())
-            .then(function(_patientClinicalData,
-                           _sampleClinicalData,
-                           _cnaData, _mutationCountData,
+          /* var _selectedpatientAttrIds =
+           _.pluck(_.values(_patientAttributes), 'attr_id');
+           var _selectedsampleAttrIds =
+           _.pluck(_.values(_sampleAttributes), 'attr_id'); */
+          $.when(self.getCnaData(), self.getMutationCount(), self.getMutData())
+            .then(function(_cnaData, _mutationCountData,
                            _mutationData) {
               var _hasMutationCNAScatterPlotData =
                 _.keys(_cnaFractionData).length > 0;
@@ -52,6 +48,12 @@
               var _patientDataIndicesObj = {};
               var _hasDFS = false;
               var _hasOS = false;
+              var _hasPatientAttrData = {};
+              var _hasSampleAttrData = {};
+              var _hasDfsStatus = false;
+              var _hasDfsMonths = false;
+              var _hasOsStatus = false;
+              var _hasOsMonths = false;
 
               var addAttr = function(data, group) {
                 if (!_.isObject(data) || !data.attr_id || !group) {
@@ -108,6 +110,22 @@
                 }
               });
               _.each(_patientAttributes, function(_metaObj) {
+                switch (_metaObj.attr_id) {
+                  case 'DFS_STATUS':
+                    _hasDfsStatus = true;
+                    break;
+                  case 'DFS_MONTHS':
+                    _hasDfsMonths = true;
+                    break;
+                  case 'OS_STATUS':
+                    _hasOsStatus = true;
+                    break;
+                  case 'OS_MONTHS':
+                    _hasOsMonths = true;
+                    break;
+                  default :
+                    break;
+                }
                 _metaObj.filter = [];
                 _metaObj.keys = {};
                 _metaObj.numOfDatum = 0;
@@ -120,37 +138,43 @@
                 }
               });
 
+              if (_hasDfsStatus && _hasDfsMonths) {
+                _hasDFS = true;
+              }
+              if (_hasOsStatus && _hasOsMonths) {
+                _hasOS = true;
+              }
               // map clinical data to each patient (key: patient ID, value: object of attributes vs. val)
-              var _patientIdToClinDataMap = {};
-              _.each(_patientClinicalData, function(_patientAttributeData) {
-                _.each(_patientAttributeData, function(_dataObj) {
-                  if (_patientIdToClinDataMap[_dataObj.patient_id] === undefined) {
-                    _patientIdToClinDataMap[_dataObj.patient_id] = {};
-                  }
-                  _patientIdToClinDataMap[_dataObj.patient_id][_dataObj.attr_id] = _dataObj.attr_val;
-                  if (!_patientAttributes[_dataObj.attr_id].keys.hasOwnProperty(_dataObj.attr_val)) {
-                    _patientAttributes[_dataObj.attr_id].keys[_dataObj.attr_val] = 0;
-                  }
-                  ++_patientAttributes[_dataObj.attr_id].keys[_dataObj.attr_val];
-                  ++_patientAttributes[_dataObj.attr_id].numOfDatum;
-                });
-              });
+              /* var _patientIdToClinDataMap = {};
+               _.each(_patientClinicalData, function(_patientAttributeData) {
+               _.each(_patientAttributeData, function(_dataObj) {
+               if (_patientIdToClinDataMap[_dataObj.patient_id] === undefined) {
+               _patientIdToClinDataMap[_dataObj.patient_id] = {};
+               }
+               _patientIdToClinDataMap[_dataObj.patient_id][_dataObj.attr_id] = _dataObj.attr_val;
+               if (!_patientAttributes[_dataObj.attr_id].keys.hasOwnProperty(_dataObj.attr_val)) {
+               _patientAttributes[_dataObj.attr_id].keys[_dataObj.attr_val] = 0;
+               }
+               ++_patientAttributes[_dataObj.attr_id].keys[_dataObj.attr_val];
+               ++_patientAttributes[_dataObj.attr_id].numOfDatum;
+               });
+               }); */
 
               // map clinical data to each sample (key: sample ID, value: object of attributes vs. val)
-              var _sampleIdToClinDataMap = {};
-              _.each(_sampleClinicalData, function(_sampleAttributeData) {
-                _.each(_sampleAttributeData, function(_dataObj) {
-                  if (_sampleIdToClinDataMap[_dataObj.sample_id] === undefined) {
-                    _sampleIdToClinDataMap[_dataObj.sample_id] = {};
-                  }
-                  _sampleIdToClinDataMap[_dataObj.sample_id][_dataObj.attr_id] = _dataObj.attr_val;
-                  if (!_sampleAttributes[_dataObj.attr_id].keys.hasOwnProperty(_dataObj.attr_val)) {
-                    _sampleAttributes[_dataObj.attr_id].keys[_dataObj.attr_val] = 0;
-                  }
-                  ++_sampleAttributes[_dataObj.attr_id].keys[_dataObj.attr_val];
-                  ++_sampleAttributes[_dataObj.attr_id].numOfDatum;
-                });
-              });
+              /* var _sampleIdToClinDataMap = {};
+               _.each(_sampleClinicalData, function(_sampleAttributeData) {
+               _.each(_sampleAttributeData, function(_dataObj) {
+               if (_sampleIdToClinDataMap[_dataObj.sample_id] === undefined) {
+               _sampleIdToClinDataMap[_dataObj.sample_id] = {};
+               }
+               _sampleIdToClinDataMap[_dataObj.sample_id][_dataObj.attr_id] = _dataObj.attr_val;
+               if (!_sampleAttributes[_dataObj.attr_id].keys.hasOwnProperty(_dataObj.attr_val)) {
+               _sampleAttributes[_dataObj.attr_id].keys[_dataObj.attr_val] = 0;
+               }
+               ++_sampleAttributes[_dataObj.attr_id].keys[_dataObj.attr_val];
+               ++_sampleAttributes[_dataObj.attr_id].numOfDatum;
+               });
+               });*/
 
               var _samplesToPatientMap = {};
               var _patientToSampleMap = {};
@@ -169,24 +193,26 @@
                   if (_patientDataIndicesObj[_patientId] === undefined) {
                     // create datum for each patient
                     var _patientDatum = {};
-                    if (_patientIdToClinDataMap[_patientId] !== undefined) {
-                      _patientDatum = _patientIdToClinDataMap[_patientId];
-                    }
+                    /* if (_patientIdToClinDataMap[_patientId] !== undefined) {
+                     _patientDatum = _patientIdToClinDataMap[_patientId];
+                     }*/
                     _patientDatum.patient_id = _patientId;
                     _patientDatum.study_id = _studyId;
+                    _hasPatientAttrData.patient_id = '';
+                    _hasPatientAttrData.study_id = '';
 
-                    if (_patientDatum.hasOwnProperty('DFS_STATUS') &&
-                      _patientDatum.hasOwnProperty('DFS_MONTHS') &&
-                      _patientDatum.DFS_STATUS !== 'NA' &&
-                      _patientDatum.DFS_MONTHS !== 'NA') {
-                      _hasDFS = true;
-                    }
-                    if (_patientDatum.hasOwnProperty('OS_STATUS') &&
-                      _patientDatum.hasOwnProperty('OS_MONTHS') &&
-                      _patientDatum.OS_STATUS !== 'NA' &&
-                      _patientDatum.OS_MONTHS !== 'NA') {
-                      _hasOS = true;
-                    }
+                    /* if (_patientDatum.hasOwnProperty('DFS_STATUS') &&
+                     _patientDatum.hasOwnProperty('DFS_MONTHS') &&
+                     _patientDatum.DFS_STATUS !== 'NA' &&
+                     _patientDatum.DFS_MONTHS !== 'NA') {
+                     _hasDFS = true;
+                     }
+                     if (_patientDatum.hasOwnProperty('OS_STATUS') &&
+                     _patientDatum.hasOwnProperty('OS_MONTHS') &&
+                     _patientDatum.OS_STATUS !== 'NA' &&
+                     _patientDatum.OS_MONTHS !== 'NA') {
+                     _hasOS = true;
+                     }*/
 
                     _patientData.push(_patientDatum);
                     _patientDataIndicesObj[_patientId] = _indexPatient;
@@ -195,14 +221,17 @@
 
                   // create datum for each sample
                   var _sampleDatum = {};
-                  if (_sampleIdToClinDataMap[_sampleId] !== undefined) {
-                    _sampleDatum = _sampleIdToClinDataMap[_sampleId];
-                  }
+                  /* if (_sampleIdToClinDataMap[_sampleId] !== undefined) {
+                   _sampleDatum = _sampleIdToClinDataMap[_sampleId];
+                   }*/
                   _sampleDatum.sample_id = _sampleId;
                   _sampleDatum.study_id = _studyId;
+                  _hasSampleAttrData.sample_id = '';
+                  _hasSampleAttrData.study_id = '';
 
                   // mutation count
                   if (_hasMutationCountData) {
+                    _hasSampleAttrData.SEQUENCED = '';
                     if (_mutationCountData[_sampleId] === undefined ||
                       _mutationCountData[_sampleId] === null) {
                       _sampleDatum.mutation_count = 'NA';
@@ -217,6 +246,7 @@
 
                   // cna fraction
                   if (_hasMutationCNAScatterPlotData) {
+                    _hasSampleAttrData.HAS_CNA_DATA = '';
                     if (_cnaFractionData[_sampleId] === undefined ||
                       _cnaFractionData[_sampleId] === null) {
                       _sampleDatum.cna_fraction = 0;
@@ -237,6 +267,7 @@
 
               // Add SAMPLE_COUNT_PATIENT data
               _.each(_patientData, function(datum) {
+                _hasPatientAttrData.SAMPLE_COUNT_PATIENT = '';
                 if (_patientToSampleMap.hasOwnProperty(datum.patient_id)) {
                   datum.SAMPLE_COUNT_PATIENT = _patientToSampleMap[datum.patient_id].length.toString();
                 }
@@ -334,6 +365,7 @@
 
               // add mutation count
               if (_hasMutationCountData) {
+                _hasSampleAttrData.mutation_count = '';
                 var _MutationCountMeta = {};
                 _MutationCountMeta.datatype = 'NUMBER';
                 _MutationCountMeta.description = 'Mutation Count';
@@ -348,6 +380,7 @@
 
               // add CNA details
               if (_hasCNAData) {
+                _hasSampleAttrData.cna_details = '';
                 var _cnaAttrMeta = {};
                 _cnaAttrMeta.type = 'cna';
                 _cnaAttrMeta.view_type = 'table';
@@ -367,6 +400,7 @@
 
               // add Gene Mutation Info
               if (_hasMutationData) {
+                _hasSampleAttrData.mutated_genes = '';
                 var _mutDataAttrMeta = {};
                 _mutDataAttrMeta.type = 'mutatedGene';
                 _mutDataAttrMeta.view_type = 'table';
@@ -386,6 +420,7 @@
 
               // add Mutation count vs. CNA fraction
               if (_hasMutationCNAScatterPlotData) {
+                _hasSampleAttrData.cna_fraction = '';
                 var _mutCntAttrMeta = {};
                 _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
                 _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
@@ -456,7 +491,9 @@
               _result.groups.sample.attr_meta =
                 iViz.util.sortByClinicalPriority(_.values(_sampleAttributes));
               _result.groups.patient.data = _patientData;
+              _result.groups.patient.hasAttrData = _hasPatientAttrData;
               _result.groups.sample.data = _sampleData;
+              _result.groups.sample.hasAttrData = _hasSampleAttrData;
               _result.groups.patient.data_indices = {};
               _result.groups.sample.data_indices = {};
               _result.groups.patient.data_indices.patient_id =
@@ -917,6 +954,13 @@
       },
       getPatientClinicalData: function(attribute_ids) {
         return getPatientClinicalData(this, attribute_ids);
+      },
+      getClinicalData: function(attribute_ids, isPatientAttributes) {
+        if (isPatientAttributes) {
+          return this.getPatientClinicalData(attribute_ids);
+        } else {
+          return this.getSampleClinicalData(attribute_ids);
+        }
       }
     };
   };

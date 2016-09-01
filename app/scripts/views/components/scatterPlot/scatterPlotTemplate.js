@@ -9,11 +9,10 @@
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations"' +
-    ' :display-name="displayName" :has-chart-title="true" :groupid="groupid"' +
+    ' :display-name="displayName" :has-chart-title="true" :groupid="attributes.group_id"' +
     ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" ' +
     ':chart-id="chartId"' +
-    ' :attributes="attributes" :filters.sync="filters" ' +
-    ':filters.sync="filters"></chart-operations>' +
+    ' :attributes="attributes" :filters.sync="attributes.filter"></chart-operations>' +
     ' <div :class="{\'start-loading\': showLoad}" ' +
     'class="dc-chart dc-scatter-plot" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
@@ -21,7 +20,7 @@
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
-      'ndx', 'attributes', 'options', 'filters', 'groupid'
+      'ndx', 'attributes'
     ],
     data: function() {
       return {
@@ -40,12 +39,11 @@
       };
     },
     watch: {
-      filters: function(newVal) {
+      'attributes.filter': function(newVal) {
         if (newVal.length === 0) {
           this.invisibleDimension.filterAll();
-          dc.redrawAll(this.groupid);
         }
-        this.updateFilters();
+        this.$dispatch('update-filters', true);
       }
     },
     events: {
@@ -57,7 +55,7 @@
           this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
         var _selectedCases =
           _.pluck(this.invisibleDimension.top(Infinity), attrId);
-        var data = iViz.getAttrData(this.attributes.group_type);
+        var data = iViz.getGroupNdx(this.attributes.group_id);
         if (_selectedCases.length === data.length) {
           this.selectedSamples = _selectedCases;
           this.chartInst.update([]);
@@ -68,12 +66,27 @@
         this.showLoad = false;
       },
       'closeChart': function() {
-        if (this.filters.length > 0) {
-          this.filters = [];
-          this.updateFilters();
-        }
         this.invisibleDimension.dispose();
         this.$dispatch('close');
+      },
+      'addingChart': function(groupId, val) {
+        if (this.attributes.group_id === groupId) {
+          if (this.attributes.filter.length > 0) {
+            if (val) {
+              this.invisibleDimension.filterAll();
+            } else {
+              var filtersMap = {};
+              _.each(this.attributes.filter, function(filter) {
+                if (filtersMap[filter] === undefined) {
+                  filtersMap[filter] = true;
+                }
+              });
+              this.invisibleDimension.filterFunction(function(d) {
+                return (filtersMap[d] !== undefined);
+              });
+            }
+          }
+        }
       }
     },
     methods: {
@@ -81,9 +94,6 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
-      },
-      updateFilters: function() {
-        this.$dispatch('update-filters');
       }
     },
     ready: function() {
@@ -100,7 +110,7 @@
         return d[attrId];
       });
 
-      var data = iViz.getAttrData(this.attributes.group_type);
+      var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(data, _opts);
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
@@ -124,7 +134,7 @@
             });
             var _selectedCases = _.pluck(_selectedData, 'sample_id').sort();
             _self.selectedSamples = _selectedCases;
-            _self.filters = _selectedCases;
+            _self.attributes.filter = _selectedCases;
 
             var filtersMap = {};
             _.each(_selectedCases, function(filter) {
@@ -135,11 +145,11 @@
             _self.invisibleDimension.filterFunction(function(d) {
               return (filtersMap[d] !== undefined);
             });
-            dc.redrawAll(_self.groupid);
+            dc.redrawAll(_self.attributes.group_id);
           }
         });
       _self.showLoad = false;
-      this.$dispatch('data-loaded', this.chartDivId);
+      this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(window.Vue,

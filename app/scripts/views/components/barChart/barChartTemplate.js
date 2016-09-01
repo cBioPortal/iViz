@@ -9,16 +9,16 @@
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
-    ':show-operations="showOperations" :groupid="groupid" ' +
+    ':show-operations="showOperations" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
-    ':filters.sync="filters"></chart-operations>' +
+    ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
     '<span class="text-center chart-title-span">{{displayName}}</span>' +
     '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid'
+      'ndx', 'attributes'
     ],
     data: function() {
       return {
@@ -40,31 +40,45 @@
           showLogScale: false,
           transitionDuration: iViz.opts.dc.transitionDuration
         },
-        opts: {}
+        opts: {},
+        addingChart: false
       };
     }, watch: {
-      filters: function(newVal) {
+      'attributes.filter': function(newVal) {
         if (this.filtersUpdated) {
           this.filtersUpdated = false;
         } else {
           this.filtersUpdated = true;
           if (newVal.length === 0) {
-            this.chartInst.filter(null);
-            dc.redrawAll(this.groupid);
-            this.$dispatch('update-filters');
+            this.chartInst.filterAll();
+            this.$dispatch('update-filters', true);
           }
         }
       }
     }, events: {
       closeChart: function() {
-        dc.deregisterChart(this.chartInst, this.attributes.groupid);
+        dc.deregisterChart(this.chartInst, this.attributes.group_id);
         this.chartInst.dimension().dispose();
         this.$dispatch('close');
       },
       changeLogScale: function(logScaleChecked) {
         $('#' + this.chartId).find('svg').remove();
-        dc.deregisterChart(this.chartInst, this.attributes.groupid);
+        dc.deregisterChart(this.chartInst, this.attributes.group_id);
         this.initChart(logScaleChecked);
+      },
+      addingChart: function(groupId, val) {
+        if (this.attributes.group_id === groupId) {
+          if (this.attributes.filter.length > 0) {
+            if (val) {
+              this.addingChart = val;
+              this.chartInst.filter(null);
+            } else {
+              var filter_ = new dc.filters.RangedFilter(this.attributes.filter[0], this.attributes.filter[1]);
+              this.chartInst.filter(filter_);
+              this.addingChart = val;
+            }
+          }
+        }
       }
     },
     methods: {
@@ -83,21 +97,23 @@
           // TODO : Right now we are manually checking for brush mouseup event.
           // This should be updated one latest dc.js is released
           // https://github.com/dc-js/dc.js/issues/627
-          if (self_.filtersUpdated) {
-            self_.filtersUpdated = false;
-          }else {
-            self_.chartInst.select('.brush').on('mouseup', function() {
-              self_.filtersUpdated = true;
-              if (typeof _filter !== 'undefined' &&
-                _filter.length > 1) {
-                var tempFilters_ = [];
-                tempFilters_[0] = _filter[0].toFixed(2);
-                tempFilters_[1] = _filter[1].toFixed(2);
-                self_.filters = tempFilters_;
-              }
-              self_.$dispatch('update-filters');
-            });
+          if (!self_.addingChart) {
+            if (self_.filtersUpdated) {
+              self_.filtersUpdated = false;
+            } else {
+              self_.chartInst.select('.brush').on('mouseup', function() {
+                self_.filtersUpdated = true;
+                if (typeof _filter !== 'undefined' &&
+                  _filter.length > 1) {
+                  var tempFilters_ = [];
+                  tempFilters_[0] = _filter[0].toFixed(2);
+                  tempFilters_[1] = _filter[1].toFixed(2);
+                  self_.attributes.filter = tempFilters_;
+                }
+                self_.$dispatch('update-filters');
+              });
             }
+          }
         });
       }
     },
@@ -113,13 +129,13 @@
         displayName: this.attributes.display_name,
         chartDivId: this.chartDivId,
         chartId: this.chartId,
-        groupid: this.groupid,
+        groupid: this.attributes.group_id,
         width: this.settings.width,
         height: this.settings.height
       });
 
       this.data.meta = _.map(_.filter(_.pluck(
-        iViz.getAttrData(this.opts.groupType), this.opts.attrId), function(d) {
+        iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
         return d !== 'NA';
       }), function(d) {
         return parseFloat(d);
@@ -133,7 +149,7 @@
         this.settings.showLogScale = true;
       }
       this.initChart(this.settings.showLogScale);
-      this.$dispatch('data-loaded', this.chartDivId);
+      this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(
