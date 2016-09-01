@@ -156,12 +156,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var groupNdxData_ = groupNdxMap_[groupId];
       var attrIds = groupNdxData_.attributes;
       if (attrIds.indexOf(attrId) > -1) {
-        def.resolve(groupNdxData_.data);
+        def.resolve(false);
       } else {
         attrIds.push(attrId);
         $.when(iViz.getDataWithAttrs(groupNdxData_.type, attrIds)).then(function(selectedData_) {
           groupNdxData_.data = selectedData_;
-          def.resolve(selectedData_);
+          def.resolve(true);
         });
       }
       return def.promise();
@@ -189,6 +189,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var hasAttrDataMap = isPatientAttributes ? hasPatientAttrDataMap_ : hasSampleAttrDataMap_;
       var attrDataToGet = [];
       var updatedAttrIds = [];
+      // TODO: Right now not all chart attribute id are mapped to clinical
+      // attribute id or there might be a case where chart attribute id is
+      // mapped to more than one clinical attribute id. Ex. for OS survial
+      // curve we need both OS_STATUS and OS_MONTHS data. In future if we
+      // need to update the logic over here if we are going to add any such
+      // special charts
       _.each(attrIds, function(_attrId) {
         if (_attrId === 'MUT_CNT_VS_CNA') {
           updatedAttrIds.push('cna_fraction');

@@ -36,7 +36,8 @@
             updateStats: false,
             highlightAllButtons: false,
             highlightCaseButtons: false,
-            clearAll: false
+            clearAll: false,
+            showScreenLoad: false
           }, watch: {
             updateSpecialCharts: function() {
               var self_ = this;
@@ -134,31 +135,38 @@
                 }
                 return true;
               });
-              if (_attrAdded) {
-                $.when(iViz.updateGroupNdx(attrData.group_id, attrData.attr_id)).then(function() {
-                  self_.groups[_groupIdToPush].attributes.push(attrData);
-                  self_.$broadcast('add-chart-to-group', attrData.group_id, attrData.attr_id);
-                  self_.$nextTick(function() {
-                    $('#iviz-add-chart').trigger('chosen:updated');
+              self_.showScreenLoad = true;
+              self_.$nextTick(function() {
+                if (_attrAdded) {
+                  $.when(iViz.updateGroupNdx(attrData.group_id, attrData.attr_id)).then(function(isGroupNdxDataUpdated) {
+                    self_.groups[_groupIdToPush].attributes.push(attrData);
+                    if (isGroupNdxDataUpdated) {
+                      self_.$broadcast('add-chart-to-group', attrData.group_id);
+                    }
+                    self_.$nextTick(function() {
+                      $('#iviz-add-chart').trigger('chosen:updated');
+                      self_.showScreenLoad = false;
+                    });
                   });
-                });
-              } else {
-                var newgroup_ = {};
-                var groupAttrs = [];
-                // newgroup_.data = _group.data;
-                newgroup_.type = _group.type;
-                newgroup_.id = self_.groupCount;
-                attrData.group_id = newgroup_.id;
-                self_.groupCount += 1;
-                groupAttrs.push(attrData);
-                newgroup_.attributes = groupAttrs;
-                $.when(iViz.createGroupNdx(newgroup_)).then(function() {
-                  self_.groups.push(newgroup_);
-                  self_.$nextTick(function() {
-                    $('#iviz-add-chart').trigger('chosen:updated');
+                } else {
+                  var newgroup_ = {};
+                  var groupAttrs = [];
+                  // newgroup_.data = _group.data;
+                  newgroup_.type = _group.type;
+                  newgroup_.id = self_.groupCount;
+                  attrData.group_id = newgroup_.id;
+                  self_.groupCount += 1;
+                  groupAttrs.push(attrData);
+                  newgroup_.attributes = groupAttrs;
+                  $.when(iViz.createGroupNdx(newgroup_)).then(function() {
+                    self_.groups.push(newgroup_);
+                    self_.$nextTick(function() {
+                      $('#iviz-add-chart').trigger('chosen:updated');
+                      self_.showScreenLoad = false;
+                    });
                   });
-                });
-              }
+                }
+              });
             },
             removeChart: function(attrId) {
               var self = this;
@@ -309,16 +317,13 @@
     bind: function() {
       var self = this;
       $(this.el).chosen({
-          width: '30%'
-        })
+        width: '30%'
+      })
         .change(
           function() {
             var value = self.el.value;
             self.params.charts[value].show = true;
             self.vm.addChart(this.el.value);
-            self.vm.$nextTick(function() {
-              $('#iviz-add-chart').trigger('chosen:updated');
-            });
           }.bind(this)
         );
     }
