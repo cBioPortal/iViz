@@ -70,10 +70,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.hasfilters = false;
       _.each(data_.groups.patient.attr_meta, function(attrData) {
         attrData.group_type = group.type;
-        if (attrData.view_type === 'table') {
-          tableData_[attrData.attr_id] = attrData.gene_list;
-          attrData.gene_list = undefined;
-        }
         if (chartsCount < 31) {
           if (attrData.show) {
             attrData.group_id = group.id;
@@ -99,10 +95,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.hasfilters = false;
       _.each(data_.groups.sample.attr_meta, function(attrData) {
         attrData.group_type = group.type;
-        if (attrData.view_type === 'table') {
-          tableData_[attrData.attr_id] = attrData.gene_list;
-          attrData.gene_list = undefined;
-        }
         if (chartsCount < 31) {
           if (attrData.show) {
             attrData.group_id = group.id;
@@ -261,8 +253,114 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       });
       return def.promise();
     },
+    extractMutationData: function(_mutationData) {
+      var _mutGeneMeta = {};
+      var _mutGeneMetaIndex = 0;
+      var _sampleDataIndicesObj = this.getCaseIndices('sample');
+      _.each(_mutationData, function(_mutGeneDataObj) {
+        var _geneSymbol = _mutGeneDataObj.gene_symbol;
+        _.each(_mutGeneDataObj.caseIds, function(_caseId) {
+          if (_sampleDataIndicesObj[_caseId] !== undefined) {
+            var _caseIdIndex = _sampleDataIndicesObj[_caseId];
+            if (_mutGeneMeta[_geneSymbol] === undefined) {
+              _mutGeneMeta[_geneSymbol] = {};
+              _mutGeneMeta[_geneSymbol].gene = _geneSymbol;
+              _mutGeneMeta[_geneSymbol].num_muts = 1;
+              _mutGeneMeta[_geneSymbol].caseIds = [_caseId];
+              _mutGeneMeta[_geneSymbol].qval = (window.iviz.datamanager.getCancerStudyIds().length === 1 && _mutGeneDataObj.hasOwnProperty('qval')) ? _mutGeneDataObj.qval : null;
+              _mutGeneMeta[_geneSymbol].index = _mutGeneMetaIndex;
+              if (sampleData_[_caseIdIndex].mutated_genes === undefined) {
+                sampleData_[_caseIdIndex].mutated_genes = [_mutGeneMetaIndex];
+              } else {
+                sampleData_[_caseIdIndex].mutated_genes.push(_mutGeneMetaIndex);
+              }
+              _mutGeneMetaIndex += 1;
+            } else {
+              _mutGeneMeta[_geneSymbol].num_muts += 1;
+              _mutGeneMeta[_geneSymbol].caseIds.push(_caseId);
+              if (sampleData_[_caseIdIndex].mutated_genes === undefined) {
+                sampleData_[_caseIdIndex].mutated_genes = [_mutGeneMeta[_geneSymbol].index];
+              } else {
+                sampleData_[_caseIdIndex].mutated_genes.push(_mutGeneMeta[_geneSymbol].index);
+              }
+            }
+          }
+        });
+      });
+      tableData_.mutated_genes = {};
+      tableData_.mutated_genes.geneMeta = _mutGeneMeta;
+      return tableData_.mutated_genes;
+    },
+    extractCnaData: function(_cnaData) {
+      var _cnaMeta = {};
+      var _cnaMetaIndex = 0;
+      var _sampleDataIndicesObj = this.getCaseIndices('sample');
+      $.each(_cnaData.caseIds, function(_index, _caseIdsPerGene) {
+        var _geneSymbol = _cnaData.gene[_index];
+        _.each(_caseIdsPerGene, function(_caseId) {
+          if (_sampleDataIndicesObj[_caseId] !== undefined) {
+            var _caseIdIndex = _sampleDataIndicesObj[_caseId];
+            if (_cnaMeta[_geneSymbol] === undefined) {
+              _cnaMeta[_geneSymbol] = {};
+              _cnaMeta[_geneSymbol].gene = _geneSymbol;
+              var _altType = '';
+              switch (_cnaData.alter[_index]) {
+                case -2:
+                  _altType = 'DEL';
+                  break;
+                case 2:
+                  _altType = 'AMP';
+                  break;
+                default:
+                  break;
+              }
+              _cnaMeta[_geneSymbol].cna = _altType;
+              _cnaMeta[_geneSymbol].cytoband = _cnaData.cytoband[_index];
+              _cnaMeta[_geneSymbol].caseIds = [_caseId];
+              if ((window.iviz.datamanager.getCancerStudyIds().length !== 1) || _cnaData.gistic[_index] === null) {
+                _cnaMeta[_geneSymbol].qval = null;
+              } else {
+                _cnaMeta[_geneSymbol].qval = _cnaData.gistic[_index][0];
+              }
+              _cnaMeta[_geneSymbol].index = _cnaMetaIndex;
+              if (sampleData_[_caseIdIndex].cna_details === undefined) {
+                sampleData_[_caseIdIndex].cna_details = [_cnaMetaIndex];
+              } else {
+                sampleData_[_caseIdIndex].cna_details.push(_cnaMetaIndex);
+              }
+              _cnaMetaIndex += 1;
+            } else {
+              _cnaMeta[_geneSymbol].caseIds.push(_caseId);
+              if (sampleData_[_caseIdIndex].cna_details === undefined) {
+                sampleData_[_caseIdIndex].cna_details = [_cnaMeta[_geneSymbol].index];
+              } else {
+                sampleData_[_caseIdIndex].cna_details.push(_cnaMeta[_geneSymbol].index);
+              }
+            }
+          }
+        });
+      });
+      tableData_.cna_details = {};
+      tableData_.cna_details.geneMeta = _cnaMeta;
+      return tableData_.cna_details;
+    },
     getTableData: function(attrId) {
-      return tableData_[attrId];
+      var def = new $.Deferred();
+      var self = this;
+      if (tableData_[attrId] === undefined) {
+        if (attrId === 'mutated_genes') {
+          $.when(window.iviz.datamanager.getMutData()).then(function(_data) {
+            def.resolve(self.extractMutationData(_data));
+          });
+        } else if (attrId === 'cna_details') {
+          $.when(window.iviz.datamanager.getCnaData()).then(function(_data) {
+            def.resolve(self.extractCnaData(_data));
+          });
+        }
+      } else {
+        def.resolve(tableData_[attrId]);
+      }
+      return def.promise();
     },
     getCasesMap: function(type) {
       if (type === 'sample') {
