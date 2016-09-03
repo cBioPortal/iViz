@@ -4,6 +4,9 @@ window.DataManagerForIviz = (function($, _) {
   // DESC, all lowercase
   var clinicalAttrsPriority = ['cancer_type', 'cancer_type_detailed',
     'gender', 'age', 'sequenced', 'has_cna_data', 'sample_count_patient'];
+
+  // Clinical attributes will be transfered into table.
+  var tableAttrs_ = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'GENDER'];
   content.util = {};
 
   /**
@@ -281,6 +284,17 @@ window.DataManagerForIviz = (function($, _) {
                 } else if (_metaObj.datatype === 'STRING') {
                   _metaObj.view_type = 'pie_chart';
                 }
+                if (tableAttrs_.indexOf(_metaObj.attr_id) !== -1) {
+                  _metaObj.view_type = 'table';
+                  _metaObj.type = 'pieLabel';
+                  _metaObj.options = {
+                    allCases: _caseLists.allSampleIds,
+                    sequencedCases: _caseLists.allSampleIds
+                  };
+                }
+                if (['CANCER_TYPE', 'CANCER_TYPE_DETAILED'].indexOf(_metaObj.attr_id) !== -1) {
+                  _metaObj.priority = 0.9;
+                }
               });
               _.each(_patientAttributes, function(_metaObj) {
                 switch (_metaObj.attr_id) {
@@ -309,6 +323,14 @@ window.DataManagerForIviz = (function($, _) {
                   _metaObj.view_type = 'bar_chart';
                 } else if (_metaObj.datatype === 'STRING') {
                   _metaObj.view_type = 'pie_chart';
+                }
+                if (tableAttrs_.indexOf(_metaObj.attr_id) !== -1) {
+                  _metaObj.view_type = 'table';
+                  _metaObj.type = 'pieLabel';
+                  _metaObj.options = {
+                    allCases: _caseLists.allSampleIds,
+                    sequencedCases: _caseLists.allSampleIds
+                  };
                 }
               });
 
@@ -418,6 +440,8 @@ window.DataManagerForIviz = (function($, _) {
                 _MutationCountMeta.attr_id = 'mutation_count';
                 _MutationCountMeta.view_type = 'bar_chart';
                 _MutationCountMeta.filter = [];
+                _mutationCountData.keys = {};
+                _mutationCountData.numOfDatum = 0;
                 _MutationCountMeta.priority = 4;
                 _MutationCountMeta.show = true;
                 _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
@@ -435,6 +459,8 @@ window.DataManagerForIviz = (function($, _) {
                 _cnaAttrMeta.attr_id = 'cna_details';
                 _cnaAttrMeta.filter = [];
                 _cnaAttrMeta.show = true;
+                _cnaAttrMeta.keys = {};
+                _cnaAttrMeta.numOfDatum = 0;
                 _cnaAttrMeta.priority = 3;
                 _cnaAttrMeta.attrList = [_cnaAttrMeta.attr_id];
                 _cnaAttrMeta.options = {
@@ -455,6 +481,8 @@ window.DataManagerForIviz = (function($, _) {
                 _mutDataAttrMeta.attr_id = 'mutated_genes';
                 _mutDataAttrMeta.filter = [];
                 _mutDataAttrMeta.show = true;
+                _mutDataAttrMeta.keys = {};
+                _mutDataAttrMeta.numOfDatum = 0;
                 _mutDataAttrMeta.priority = 3;
                 _mutDataAttrMeta.attrList = [_mutDataAttrMeta.attr_id];
                 _mutDataAttrMeta.options = {
@@ -474,6 +502,8 @@ window.DataManagerForIviz = (function($, _) {
                 _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
                 _mutCntAttrMeta.filter = [];
                 _mutCntAttrMeta.show = true;
+                _mutCntAttrMeta.keys = {};
+                _mutCntAttrMeta.numOfDatum = 0;
                 _mutCntAttrMeta.priority = 2;
                 _mutCntAttrMeta.attrList = ['cna_fraction'];
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
@@ -488,6 +518,8 @@ window.DataManagerForIviz = (function($, _) {
                 _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
                 _dfsSurvivalAttrMeta.filter = [];
                 _dfsSurvivalAttrMeta.show = true;
+                _dfsSurvivalAttrMeta.keys = {};
+                _dfsSurvivalAttrMeta.numOfDatum = 0;
                 _dfsSurvivalAttrMeta.priority = 1;
                 _dfsSurvivalAttrMeta.attrList = ['DFS_STATUS', 'DFS_MONTHS'];
                 _patientAttributes[_dfsSurvivalAttrMeta.attr_id] = _dfsSurvivalAttrMeta;
@@ -502,6 +534,8 @@ window.DataManagerForIviz = (function($, _) {
                 _osSurvivalAttrMeta.display_name = 'Overall Survival';
                 _osSurvivalAttrMeta.filter = [];
                 _osSurvivalAttrMeta.show = true;
+                _osSurvivalAttrMeta.keys = {};
+                _osSurvivalAttrMeta.numOfDatum = 0;
                 _osSurvivalAttrMeta.priority = 1;
                 _osSurvivalAttrMeta.attrList = ['OS_STATUS', 'OS_MONTHS'];
                 _patientAttributes[_osSurvivalAttrMeta.attr_id] = _osSurvivalAttrMeta;
@@ -516,6 +550,8 @@ window.DataManagerForIviz = (function($, _) {
                   attr_id: 'study_id',
                   view_type: 'pie_chart',
                   filter: [],
+                  keys: [],
+                  numOfDatum: 0,
                   priority: 1,
                   show: true,
                   attrList: ['study_id']
@@ -532,8 +568,10 @@ window.DataManagerForIviz = (function($, _) {
                   view_type: 'bar_chart',
                   priority: 4,
                   filter: [],
-                  show: true,
-                  attrList: ['copy_number_alterations']
+                  attrList: ['copy_number_alterations'],
+                  keys: [],
+                  numOfDatum: 0,
+                  show: true
                 };
               }
               _.each(content.util.sortClinicalAttrs(_.values(_.extend({}, _patientAttributes, _sampleAttributes))), function(attr, index) {

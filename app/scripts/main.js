@@ -236,28 +236,69 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var self_ = this;
       var isPatientAttributes = (type === 'patient');
       var _data = isPatientAttributes ? patientData_ : sampleData_;
-      var hasAttrDataMap = isPatientAttributes ? hasPatientAttrDataMap_ : hasSampleAttrDataMap_;
+      var hasAttrDataMap = isPatientAttributes ?
+        hasPatientAttrDataMap_ : hasSampleAttrDataMap_;
 
-      $.when(window.iviz.datamanager.getClinicalData(attrIds, isPatientAttributes)).then(function(clinicalData) {
-        var _caseIdToClinDataMap = {};
-        var idType = isPatientAttributes ? 'patient_id' : 'sample_id';
-        _.each(clinicalData, function(_clinicalAttributeData, _attrId) {
-          hasAttrDataMap[_attrId] = '';
-          _.each(_clinicalAttributeData, function(_dataObj) {
-            if (_caseIdToClinDataMap[_dataObj[idType]] === undefined) {
-              _caseIdToClinDataMap[_dataObj[idType]] = {};
+      $.when(
+        window.iviz.datamanager.getClinicalData(attrIds, isPatientAttributes))
+        .then(function(clinicalData) {
+          var _caseIdToClinDataMap = {};
+          var idType = isPatientAttributes ? 'patient_id' : 'sample_id';
+          _.each(clinicalData, function(_clinicalAttributeData, _attrId) {
+            var attrs = isPatientAttributes ? data_.groups.patient.attr_meta :
+              data_.groups.sample.attr_meta;
+            var selectedAttrMetaIndex = -1;
+
+            _.every(attrs, function(attr, index) {
+              if (attr.attr_id === _attrId) {
+                selectedAttrMetaIndex = index;
+                return false;
+              }
+              return true;
+            });
+
+            hasAttrDataMap[_attrId] = '';
+            attrs[selectedAttrMetaIndex].keys = {};
+            attrs[selectedAttrMetaIndex].numOfDatum = 0;
+
+            _.each(_clinicalAttributeData, function(_dataObj) {
+              if (_caseIdToClinDataMap[_dataObj[idType]] === undefined) {
+                _caseIdToClinDataMap[_dataObj[idType]] = {};
+              }
+              _caseIdToClinDataMap[_dataObj[idType]][_dataObj.attr_id] =
+                _dataObj.attr_val;
+
+              if (!attrs[selectedAttrMetaIndex].keys
+                  .hasOwnProperty(_dataObj.attr_val)) {
+                attrs[selectedAttrMetaIndex].keys[_dataObj.attr_val] = 0;
+              }
+              ++attrs[selectedAttrMetaIndex].keys[_dataObj.attr_val];
+              ++attrs[selectedAttrMetaIndex].numOfDatum;
+            });
+
+            if (Object.keys(attrs[selectedAttrMetaIndex].keys).length >
+              (attrs[selectedAttrMetaIndex].numOfDatum / 2)) {
+              var caseIds = isPatientAttributes ?
+                Object.keys(data_.groups.group_mapping.patient.sample) :
+                Object.keys(data_.groups.group_mapping.sample.patient);
+
+              attrs[selectedAttrMetaIndex].view_type = 'table';
+              attrs[selectedAttrMetaIndex].type = 'pieLabel';
+              attrs[selectedAttrMetaIndex].options = {
+                allCases: caseIds,
+                sequencedCases: caseIds
+              };
             }
-            _caseIdToClinDataMap[_dataObj[idType]][_dataObj.attr_id] = _dataObj.attr_val;
           });
+          var type = isPatientAttributes ? 'patient' : 'sample';
+          var caseIndices = self_.getCaseIndices(type);
+          _.each(_caseIdToClinDataMap, function(_clinicalData, _caseId) {
+            var _caseIndex = caseIndices[_caseId];
+            _.extend(_data[_caseIndex], _clinicalData);
+          });
+
+          def.resolve();
         });
-        var type = isPatientAttributes ? 'patient' : 'sample';
-        var caseIndices = self_.getCaseIndices(type);
-        _.each(_caseIdToClinDataMap, function(_clinicalData, _caseId) {
-          var _caseIndex = caseIndices[_caseId];
-          _.extend(_data[_caseIndex], _clinicalData);
-        });
-        def.resolve();
-      });
       return def.promise();
     },
     extractMutationData: function(_mutationData) {

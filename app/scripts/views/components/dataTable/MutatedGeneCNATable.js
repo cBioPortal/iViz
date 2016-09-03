@@ -388,7 +388,7 @@ var EnhancedFixedDataTableSpecial = (function() {
             this.props.resultInfo ?
               React.createElement("div", {className: "EFDT-result-info"},
                 React.createElement("span", {className: "EFDT-result-info-content"},
-                  "Showing ", this.props.filteredRowsSize, " samples",
+                  "Showing ", this.props.filteredRowsSize, " cases",
 
                   this.props.filteredRowsSize !== this.props.rowsSize ?
                     React.createElement("span", null, ' (filtered from ' + this.props.rowsSize + ') ',
@@ -478,7 +478,7 @@ var EnhancedFixedDataTableSpecial = (function() {
                 "data-qtip": '<b>Gistic</b><br/><i>Q-value</i>: ' + data[rowIndex].row.qval})) : '',
 
 
-          field === 'samples' ?
+          field === 'cases' ?
             React.createElement("input", {type: "checkbox", style: {float: 'right'},
               title: 'Select ' + data[rowIndex].row[field]
               + ' sample' + (Number(data[rowIndex].row[field]) > 1 ? 's':'')
@@ -1131,7 +1131,7 @@ var EnhancedFixedDataTableSpecial = (function() {
       state.confirmedRows = ['mutatedGene', 'cna'].indexOf(this.props.tableType) !== -1 ? state.selectedRows : [];
       state.filteredRows = null;
       state.filterAll = "";
-      state.sortBy = this.props.sortBy || 'samples';
+      state.sortBy = this.props.sortBy || 'cases';
       state.goToColumn = null;
       state.filterTimer = 0;
       state.sortDir = this.props.sortDir || this.SortTypes.DESC;
@@ -1314,7 +1314,7 @@ var EnhancedFixedDataTableSpecial = (function() {
       state.confirmedRows = ['mutatedGene', 'cna'].indexOf(newProps.tableType) !== -1 ? state.selectedRows : [];
       state.filteredRows = null;
       state.filterAll = this.state.filterAll || '';
-      state.sortBy = this.props.sortBy || 'samples';
+      state.sortBy = this.props.sortBy || 'cases';
       state.sortDir = this.props.sortDir || this.SortTypes.DESC;
       state.goToColumn = null;
       state.filterTimer = 0;
@@ -1373,7 +1373,7 @@ var EnhancedFixedDataTableSpecial = (function() {
         tableType: 'mutatedGene',
         selectedRows: [],
         selectedGene: [],
-        sortBy: 'samples',
+        sortBy: 'cases',
         sortDir: 'DESC',
         isResizable: false
       };

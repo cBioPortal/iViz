@@ -10,6 +10,7 @@
     var data_;
     var type_ = '';
     var attr_ = [];
+    var attributes_ = [];
     var geneData_ = [];
     var selectedRows = [];
     var selectedGenes = [];
@@ -23,6 +24,8 @@
     var selectedRowData = [];
     var selectedGeneData = [];
     var displayName = '';
+    var categories_ = {};
+    var reactData_;
 
     content.getCases = function() {
       return iViz.util.intersection(selectedSamples, sequencedSampleIds);
@@ -52,6 +55,7 @@
         geneData_ = _geneData;
         type_ = _attributes.type;
         displayName = _attributes.attr_id || 'Table';
+        attributes_ = _attributes;
         callbacks_ = _callbacks;
         initReactTable(true);
       };
@@ -143,6 +147,7 @@
         autoColumnWidth: false,
         columnMaxWidth: 300,
         columnSorting: false,
+        sortBy: 'cases',
         selectedRows: selectedRows,
         selectedGene: selectedGenes,
         rowClickFunc: reactRowClickCallback,
@@ -158,6 +163,51 @@
       ReactDOM.render(testElement, document.getElementById(chartId_));
     }
 
+    function initRegularTableData() {
+      var data = [];
+      _.each(categories_, function(category, name) {
+        for (var key in category) {
+          if (category.hasOwnProperty(key)) {
+            var datum = {
+              attr_id: key,
+              uniqueId: name,
+              attr_val: category[key]
+            };
+            data.push(datum);
+          }
+        }
+      });
+      reactData_ = data;
+    }
+
+    function initCategories() {
+      var colors = $.extend(true, [], iViz.util.getColors());
+      _.each(data_, function(item) {
+        var _datum = item[attributes_.attr_id];
+
+        if (!_datum) {
+          _datum = 'NA';
+        }
+
+        if (!categories_.hasOwnProperty(_datum)) {
+          categories_[_datum] = {
+            name: _datum,
+            cases: 0,
+            color: colors[0],
+            caseIds: []
+          };
+          colors.shift();
+        }
+        ++categories_[_datum].cases;
+        categories_[_datum].caseIds.push(item.patient_id ? item.patient_id : item.sample_id);
+      });
+      _.each(categories_, function(category) {
+        category.caseRate =
+          (((category.cases / data_.length).toPrecision(2) * 100)).toString() +
+          '%';
+      });
+    }
+
     function mutatedGenesData(_selectedGenesMap) {
       var numOfCases_ = content.getCases().length;
 
@@ -169,20 +219,20 @@
           datum.gene = item.gene;
           if (_selectedGenesMap === undefined) {
             datum.caseIds = iViz.util.unique(item.caseIds);
-            datum.samples = datum.caseIds.length;
+            datum.cases = datum.caseIds.length;
             datum.uniqueId = index;
             switch (type_) {
               case 'mutatedGene':
                 datum.numOfMutations = item.num_muts;
                 datum.sampleRate = (numOfCases_ <= 0 ? 0 :
-                    ((datum.samples / Number(numOfCases_) * 100).toFixed(1))) +
+                    ((datum.cases / Number(numOfCases_) * 100).toFixed(1))) +
                   '%';
                 break;
               case 'cna':
                 datum.cytoband = item.cytoband;
                 datum.altType = item.cna;
                 datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
-                    (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
+                    (datum.cases / numOfCases_ * 100).toFixed(1))) + '%';
                 break;
               default:
                 break;
@@ -193,12 +243,12 @@
             }
             datum.caseIds =
               iViz.util.unique(_selectedGenesMap[item.index].caseIds);
-            datum.samples = datum.caseIds.length;
+            datum.cases = datum.caseIds.length;
             switch (type_) {
               case 'mutatedGene':
                 datum.numOfMutations = _selectedGenesMap[item.index].num_muts;
                 datum.sampleRate = (numOfCases_ <= 0 ? 0 :
-                    ((datum.samples / Number(numOfCases_) * 100).toFixed(
+                    ((datum.cases / Number(numOfCases_) * 100).toFixed(
                       1))) + '%';
                 datum.uniqueId = datum.gene;
                 break;
@@ -206,7 +256,7 @@
                 datum.cytoband = item.cytoband;
                 datum.altType = item.cna;
                 datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
-                    (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
+                    (datum.cases / numOfCases_ * 100).toFixed(1))) + '%';
                 datum.uniqueId = datum.gene + '-' + datum.altType;
                 break;
               default:
@@ -236,19 +286,28 @@
         data: [],
         attributes: attr_
       };
-      var _mutationData = mutatedGenesData(_selectedGenesMap);
-      _.each(_mutationData, function(item) {
-        for (var key in item) {
-          if (item.hasOwnProperty(key)) {
-            var datum = {
-              attr_id: key,
-              uniqueId: item.uniqueId,
-              attr_val: key === 'caseIds' ? item.caseIds.join(',') : item[key]
-            };
-            result.data.push(datum);
+
+      if (type_ === 'mutatedGene' || type_ === 'cna') {
+        var _mutationData = mutatedGenesData(_selectedGenesMap);
+        _.each(_mutationData, function(item) {
+          for (var key in item) {
+            if (item.hasOwnProperty(key)) {
+              var datum = {
+                attr_id: key,
+                uniqueId: item.uniqueId,
+                attr_val: key === 'caseIds' ? item.caseIds.join(',') : item[key]
+              };
+              result.data.push(datum);
+            }
           }
-        }
-      });
+        });
+      } else {
+        categories_ = {};
+        result.attributes[0].display_name = displayName;
+        initCategories();
+        initRegularTableData();
+        result.data = reactData_;
+      }
       return result;
     }
 
@@ -334,7 +393,7 @@
               column_width: 90
             },
             {
-              attr_id: 'samples',
+              attr_id: 'cases',
               display_name: '#',
               datatype: 'NUMBER',
               column_width: 90
@@ -386,7 +445,7 @@
               column_width: 55
             },
             {
-              attr_id: 'samples',
+              attr_id: 'cases',
               display_name: '#',
               datatype: 'NUMBER',
               column_width: 70
@@ -418,13 +477,46 @@
           ];
           break;
         default:
+          _attr = [
+            {
+              attr_id: 'name',
+              display_name: 'Unknown',
+              datatype: 'STRING',
+              column_width: 213
+            }, {
+              attr_id: 'color',
+              display_name: 'Color',
+              datatype: 'STRING',
+              show: false
+            }, {
+              attr_id: 'cases',
+              display_name: '#',
+              datatype: 'NUMBER',
+              column_width: 70
+            }, {
+              attr_id: 'caseRate',
+              display_name: 'Freq',
+              datatype: 'PERCENTAGE',
+              column_width: 90
+            }, {
+              attr_id: 'caseIds',
+              display_name: 'Cases',
+              datatype: 'STRING',
+              show: false
+            }, {
+              attr_id: 'uniqueId',
+              display_name: 'uniqueId',
+              datatype: 'STRING',
+              show: false
+            }];
           break;
       }
       return _attr;
     };
     return content;
   })();
-})(window.iViz,
+})(
+  window.iViz,
   window.dc,
   window._,
   window.React,

@@ -68,7 +68,7 @@
       datatype: 'STRING',
       show: false
     }, {
-      attr_id: 'samples',
+      attr_id: 'cases',
       display_name: '#',
       datatype: 'NUMBER',
       column_width: 70
@@ -263,7 +263,7 @@
       for (var i = 0; i < meta.length; i++) {
         data += '\r\n';
         data += meta[i].name + '\t';
-        data += meta[i].samples;
+        data += meta[i].cases;
       }
       content.setDownloadData('tsv', {
         fileName: v.data.display_name || 'Pie Chart',
@@ -350,14 +350,14 @@
           _labelDatum.index = labelInitData[label.key].index;
           _labelDatum.name = label.key;
           _labelDatum.color = labelInitData[label.key].color;
-          _labelDatum.samples = _labelValue;
+          _labelDatum.cases = _labelValue;
           _currentSampleSize += _labelValue;
           _labels[_labelDatum.id] = _labelDatum;
         }
       });
 
       _.each(_labels, function(label) {
-        label.sampleRate = (_currentSampleSize <= 0 ? 0 : (Number(label.samples) * 100 / _currentSampleSize).toFixed(1).toString()) + '%';
+        label.sampleRate = (_currentSampleSize <= 0 ? 0 : (Number(label.cases) * 100 / _currentSampleSize).toFixed(1).toString()) + '%';
       });
       labels = _labels;
     }
