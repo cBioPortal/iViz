@@ -703,9 +703,9 @@ window.DataManagerForIviz = (function($, _) {
             });
           $.when.apply($, requests).then(function() {
             _.each(_profiles, function(_profile) {
-              if (_profile.study_id + '_gistic' === _profile.id) {
+              if (_profile.genetic_alteration_type === 'COPY_NUMBER_ALTERATION') {
                 self.gisticProfileIdsMap[_profile.study_id] = _profile.id;
-              } else if (_profile.study_id + '_mutations' === _profile.id) {
+              } else if (_profile.genetic_alteration_type === 'MUTATION_EXTENDED') {
                 self.mutationProfileIdsMap[_profile.study_id] = _profile.id;
               }
             });
