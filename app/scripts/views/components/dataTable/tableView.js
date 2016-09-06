@@ -38,7 +38,7 @@
 
     content.init =
       function(_attributes, _selectedSamples, _selectedGenes,
-               _data, _chartId, _callbacks) {
+               _data, _chartId, _callbacks, _geneData) {
         initialized = false;
         allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
@@ -49,7 +49,7 @@
         chartId_ = _chartId;
         caseIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
-        geneData_ = iViz.getTableData(_attributes.attr_id);
+        geneData_ = _geneData;
         type_ = _attributes.type;
         displayName = _attributes.attr_id || 'Table';
         callbacks_ = _callbacks;
