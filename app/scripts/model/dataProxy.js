@@ -361,7 +361,7 @@ window.DataManagerForIviz = (function($, _) {
                     _hasSampleAttrData.cna_fraction = '';
                     if (_cnaFractionData[_sampleId] === undefined ||
                       _cnaFractionData[_sampleId] === null) {
-                      _sampleDatum.cna_fraction = 0;
+                      _sampleDatum.cna_fraction = 'NA';
                       _sampleDatum.has_cna_data = 'NO';
                       _sampleDatum.copy_number_alterations = 'NA';
                     } else {

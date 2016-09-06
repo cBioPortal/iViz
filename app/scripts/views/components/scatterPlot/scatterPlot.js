@@ -9,6 +9,17 @@
     var chartId_;
     var data_;
     var opts_;
+    var getQtipString = function(_data) {
+      var toReturn = 'Cancer Study:' + _data.study_id + '<br>Sample Id: ' +
+        _data.sample_id + '<br>CNA fraction: ';
+      if (isNaN(_data.cna_fraction)) {
+        toReturn += _data.cna_fraction;
+      } else {
+        toReturn += cbio.util.toPrecision(_data.cna_fraction, 2, 0.001);
+      }
+      toReturn += '<br>Mutation count: ' + _data.mutation_count;
+      return toReturn;
+    };
 
     content.init = function(_data, opts) {
       opts_ = $.extend(true, {}, opts);
@@ -18,10 +29,7 @@
       var _yArr = _.pluck(data_, 'mutation_count');
       var _qtips = [];
       _.each(data_, function(_dataObj) {
-        _qtips.push('Cancer Study:' + _dataObj.study_id + '<br>Sample Id: ' +
-          _dataObj.sample_id + '<br>CNA fraction: ' +
-          cbio.util.toPrecision(_dataObj.cna_fraction, 2, 0.001) +
-          '<br>Mutation count: ' + _dataObj.mutation_count);
+        _qtips.push(getQtipString(_dataObj));
       });
       var trace = {
         x: _xArr,
@@ -110,16 +118,10 @@
       var _selectedDataQtips = [];
 
       _.each(_unselectedData, function(_dataObj) {
-        _unselectedDataQtips.push('Cancer Study:' + _dataObj.study_id +
-          '<br>Sample Id: ' + _dataObj.sample_id + '<br>CNA fraction: ' +
-          cbio.util.toPrecision(_dataObj.cna_fraction, 2, 0.001) +
-          '<br>Mutation count: ' + _dataObj.mutation_count);
+        _unselectedDataQtips.push(getQtipString(_dataObj));
       });
       _.each(_selectedData, function(_dataObj) {
-        _selectedDataQtips.push('Cancer Study:' + _dataObj.study_id +
-          '<br>Sample Id: ' + _dataObj.sample_id + '<br>CNA fraction: ' +
-          cbio.util.toPrecision(_dataObj.cna_fraction, 2, 0.001) +
-          '<br>Mutation count: ' + _dataObj.mutation_count);
+        _selectedDataQtips.push(getQtipString(_dataObj));
       });
       document.getElementById(chartId_).data[0] = {
         x: _.pluck(_unselectedData, 'cna_fraction'),
