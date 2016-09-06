@@ -37,8 +37,12 @@
             highlightAllButtons: false,
             highlightCaseButtons: false,
             clearAll: false,
-            showScreenLoad: false
+            showScreenLoad: false,
+            showDropDown: false
           }, watch: {
+            charts: function() {
+              this.checkForDropDownCharts();
+            },
             updateSpecialCharts: function() {
               var self_ = this;
               // TODO: need to update setting timeout
@@ -84,6 +88,16 @@
               this.removeChart(attrId, groupId);
             }
           }, methods: {
+            checkForDropDownCharts: function() {
+              var showDropDown = false;
+              _.each(this.charts, function(_chart) {
+                if (!_chart.show) {
+                  showDropDown = true;
+                  return false;
+                }
+              });
+              this.showDropDown = showDropDown;
+            },
             openCases: function() {
               iViz.openCases();
             },
@@ -122,6 +136,7 @@
               var _attrAdded = false;
               var _group = {};
               var _groupIdToPush = 0;
+              self_.checkForDropDownCharts();
               _.every(self_.groups, function(group) {
                 if (group.type === attrData.group_type) {
                   if (group.attributes.length < 31) {
@@ -172,6 +187,7 @@
               var self = this;
               var attrData = self.charts[attrId];
               var attributes = self.groups[attrData.group_id].attributes;
+              self.checkForDropDownCharts();
               attributes.$remove(attrData);
 
               self.$broadcast('remove-grid-item',

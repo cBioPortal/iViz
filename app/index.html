@@ -156,7 +156,7 @@
         <custom-case-input></custom-case-input>
         
         <select id="iviz-add-chart" class="chosen-select"
-                v-select :charts="charts">
+                v-select :charts="charts" v-if="showDropDown">
           <option id='' value="">Add Chart</option>
           <option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}" v-for="(index,data) in charts">{{data.display_name}}</option>
         </select>
