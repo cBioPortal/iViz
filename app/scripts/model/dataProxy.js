@@ -342,6 +342,7 @@ window.DataManagerForIviz = (function($, _) {
                   _hasSampleAttrData.sequenced = '';
                   _hasSampleAttrData.has_cna_data = '';
                   // mutation count
+                  _hasSampleAttrData.SEQUENCED = '';
                   if (_hasMutationCountData) {
                     _hasSampleAttrData.mutation_count = '';
                     if (_mutationCountData[_sampleId] === undefined ||
@@ -356,12 +357,13 @@ window.DataManagerForIviz = (function($, _) {
                     _sampleDatum.sequenced = 'NO';
                   }
                   // cna fraction
+                  _hasSampleAttrData.has_cna_data = '';
                   if (_hasCNAFractionData) {
                     _hasSampleAttrData.copy_number_alterations = '';
                     _hasSampleAttrData.cna_fraction = '';
                     if (_cnaFractionData[_sampleId] === undefined ||
                       _cnaFractionData[_sampleId] === null) {
-                      _sampleDatum.cna_fraction = 0;
+                      _sampleDatum.cna_fraction = 'NA';
                       _sampleDatum.has_cna_data = 'NO';
                       _sampleDatum.copy_number_alterations = 'NA';
                     } else {
