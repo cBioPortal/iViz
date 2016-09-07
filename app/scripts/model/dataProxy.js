@@ -216,8 +216,14 @@ window.DataManagerForIviz = (function($, _) {
               var _hasDfsMonths = false;
               var _hasOsStatus = false;
               var _hasOsMonths = false;
+              var _cnaCasesMap = {};
               var _sequencedCasesMap = {};
-              _.each(_caseLists.cnaSampleIds, function(_sampleId){
+              var _cnaCases = _caseLists.cnaSampleIds.length > 0 ? _caseLists.cnaSampleIds : _caseLists.allSampleIds;
+              var _sequencedCases = _caseLists.sequencedSampleIds.length > 0 ? _caseLists.sequencedSampleIds : _caseLists.allSampleIds;
+              _.each(_cnaCases, function(_sampleId) {
+                _cnaCasesMap[_sampleId] = _sampleId;
+              });
+              _.each(_sequencedCases, function(_sampleId) {
                 _sequencedCasesMap[_sampleId] = _sampleId;
               });
 
@@ -314,6 +320,10 @@ window.DataManagerForIviz = (function($, _) {
               var _samplesToPatientMap = {};
               var _patientToSampleMap = {};
 
+              _hasSampleAttrData.sample_id = '';
+              _hasSampleAttrData.study_id = '';
+              _hasSampleAttrData.sequenced = '';
+              _hasSampleAttrData.has_cna_data = '';
               _.each(_studyToSampleToPatientMap, function(_sampleToPatientMap, _studyId) {
                 _.each(_sampleToPatientMap, function(_patientId, _sampleId) {
                   if (_samplesToPatientMap[_sampleId] === undefined) {
@@ -342,24 +352,16 @@ window.DataManagerForIviz = (function($, _) {
                   _sampleDatum.sample_id = _sampleId;
                   _sampleDatum.study_id = _studyId;
                   _sampleDatum.has_cna_data = 'NO';
-                  _hasSampleAttrData.sample_id = '';
-                  _hasSampleAttrData.study_id = '';
-                  _hasSampleAttrData.sequenced = '';
-                  _hasSampleAttrData.has_cna_data = '';
+                  _sampleDatum.sequenced = 'NO';
                   // mutation count
-                  _hasSampleAttrData.SEQUENCED = '';
                   if (_hasMutationCountData) {
                     _hasSampleAttrData.mutation_count = '';
                     if (_mutationCountData[_sampleId] === undefined ||
                       _mutationCountData[_sampleId] === null) {
                       _sampleDatum.mutation_count = 'NA';
-                      _sampleDatum.sequenced = 'NO';
                     } else {
                       _sampleDatum.mutation_count = _mutationCountData[_sampleId];
-                      _sampleDatum.sequenced = 'YES';
                     }
-                  } else {
-                    _sampleDatum.sequenced = 'NO';
                   }
                   // cna fraction
                   if (_hasCNAFractionData) {
@@ -375,10 +377,13 @@ window.DataManagerForIviz = (function($, _) {
                     }
                   }
                   if (self.hasMutationData()) {
+                    if (_sequencedCasesMap[_sampleDatum.sample_id] !== undefined) {
+                      _sampleDatum.sequenced = 'YES';
+                    }
                     _sampleDatum.mutated_genes = [];
                   }
                   if (self.hasCnaSegmentData()) {
-                    if (_sequencedCasesMap[_sampleDatum.sample_id] !== undefined) {
+                    if (_cnaCasesMap[_sampleDatum.sample_id] !== undefined) {
                       _sampleDatum.has_cna_data = 'YES';
                     }
                     _sampleDatum.cna_details = [];
@@ -426,7 +431,7 @@ window.DataManagerForIviz = (function($, _) {
                 _cnaAttrMeta.priority = 3;
                 _cnaAttrMeta.options = {
                   allCases: _caseLists.allSampleIds,
-                  sequencedCases: _caseLists.cnaSampleIds.length > 0 ? _caseLists.cnaSampleIds : _caseLists.allSampleIds
+                  sequencedCases: _cnaCases
                 };
                 _sampleAttributes[_cnaAttrMeta.attr_id] = _cnaAttrMeta;
               }
@@ -445,7 +450,7 @@ window.DataManagerForIviz = (function($, _) {
                 _mutDataAttrMeta.priority = 3;
                 _mutDataAttrMeta.options = {
                   allCases: _caseLists.allSampleIds,
-                  sequencedCases: _caseLists.sequencedSampleIds.length > 0 ? _caseLists.sequencedSampleIds : _caseLists.allSampleIds
+                  sequencedCases: _sequencedCases
                 };
                 _sampleAttributes[_mutDataAttrMeta.attr_id] = _mutDataAttrMeta;
               }
