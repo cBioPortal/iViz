@@ -711,7 +711,7 @@ window.DataManagerForIviz = (function($, _) {
             });
           $.when.apply($, requests).then(function() {
             _.each(_profiles, function(_profile) {
-              if (_profile.genetic_alteration_type === 'COPY_NUMBER_ALTERATION') {
+              if (_profile.genetic_alteration_type === 'COPY_NUMBER_ALTERATION' && _profile.datatype === 'DISCRETE') {
                 self.cnaProfileIdsMap[_profile.study_id] = _profile.id;
               } else if (_profile.genetic_alteration_type === 'MUTATION_EXTENDED') {
                 self.mutationProfileIdsMap[_profile.study_id] = _profile.id;
