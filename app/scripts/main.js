@@ -259,16 +259,17 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var _sampleDataIndicesObj = this.getCaseIndices('sample');
       _.each(_mutationData, function(_mutGeneDataObj) {
         var _geneSymbol = _mutGeneDataObj.gene_symbol;
+        var _uniqueId = _geneSymbol;
         _.each(_mutGeneDataObj.caseIds, function(_caseId) {
           if (_sampleDataIndicesObj[_caseId] !== undefined) {
             var _caseIdIndex = _sampleDataIndicesObj[_caseId];
-            if (_mutGeneMeta[_geneSymbol] === undefined) {
-              _mutGeneMeta[_geneSymbol] = {};
-              _mutGeneMeta[_geneSymbol].gene = _geneSymbol;
-              _mutGeneMeta[_geneSymbol].num_muts = 1;
-              _mutGeneMeta[_geneSymbol].caseIds = [_caseId];
-              _mutGeneMeta[_geneSymbol].qval = (window.iviz.datamanager.getCancerStudyIds().length === 1 && _mutGeneDataObj.hasOwnProperty('qval')) ? _mutGeneDataObj.qval : null;
-              _mutGeneMeta[_geneSymbol].index = _mutGeneMetaIndex;
+            if (_mutGeneMeta[_uniqueId] === undefined) {
+              _mutGeneMeta[_uniqueId] = {};
+              _mutGeneMeta[_uniqueId].gene = _geneSymbol;
+              _mutGeneMeta[_uniqueId].num_muts = 1;
+              _mutGeneMeta[_uniqueId].caseIds = [_caseId];
+              _mutGeneMeta[_uniqueId].qval = (window.iviz.datamanager.getCancerStudyIds().length === 1 && _mutGeneDataObj.hasOwnProperty('qval')) ? _mutGeneDataObj.qval : null;
+              _mutGeneMeta[_uniqueId].index = _mutGeneMetaIndex;
               if (sampleData_[_caseIdIndex].mutated_genes === undefined) {
                 sampleData_[_caseIdIndex].mutated_genes = [_mutGeneMetaIndex];
               } else {
@@ -276,12 +277,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               }
               _mutGeneMetaIndex += 1;
             } else {
-              _mutGeneMeta[_geneSymbol].num_muts += 1;
-              _mutGeneMeta[_geneSymbol].caseIds.push(_caseId);
+              _mutGeneMeta[_uniqueId].num_muts += 1;
+              _mutGeneMeta[_uniqueId].caseIds.push(_caseId);
               if (sampleData_[_caseIdIndex].mutated_genes === undefined) {
-                sampleData_[_caseIdIndex].mutated_genes = [_mutGeneMeta[_geneSymbol].index];
+                sampleData_[_caseIdIndex].mutated_genes = [_mutGeneMeta[_uniqueId].index];
               } else {
-                sampleData_[_caseIdIndex].mutated_genes.push(_mutGeneMeta[_geneSymbol].index);
+                sampleData_[_caseIdIndex].mutated_genes.push(_mutGeneMeta[_uniqueId].index);
               }
             }
           }
@@ -297,32 +298,34 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var _sampleDataIndicesObj = this.getCaseIndices('sample');
       $.each(_cnaData.caseIds, function(_index, _caseIdsPerGene) {
         var _geneSymbol = _cnaData.gene[_index];
+        var _altType = '';
+        switch (_cnaData.alter[_index]) {
+          case -2:
+            _altType = 'DEL';
+            break;
+          case 2:
+            _altType = 'AMP';
+            break;
+          default:
+            break;
+        }
+        var _uniqueId = _geneSymbol + '-' + _altType;
         _.each(_caseIdsPerGene, function(_caseId) {
           if (_sampleDataIndicesObj[_caseId] !== undefined) {
             var _caseIdIndex = _sampleDataIndicesObj[_caseId];
-            if (_cnaMeta[_geneSymbol] === undefined) {
-              _cnaMeta[_geneSymbol] = {};
-              _cnaMeta[_geneSymbol].gene = _geneSymbol;
-              var _altType = '';
-              switch (_cnaData.alter[_index]) {
-                case -2:
-                  _altType = 'DEL';
-                  break;
-                case 2:
-                  _altType = 'AMP';
-                  break;
-                default:
-                  break;
-              }
-              _cnaMeta[_geneSymbol].cna = _altType;
-              _cnaMeta[_geneSymbol].cytoband = _cnaData.cytoband[_index];
-              _cnaMeta[_geneSymbol].caseIds = [_caseId];
+            if (_cnaMeta[_uniqueId] === undefined) {
+              _cnaMeta[_uniqueId] = {};
+              _cnaMeta[_uniqueId].gene = _geneSymbol;
+              
+              _cnaMeta[_uniqueId].cna = _altType;
+              _cnaMeta[_uniqueId].cytoband = _cnaData.cytoband[_index];
+              _cnaMeta[_uniqueId].caseIds = [_caseId];
               if ((window.iviz.datamanager.getCancerStudyIds().length !== 1) || _cnaData.gistic[_index] === null) {
-                _cnaMeta[_geneSymbol].qval = null;
+                _cnaMeta[_uniqueId].qval = null;
               } else {
-                _cnaMeta[_geneSymbol].qval = _cnaData.gistic[_index][0];
+                _cnaMeta[_uniqueId].qval = _cnaData.gistic[_index][0];
               }
-              _cnaMeta[_geneSymbol].index = _cnaMetaIndex;
+              _cnaMeta[_uniqueId].index = _cnaMetaIndex;
               if (sampleData_[_caseIdIndex].cna_details === undefined) {
                 sampleData_[_caseIdIndex].cna_details = [_cnaMetaIndex];
               } else {
@@ -330,11 +333,11 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               }
               _cnaMetaIndex += 1;
             } else {
-              _cnaMeta[_geneSymbol].caseIds.push(_caseId);
+              _cnaMeta[_uniqueId].caseIds.push(_caseId);
               if (sampleData_[_caseIdIndex].cna_details === undefined) {
-                sampleData_[_caseIdIndex].cna_details = [_cnaMeta[_geneSymbol].index];
+                sampleData_[_caseIdIndex].cna_details = [_cnaMeta[_uniqueId].index];
               } else {
-                sampleData_[_caseIdIndex].cna_details.push(_cnaMeta[_geneSymbol].index);
+                sampleData_[_caseIdIndex].cna_details.push(_cnaMeta[_uniqueId].index);
               }
             }
           }

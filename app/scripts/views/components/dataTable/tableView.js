@@ -164,26 +164,25 @@
       selectedGeneData.length = 0;
 
       if (geneData_) {
-        _.each(geneData_, function(item) {
+        _.each(geneData_, function(item, index) {
           var datum = {};
           datum.gene = item.gene;
           if (_selectedGenesMap === undefined) {
             datum.caseIds = iViz.util.unique(item.caseIds);
             datum.samples = datum.caseIds.length;
+            datum.uniqueId = index;
             switch (type_) {
               case 'mutatedGene':
                 datum.numOfMutations = item.num_muts;
                 datum.sampleRate = (numOfCases_ <= 0 ? 0 :
                     ((datum.samples / Number(numOfCases_) * 100).toFixed(1))) +
                   '%';
-                datum.uniqueId = datum.gene;
                 break;
               case 'cna':
                 datum.cytoband = item.cytoband;
                 datum.altType = item.cna;
                 datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
                     (datum.samples / numOfCases_ * 100).toFixed(1))) + '%';
-                datum.uniqueId = datum.gene + '-' + datum.altType;
                 break;
               default:
                 break;

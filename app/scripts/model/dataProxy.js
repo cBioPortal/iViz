@@ -216,6 +216,16 @@ window.DataManagerForIviz = (function($, _) {
               var _hasDfsMonths = false;
               var _hasOsStatus = false;
               var _hasOsMonths = false;
+              var _cnaCasesMap = {};
+              var _sequencedCasesMap = {};
+              var _cnaCases = _caseLists.cnaSampleIds.length > 0 ? _caseLists.cnaSampleIds : _caseLists.allSampleIds;
+              var _sequencedCases = _caseLists.sequencedSampleIds.length > 0 ? _caseLists.sequencedSampleIds : _caseLists.allSampleIds;
+              _.each(_cnaCases, function(_sampleId) {
+                _cnaCasesMap[_sampleId] = _sampleId;
+              });
+              _.each(_sequencedCases, function(_sampleId) {
+                _sequencedCasesMap[_sampleId] = _sampleId;
+              });
 
               var addAttr = function(data, group) {
                 if (!_.isObject(data) || !data.attr_id || !group) {
@@ -310,6 +320,10 @@ window.DataManagerForIviz = (function($, _) {
               var _samplesToPatientMap = {};
               var _patientToSampleMap = {};
 
+              _hasSampleAttrData.sample_id = '';
+              _hasSampleAttrData.study_id = '';
+              _hasSampleAttrData.sequenced = '';
+              _hasSampleAttrData.has_cna_data = '';
               _.each(_studyToSampleToPatientMap, function(_sampleToPatientMap, _studyId) {
                 _.each(_sampleToPatientMap, function(_patientId, _sampleId) {
                   if (_samplesToPatientMap[_sampleId] === undefined) {
@@ -337,47 +351,41 @@ window.DataManagerForIviz = (function($, _) {
                   var _sampleDatum = {};
                   _sampleDatum.sample_id = _sampleId;
                   _sampleDatum.study_id = _studyId;
-                  _hasSampleAttrData.sample_id = '';
-                  _hasSampleAttrData.study_id = '';
-                  _hasSampleAttrData.sequenced = '';
-                  _hasSampleAttrData.has_cna_data = '';
+                  _sampleDatum.has_cna_data = 'NO';
+                  _sampleDatum.sequenced = 'NO';
                   // mutation count
-                  _hasSampleAttrData.SEQUENCED = '';
                   if (_hasMutationCountData) {
                     _hasSampleAttrData.mutation_count = '';
                     if (_mutationCountData[_sampleId] === undefined ||
                       _mutationCountData[_sampleId] === null) {
                       _sampleDatum.mutation_count = 'NA';
-                      _sampleDatum.sequenced = 'NO';
                     } else {
                       _sampleDatum.mutation_count = _mutationCountData[_sampleId];
-                      _sampleDatum.sequenced = 'YES';
                     }
-                  } else {
-                    _sampleDatum.sequenced = 'NO';
                   }
                   // cna fraction
-                  _hasSampleAttrData.has_cna_data = '';
                   if (_hasCNAFractionData) {
                     _hasSampleAttrData.copy_number_alterations = '';
                     _hasSampleAttrData.cna_fraction = '';
                     if (_cnaFractionData[_sampleId] === undefined ||
                       _cnaFractionData[_sampleId] === null) {
                       _sampleDatum.cna_fraction = 'NA';
-                      _sampleDatum.has_cna_data = 'NO';
                       _sampleDatum.copy_number_alterations = 'NA';
                     } else {
                       _sampleDatum.cna_fraction = _cnaFractionData[_sampleId];
-                      _sampleDatum.has_cna_data = 'YES';
                       _sampleDatum.copy_number_alterations = _cnaFractionData[_sampleId];
                     }
-                  } else {
-                    _sampleDatum.has_cna_data = 'NO';
                   }
                   if (self.hasMutationData()) {
+                    if (_sequencedCasesMap[_sampleDatum.sample_id] !== undefined) {
+                      _sampleDatum.sequenced = 'YES';
+                    }
                     _sampleDatum.mutated_genes = [];
                   }
                   if (self.hasCnaSegmentData()) {
+                    if (_cnaCasesMap[_sampleDatum.sample_id] !== undefined) {
+                      _sampleDatum.has_cna_data = 'YES';
+                    }
                     _sampleDatum.cna_details = [];
                   }
                   _sampleData.push(_sampleDatum);
@@ -423,7 +431,7 @@ window.DataManagerForIviz = (function($, _) {
                 _cnaAttrMeta.priority = 3;
                 _cnaAttrMeta.options = {
                   allCases: _caseLists.allSampleIds,
-                  sequencedCases: _caseLists.cnaSampleIds.length > 0 ? _caseLists.cnaSampleIds : _caseLists.allSampleIds
+                  sequencedCases: _cnaCases
                 };
                 _sampleAttributes[_cnaAttrMeta.attr_id] = _cnaAttrMeta;
               }
@@ -442,7 +450,7 @@ window.DataManagerForIviz = (function($, _) {
                 _mutDataAttrMeta.priority = 3;
                 _mutDataAttrMeta.options = {
                   allCases: _caseLists.allSampleIds,
-                  sequencedCases: _caseLists.sequencedSampleIds.length > 0 ? _caseLists.sequencedSampleIds : _caseLists.allSampleIds
+                  sequencedCases: _sequencedCases
                 };
                 _sampleAttributes[_mutDataAttrMeta.attr_id] = _mutDataAttrMeta;
               }
@@ -496,7 +504,7 @@ window.DataManagerForIviz = (function($, _) {
                   attr_id: 'study_id',
                   view_type: 'pie_chart',
                   filter: [],
-                  priority : 1,
+                  priority: 1,
                   show: true
                 };
               }
@@ -509,7 +517,7 @@ window.DataManagerForIviz = (function($, _) {
                   display_name: 'Copy Number Alterations',
                   attr_id: 'copy_number_alterations',
                   view_type: 'bar_chart',
-                  priority : 4,
+                  priority: 4,
                   filter: [],
                   show: true
                 };
@@ -665,7 +673,7 @@ window.DataManagerForIviz = (function($, _) {
       initialSetupResult: '',
       cancerStudyIds: [],
       mutationProfileIdsMap: {},
-      gisticProfileIdsMap: {},
+      cnaProfileIdsMap: {},
       portalUrl: _portalUrl,
       studyCasesMap: _study_cases_map,
       initialSetup: initialSetup,
@@ -673,7 +681,7 @@ window.DataManagerForIviz = (function($, _) {
         return _.keys(this.mutationProfileIdsMap).length > 0;
       },
       hasCnaSegmentData: function() {
-        return _.keys(this.gisticProfileIdsMap).length > 0;
+        return _.keys(this.cnaProfileIdsMap).length > 0;
       },
       getCancerStudyIds: function() {
         if (this.cancerStudyIds.length === 0) {
@@ -703,9 +711,9 @@ window.DataManagerForIviz = (function($, _) {
             });
           $.when.apply($, requests).then(function() {
             _.each(_profiles, function(_profile) {
-              if (_profile.study_id + '_gistic' === _profile.id) {
-                self.gisticProfileIdsMap[_profile.study_id] = _profile.id;
-              } else if (_profile.study_id + '_mutations' === _profile.id) {
+              if (_profile.genetic_alteration_type === 'COPY_NUMBER_ALTERATION' && _profile.datatype === 'DISCRETE') {
+                self.cnaProfileIdsMap[_profile.study_id] = _profile.id;
+              } else if (_profile.genetic_alteration_type === 'MUTATION_EXTENDED') {
                 self.mutationProfileIdsMap[_profile.study_id] = _profile.id;
               }
             });
@@ -880,7 +888,7 @@ window.DataManagerForIviz = (function($, _) {
         function(self, fetch_promise) {
           var _ajaxCnaData = {};
           var fetch_promises = [];
-          var _gisticProfiles = self.gisticProfileIdsMap;
+          var _cnaProfiles = self.cnaProfileIdsMap;
           _ajaxCnaData.gene = [];
           _ajaxCnaData.gistic = [];
           _ajaxCnaData.cytoband = [];
@@ -888,7 +896,7 @@ window.DataManagerForIviz = (function($, _) {
           _ajaxCnaData.caseIds = [];
           var _studyCasesMap = self.getStudyCasesMap();
 
-          fetch_promises = fetch_promises.concat(_.map(_gisticProfiles,
+          fetch_promises = fetch_promises.concat(_.map(_cnaProfiles,
             function(_profileId, _studyId) {
               var _def = new $.Deferred();
               var _samples = _studyCasesMap[_studyId].samples;
