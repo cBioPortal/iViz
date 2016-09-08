@@ -275,6 +275,7 @@ window.DataManagerForIviz = (function($, _) {
                 _metaObj.numOfDatum = 0;
                 _metaObj.priority = -1;
                 _metaObj.show = true;
+                _metaObj.attrList = [_metaObj.attr_id];
                 if (_metaObj.datatype === 'NUMBER') {
                   _metaObj.view_type = 'bar_chart';
                 } else if (_metaObj.datatype === 'STRING') {
@@ -303,6 +304,7 @@ window.DataManagerForIviz = (function($, _) {
                 _metaObj.numOfDatum = 0;
                 _metaObj.show = true;
                 _metaObj.priority = -1;
+                _metaObj.attrList = [_metaObj.attr_id];
                 if (_metaObj.datatype === 'NUMBER') {
                   _metaObj.view_type = 'bar_chart';
                 } else if (_metaObj.datatype === 'STRING') {
@@ -414,6 +416,7 @@ window.DataManagerForIviz = (function($, _) {
                 _MutationCountMeta.filter = [];
                 _MutationCountMeta.priority = 4;
                 _MutationCountMeta.show = true;
+                _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
                 _sampleAttributes[_MutationCountMeta.attr_id] = (_MutationCountMeta);
               }
 
@@ -429,6 +432,7 @@ window.DataManagerForIviz = (function($, _) {
                 _cnaAttrMeta.filter = [];
                 _cnaAttrMeta.show = true;
                 _cnaAttrMeta.priority = 3;
+                _cnaAttrMeta.attrList = [_cnaAttrMeta.attr_id];
                 _cnaAttrMeta.options = {
                   allCases: _caseLists.allSampleIds,
                   sequencedCases: _cnaCases
@@ -448,6 +452,7 @@ window.DataManagerForIviz = (function($, _) {
                 _mutDataAttrMeta.filter = [];
                 _mutDataAttrMeta.show = true;
                 _mutDataAttrMeta.priority = 3;
+                _mutDataAttrMeta.attrList = [_mutDataAttrMeta.attr_id];
                 _mutDataAttrMeta.options = {
                   allCases: _caseLists.allSampleIds,
                   sequencedCases: _sequencedCases
@@ -466,6 +471,7 @@ window.DataManagerForIviz = (function($, _) {
                 _mutCntAttrMeta.filter = [];
                 _mutCntAttrMeta.show = true;
                 _mutCntAttrMeta.priority = 2;
+                _mutCntAttrMeta.attrList = ['cna_fraction'];
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
               }
 
@@ -479,6 +485,7 @@ window.DataManagerForIviz = (function($, _) {
                 _dfsSurvivalAttrMeta.filter = [];
                 _dfsSurvivalAttrMeta.show = true;
                 _dfsSurvivalAttrMeta.priority = 1;
+                _dfsSurvivalAttrMeta.attrList = ['DFS_STATUS', 'DFS_MONTHS'];
                 _patientAttributes[_dfsSurvivalAttrMeta.attr_id] = _dfsSurvivalAttrMeta;
               }
 
@@ -492,6 +499,7 @@ window.DataManagerForIviz = (function($, _) {
                 _osSurvivalAttrMeta.filter = [];
                 _osSurvivalAttrMeta.show = true;
                 _osSurvivalAttrMeta.priority = 1;
+                _osSurvivalAttrMeta.attrList = ['OS_STATUS', 'OS_MONTHS'];
                 _patientAttributes[_osSurvivalAttrMeta.attr_id] = _osSurvivalAttrMeta;
               }
 
@@ -505,7 +513,8 @@ window.DataManagerForIviz = (function($, _) {
                   view_type: 'pie_chart',
                   filter: [],
                   priority: 1,
-                  show: true
+                  show: true,
+                  attrList: ['study_id']
                 };
               }
               // add Copy Number Alterations bar chart
@@ -519,7 +528,8 @@ window.DataManagerForIviz = (function($, _) {
                   view_type: 'bar_chart',
                   priority: 4,
                   filter: [],
-                  show: true
+                  show: true,
+                  attrList: ['copy_number_alterations']
                 };
               }
               _.each(content.util.sortClinicalAttrs(_.values(_.extend({}, _patientAttributes, _sampleAttributes))), function(attr, index) {
@@ -580,13 +590,15 @@ window.DataManagerForIviz = (function($, _) {
           }
           _.each(attr_ids, function(_attrId) {
             var attrDetails = attributes[_attrId];
-            _.each(attrDetails.study_ids, function(studyId) {
-              if (studyAttributesMap[studyId] === undefined) {
-                studyAttributesMap[studyId] = [attrDetails.attr_id];
-              } else {
-                studyAttributesMap[studyId].push(attrDetails.attr_id);
-              }
-            });
+            if (attrDetails !== undefined) {
+              _.each(attrDetails.study_ids, function(studyId) {
+                if (studyAttributesMap[studyId] === undefined) {
+                  studyAttributesMap[studyId] = [attrDetails.attr_id];
+                } else {
+                  studyAttributesMap[studyId].push(attrDetails.attr_id);
+                }
+              });
+            }
           });
 
           fetch_promises = fetch_promises.concat(Object.keys(studyAttributesMap).map(function(_studyId) {
@@ -632,13 +644,15 @@ window.DataManagerForIviz = (function($, _) {
 
           _.each(attr_ids, function(_attrId) {
             var attrDetails = attributes[_attrId];
-            _.each(attrDetails.study_ids, function(studyId) {
-              if (studyAttributesMap[studyId] === undefined) {
-                studyAttributesMap[studyId] = [attrDetails.attr_id];
-              } else {
-                studyAttributesMap[studyId].push(attrDetails.attr_id);
-              }
-            });
+            if (attrDetails !== undefined) {
+              _.each(attrDetails.study_ids, function(studyId) {
+                if (studyAttributesMap[studyId] === undefined) {
+                  studyAttributesMap[studyId] = [attrDetails.attr_id];
+                } else {
+                  studyAttributesMap[studyId].push(attrDetails.attr_id);
+                }
+              });
+            }
           });
 
           fetch_promises = fetch_promises.concat(Object.keys(studyAttributesMap)

@@ -175,7 +175,6 @@
 
       initDc_(opts.logScaleChecked);
 
-      chartInst_.render();
       return chartInst_;
     };
 

@@ -41,7 +41,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
   var hasPatientAttrDataMap_ = {};
   var patientData_;
   var sampleData_;
-
+  var charts = {};
   return {
 
     init: function(_rawDataJSON) {
@@ -60,7 +60,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var chartsCount = 0;
       var groupAttrs = [];
       var group = {};
-      var charts = {};
       var groups = [];
 
       // group.data = data_.groups.patient.data;
@@ -127,6 +126,10 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         // vm_.samplemap = data_.groups.group_mapping.sample.patient;
         vm_.groups = groups;
         vm_.charts = charts;
+        vm_.$nextTick(function() {
+          _self.fetchCompleteData('patient');
+          _self.fetchCompleteData('sample');
+        });
       });
     }, // ---- close init function ----groups
     createGroupNdx: function(group) {
@@ -181,26 +184,14 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var hasAttrDataMap = isPatientAttributes ? hasPatientAttrDataMap_ : hasSampleAttrDataMap_;
       var attrDataToGet = [];
       var updatedAttrIds = [];
-      // TODO: Right now not all chart attribute id are mapped to clinical
-      // attribute id or there might be a case where chart attribute id is
-      // mapped to more than one clinical attribute id. Ex. for OS survial
-      // curve we need both OS_STATUS and OS_MONTHS data. In future if we
-      // need to update the logic over here if we are going to add any such
-      // special charts
       _.each(attrIds, function(_attrId) {
-        if (_attrId === 'MUT_CNT_VS_CNA') {
-          updatedAttrIds.push('cna_fraction');
-        } else if (_attrId === 'DFS_SURVIVAL') {
-          updatedAttrIds.push('DFS_STATUS');
-          updatedAttrIds.push('DFS_MONTHS');
-        } else if (_attrId === 'OS_SURVIVAL') {
-          updatedAttrIds.push('OS_STATUS');
-          updatedAttrIds.push('OS_MONTHS');
+        if (charts[_attrId] === undefined) {
+          updatedAttrIds = updatedAttrIds.concat(_attrId);
         } else {
-          updatedAttrIds.push(_attrId);
+          updatedAttrIds = updatedAttrIds.concat(charts[_attrId].attrList);
         }
       });
-
+      updatedAttrIds = iViz.util.unique(updatedAttrIds);
       _.each(updatedAttrIds, function(attrId) {
         if (hasAttrDataMap[attrId] === undefined) {
           attrDataToGet.push(attrId);
@@ -223,6 +214,22 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         _def.resolve();
       }
       return def.promise();
+    },
+    fetchCompleteData: function(_type, _processData) {
+      var _def = new $.Deferred();
+      var _attrIds = _.pluck(_.filter(charts, function(_chart) {
+        return _chart.group_type === _type;
+      }), 'attr_id');
+      if (_processData) {
+        $.when(iViz.getDataWithAttrs(_type, _attrIds)).then(function() {
+          _def.resolve();
+        });
+      } else {
+        $.when(window.iviz.datamanager.getClinicalData(_attrIds, (_type === 'patient'))).then(function() {
+          _def.resolve();
+        });
+      }
+      return _def.promise();
     },
     updateDataObject: function(type, attrIds) {
       var def = new $.Deferred();
@@ -316,7 +323,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             if (_cnaMeta[_uniqueId] === undefined) {
               _cnaMeta[_uniqueId] = {};
               _cnaMeta[_uniqueId].gene = _geneSymbol;
-              
               _cnaMeta[_uniqueId].cna = _altType;
               _cnaMeta[_uniqueId].cytoband = _cnaData.cytoband[_index];
               _cnaMeta[_uniqueId].caseIds = [_caseId];
@@ -407,75 +413,76 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     downloadCaseData: function() {
       var sampleIds_ = vm_.selectedsamples;
       var attr = {};
+      $.when(this.fetchCompleteData('patient', true), this.fetchCompleteData('sample', true)).then(function() {
+        attr.CANCER_TYPE_DETAILED = 'Cancer Type Detailed';
+        attr.CANCER_TYPE = 'Cancer Type';
+        attr.study_id = 'Study ID';
+        attr.patient_id = 'Patient ID';
+        attr.sample_id = 'Sample ID';
+        attr.mutated_genes = 'With Mutation Data';
+        attr.cna_details = 'With CNA Data';
 
-      attr.CANCER_TYPE_DETAILED = 'Cancer Type Detailed';
-      attr.CANCER_TYPE = 'Cancer Type';
-      attr.study_id = 'Study ID';
-      attr.patient_id = 'Patient ID';
-      attr.sample_id = 'Sample ID';
-      attr.mutated_genes = 'With Mutation Data';
-      attr.cna_details = 'With CNA Data';
+        var arr = [];
+        var strA = [];
 
-      var arr = [];
-      var strA = [];
+        var sampleAttr_ = data_.groups.sample.attr_meta;
+        var patientAttr_ = data_.groups.patient.attr_meta;
 
-      var sampleAttr_ = data_.groups.sample.attr_meta;
-      var patientAttr_ = data_.groups.patient.attr_meta;
-
-      _.each(sampleAttr_, function(_attr) {
-        if (attr[_attr.attr_id] === undefined &&
-          _attr.view_type !== 'scatter_plot') {
-          attr[_attr.attr_id] = _attr.display_name;
-        }
-      });
-
-      _.each(patientAttr_, function(_attr) {
-        if (attr[_attr.attr_id] === undefined &&
-          _attr.view_type !== 'survival') {
-          attr[_attr.attr_id] = _attr.display_name;
-        }
-      });
-
-      _.each(attr, function(displayName) {
-        strA.push(displayName || 'Unknown');
-      });
-      var content = strA.join('\t');
-      strA.length = 0;
-      var sampleIndices_ = data_.groups.sample.data_indices.sample_id;
-      var patienIndices_ = data_.groups.patient.data_indices.patient_id;
-      var samplePatientMapping = data_.groups.group_mapping.sample.patient;
-      _.each(sampleIds_, function(sampleId) {
-        var temp = sampleData_[sampleIndices_[sampleId]];
-        var temp1 = $.extend(true, temp,
-          patientData_[patienIndices_[samplePatientMapping[sampleId][0]]]);
-        arr.push(temp1);
-      });
-
-      var arrL = arr.length;
-
-      for (var i = 0; i < arrL; i++) {
-        strA.length = 0;
-        _.each(attr, function(displayName, attrId) {
-          if (attrId === 'cna_details' || attrId === 'mutated_genes') {
-            var temp = 'No';
-            if (arr[i][attrId] !== undefined) {
-              temp = arr[i][attrId].length > 0 ? 'Yes' : 'No';
-            }
-            strA.push(temp);
-          } else {
-            strA.push(arr[i][attrId]);
+        _.each(sampleAttr_, function(_attr) {
+          if (attr[_attr.attr_id] === undefined &&
+            _attr.view_type !== 'scatter_plot') {
+            attr[_attr.attr_id] = _attr.display_name;
           }
         });
-        content += '\r\n' + strA.join('\t');
-      }
 
-      var downloadOpts = {
-        filename: 'study_view_clinical_data.txt',
-        contentType: 'text/plain;charset=utf-8',
-        preProcess: false
-      };
+        _.each(patientAttr_, function(_attr) {
+          if (attr[_attr.attr_id] === undefined &&
+            _attr.view_type !== 'survival') {
+            attr[_attr.attr_id] = _attr.display_name;
+          }
+        });
 
-      cbio.download.initDownload(content, downloadOpts);
+        _.each(attr, function(displayName) {
+          strA.push(displayName || 'Unknown');
+        });
+        var content = strA.join('\t');
+        strA.length = 0;
+        var sampleIndices_ = data_.groups.sample.data_indices.sample_id;
+        var patienIndices_ = data_.groups.patient.data_indices.patient_id;
+        var samplePatientMapping = data_.groups.group_mapping.sample.patient;
+        _.each(sampleIds_, function(sampleId) {
+          var temp = sampleData_[sampleIndices_[sampleId]];
+          var temp1 = $.extend(true, temp,
+            patientData_[patienIndices_[samplePatientMapping[sampleId][0]]]);
+          arr.push(temp1);
+        });
+
+        var arrL = arr.length;
+
+        for (var i = 0; i < arrL; i++) {
+          strA.length = 0;
+          _.each(attr, function(displayName, attrId) {
+            if (attrId === 'cna_details' || attrId === 'mutated_genes') {
+              var temp = 'No';
+              if (arr[i][attrId] !== undefined) {
+                temp = arr[i][attrId].length > 0 ? 'Yes' : 'No';
+              }
+              strA.push(temp);
+            } else {
+              strA.push(arr[i][attrId]);
+            }
+          });
+          content += '\r\n' + strA.join('\t');
+        }
+
+        var downloadOpts = {
+          filename: 'study_view_clinical_data.txt',
+          contentType: 'text/plain;charset=utf-8',
+          preProcess: false
+        };
+
+        cbio.download.initDownload(content, downloadOpts);
+      });
     },
     submitForm: function() {
       var selectedCases_ = vm_.selectedsamples;
