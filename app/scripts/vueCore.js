@@ -78,9 +78,7 @@
               }
             }
           }, events: {
-            'redraw-all-charts': function() {
-              this.redrawgroups.push(true);
-            }, 'manage-genes': function(geneList) {
+            'manage-genes': function(geneList) {
               this.updateGeneList(geneList, false);
             }, 'set-selected-cases': function(selectionType, selectedCases) {
               this.setSelectedCases(selectionType, selectedCases);

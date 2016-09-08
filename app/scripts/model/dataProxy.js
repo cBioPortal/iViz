@@ -590,13 +590,15 @@ window.DataManagerForIviz = (function($, _) {
           }
           _.each(attr_ids, function(_attrId) {
             var attrDetails = attributes[_attrId];
-            _.each(attrDetails.study_ids, function(studyId) {
-              if (studyAttributesMap[studyId] === undefined) {
-                studyAttributesMap[studyId] = [attrDetails.attr_id];
-              } else {
-                studyAttributesMap[studyId].push(attrDetails.attr_id);
-              }
-            });
+            if (attrDetails !== undefined) {
+              _.each(attrDetails.study_ids, function(studyId) {
+                if (studyAttributesMap[studyId] === undefined) {
+                  studyAttributesMap[studyId] = [attrDetails.attr_id];
+                } else {
+                  studyAttributesMap[studyId].push(attrDetails.attr_id);
+                }
+              });
+            }
           });
 
           fetch_promises = fetch_promises.concat(Object.keys(studyAttributesMap).map(function(_studyId) {
@@ -642,13 +644,15 @@ window.DataManagerForIviz = (function($, _) {
 
           _.each(attr_ids, function(_attrId) {
             var attrDetails = attributes[_attrId];
-            _.each(attrDetails.study_ids, function(studyId) {
-              if (studyAttributesMap[studyId] === undefined) {
-                studyAttributesMap[studyId] = [attrDetails.attr_id];
-              } else {
-                studyAttributesMap[studyId].push(attrDetails.attr_id);
-              }
-            });
+            if (attrDetails !== undefined) {
+              _.each(attrDetails.study_ids, function(studyId) {
+                if (studyAttributesMap[studyId] === undefined) {
+                  studyAttributesMap[studyId] = [attrDetails.attr_id];
+                } else {
+                  studyAttributesMap[studyId].push(attrDetails.attr_id);
+                }
+              });
+            }
           });
 
           fetch_promises = fetch_promises.concat(Object.keys(studyAttributesMap)

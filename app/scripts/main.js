@@ -126,6 +126,10 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         // vm_.samplemap = data_.groups.group_mapping.sample.patient;
         vm_.groups = groups;
         vm_.charts = charts;
+        vm_.$nextTick(function() {
+          _self.fetchCompleteData('patient');
+          _self.fetchCompleteData('sample');
+        });
       });
     }, // ---- close init function ----groups
     createGroupNdx: function(group) {
@@ -181,10 +185,13 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var attrDataToGet = [];
       var updatedAttrIds = [];
       _.each(attrIds, function(_attrId) {
-        if (charts[_attrId] !== undefined) {
+        if (charts[_attrId] === undefined) {
+          updatedAttrIds = updatedAttrIds.concat(_attrId);
+        } else {
           updatedAttrIds = updatedAttrIds.concat(charts[_attrId].attrList);
         }
       });
+      updatedAttrIds = iViz.util.unique(updatedAttrIds);
       _.each(updatedAttrIds, function(attrId) {
         if (hasAttrDataMap[attrId] === undefined) {
           attrDataToGet.push(attrId);
@@ -207,6 +214,22 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         _def.resolve();
       }
       return def.promise();
+    },
+    fetchCompleteData: function(_type, _processData) {
+      var _def = new $.Deferred();
+      var _attrIds = _.pluck(_.filter(charts, function(_chart) {
+        return _chart.group_type === _type;
+      }), 'attr_id');
+      if (_processData) {
+        $.when(iViz.getDataWithAttrs(_type, _attrIds)).then(function() {
+          _def.resolve();
+        });
+      } else {
+        $.when(window.iviz.datamanager.getClinicalData(_attrIds, (_type === 'patient'))).then(function() {
+          _def.resolve();
+        });
+      }
+      return _def.promise();
     },
     updateDataObject: function(type, attrIds) {
       var def = new $.Deferred();
@@ -300,7 +323,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             if (_cnaMeta[_uniqueId] === undefined) {
               _cnaMeta[_uniqueId] = {};
               _cnaMeta[_uniqueId].gene = _geneSymbol;
-              
               _cnaMeta[_uniqueId].cna = _altType;
               _cnaMeta[_uniqueId].cytoband = _cnaData.cytoband[_index];
               _cnaMeta[_uniqueId].caseIds = [_caseId];
@@ -391,13 +413,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     downloadCaseData: function() {
       var sampleIds_ = vm_.selectedsamples;
       var attr = {};
-      var sampleAttrs = _.pluck(_.filter(charts, function(_chart) {
-        return _chart.group_type === 'sample';
-      }), 'attr_id');
-      var patientAttrs =  _.pluck(_.filter(charts, function(_chart) {
-        return _chart.group_type === 'patient';
-      }), 'attr_id');
-      $.when(this.getDataWithAttrs('patient', patientAttrs), this.getDataWithAttrs('sample', sampleAttrs)).then(function() {
+      $.when(this.fetchCompleteData('patient', true), this.fetchCompleteData('sample', true)).then(function() {
         attr.CANCER_TYPE_DETAILED = 'Cancer Type Detailed';
         attr.CANCER_TYPE = 'Cancer Type';
         attr.study_id = 'Study ID';
