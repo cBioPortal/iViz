@@ -360,7 +360,11 @@ window.DataManagerForIviz = (function($, _) {
                     _hasSampleAttrData.mutation_count = '';
                     if (_mutationCountData[_sampleId] === undefined ||
                       _mutationCountData[_sampleId] === null) {
-                      _sampleDatum.mutation_count = 'NA';
+                      if (_sequencedCasesMap[_sampleDatum.sample_id] === undefined) {
+                        _sampleDatum.mutation_count = 'NA';
+                      } else {
+                        _sampleDatum.mutation_count = 0;
+                      }
                     } else {
                       _sampleDatum.mutation_count = _mutationCountData[_sampleId];
                     }
