@@ -36,7 +36,8 @@
         selectedRows: [],
         invisibleDimension: {},
         isMutatedGeneCna: false,
-        classTableHeight: 'grid-item-h-2'
+        classTableHeight: 'grid-item-h-2',
+        madeSelection: false
       };
     },
     watch: {
@@ -50,20 +51,27 @@
     },
     events: {
       'show-loader': function() {
-        this.showLoad = true;
+        if (!this.madeSelection) {
+          this.showLoad = true;
+        }
       },
       'gene-list-updated': function(genes) {
         genes = $.extend(true, [], genes);
         this.chartInst.updateGenes(genes);
       },
       'update-special-charts': function() {
-        var attrId =
-          this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
-        var _selectedCases =
-          _.pluck(this.invisibleDimension.top(Infinity), attrId);
-        this.chartInst.update(_selectedCases, this.selectedRows);
-        this.setDisplayTitle(this.chartInst.getCases().length);
-        this.showLoad = false;
+        // Do not update chart if the selection is made on itself
+        if (this.madeSelection) {
+          this.madeSelection = false;
+        } else {
+          var attrId =
+            this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+          var _selectedCases =
+            _.pluck(this.invisibleDimension.top(Infinity), attrId);
+          this.chartInst.update(_selectedCases, this.selectedRows);
+          this.setDisplayTitle(this.chartInst.getCases().length);
+          this.showLoad = false;
+        }
       },
       'closeChart': function() {
         this.invisibleDimension.dispose();
@@ -99,6 +107,9 @@
       submitClick: function(_selectedRowData) {
         var selectedSamplesUnion = [];
         var selectedRowsUids = _.pluck(_selectedRowData, 'uniqueId');
+
+        this.madeSelection = true;
+
         if (this.isMutatedGeneCna) {
           this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
         } else {

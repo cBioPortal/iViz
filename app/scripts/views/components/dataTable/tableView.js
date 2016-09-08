@@ -58,12 +58,12 @@
         displayName = _attributes.display_name || 'Table';
         attributes_ = _attributes;
         callbacks_ = _callbacks;
-        isMutatedGeneCna = ['mutatedGene', 'cna'].indexOf(type_) !== -1
+        isMutatedGeneCna = ['mutatedGene', 'cna'].indexOf(type_) !== -1;
         initReactTable(true);
       };
 
     content.update = function(_selectedSamples, _selectedRows) {
-      var selectedGenesMap_ = [];
+      var selectedMap_ = {};
       var includeMutationCount = false;
       if (_selectedRows !== undefined) {
         selectedRows = _selectedRows;
@@ -90,24 +90,31 @@
                 includeMutationCount = false;
                 break;
               default:
+                var category = caseData_[attributes_.attr_id];
+                if (!selectedMap_.hasOwnProperty(category)) {
+                  selectedMap_[category] = [];
+                }
+                selectedMap_[category].push(caseId);
                 break;
             }
-            _.each(tempData_, function(geneIndex) {
-              if (selectedGenesMap_[geneIndex] === undefined) {
-                selectedGenesMap_[geneIndex] = {};
-                if (includeMutationCount) {
-                  selectedGenesMap_[geneIndex].num_muts = 1;
+            if (isMutatedGeneCna) {
+              _.each(tempData_, function(geneIndex) {
+                if (selectedMap_[geneIndex] === undefined) {
+                  selectedMap_[geneIndex] = {};
+                  if (includeMutationCount) {
+                    selectedMap_[geneIndex].num_muts = 1;
+                  }
+                  selectedMap_[geneIndex].caseIds = [caseId];
+                } else {
+                  if (includeMutationCount) {
+                    selectedMap_[geneIndex].num_muts += 1;
+                  }
+                  selectedMap_[geneIndex].caseIds.push(caseId);
                 }
-                selectedGenesMap_[geneIndex].caseIds = [caseId];
-              } else {
-                if (includeMutationCount) {
-                  selectedGenesMap_[geneIndex].num_muts += 1;
-                }
-                selectedGenesMap_[geneIndex].caseIds.push(caseId);
-              }
-            });
+              });
+            }
           });
-          initReactTable(true, selectedGenesMap_);
+          initReactTable(true, selectedMap_);
         }
       } else {
         initReactTable(false);
@@ -125,9 +132,9 @@
       }
     };
 
-    function initReactTable(_reloadData, _selectedGenesMap) {
+    function initReactTable(_reloadData, _selectedMap) {
       if (_reloadData) {
-        reactTableData = initReactData(_selectedGenesMap);
+        reactTableData = initReactData(_selectedMap);
       }
       var _opts = {
         input: reactTableData,
@@ -190,31 +197,65 @@
       reactData_ = data;
     }
 
-    function initCategories() {
+    function initCategories(_selectedMap) {
       var colors = $.extend(true, [], iViz.util.getColors());
-      _.each(data_, function(item) {
-        var _datum = item[attributes_.attr_id];
-        var color = colors.shift();
+      var hasSelectedCases = _.isObject(_selectedMap);
+      var numOfCases = 0;
 
-        if (!_datum) {
-          _datum = 'NA';
-          color = '#cccccc';
-        }
+      if (hasSelectedCases) {
+        _.each(_selectedMap, function(datum) {
+          if (_.isArray(datum)) {
+            numOfCases += datum.length;
+          }
+        });
+      } else {
+        numOfCases = data_.length;
+      }
 
-        if (!categories_.hasOwnProperty(_datum)) {
-          categories_[_datum] = {
-            name: _datum,
-            cases: 0,
+      if (hasSelectedCases) {
+        _.each(_selectedMap, function(category, key) {
+          var color = '#cccccc';
+          if (key) {
+            color = colors.shift();
+          } else {
+            key = 'NA';
+            color = '#cccccc';
+          }
+
+          categories_[key] = {
+            name: key,
             color: color ? color : iViz.util.getRandomColorOutOfLib(),
-            caseIds: []
+            caseIds: category,
+            cases: category.length
           };
-        }
-        ++categories_[_datum].cases;
-        categories_[_datum].caseIds.push(item.patient_id ? item.patient_id : item.sample_id);
-      });
+        });
+      } else {
+        _.each(data_, function(item) {
+          var _datum = item[attributes_.attr_id];
+          var color = '#cccccc';
+
+          if (_datum) {
+            color = colors.shift();
+          } else {
+            _datum = 'NA';
+            color = '#cccccc';
+          }
+
+          if (!categories_.hasOwnProperty(_datum)) {
+            categories_[_datum] = {
+              name: _datum,
+              cases: 0,
+              color: color ? color : iViz.util.getRandomColorOutOfLib(),
+              caseIds: []
+            };
+          }
+          ++categories_[_datum].cases;
+          categories_[_datum].caseIds.push(item.patient_id ? item.patient_id : item.sample_id);
+        });
+      }
       _.each(categories_, function(category) {
         category.caseRate =
-          (((category.cases / data_.length).toPrecision(2) * 100)).toString() +
+          (((category.cases / numOfCases).toPrecision(2) * 100)).toString() +
           '%';
       });
     }
@@ -291,7 +332,7 @@
       return selectedGeneData;
     }
 
-    function initReactData(_selectedGenesMap) {
+    function initReactData(_selectedMap) {
       attr_ = iViz.util.tableView.getAttributes(type_);
       var result = {
         data: [],
@@ -299,7 +340,7 @@
       };
 
       if (isMutatedGeneCna) {
-        var _mutationData = mutatedGenesData(_selectedGenesMap);
+        var _mutationData = mutatedGenesData(_selectedMap);
         _.each(_mutationData, function(item) {
           for (var key in item) {
             if (item.hasOwnProperty(key)) {
@@ -315,7 +356,7 @@
       } else {
         categories_ = {};
         result.attributes[0].display_name = displayName;
-        initCategories();
+        initCategories(_selectedMap);
         initRegularTableData();
         result.data = reactData_;
       }
