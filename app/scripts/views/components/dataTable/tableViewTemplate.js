@@ -5,7 +5,7 @@
 (function(Vue, dc, iViz, $, QueryByGeneTextArea, _) {
   Vue.component('tableView', {
     template: '<div id={{chartDivId}} ' +
-    'class="grid-item grid-item-h-2 grid-item-w-2" ' +
+    ':class="[\'grid-item\', classTableHeight, \'grid-item-w-2\']" ' +
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
@@ -34,7 +34,9 @@
         chartInst: {},
         showLoad: true,
         selectedRows: [],
-        invisibleDimension: {}
+        invisibleDimension: {},
+        isMutatedGeneCna: false,
+        classTableHeight: 'grid-item-h-2'
       };
     },
     watch: {
@@ -97,14 +99,18 @@
       submitClick: function(_selectedRowData) {
         var selectedSamplesUnion = [];
         var selectedRowsUids = _.pluck(_selectedRowData, 'uniqueId');
-        this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
+        if (this.isMutatedGeneCna) {
+          this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
+        } else {
+          this.selectedRows = selectedRowsUids;
+        }
         _.each(_selectedRowData, function(item) {
           var casesIds = item.caseIds.split(',');
           selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
         });
-        if (this.attributes.filter.length === 0) {
+        if (this.attributes.filter.length === 0 || !this.isMutatedGeneCna) {
           this.attributes.filter = selectedSamplesUnion.sort();
-        } else {
+        } else if (this.isMutatedGeneCna) {
           this.attributes.filter =
             iViz.util.intersection(this.attributes.filter, selectedSamplesUnion.sort());
         }
@@ -117,7 +123,9 @@
         this.invisibleDimension.filterFunction(function(d) {
           return (filtersMap[d] !== undefined);
         });
-        this.chartInst.clearSelectedRowData();
+        if (this.isMutatedGeneCna) {
+          this.chartInst.clearSelectedRowData();
+        }
       },
       addGeneClick: function(clickedRowData) {
         this.$dispatch('manage-gene', clickedRowData.gene);
@@ -125,7 +133,7 @@
       },
       setDisplayTitle: function(numOfCases) {
         this.displayName = this.attributes.display_name +
-          '(' + numOfCases + ' profiled samples)';
+          (this.isMutatedGeneCna ? '(' + numOfCases + ' profiled samples)' : '');
       }
     },
     ready: function() {
@@ -147,6 +155,9 @@
         _self.chartInst.init(this.attributes, this.$root.selectedsamples,
           this.$root.selectedgenes, data, this.chartId, callbacks);
         this.setDisplayTitle(this.chartInst.getCases().length);
+        if (Object.keys(this.attributes.keys).length <= 3) {
+          this.classTableHeight = 'grid-item-h-1';
+        }
         _self.showLoad = false;
       } else {
         $.when(iViz.getTableData(_self.attributes.attr_id)).then(function(_data) {
@@ -154,6 +165,7 @@
           _self.chartInst.init(_self.attributes, _self.$root.selectedsamples,
             _self.$root.selectedgenes, data, _self.chartId, callbacks, _data.geneMeta);
           _self.setDisplayTitle(_self.chartInst.getCases().length);
+          _self.isMutatedGeneCna = true;
           _self.showLoad = false;
         });
       }

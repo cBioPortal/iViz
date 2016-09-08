@@ -26,6 +26,7 @@
     var displayName = '';
     var categories_ = {};
     var reactData_;
+    var isMutatedGeneCna = false;
 
     content.getCases = function() {
       return iViz.util.intersection(selectedSamples, sequencedSampleIds);
@@ -54,9 +55,10 @@
         data_ = _data;
         geneData_ = _geneData;
         type_ = _attributes.type;
-        displayName = _attributes.attr_id || 'Table';
+        displayName = _attributes.display_name || 'Table';
         attributes_ = _attributes;
         callbacks_ = _callbacks;
+        isMutatedGeneCna = ['mutatedGene', 'cna'].indexOf(type_) !== -1
         initReactTable(true);
       };
 
@@ -149,14 +151,22 @@
         columnSorting: false,
         sortBy: 'cases',
         selectedRows: selectedRows,
-        selectedGene: selectedGenes,
-        rowClickFunc: reactRowClickCallback,
-        geneClickFunc: reactGeneClickCallback,
-        selectButtonClickCallback: reactSubmitClickCallback,
+        rowClickFunc: function(data, selected) {
+          reactRowClickCallback(data, selected);
+          reactSubmitClickCallback();
+        },
         // sortBy: 'name',
         // sortDir: 'DESC',
         tableType: type_
       };
+      if (isMutatedGeneCna) {
+        _opts = _.extend(_opts, {
+          rowClickFunc: reactRowClickCallback,
+          selectedGene: selectedGenes,
+          geneClickFunc: reactGeneClickCallback,
+          selectButtonClickCallback: reactSubmitClickCallback
+        });
+      }
       var testElement = React.createElement(EnhancedFixedDataTableSpecial,
         _opts);
 
@@ -171,7 +181,7 @@
             var datum = {
               attr_id: key,
               uniqueId: name,
-              attr_val: category[key]
+              attr_val: key === 'caseIds' ? category.caseIds.join(',') : category[key]
             };
             data.push(datum);
           }
@@ -184,19 +194,20 @@
       var colors = $.extend(true, [], iViz.util.getColors());
       _.each(data_, function(item) {
         var _datum = item[attributes_.attr_id];
+        var color = colors.shift();
 
         if (!_datum) {
           _datum = 'NA';
+          color = '#cccccc';
         }
 
         if (!categories_.hasOwnProperty(_datum)) {
           categories_[_datum] = {
             name: _datum,
             cases: 0,
-            color: colors[0],
+            color: color ? color : iViz.util.getRandomColorOutOfLib(),
             caseIds: []
           };
-          colors.shift();
         }
         ++categories_[_datum].cases;
         categories_[_datum].caseIds.push(item.patient_id ? item.patient_id : item.sample_id);
@@ -287,7 +298,7 @@
         attributes: attr_
       };
 
-      if (type_ === 'mutatedGene' || type_ === 'cna') {
+      if (isMutatedGeneCna) {
         var _mutationData = mutatedGenesData(_selectedGenesMap);
         _.each(_mutationData, function(item) {
           for (var key in item) {
@@ -320,7 +331,7 @@
         selectedRowData.push(data);
       } else {
         selectedRowData = _.filter(selectedRowData, function(item) {
-          return (item.uniqueId === selected.uniqueId);
+          return (item.uniqueId !== data.uniqueId);
         });
       }
     }

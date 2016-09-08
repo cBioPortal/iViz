@@ -158,6 +158,33 @@
       return str;
     };
 
+    /**
+     * Get a random color hex.
+     *
+     * @return {string} Color HEX
+     */
+    content.getRandomColor = function() {
+      var letters = '0123456789abcdef';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+    }
+
+    /**
+     * Get a random color hex out of Colors in getColors function;
+     *
+     * @return {string} Color HEX
+     */
+    content.getRandomColorOutOfLib = function() {
+      var color;
+      while (!color || content.getColors().indexOf(color) !== -1) {
+        color = content.getRandomColor();
+      }
+      return color;
+    };
+
     function tableDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
@@ -297,7 +324,7 @@
 
         _pieLabelString += '<g transform="translate(0, ' +
           _pieLabelYCoord + ')"><rect height="10" width="10" fill="' +
-           _label.color + '"></rect><text x="13" y="10" ' +
+          _label.color + '"></rect><text x="13" y="10" ' +
           'style="font-size:15px">' + _label.name + '</text>' +
           '<text x="' + _width.name * 10 + '" y="10" ' +
           'style="font-size:15px">' + _label.samples + '</text>' +
