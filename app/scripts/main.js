@@ -69,7 +69,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.hasfilters = false;
       _.each(data_.groups.patient.attr_meta, function(attrData) {
         attrData.group_type = group.type;
-        if (chartsCount < 31) {
+        if (chartsCount < 10) {
           if (attrData.show) {
             attrData.group_id = group.id;
             groupAttrs.push(attrData);
@@ -94,7 +94,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.hasfilters = false;
       _.each(data_.groups.sample.attr_meta, function(attrData) {
         attrData.group_type = group.type;
-        if (chartsCount < 31) {
+        if (chartsCount < 10) {
           if (attrData.show) {
             attrData.group_id = group.id;
             groupAttrs.push(attrData);
@@ -236,28 +236,60 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var self_ = this;
       var isPatientAttributes = (type === 'patient');
       var _data = isPatientAttributes ? patientData_ : sampleData_;
-      var hasAttrDataMap = isPatientAttributes ? hasPatientAttrDataMap_ : hasSampleAttrDataMap_;
+      var hasAttrDataMap = isPatientAttributes ?
+        hasPatientAttrDataMap_ : hasSampleAttrDataMap_;
 
-      $.when(window.iviz.datamanager.getClinicalData(attrIds, isPatientAttributes)).then(function(clinicalData) {
-        var _caseIdToClinDataMap = {};
-        var idType = isPatientAttributes ? 'patient_id' : 'sample_id';
-        _.each(clinicalData, function(_clinicalAttributeData, _attrId) {
-          hasAttrDataMap[_attrId] = '';
-          _.each(_clinicalAttributeData, function(_dataObj) {
-            if (_caseIdToClinDataMap[_dataObj[idType]] === undefined) {
-              _caseIdToClinDataMap[_dataObj[idType]] = {};
+      $.when(
+        window.iviz.datamanager.getClinicalData(attrIds, isPatientAttributes))
+        .then(function(clinicalData) {
+          var _caseIdToClinDataMap = {};
+          var idType = isPatientAttributes ? 'patient_id' : 'sample_id';
+          _.each(clinicalData, function(_clinicalAttributeData, _attrId) {
+            var selectedAttrMeta = charts[_attrId];
+
+            hasAttrDataMap[_attrId] = '';
+            selectedAttrMeta.keys = {};
+            selectedAttrMeta.numOfDatum = 0;
+
+            _.each(_clinicalAttributeData, function(_dataObj) {
+              if (_caseIdToClinDataMap[_dataObj[idType]] === undefined) {
+                _caseIdToClinDataMap[_dataObj[idType]] = {};
+              }
+              _caseIdToClinDataMap[_dataObj[idType]][_dataObj.attr_id] =
+                _dataObj.attr_val;
+
+              if (!selectedAttrMeta.keys
+                  .hasOwnProperty(_dataObj.attr_val)) {
+                selectedAttrMeta.keys[_dataObj.attr_val] = 0;
+              }
+              ++selectedAttrMeta.keys[_dataObj.attr_val];
+              ++selectedAttrMeta.numOfDatum;
+            });
+
+            if (Object.keys(selectedAttrMeta.keys).length >
+              (selectedAttrMeta.numOfDatum / 2) &&
+              selectedAttrMeta.datatype === 'STRING') {
+              var caseIds = isPatientAttributes ?
+                Object.keys(data_.groups.group_mapping.patient.sample) :
+                Object.keys(data_.groups.group_mapping.sample.patient);
+
+              selectedAttrMeta.view_type = 'table';
+              selectedAttrMeta.type = 'pieLabel';
+              selectedAttrMeta.options = {
+                allCases: caseIds,
+                sequencedCases: caseIds
+              };
             }
-            _caseIdToClinDataMap[_dataObj[idType]][_dataObj.attr_id] = _dataObj.attr_val;
           });
+          var type = isPatientAttributes ? 'patient' : 'sample';
+          var caseIndices = self_.getCaseIndices(type);
+          _.each(_caseIdToClinDataMap, function(_clinicalData, _caseId) {
+            var _caseIndex = caseIndices[_caseId];
+            _.extend(_data[_caseIndex], _clinicalData);
+          });
+
+          def.resolve();
         });
-        var type = isPatientAttributes ? 'patient' : 'sample';
-        var caseIndices = self_.getCaseIndices(type);
-        _.each(_caseIdToClinDataMap, function(_clinicalData, _caseId) {
-          var _caseIndex = caseIndices[_caseId];
-          _.extend(_data[_caseIndex], _clinicalData);
-        });
-        def.resolve();
-      });
       return def.promise();
     },
     extractMutationData: function(_mutationData) {

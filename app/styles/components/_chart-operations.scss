@@ -37,7 +37,7 @@
     float: right;
   }
   .chart-title-active {
-    width: 55%;
+    width: calc(100% - 80px); // 5 icons on chart header, each occupies 16px
     float: left;
   }
 

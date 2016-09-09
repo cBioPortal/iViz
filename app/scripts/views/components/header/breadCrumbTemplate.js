@@ -8,16 +8,14 @@
     'v-if="attributes.filter.length > 0">' +
     '<span>{{attributes.display_name}}</span><span ' +
     'v-if="(filtersToSkipShowing.indexOf(attributes.attr_id) === -1) && ' +
-    '(attributes.view_type ! == \'table\')" class="breadcrumb_items">' +
+    '(specialTables.indexOf(attributes.attr_id) === -1)" class="breadcrumb_items">' +
     '<span v-if="filters.filterType === \'RangedFilter\'">' +
     '<span class="breadcrumb_item">{{filters[0]}} -- {{filters[1]}}</span>' +
     '<i class="fa fa-times breadcrumb_remove" @click="removeFilter()"></i>' +
     '</span>' +
     '<template v-else>' +
     '<span v-for="filter in filters" style="display:inline-block;">' +
-    '<span v-if="attributes.view_type === \'table\'" ' +
-    'class="breadcrumb_item">{{filter.uniqueId}}</span>' +
-    '<span v-else class="breadcrumb_item">{{filter}}</span>' +
+    '<span class="breadcrumb_item">{{filter}}</span>' +
     '<i class="fa fa-times breadcrumb_remove" ' +
     '@click="removeFilter(filter)"></i></span></template></span>' +
     '<template v-else>' +
@@ -27,7 +25,8 @@
       'filters', 'attributes'
     ], data: function() {
       return {
-        filtersToSkipShowing: ['MUT_CNT_VS_CNA', 'sample_id', 'patient_id']
+        filtersToSkipShowing: ['MUT_CNT_VS_CNA', 'sample_id', 'patient_id'],
+        specialTables: ['mutated_genes', 'cna_details']
       };
     },
     methods: {
@@ -44,7 +43,11 @@
         } else if (this.attributes.view_type === 'scatter_plot') {
           this.filters = [];
         } else if (this.attributes.view_type === 'table') {
-          this.filters = [];
+          if (this.specialTables.indexOf(this.attributes.attr_id) === -1) {
+            this.filters.$remove(val);
+          } else {
+            this.filters = [];
+          }
         }
       }
     }
