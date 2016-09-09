@@ -74,6 +74,9 @@
       if (_selectedRows !== undefined) {
         selectedRows = _selectedRows;
       }
+      if (selectedRows.length === 0) {
+        selectedRowData = [];
+      }
       _selectedSamples.sort();
       if ((!initialized) ||
         (!iViz.util.compare(selectedSamples, _selectedSamples))) {
