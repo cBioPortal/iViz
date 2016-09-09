@@ -189,10 +189,16 @@
             content: {
               text: function() {
                 var content =
-                  'Survival Rate: <strong>' + _survivalRate + '</strong><br>' +
-                  'Months: <strong>' + _time + '</strong><br>' +
-                  'Patient ID: <strong>' + d.patient_id + '</strong><br>' +
-                  'Study: <strong>' + d.study_id + '</strong>';
+                  (_.isUndefined(_survivalRate) ? '' :
+                    ('Survival Rate: <strong>' +
+                    _survivalRate + '</strong><br>')) +
+                  (_.isUndefined(_time) ? '' :
+                    ('Months: <strong>' + _time + '</strong><br>')) +
+                  (d.patient_id ?
+                    ('Patient ID: <strong>' + d.patient_id + '</strong><br>') :
+                    '') +
+                  (d.study_id ?
+                    ('Study: <strong>' + d.study_id + '</strong>') : '');
                 return content;
               }
             },
