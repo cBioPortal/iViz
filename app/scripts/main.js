@@ -69,7 +69,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.hasfilters = false;
       _.each(data_.groups.patient.attr_meta, function(attrData) {
         attrData.group_type = group.type;
-        if (chartsCount < 31) {
+        if (chartsCount < 10) {
           if (attrData.show) {
             attrData.group_id = group.id;
             groupAttrs.push(attrData);
@@ -94,7 +94,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.hasfilters = false;
       _.each(data_.groups.sample.attr_meta, function(attrData) {
         attrData.group_type = group.type;
-        if (chartsCount < 31) {
+        if (chartsCount < 10) {
           if (attrData.show) {
             attrData.group_id = group.id;
             groupAttrs.push(attrData);
@@ -245,21 +245,11 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           var _caseIdToClinDataMap = {};
           var idType = isPatientAttributes ? 'patient_id' : 'sample_id';
           _.each(clinicalData, function(_clinicalAttributeData, _attrId) {
-            var attrs = isPatientAttributes ? data_.groups.patient.attr_meta :
-              data_.groups.sample.attr_meta;
-            var selectedAttrMetaIndex = -1;
-
-            _.every(attrs, function(attr, index) {
-              if (attr.attr_id === _attrId) {
-                selectedAttrMetaIndex = index;
-                return false;
-              }
-              return true;
-            });
+            var selectedAttrMeta = charts[_attrId];
 
             hasAttrDataMap[_attrId] = '';
-            attrs[selectedAttrMetaIndex].keys = {};
-            attrs[selectedAttrMetaIndex].numOfDatum = 0;
+            selectedAttrMeta.keys = {};
+            selectedAttrMeta.numOfDatum = 0;
 
             _.each(_clinicalAttributeData, function(_dataObj) {
               if (_caseIdToClinDataMap[_dataObj[idType]] === undefined) {
@@ -268,23 +258,23 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               _caseIdToClinDataMap[_dataObj[idType]][_dataObj.attr_id] =
                 _dataObj.attr_val;
 
-              if (!attrs[selectedAttrMetaIndex].keys
+              if (!selectedAttrMeta.keys
                   .hasOwnProperty(_dataObj.attr_val)) {
-                attrs[selectedAttrMetaIndex].keys[_dataObj.attr_val] = 0;
+                selectedAttrMeta.keys[_dataObj.attr_val] = 0;
               }
-              ++attrs[selectedAttrMetaIndex].keys[_dataObj.attr_val];
-              ++attrs[selectedAttrMetaIndex].numOfDatum;
+              ++selectedAttrMeta.keys[_dataObj.attr_val];
+              ++selectedAttrMeta.numOfDatum;
             });
 
-            if (Object.keys(attrs[selectedAttrMetaIndex].keys).length >
-              (attrs[selectedAttrMetaIndex].numOfDatum / 2)) {
+            if (Object.keys(selectedAttrMeta.keys).length >
+              (selectedAttrMeta.numOfDatum / 2)) {
               var caseIds = isPatientAttributes ?
                 Object.keys(data_.groups.group_mapping.patient.sample) :
                 Object.keys(data_.groups.group_mapping.sample.patient);
 
-              attrs[selectedAttrMetaIndex].view_type = 'table';
-              attrs[selectedAttrMetaIndex].type = 'pieLabel';
-              attrs[selectedAttrMetaIndex].options = {
+              selectedAttrMeta.view_type = 'table';
+              selectedAttrMeta.type = 'pieLabel';
+              selectedAttrMeta.options = {
                 allCases: caseIds,
                 sequencedCases: caseIds
               };

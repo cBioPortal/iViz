@@ -29,7 +29,7 @@
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
         chartId: 'chart-new-' +
         this.attributes.attr_id.replace(/\(|\)| /g, ''),
-        displayName: this.attributes.display_name,
+        displayName: '',
         showOperations: false,
         chartInst: {},
         showLoad: true,
@@ -51,7 +51,7 @@
     },
     events: {
       'show-loader': function() {
-        if (!this.madeSelection) {
+        if (!this.madeSelection || this.isMutatedGeneCna) {
           this.showLoad = true;
         }
       },
@@ -61,7 +61,7 @@
       },
       'update-special-charts': function() {
         // Do not update chart if the selection is made on itself
-        if (this.madeSelection) {
+        if (this.madeSelection && !this.isMutatedGeneCna) {
           this.madeSelection = false;
         } else {
           var attrId =
@@ -119,11 +119,15 @@
           var casesIds = item.caseIds.split(',');
           selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
         });
-        if (this.attributes.filter.length === 0 || !this.isMutatedGeneCna) {
-          this.attributes.filter = selectedSamplesUnion.sort();
-        } else if (this.isMutatedGeneCna) {
-          this.attributes.filter =
-            iViz.util.intersection(this.attributes.filter, selectedSamplesUnion.sort());
+        if (this.isMutatedGeneCna) {
+          if (this.attributes.filter.length === 0) {
+            this.attributes.filter = selectedSamplesUnion.sort();
+          } else {
+            this.attributes.filter =
+              iViz.util.intersection(this.attributes.filter, selectedSamplesUnion.sort());
+          }
+        } else {
+          this.attributes.filter = this.selectedRows;
         }
         var filtersMap = {};
         _.each(this.attributes.filter, function(filter) {
@@ -143,42 +147,47 @@
         QueryByGeneTextArea.addRemoveGene(clickedRowData.gene);
       },
       setDisplayTitle: function(numOfCases) {
-        this.displayName = this.attributes.display_name +
-          (this.isMutatedGeneCna ? '(' + numOfCases + ' profiled samples)' : '');
+        this.displayName = this.isMutatedGeneCna ?
+          (this.attributes.display_name +
+          ' (' + numOfCases + ' profiled samples)') : '';
+      },
+      processTableData: function(_data) {
+        var data = iViz.getGroupNdx(this.attributes.group_id);
+        this.chartInst.init(this.attributes, this.$root.selectedsamples,
+          this.$root.selectedgenes, data, this.chartId, {
+            addGeneClick: this.addGeneClick,
+            submitClick: this.submitClick
+          }, this.isMutatedGeneCna ? _data.geneMeta : null);
+        this.setDisplayTitle(this.chartInst.getCases().length);
+        this.showLoad = false;
       }
     },
     ready: function() {
       var _self = this;
       _self.showLoad = true;
       var callbacks = {};
-      var attrId =
-        this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+      var attrId = this.attributes.attr_id;
+
+      this.isMutatedGeneCna =
+        ['mutated_genes', 'cna_details']
+          .indexOf(_self.attributes.attr_id) !== -1;
+
+      if (this.isMutatedGeneCna) {
+        attrId = this.attributes.group_type === 'patient' ?
+          'patient_id' : 'sample_id';
+      }
+
       this.invisibleDimension = this.ndx.dimension(function(d) {
         return d[attrId];
       });
-
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.TableView();
       _self.chartInst.setDownloadDataTypes(['tsv']);
-      if (['mutated_genes', 'cna_details'].indexOf(_self.attributes.attr_id) === -1) {
-        var data = iViz.getGroupNdx(this.attributes.group_id);
-        _self.chartInst.init(this.attributes, this.$root.selectedsamples,
-          this.$root.selectedgenes, data, this.chartId, callbacks);
-        this.setDisplayTitle(this.chartInst.getCases().length);
-        if (Object.keys(this.attributes.keys).length <= 3) {
-          this.classTableHeight = 'grid-item-h-1';
-        }
-        _self.showLoad = false;
+      if (this.isMutatedGeneCna) {
+        $.when(iViz.getTableData(_self.attributes.attr_id)).then(this.processTableData);
       } else {
-        $.when(iViz.getTableData(_self.attributes.attr_id)).then(function(_data) {
-          var data = iViz.getGroupNdx(_self.attributes.group_id);
-          _self.chartInst.init(_self.attributes, _self.$root.selectedsamples,
-            _self.$root.selectedgenes, data, _self.chartId, callbacks, _data.geneMeta);
-          _self.setDisplayTitle(_self.chartInst.getCases().length);
-          _self.isMutatedGeneCna = true;
-          _self.showLoad = false;
-        });
+        this.processTableData();
       }
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
