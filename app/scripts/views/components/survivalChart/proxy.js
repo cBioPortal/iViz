@@ -30,7 +30,7 @@
         _time = _dataObj.OS_MONTHS;
         _status = _dataObj.OS_STATUS;
       }
-      if (_time !== 'NaN' && _time !== 'NA' &&
+      if (!isNaN(_time) &&
         _status !== 'NaN' && _status !== 'NA' &&
         typeof _status !== 'undefined' && typeof _time !== 'undefined') {
         var _datum = jQuery.extend(true, {}, datum_);
