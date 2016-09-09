@@ -107,14 +107,24 @@
 
     function getTickFormat(v, logScale) {
       var _returnValue = v;
+      var index = 0;
       if (logScale) {
         if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
         } else {
-          var index = opts_.xDomain.indexOf(v);
+          index = opts_.xDomain.indexOf(v);
           if (index % 2 !== 0) {
             _returnValue = '';
           }
+        }
+      } else if (opts_.xDomain.length === 1) {
+        return 'NA';
+      } else if (opts_.xDomain.length === 2) {
+        // when there is only one value and NA in the data
+        if (v === opts_.xDomain[0]) {
+          _returnValue = v;
+        } else {
+          _returnValue = 'NA';
         }
       } else if (v === opts_.xDomain[0]) {
         return '<=' + opts_.xDomain[1];
@@ -122,6 +132,17 @@
         return '>' + opts_.xDomain[opts_.xDomain.length - 3];
       } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
         return 'NA';
+      } else if (Math.abs(data_.max - data_.min) > 1500 &&
+        opts_.xDomain.length > 7) {
+        // this is the special case for printing out year
+        index = opts_.xDomain.indexOf(v);
+        if (index % 2 === 0) {
+          _returnValue = v;
+        } else {
+          _returnValue = '';
+        }
+      } else {
+        _returnValue = v;
       }
       return _returnValue;
     }
@@ -254,11 +275,11 @@
             config.divider;
           config.gutter = 0.2;
           config.startPoint = (parseInt(min / 0.2, 10) - 1) * 0.2;
-          config.emptyMappingVal = config.maxVal + 0.2;
+          // config.emptyMappingVal = config.maxVal + 0.2;
         } else if (range <= 1 && min >= 0 && max <= 1) {
           config.gutter = 0.1;
           config.startPoint = 0;
-          config.emptyMappingVal = 1.1;
+          // config.emptyMappingVal = 1.1;
         } else if (range >= 1) {
           config.gutter = (
               parseInt(range / (config.numOfGroups * config.divider), 10) + 1
@@ -267,11 +288,11 @@
             config.gutter;
           config.startPoint = parseInt(min / config.gutter, 10) *
             config.gutter;
-          config.emptyMappingVal = config.maxVal + config.gutter;
+          // config.emptyMappingVal = config.maxVal + config.gutter;
         } else {
           config.gutter = 0.1;
           config.startPoint = -1;
-          config.emptyMappingVal = config.maxVal + 0.1;
+          // config.emptyMappingVal = config.maxVal + 0.1;
         }
 
         if (logScale) {
@@ -280,56 +301,62 @@
 
             config.xDomain.push(_tmpValue);
             if (_tmpValue > data.max) {
-              config.emptyMappingVal = Math.pow(10, i + 0.5);
+              config.xDomain.push(Math.pow(10, i + 0.5));
+              config.emptyMappingVal = Math.pow(10, i + 1);
               config.xDomain.push(config.emptyMappingVal);
-              config.maxDomain = Math.pow(10, i + 1);
+              config.maxDomain = Math.pow(10, i + 1.5);
               break;
             }
           }
         } else {
-          for (i = 0; i <= config.numOfGroups; i++) {
-            _tmpValue = i * config.gutter + config.startPoint;
+          if (!_.isNaN(range)) {
+            for (i = 0; i <= config.numOfGroups; i++) {
+              _tmpValue = i * config.gutter + config.startPoint;
+              if (config.startPoint < 1500) {
+                _tmpValue =
+                  Number(cbio.util.toPrecision(Number(_tmpValue), 3, 0.1));
+              }
 
-            _tmpValue =
-              Number(iViz.util.toPrecision(Number(_tmpValue), 3, 0.1));
-
-            // If the current _tmpValue already bigger than maximum number, the
-            // function should decrease the number of bars and also reset the
-            // mapped empty value.
-            if (_tmpValue >= max) {
-              // if i = 0 and tmpValue bigger than maximum number, that means
-              // all data fall into NA category.
-              if (i !== 0) {
+              // If the current tmpValue already bigger than maxmium number, the
+              // function should decrease the number of bars and also reset the
+              // Mappped empty value.
+              if (_tmpValue >= max) {
+                // if i = 0 and tmpValue bigger than maximum number, that means
+                // all data fall into NA category.
+                config.xDomain.push(_tmpValue);
+                break;
+              } else {
                 config.xDomain.push(_tmpValue);
               }
-              // Reset the empty mapping value
-              if (range > 1000 || range < 1) {
-                config.emptyMappingVal = (i + 1) * config.gutter +
-                  config.startPoint;
-              }
-
-              // If the distance of Max and Min value is smaller than 1, give
-              // a more precise value
-              if (range < 1) {
-                config.emptyMappingVal =
-                  Number(iViz.util.toPrecision(
-                    Number(config.emptyMappingVal), 3, 0.1));
-              }
-
-              break;
-            } else {
-              config.xDomain.push(_tmpValue);
             }
           }
-          // currently we always add ">max" and "NA" marker
-          // add marker for greater than maximum
-          config.xDomain.push(Number(cbio.util.toPrecision(
-            Number(config.xDomain[config.xDomain.length - 1] +
-              config.gutter), 3, 0.1)));
-          // add marker for NA values
-          config.xDomain.push(Number(cbio.util.toPrecision(
-            Number(config.xDomain[config.xDomain.length - 1] +
-              config.gutter), 3, 0.1)));
+          if (config.xDomain.length === 0) {
+            config.xDomain.push(Number(config.startPoint));
+          } else if (config.xDomain.length === 1) {
+            config.xDomain.push(Number(config.xDomain[0] + config.gutter));
+          } else if (Math.abs(min) > 1500) {
+            // currently we always add ">max" and "NA" marker
+            // add marker for greater than maximum
+            config.xDomain.push(
+              Number(config.xDomain[config.xDomain.length - 1] +
+                config.gutter));
+            // add marker for NA values
+            config.emptyMappingVal =
+              config.xDomain[config.xDomain.length - 1] + config.gutter;
+            config.xDomain.push(config.emptyMappingVal);
+          } else {
+            // add marker for greater than maximum
+            config.xDomain.push(
+              Number(cbio.util.toPrecision(
+                Number(config.xDomain[config.xDomain.length - 1] +
+                  config.gutter), 3, 0.1)));
+            // add marker for NA values
+            config.emptyMappingVal =
+              Number(cbio.util.toPrecision(
+                Number(config.xDomain[config.xDomain.length - 1] +
+                  config.gutter), 3, 0.1));
+            config.xDomain.push(config.emptyMappingVal);
+          }
         }
       }
       return config;
