@@ -252,9 +252,7 @@
         numOfCases = data_.length;
       }
       _.each(categories_, function(category) {
-        category.caseRate =
-          (((category.cases / numOfCases).toPrecision(2) * 100)).toString() +
-          '%';
+        category.caseRate = iViz.util.calcFreq(category.cases, numOfCases);
       });
     }
 
@@ -266,23 +264,22 @@
       if (geneData_) {
         _.each(geneData_, function(item, index) {
           var datum = {};
+          var freq = 0;
           datum.gene = item.gene;
           if (_selectedGenesMap === undefined) {
             datum.caseIds = iViz.util.unique(item.caseIds);
             datum.cases = datum.caseIds.length;
             datum.uniqueId = index;
+            freq = iViz.util.calcFreq(datum.cases, numOfCases_);
             switch (type_) {
               case 'mutatedGene':
                 datum.numOfMutations = item.num_muts;
-                datum.sampleRate = (numOfCases_ <= 0 ? 0 :
-                    ((datum.cases / Number(numOfCases_) * 100).toFixed(1))) +
-                  '%';
+                datum.sampleRate = freq;
                 break;
               case 'cna':
                 datum.cytoband = item.cytoband;
                 datum.altType = item.cna;
-                datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
-                    (datum.cases / numOfCases_ * 100).toFixed(1))) + '%';
+                datum.altrateInSample = freq;
                 break;
               default:
                 break;
@@ -294,19 +291,17 @@
             datum.caseIds =
               iViz.util.unique(_selectedGenesMap[item.index].caseIds);
             datum.cases = datum.caseIds.length;
+            freq = iViz.util.calcFreq(datum.cases, numOfCases_);
             switch (type_) {
               case 'mutatedGene':
                 datum.numOfMutations = _selectedGenesMap[item.index].num_muts;
-                datum.sampleRate = (numOfCases_ <= 0 ? 0 :
-                    ((datum.cases / Number(numOfCases_) * 100).toFixed(
-                      1))) + '%';
+                datum.sampleRate = freq;
                 datum.uniqueId = datum.gene;
                 break;
               case 'cna':
                 datum.cytoband = item.cytoband;
                 datum.altType = item.cna;
-                datum.altrateInSample = ((numOfCases_ <= 0 ? 0 :
-                    (datum.cases / numOfCases_ * 100).toFixed(1))) + '%';
+                datum.altrateInSample = freq;
                 datum.uniqueId = datum.gene + '-' + datum.altType;
                 break;
               default:

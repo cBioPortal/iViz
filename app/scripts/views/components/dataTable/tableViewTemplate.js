@@ -65,7 +65,8 @@
           this.madeSelection = false;
         } else {
           var attrId =
-            this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+            this.attributes.group_type === 'patient' ?
+              'patient_id' : 'sample_id';
           var _selectedCases =
             _.pluck(this.invisibleDimension.top(Infinity), attrId);
           this.chartInst.update(_selectedCases, this.selectedRows);
@@ -159,6 +160,10 @@
             submitClick: this.submitClick
           }, this.isMutatedGeneCna ? _data.geneMeta : null);
         this.setDisplayTitle(this.chartInst.getCases().length);
+        if (!this.isMutatedGeneCna &&
+          Object.keys(this.attributes.keys).length <= 3) {
+          this.classTableHeight = 'grid-item-h-1';
+        }
         this.showLoad = false;
       }
     },
@@ -185,7 +190,8 @@
       _self.chartInst = new iViz.view.component.TableView();
       _self.chartInst.setDownloadDataTypes(['tsv']);
       if (this.isMutatedGeneCna) {
-        $.when(iViz.getTableData(_self.attributes.attr_id)).then(this.processTableData);
+        $.when(iViz.getTableData(_self.attributes.attr_id))
+          .then(this.processTableData);
       } else {
         this.processTableData();
       }

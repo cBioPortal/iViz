@@ -185,6 +185,16 @@
       return color;
     };
 
+    content.calcFreq = function(fraction, numerator, toFixed) {
+      var freq = 0;
+      toFixed = isNaN(toFixed) ? 2 : Number(toFixed);
+      if (numerator > 0) {
+        freq = fraction / numerator * 100;
+        freq = freq % 1 === 0 ? freq : freq.toFixed(toFixed);
+      }
+      return freq + '%';
+    };
+
     function tableDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
