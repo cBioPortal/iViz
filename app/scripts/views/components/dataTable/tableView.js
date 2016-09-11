@@ -27,6 +27,9 @@
     var categories_ = {};
     var reactData_;
     var isMutatedGeneCna = false;
+    var dimension = {};
+    var group = {};
+    var labelInitData = {};
 
     // Category based color assignment. Avoid color changing
     var assignedColors = {
@@ -48,7 +51,7 @@
 
     content.init =
       function(_attributes, _selectedSamples, _selectedGenes,
-               _data, _chartId, _callbacks, _geneData) {
+               _data, _chartId, _callbacks, _geneData, _dimension) {
         initialized = false;
         allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
@@ -65,6 +68,11 @@
         attributes_ = _attributes;
         callbacks_ = _callbacks;
         isMutatedGeneCna = ['mutatedGene', 'cna'].indexOf(type_) !== -1;
+        if (!isMutatedGeneCna) {
+          dimension = _dimension;
+          group = dimension.group();
+          initPieTableData();
+        }
         initReactTable(true);
       };
 
@@ -219,9 +227,39 @@
       }
       return assignedColors[key];
     }
+    function initPieTableData() {
+      _.each(group.all(), function(attr, index) {
+        labelInitData[attr.key] = {
+          attr: attr,
+          color: getColor(attr.value),
+          id: attr.key,
+          index: index
+        };
+      });
+    }
 
-    function initCategories(_selectedMap) {
-      var hasSelectedCases = _.isObject(_selectedMap);
+    function updateCategories() {
+      var _labels = {};
+      var _currentSampleSize = 0;
+      _.each(group.top(Infinity), function(label) {
+        var _labelDatum = {};
+        var _labelValue = Number(label.value);
+        if (_labelValue > 0) {
+          _labelDatum.id = labelInitData[label.key].id;
+          _labelDatum.index = labelInitData[label.key].index;
+          _labelDatum.name = label.key;
+          _labelDatum.color = labelInitData[label.key].color;
+          _labelDatum.cases = _labelValue;
+          _currentSampleSize += _labelValue;
+          _labels[_labelDatum.id] = _labelDatum;
+        }
+      });
+
+      _.each(_labels, function(label) {
+        label.caseRate = (_currentSampleSize <= 0 ? 0 : (Number(label.cases) * 100 / _currentSampleSize).toFixed(1).toString()) + '%';
+      });
+      categories_ = _labels;
+     /* var hasSelectedCases = _.isObject(_selectedMap);
       var numOfCases = 0;
 
       if (hasSelectedCases) {
@@ -256,7 +294,7 @@
       }
       _.each(categories_, function(category) {
         category.caseRate = iViz.util.calcFreq(category.cases, numOfCases);
-      });
+      });*/
     }
 
     function mutatedGenesData(_selectedGenesMap) {
@@ -352,7 +390,7 @@
       } else {
         categories_ = {};
         result.attributes[0].display_name = displayName;
-        initCategories(_selectedMap);
+        updateCategories(_selectedMap);
         initRegularTableData();
         result.data = reactData_;
       }

@@ -113,14 +113,10 @@
 
         if (this.isMutatedGeneCna) {
           this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
-        } else {
-          this.selectedRows = selectedRowsUids;
-        }
-        _.each(_selectedRowData, function(item) {
-          var casesIds = item.caseIds.split(',');
-          selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
-        });
-        if (this.isMutatedGeneCna) {
+          _.each(_selectedRowData, function(item) {
+            var casesIds = item.caseIds.split(',');
+            selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
+          });
           if (this.attributes.filter.length === 0) {
             this.attributes.filter = selectedSamplesUnion.sort();
           } else {
@@ -128,6 +124,7 @@
               iViz.util.intersection(this.attributes.filter, selectedSamplesUnion.sort());
           }
         } else {
+          this.selectedRows = selectedRowsUids;
           this.attributes.filter = this.selectedRows;
         }
         var filtersMap = {};
@@ -158,7 +155,7 @@
           this.$root.selectedgenes, data, this.chartId, {
             addGeneClick: this.addGeneClick,
             submitClick: this.submitClick
-          }, this.isMutatedGeneCna ? _data.geneMeta : null);
+          }, this.isMutatedGeneCna ? _data.geneMeta : null, this.invisibleDimension);
         this.setDisplayTitle(this.chartInst.getCases().length);
         if (!this.isMutatedGeneCna &&
           Object.keys(this.attributes.keys).length <= 3) {
@@ -183,6 +180,9 @@
       }
 
       this.invisibleDimension = this.ndx.dimension(function(d) {
+        if (typeof d[attrId] === 'undefined') {
+          d[attrId] = 'NA';
+        }
         return d[attrId];
       });
       callbacks.addGeneClick = this.addGeneClick;
