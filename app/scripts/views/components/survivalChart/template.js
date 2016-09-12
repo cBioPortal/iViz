@@ -58,7 +58,7 @@
         this.invisibleDimension.dispose();
         this.$dispatch('close');
       },
-      'adding-chart': function(groupId, val) {
+      'addingChart': function(groupId, val) {
         if (this.attributes.group_id === groupId) {
           if (this.attributes.filter.length > 0) {
             if (val) {
