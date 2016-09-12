@@ -256,7 +256,7 @@
       });
 
       _.each(_labels, function(label) {
-        label.caseRate = (_currentSampleSize <= 0 ? 0 : (Number(label.cases) * 100 / _currentSampleSize).toFixed(1).toString()) + '%';
+        label.caseRate = iViz.util.calcFreq(Number(label.cases), _currentSampleSize);
       });
       categories_ = _labels;
      /* var hasSelectedCases = _.isObject(_selectedMap);
