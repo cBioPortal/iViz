@@ -103,14 +103,17 @@
             } else {
               self_.chartInst.select('.brush').on('mouseup', function() {
                 self_.filtersUpdated = true;
-                if (typeof _filter !== 'undefined' &&
+                if (typeof _filter !== 'undefined' && _filter !== null &&
                   _filter.length > 1) {
                   var tempFilters_ = [];
                   tempFilters_[0] = _filter[0].toFixed(2);
                   tempFilters_[1] = _filter[1].toFixed(2);
                   self_.attributes.filter = tempFilters_;
+                  self_.$dispatch('update-filters');
+                } else if (self_.attributes.filter.length > 0) {
+                  self_.attributes.filter = [];
+                  self_.$dispatch('update-filters');
                 }
-                self_.$dispatch('update-filters');
               });
             }
           }
