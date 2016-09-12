@@ -1,0 +1,8 @@
+--- 
+articles: 
+  - Overview: README.md
+branches: 
+  - master
+  - portal-rc
+dir: app/scripts
+packageJson: package.json
