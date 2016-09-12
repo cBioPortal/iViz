@@ -1,0 +1,23 @@
+languages:
+    JavaScript: true
+
+exclude_paths:
+- "test/*"
+- "dist/*"
+- "bower_components/*"
+- "node_modules/*"
+- "app/_components/*"
+
+engines:
+  eslint:
+    enabled: true
+    channel: "eslint-2"
+    config:
+        extensions:
+        - .es6
+        - .js
+
+ratings:
+   paths:
+   - app/**
+   - **.js
