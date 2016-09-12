@@ -196,10 +196,10 @@ window.DataManagerForIviz = (function($, _) {
         this.getPatientClinicalAttributes(),
         this.getCnaFractionData())
         .then(function(_geneticProfiles, _caseLists,
-                       _studyToSampleToPatientMap,
-                       _sampleAttributes,
-                       _patientAttributes,
-                       _cnaFractionData) {
+          _studyToSampleToPatientMap,
+          _sampleAttributes,
+          _patientAttributes,
+          _cnaFractionData) {
           $.when(self.getMutationCount())
             .then(function(_mutationCountData) {
               var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
@@ -1066,11 +1066,8 @@ window.DataManagerForIviz = (function($, _) {
         return getPatientClinicalData(this, attribute_ids);
       },
       getClinicalData: function(attribute_ids, isPatientAttributes) {
-        if (isPatientAttributes) {
-          return this.getPatientClinicalData(attribute_ids);
-        } else {
-          return this.getSampleClinicalData(attribute_ids);
-        }
+        return isPatientAttributes ? this.getPatientClinicalData(attribute_ids) :
+          this.getSampleClinicalData(attribute_ids);
       }
     };
   };

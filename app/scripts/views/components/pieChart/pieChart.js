@@ -35,7 +35,7 @@
  */
 
 'use strict';
-(function(iViz, d3, dc, _, $, React, ReactDOM) {
+(function(iViz, d3, dc, _, $, React, ReactDOM, EnhancedFixedDataTableSpecial) {
   // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.PieChart = function(ndx, attributes, opts, cluster) {
     var content = this;
@@ -557,4 +557,6 @@
   window._,
   window.$ || window.jQuery,
   window.React,
-  window.ReactDOM);
+  window.ReactDOM,
+  window.EnhancedFixedDataTableSpecial
+);

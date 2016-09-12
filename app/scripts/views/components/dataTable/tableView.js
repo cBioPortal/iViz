@@ -2,7 +2,7 @@
  * Created by Karthik Kalletla on 6/20/16.
  */
 'use strict';
-(function(iViz, dc, _, React, ReactDOM) {
+(function(iViz, dc, _, React, ReactDOM, EnhancedFixedDataTableSpecial) {
   // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.TableView = function() {
     var content = this;
@@ -33,7 +33,7 @@
 
     // Category based color assignment. Avoid color changing
     var assignedColors = {
-      'NA': '#cccccc'
+      NA: '#cccccc'
     };
     var colors = $.extend(true, [], iViz.util.getColors());
 
@@ -606,5 +606,6 @@
   window.dc,
   window._,
   window.React,
-  window.ReactDOM
+  window.ReactDOM,
+  window.EnhancedFixedDataTableSpecial
 );

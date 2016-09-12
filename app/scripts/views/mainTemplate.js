@@ -2,7 +2,7 @@
  * Created by Karthik Kalletla on 4/13/16.
  */
 'use strict';
-(function(Vue, dc, iViz, Packery, Draggabilly, _, $) {
+(function(Vue, dc, iViz, Packery, Draggabilly, _) {
   Vue.component('mainTemplate', {
     template: '<chart-group :redrawgroups.sync="redrawgroups" :id="group.id" ' +
     ':type="group.type" ' +
@@ -234,5 +234,4 @@
   window.iViz,
   window.Packery,
   window.Draggabilly,
-  window._,
-  window.$ || window.jQuery);
+  window._);

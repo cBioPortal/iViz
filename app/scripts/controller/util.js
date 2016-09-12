@@ -170,7 +170,7 @@
         color += letters[Math.floor(Math.random() * 16)];
       }
       return color;
-    }
+    };
 
     /**
      * Get a random color hex out of Colors in getColors function;
