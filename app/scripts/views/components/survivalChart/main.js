@@ -17,7 +17,7 @@
       this.chartInst_ =
         new iViz.view.component
           .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
-      this.update(_selectedPatientList, opts_.chartId, opts_.attrId);
+      this.chartInst_.addCurve(_dataProxy.get(), 0, '#2986e2');
     };
 
     // _attrId here indicates chart type (OS or DFS)
