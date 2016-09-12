@@ -42,6 +42,23 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
   var patientData_;
   var sampleData_;
   var charts = {};
+
+  function getAttrVal(attrs, arr) {
+    var str = [];
+    _.each(attrs, function(displayName, attrId) {
+      if (attrId === 'cna_details' || attrId === 'mutated_genes') {
+        var temp = 'No';
+        if (arr[attrId] !== undefined) {
+          temp = arr[attrId].length > 0 ? 'Yes' : 'No';
+        }
+        str.push(temp);
+      } else {
+        str.push(arr[attrId] ? arr[attrId] : 'NA');
+      }
+    });
+    return str;
+  }
+
   return {
 
     init: function(_rawDataJSON) {
@@ -493,17 +510,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
         for (var i = 0; i < arrL; i++) {
           strA.length = 0;
-          _.each(attr, function(displayName, attrId) {
-            if (attrId === 'cna_details' || attrId === 'mutated_genes') {
-              var temp = 'No';
-              if (arr[i][attrId] !== undefined) {
-                temp = arr[i][attrId].length > 0 ? 'Yes' : 'No';
-              }
-              strA.push(temp);
-            } else {
-              strA.push(arr[i][attrId]);
-            }
-          });
+          strA = getAttrVal(attr, arr[i]);
           content += '\r\n' + strA.join('\t');
         }
 
@@ -554,7 +561,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         if (QueryByGeneTextArea.isEmpty()) {
           $('#iviz-form').trigger('submit');
         } else {
-          event.preventDefault();
+          window.event.preventDefault();
           QueryByGeneTextArea.validateGenes(this.decideSubmit, false);
         }
       } else {

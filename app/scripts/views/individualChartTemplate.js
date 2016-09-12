@@ -37,14 +37,14 @@
       };
     },
     watch: {
-      'clearChart': function(val) {
+      clearChart: function(val) {
         if (val && this.attributes.filter.length > 0) {
           this.attributes.filter = [];
         }
       }
     },
     events: {
-      'close': function() {
+      close: function() {
         this.attributes.show = false;
         this.$dispatch('remove-chart',
           this.attributes.attr_id, this.attributes.group_id);
