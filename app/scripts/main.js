@@ -53,7 +53,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         }
         str.push(temp);
       } else {
-        str.push(arr[attrId]); // This may return undefined. Is this expected?
+        str.push(arr[attrId] ? arr[attrId] : 'NA');
       }
     });
     return str;
