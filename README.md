@@ -1,4 +1,6 @@
 # iViz
+<a href="https://codeclimate.com/github/cBioPortal/iViz"><img src="https://codeclimate.com/github/cBioPortal/iViz/badges/gpa.svg" /></a>
+
 Stand-alone library to analysis cohorts. It's seperated from cBioPortal Study View.
 
 
