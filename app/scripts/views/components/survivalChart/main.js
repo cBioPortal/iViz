@@ -9,7 +9,7 @@
     var data_ = {};
     var opts_ = {};
 
-    content_.init = function(_data, _opts, _selectedPatientList) {
+    content_.init = function(_data, _opts) {
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
       data_ = _data;
