@@ -9,7 +9,7 @@
     var data_ = {};
     var opts_ = {};
 
-    content_.init = function(_data, _opts, _selectedPatientList) {
+    content_.init = function(_data, _opts) {
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
       data_ = _data;
@@ -17,7 +17,7 @@
       this.chartInst_ =
         new iViz.view.component
           .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
-      this.update(_selectedPatientList, opts_.chartId, opts_.attrId);
+      this.chartInst_.addCurve(_dataProxy.get(), 0, '#2986e2');
     };
 
     // _attrId here indicates chart type (OS or DFS)

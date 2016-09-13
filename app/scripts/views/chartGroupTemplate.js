@@ -51,7 +51,7 @@
     events: {
       'add-chart-to-group': function(groupId) {
         if (this.id === groupId) {
-          this.$broadcast('adding-chart', this.id, true);
+          this.$broadcast('addingChart', this.id, true);
           if (this.invisibleChartFilters.length > 0) {
             this.invisibleBridgeDimension.filterAll();
           }
@@ -68,7 +68,7 @@
               return (filtersMap[d] !== undefined);
             });
           }
-          this.$broadcast('adding-chart', this.id, false);
+          this.$broadcast('addingChart', this.id, false);
         }
       },
       /*

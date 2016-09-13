@@ -49,10 +49,15 @@
     _.each(datumArr_, function(_datumObj) {
       var _status = _datumObj.status.toString().toLowerCase();
       if (_status === 'deceased' || _status === 'recurred/progressed' ||
-        _status === 'recurred') {
+        _status === 'recurred' || _status === 1) {
         _datumObj.status = 1;
       } else if (_status === 'living' || _status === 'disease free' ||
-        _status === 'diseasefree') {
+        _status === 'diseasefree' || _status === 'alive' || _status === 0) {
+        _datumObj.status = 0;
+      } else {
+        // TODO : by default set status 0 when _status doesn't
+        // match to any of the above cases, not sure whether to treat them as
+        // living or not
         _datumObj.status = 0;
       }
     });
