@@ -195,7 +195,9 @@
                   (_.isUndefined(_time) ? '' :
                     ('Months: <strong>' + _time + '</strong><br>')) +
                   (d.patient_id ?
-                    ('Patient ID: <strong>' + d.patient_id + '</strong><br>') :
+                    ('Patient ID: <strong><a href="' + window.cbioURL + '/' +
+                    window.cbio.util.getLinkToPatientView(d.study_id, d.patient_id ) +
+                    '" target="_blank">' + d.patient_id + '</a></strong><br>') :
                     '') +
                   (d.study_id ?
                     ('Study: <strong>' + d.study_id + '</strong>') : '');
