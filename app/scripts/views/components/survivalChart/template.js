@@ -101,12 +101,11 @@
         title: this.attributes.display_name,
         type: this.attributes.group_type
       };
-      var _selectedPatientList = this.$parent.$parent.$parent.selectedpatients;
       _self.chartInst = new iViz.view.component.Survival();
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
       var data = iViz.getGroupNdx(this.attributes.group_id);
-      _self.chartInst.init(data, _opts, _selectedPatientList);
+      _self.chartInst.init(data, _opts);
       _self.showLoad = false;
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
