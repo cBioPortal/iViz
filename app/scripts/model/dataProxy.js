@@ -13,7 +13,7 @@ window.DataManagerForIviz = (function($, _) {
   // TODO: how do work with merged studies(virtual studies)
   var hiddenAttrs_ = {
     OS_SURVIVAL: ['mskimpact'],
-    DFS_SURVIVAL: ['mskimpact'],
+    DFS_SURVIVAL: ['mskimpact']
   };
 
   /**
