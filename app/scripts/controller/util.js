@@ -633,6 +633,15 @@
       return false;
     };
 
+    content.escape = function(_str) {
+      _str = _str.replace(/>/g, "_greater_than_");
+      _str = _str.replace(/</g, "_less_than_");
+      _str = _str.replace(/+/g, "_plus_");
+      _str = _str.replace(/-/g, "_minus_");
+      _str = _str.replace(/\(|\)| /g, '');
+      return _str;
+    }
+    
     return content;
   })();
 })(window.iViz,
