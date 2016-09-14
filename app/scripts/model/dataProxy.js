@@ -8,12 +8,12 @@ window.DataManagerForIviz = (function($, _) {
   // Clinical attributes will be transfered into table.
   var tableAttrs_ = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'GENDER'];
   content.util = {};
-  
+
   // clinical attr id as key, designed for specific studies.
   // TODO: how do work with merged studies(virtual studies)
   var hiddenAttrs_ = {
     OS_SURVIVAL: ['mskimpact'],
-    DFS_SURVIVAL: ['mskimpact'],
+    DFS_SURVIVAL: ['mskimpact']
   };
 
   /**
@@ -202,10 +202,10 @@ window.DataManagerForIviz = (function($, _) {
         this.getPatientClinicalAttributes(),
         this.getCnaFractionData())
         .then(function(_geneticProfiles, _caseLists,
-          _studyToSampleToPatientMap,
-          _sampleAttributes,
-          _patientAttributes,
-          _cnaFractionData) {
+                       _studyToSampleToPatientMap,
+                       _sampleAttributes,
+                       _patientAttributes,
+                       _cnaFractionData) {
           $.when(self.getMutationCount())
             .then(function(_mutationCountData) {
               var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
@@ -932,7 +932,7 @@ window.DataManagerForIviz = (function($, _) {
               }
               $.ajax({
                 method: 'POST',
-                url: self.portalUrl + '/cna.json?',
+                url: self.portalUrl + 'cna.json?',
                 data: _data,
                 success: function(response) {
                   _ajaxCnaFractionData = $.extend({}, response, _ajaxCnaFractionData);
@@ -973,7 +973,7 @@ window.DataManagerForIviz = (function($, _) {
               }
               $.ajax({
                 method: 'POST',
-                url: self.portalUrl + '/cna.json?',
+                url: self.portalUrl + 'cna.json?',
                 data: _data,
                 success: function(response) {
                   _ajaxCnaData.gene = _ajaxCnaData.gene.concat(response.gene);
@@ -1015,7 +1015,7 @@ window.DataManagerForIviz = (function($, _) {
                 }
                 $.ajax({
                   method: 'POST',
-                  url: self.portalUrl + '/mutations.json?',
+                  url: self.portalUrl + 'mutations.json?',
                   data: _data,
                   success: function(response) {
                     _ajaxMutationCountData = $.extend({}, response, _ajaxMutationCountData);
@@ -1051,7 +1051,7 @@ window.DataManagerForIviz = (function($, _) {
               }
               $.ajax({
                 method: 'POST',
-                url: self.portalUrl + '/mutations.json?',
+                url: self.portalUrl + 'mutations.json?',
                 data: _data,
                 success: function(response) {
                   _mutDataStudyIdArr = $.extend({}, response, _mutDataStudyIdArr);

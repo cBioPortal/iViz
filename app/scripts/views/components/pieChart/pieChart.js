@@ -55,10 +55,6 @@
     v.data = $.extend(true, v.data, attributes);
     v.data.ndx = ndx;
 
-    v.opts.chartId = iViz.util.escape(v.opts.chartId);
-    v.opts.chartDivId = iViz.util.escape(v.opts.chartDivId);
-    v.opts.chartTableId = iViz.util.escape(v.opts.chartTableId);
-    
     var labels = [];
     var reactTableData = {};
     reactTableData.attributes = [{
@@ -190,13 +186,12 @@
         var radius = (width - 20) / 2;
         var color = $.extend(true, [], v.data.color);
 
-
         v.chart = dc.pieChart('#' + v.opts.chartId, v.opts.groupid);
 
         v.data.attrKeys = cluster.group().all().map(function(d) {
           return d.key;
         });
-        
+
         v.data.category = iViz.util.pieChart.getCategory(v.data.attr_id,
           v.data.attrKeys);
 
