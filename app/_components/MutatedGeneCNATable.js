@@ -1,6 +1,6 @@
 'use strict';
 
-var EnhancedFixedDataTableSpecial = (function() {
+window.EnhancedFixedDataTableSpecial = (function() {
 // Data button component
   var FileGrabber = React.createClass({displayName: "FileGrabber",
     // Saves table content to a text file

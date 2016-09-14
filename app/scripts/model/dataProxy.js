@@ -2,12 +2,19 @@
 window.DataManagerForIviz = (function($, _) {
   var content = {};
   // DESC, all lowercase
-  var clinicalAttrsPriority = ['cancer_type', 'cancer_type_detailed',
-    'gender', 'age', 'sequenced', 'has_cna_data', 'sample_count_patient'];
+  var clinicalAttrsPriority = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED',
+    'GENDER', 'AGE', 'SEQUENCED', 'HAS_CNA_DATA', 'SAMPLE_COUNT_PATIENT'];
 
   // Clinical attributes will be transfered into table.
   var tableAttrs_ = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'GENDER'];
   content.util = {};
+  
+  // clinical attr id as key, designed for specific studies.
+  // TODO: how do work with merged studies(virtual studies)
+  var hiddenAttrs_ = {
+    OS_SURVIVAL: ['mskimpact'],
+    DFS_SURVIVAL: ['mskimpact'],
+  };
 
   /**
    * General pick clinical attributes based on predesigned Regex
@@ -37,7 +44,6 @@ window.DataManagerForIviz = (function($, _) {
     };
 
     if (_.isString(attr)) {
-      attr = attr.toLowerCase();
       if (_.isString(studyId) && studySpecific.hasOwnProperty(studyId) &&
         studySpecific[studyId].indexOf(attr) !== -1) {
         return true;
@@ -101,8 +107,8 @@ window.DataManagerForIviz = (function($, _) {
     if (!_.isString(b)) {
       return -1;
     }
-    var aI = clinicalAttrsPriority.indexOf(a.toLowerCase());
-    var bI = clinicalAttrsPriority.indexOf(b.toLowerCase());
+    var aI = clinicalAttrsPriority.indexOf(a);
+    var bI = clinicalAttrsPriority.indexOf(b);
     return aI - bI;
   };
 
@@ -509,7 +515,8 @@ window.DataManagerForIviz = (function($, _) {
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
               }
 
-              if (_hasDFS) {
+              if (_hasDFS &&
+                _.intersection(hiddenAttrs_.DFS_SURVIVAL, Object.keys(_studyToSampleToPatientMap)).length === 0) {
                 var _dfsSurvivalAttrMeta = {};
                 _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
                 _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
@@ -525,7 +532,8 @@ window.DataManagerForIviz = (function($, _) {
                 _patientAttributes[_dfsSurvivalAttrMeta.attr_id] = _dfsSurvivalAttrMeta;
               }
 
-              if (_hasOS) {
+              if (_hasOS &&
+                _.intersection(hiddenAttrs_.OS_SURVIVAL, Object.keys(_studyToSampleToPatientMap)).length === 0) {
                 var _osSurvivalAttrMeta = {};
                 _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
                 _osSurvivalAttrMeta.datatype = 'SURVIVAL';

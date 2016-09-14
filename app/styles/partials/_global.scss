@@ -113,14 +113,14 @@
 
 #iviz_add_chart_chosen {
   margin-top: -3px;
-  width: 250px !important;
+  width: $add-chart-chosen-width !important;
   background-image: none !important;
 }
 
 #iviz_add_chart_chosen>a {
   background-image: none;
-  height: 28px;
-  line-height: 28px;
+  height: 30px;
+  line-height: 30px;
 }
 
 div.geneValidationNotification,
