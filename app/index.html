@@ -227,8 +227,6 @@
     $.when(window.iviz.datamanager.initialSetup()).then(function(_data){
       iViz.init(_data);
     });
-    //  iViz.data.init(window.cbioURL, ['hnsc_tcga'], iViz.init);
-   
     
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
       iViz.vue.manage.getInstance().$broadcast('gene-list-updated',genes);

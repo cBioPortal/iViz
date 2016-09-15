@@ -418,7 +418,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       });
       if (possible) {
         var _selectedPatientIds = selectedCases_.sort();
-        var _url = window.cbioURL + '/case.do?cancer_study_id=' +
+        var _url = window.cbioURL + 'case.do?cancer_study_id=' +
           studyId +
           '&case_id=' + _selectedPatientIds[0] +
           '#nav_case_ids=' + _selectedPatientIds.join(',');
@@ -508,7 +508,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       });
       if (possibleTOQuery) {
         $('#iviz-form').get(0).setAttribute(
-          'action', window.cbioURL + '/index.do');
+          'action', window.cbioURL + 'index.do');
         $('<input>').attr({
           type: 'hidden',
           value: studyId_,
