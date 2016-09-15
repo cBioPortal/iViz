@@ -6,7 +6,7 @@ window.DataManagerForIviz = (function($, _) {
     'GENDER', 'AGE', 'SEQUENCED', 'HAS_CNA_DATA', 'SAMPLE_COUNT_PATIENT'];
 
   // Clinical attributes will be transfered into table.
-  var tableAttrs_ = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED', 'GENDER'];
+  var tableAttrs_ = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED'];
   content.util = {};
 
   // clinical attr id as key, designed for specific studies.
