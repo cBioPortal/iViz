@@ -230,6 +230,9 @@
 
     function initPieTableData() {
       _.each(group.all(), function(attr, index) {
+        if (!attr.value || attr.value === 'na') {
+          attr.value = 'NA';
+        }
         labelInitData[attr.key] = {
           attr: attr,
           color: getColor(attr.key),
