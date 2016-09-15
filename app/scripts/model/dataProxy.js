@@ -17,6 +17,16 @@ window.DataManagerForIviz = (function($, _) {
   };
 
   /**
+   * Priorities (number before 10 are reserved for manually assign)
+   * TODO: priority manager after 10
+   *
+   * Survival Plots: 1; Scatter Plot: 2;
+   * Mutated Genes table: 3; CNA table: 4;
+   * Mutated Count bar chart: 5; CNA bar chart:6
+   * Cancer Type/Cancer Type details: 4.1 but MSKIMPACT: 0.9
+   */
+
+  /**
    * General pick clinical attributes based on predesigned Regex
    * This filter is the same one which used in previous Google Charts Version,
    * should be revised later.
@@ -298,8 +308,14 @@ window.DataManagerForIviz = (function($, _) {
                     sequencedCases: _caseLists.allSampleIds
                   };
                 }
-                if (['CANCER_TYPE', 'CANCER_TYPE_DETAILED'].indexOf(_metaObj.attr_id) !== -1) {
-                  _metaObj.priority = 0.9;
+                if (['CANCER_TYPE', 'CANCER_TYPE_DETAILED']
+                    .indexOf(_metaObj.attr_id) !== -1) {
+                  if (Object.keys(_studyToSampleToPatientMap)
+                      .indexOf('MSKIMPACT') === -1) {
+                    _metaObj.priority = 4.1;
+                  } else {
+                    _metaObj.priority = 0.9;
+                  }
                 }
               });
               _.each(_patientAttributes, function(_metaObj) {
@@ -448,7 +464,7 @@ window.DataManagerForIviz = (function($, _) {
                 _MutationCountMeta.filter = [];
                 _mutationCountData.keys = {};
                 _mutationCountData.numOfDatum = 0;
-                _MutationCountMeta.priority = 4;
+                _MutationCountMeta.priority = 5;
                 _MutationCountMeta.show = true;
                 _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
                 _sampleAttributes[_MutationCountMeta.attr_id] = (_MutationCountMeta);
@@ -467,7 +483,7 @@ window.DataManagerForIviz = (function($, _) {
                 _cnaAttrMeta.show = true;
                 _cnaAttrMeta.keys = {};
                 _cnaAttrMeta.numOfDatum = 0;
-                _cnaAttrMeta.priority = 3;
+                _cnaAttrMeta.priority = 4;
                 _cnaAttrMeta.attrList = [_cnaAttrMeta.attr_id];
                 _cnaAttrMeta.options = {
                   allCases: _caseLists.allSampleIds,
@@ -560,7 +576,7 @@ window.DataManagerForIviz = (function($, _) {
                   filter: [],
                   keys: [],
                   numOfDatum: 0,
-                  priority: 1,
+                  priority: -1,
                   show: true,
                   attrList: ['study_id']
                 };
@@ -574,7 +590,7 @@ window.DataManagerForIviz = (function($, _) {
                   display_name: 'Copy Number Alterations',
                   attr_id: 'copy_number_alterations',
                   view_type: 'bar_chart',
-                  priority: 4,
+                  priority: 6,
                   filter: [],
                   attrList: ['copy_number_alterations'],
                   keys: [],

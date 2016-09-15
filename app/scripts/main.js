@@ -285,7 +285,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
             if (Object.keys(selectedAttrMeta.keys).length >
               (selectedAttrMeta.numOfDatum / 2) &&
-              selectedAttrMeta.datatype === 'STRING') {
+              selectedAttrMeta.datatype === 'STRING' &&
+              Object.keys(selectedAttrMeta.keys).length > 10) {
               var caseIds = isPatientAttributes ?
                 Object.keys(data_.groups.group_mapping.patient.sample) :
                 Object.keys(data_.groups.group_mapping.sample.patient);

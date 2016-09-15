@@ -227,11 +227,15 @@
       }
       return assignedColors[key];
     }
+
     function initPieTableData() {
       _.each(group.all(), function(attr, index) {
+        if (!attr.value || attr.value === 'na') {
+          attr.value = 'NA';
+        }
         labelInitData[attr.key] = {
           attr: attr,
-          color: getColor(attr.value),
+          color: getColor(attr.key),
           id: attr.key,
           index: index
         };
@@ -259,42 +263,6 @@
         label.caseRate = iViz.util.calcFreq(Number(label.cases), _currentSampleSize);
       });
       categories_ = _labels;
-     /* var hasSelectedCases = _.isObject(_selectedMap);
-      var numOfCases = 0;
-
-      if (hasSelectedCases) {
-        _.each(_selectedMap, function(category, key) {
-          if (!key) {
-            key = 'NA';
-          }
-          categories_[key] = {
-            name: key,
-            color: getColor(key),
-            caseIds: category,
-            cases: category.length
-          };
-          numOfCases += category.length;
-        });
-      } else {
-        _.each(data_, function(item) {
-          var _datum = item[attributes_.attr_id] || 'NA';
-
-          if (!categories_.hasOwnProperty(_datum)) {
-            categories_[_datum] = {
-              name: _datum,
-              cases: 0,
-              color: getColor(_datum),
-              caseIds: []
-            };
-          }
-          ++categories_[_datum].cases;
-          categories_[_datum].caseIds.push(item.patient_id ? item.patient_id : item.sample_id);
-        });
-        numOfCases = data_.length;
-      }
-      _.each(categories_, function(category) {
-        category.caseRate = iViz.util.calcFreq(category.cases, numOfCases);
-      });*/
     }
 
     function mutatedGenesData(_selectedGenesMap) {
