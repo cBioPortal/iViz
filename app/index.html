@@ -208,7 +208,7 @@
     iViz.vue.manage.getInstance().showManageButton = true;
     iViz.vue.manage.getInstance().showSaveButton = true;
     
-    $.get('resources/vars.json')
+    $.getJSON('resources/vars.json')
       .then(function(data) {
         window.style.vars = data;
         window.style.vars.survivalWidth = 370;
