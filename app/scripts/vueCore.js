@@ -96,8 +96,8 @@
               });
               this.showDropDown = showDropDown;
             },
-            openCases: function() {
-              iViz.openCases();
+            openCases: function(type) {
+              iViz.openCases(type);
             },
             downloadCaseData: function() {
               iViz.downloadCaseData();
