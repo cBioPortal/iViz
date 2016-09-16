@@ -132,7 +132,7 @@
         return '>' + opts_.xDomain[opts_.xDomain.length - 3];
       } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
         return 'NA';
-      } else if (Math.abs(data_.max - data_.min) > 1500 &&
+      } else if (data_.min > 1500 &&
         opts_.xDomain.length > 7) {
         // this is the special case for printing out year
         index = opts_.xDomain.indexOf(v);

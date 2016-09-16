@@ -40,12 +40,14 @@
   position: relative;
 }
 
-.start-loading{
+.start-loading {
   opacity: 0.3;
 }
-.show-loading{
+
+.show-loading {
   display: block !important;
 }
+
 .chart-loader {
   width: 100%;
   display: none;
@@ -64,7 +66,6 @@
   text-align: center;
 }
 
-
 #iviz-case-select-custom-dialog input[type="radio"] {
   margin: 3px;
 }
@@ -76,6 +77,7 @@
 .iviz-hidden {
   display: none;
 }
+
 .show {
   display: block;
 }
@@ -87,8 +89,8 @@
 
 .iviz-header-button {
   float: left;
-  margin: -3px 5px 0 0;
-  font-family: Verdana,Arial,sans-serif;
+  margin: 0 5px;
+  font-family: Verdana, Arial, sans-serif;
   font-size: 1.1em;
   border: 1px solid darkgray;
   background: none;
@@ -100,32 +102,33 @@
   border-color: darkgrey;
   line-height: 18px;
 }
+
 .iviz-header-button:hover {
   cursor: pointer;
 }
 
-#iviz-header-left{
+#iviz-header-left {
   display: inline-block;
 }
+
 #iviz-header-right {
   float: right;
 }
 
 #iviz_add_chart_chosen {
-  margin-top: -3px;
   width: $add-chart-chosen-width !important;
   background-image: none !important;
 }
 
-#iviz_add_chart_chosen>a {
+#iviz_add_chart_chosen > a {
   background-image: none;
   height: 30px;
   line-height: 30px;
 }
 
 div.geneValidationNotification,
-div.geneAddedNotification{
-  width:400px;
+div.geneAddedNotification {
+  width: 400px;
   height: 15px;
   font-size: 0.8em;
 }
@@ -134,36 +137,32 @@ div.geneAddedNotification{
   font-size: 1.1em;
 }
 
-.iviz-header-left-case-name {
-  float: left;
-  border: 0;
-  font-size: 13px;
-  margin: 0;
-  z-index: 21;
+.iviz-header-left-case {
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 1.1em;
   vertical-align: middle;
-  padding: 0 10px 0 0;
-  width: auto;
-  color: black;
-  text-align: center;
-  font-family: Verdana,Arial,sans-serif;
-  font-size: 1.1em;
-  margin-top: 3px;
-}
-
-.iviz-header-left-case-number {
   float: left;
-  margin: -3px 5px 0 0;
-  font-family: Verdana,Arial,sans-serif;
-  font-size: 1.1em;
-  border: 1px solid darkgray;
-  background: none;
-  font-weight: normal;
-  color: orange;
-  padding: 5px 10px;
-  border: solid 1px;
-  border-radius: 5px;
-  border-color: darkgrey;
-  outline-offset: -2px;
+  line-height: 30px;
+  margin: 0 5px;
+  span {
+    float: left;
+  }
+  .name {
+    color: black;
+  }
+  .content {
+    color: orange;
+    line-height: 26px;
+    span {
+      margin: 2px 2px;
+    }
+    span.number {
+      border-bottom: 2px dotted darkgray;
+    }
+    span.number:hover {
+      border-bottom: 2px solid orange;
+    }
+  }
 }
 
 #iviz-header-left-download {
@@ -174,14 +173,21 @@ div.geneAddedNotification{
   cursor: pointer;
 }
 
-#arrow_studyview{
-  color: skyblue;
+.iviz-header-arrow {
+  line-height: 30px;
   float: left;
-  padding: 0px 10px 0px 0px;
-  font-size: 22px;
-  margin-top: -3px;
+  padding: 0px 5px;
+  i {
+    color: skyblue;
+    font-size: 22px;
+  }
 }
 
-.iviz-button-hover{
-  outline:-webkit-focus-ring-color auto 5px;
+.iviz-button-hover {
+  outline: -webkit-focus-ring-color auto 5px;
+}
+
+.iviz-cohort-component .btn{
+  line-height: 18px;
+  padding: 5px 12px;
 }

@@ -1,4 +1,3 @@
-
 'use strict';
 var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
   var data_;
@@ -252,10 +251,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               ++selectedAttrMeta.numOfDatum;
             });
 
-            if (Object.keys(selectedAttrMeta.keys).length >
-              (selectedAttrMeta.numOfDatum / 2) &&
-              selectedAttrMeta.datatype === 'STRING' &&
-              Object.keys(selectedAttrMeta.keys).length > 10) {
+            if (selectedAttrMeta.datatype === 'STRING' &&
+              Object.keys(selectedAttrMeta.keys).length > 20) {
               var caseIds = isPatientAttributes ?
                 Object.keys(data_.groups.group_mapping.patient.sample) :
                 Object.keys(data_.groups.group_mapping.sample.patient);
@@ -402,26 +399,41 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       }
       return data_.groups.patient.data_indices.patient_id;
     },
-    openCases: function() {
+    openCases: function(type) {
+      if (type !== 'patient') {
+        type = 'sample';
+      }
+
       var studyId = '';
       var possible = true;
-      var selectedCases_ = vm_.selectedpatients;
-      var caseIndices_ = this.getCaseIndices('patient');
+      var selectedCases_ = [];
+      var caseIndices_ = {};
+      var dataRef = [];
+
+      if (type === 'patient') {
+        selectedCases_ = vm_.selectedpatients;
+        caseIndices_ = this.getCaseIndices('patient');
+        dataRef = patientData_;
+      } else {
+        selectedCases_ = vm_.selectedsamples;
+        caseIndices_ = this.getCaseIndices('sample');
+        dataRef = sampleData_;
+      }
 
       $.each(selectedCases_, function(key, caseId) {
         if (key === 0) {
-          studyId = patientData_[caseIndices_[caseId]].study_id;
-        } else if (studyId !== patientData_[caseIndices_[caseId]].study_id) {
+          studyId = dataRef[caseIndices_[caseId]].study_id;
+        } else if (studyId !== dataRef[caseIndices_[caseId]].study_id) {
           possible = false;
           return false;
         }
       });
       if (possible) {
-        var _selectedPatientIds = selectedCases_.sort();
+        var _selectedCaseIds = selectedCases_.sort();
         var _url = window.cbioURL + 'case.do?cancer_study_id=' +
-          studyId +
-          '&case_id=' + _selectedPatientIds[0] +
-          '#nav_case_ids=' + _selectedPatientIds.join(',');
+          studyId + '&' + (type === 'patient' ? 'case_id' : 'sample_id') +
+          '=' + _selectedCaseIds[0] +
+          '#nav_case_ids=' + _selectedCaseIds.join(',');
         window.open(_url);
       } else {
         new Notification().createNotification(
