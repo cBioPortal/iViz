@@ -7,7 +7,7 @@
     template: ' <div is="individual-chart" ' +
     ':clear-chart="clearGroup" :ndx="ndx"   :attributes.sync="attribute"   v-for="attribute in attributes"></div>',
     props: [
-      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup'
+      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup', 'hasfilters'
     ], created: function() {
       // TODO: update this.data
       var _self = this;
@@ -130,7 +130,7 @@
         });
         this.invisibleChartFilters = [];
         this.invisibleBridgeDimension.filterAll();
-        if (_selectedCases.length > 0) {
+        if (this.hasfilters) {
           this.invisibleChartFilters = _selectedCases;
           var filtersMap = {};
           _.each(_selectedCases, function(filter) {

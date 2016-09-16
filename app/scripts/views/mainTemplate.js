@@ -4,8 +4,8 @@
 'use strict';
 (function(Vue, dc, iViz, Packery, Draggabilly, _) {
   Vue.component('mainTemplate', {
-    template: '<chart-group :redrawgroups.sync="redrawgroups" :id="group.id" ' +
-    ':type="group.type" ' +
+    template: '<chart-group :redrawgroups.sync="redrawgroups" ' +
+    ':hasfilters="hasfilters" :id="group.id" :type="group.type" ' +
     ':mappedcases="group.type==\'patient\'?patientsync:samplesync" ' +
     ' :attributes.sync="group.attributes" :clear-group="clearAll"' +
     ' v-for="group in groups"></chart-group> ',
@@ -171,15 +171,15 @@
         self_.hasfilters = _hasFilters;
         if (updateType_ === 'patient') {
           self_.selectedPatientsByFilters = _selectedCasesByFilters.sort();
-          _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
-            self_.completePatientsList : _selectedCasesByFilters;
+         // _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
+         //   self_.completePatientsList : _selectedCasesByFilters;
           _counterSelectedCasesByFilters =
             this.selectedSamplesByFilters.length === 0 ?
               self_.completeSamplesList : this.selectedSamplesByFilters;
         } else {
           self_.selectedSamplesByFilters = _selectedCasesByFilters.sort();
-          _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
-            self_.completeSamplesList : _selectedCasesByFilters;
+         // _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
+         //   self_.completeSamplesList : _selectedCasesByFilters;
           _counterSelectedCasesByFilters =
             this.selectedPatientsByFilters.length === 0 ?
               self_.completePatientsList : this.selectedPatientsByFilters;
@@ -202,13 +202,23 @@
         if (updateType_ === 'patient') {
           self_.patientsync = _casesSync;
           self_.samplesync = _counterCasesSync;
-          self_.selectedsamples = _resultCounterSelectedCases;
-          self_.selectedpatients = _resultSelectedCases;
+          if (self_.hasfilters) {
+            self_.selectedsamples = _resultCounterSelectedCases;
+            self_.selectedpatients = _resultSelectedCases;
+          } else {
+            self_.selectedsamples = self_.completeSamplesList;
+            self_.selectedpatients = self_.completePatientsList;
+          }
         } else {
           self_.samplesync = _casesSync;
           self_.patientsync = _counterCasesSync;
-          self_.selectedsamples = _resultSelectedCases;
-          self_.selectedpatients = _resultCounterSelectedCases;
+          if (self_.hasfilters) {
+            self_.selectedsamples = _resultSelectedCases;
+            self_.selectedpatients = _resultCounterSelectedCases;
+          } else {
+            self_.selectedsamples = self_.completeSamplesList;
+            self_.selectedpatients = self_.completePatientsList;
+          }
         }
       },
       'update-custom-filters': function() {

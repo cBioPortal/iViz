@@ -104,7 +104,7 @@
               self_.chartInst.select('.brush').on('mouseup', function() {
                 self_.filtersUpdated = true;
                 if (typeof _filter !== 'undefined' && _filter !== null &&
-                  _filter.length > 1) {
+                    _filter.length > 1 && self_.chartInst.hasFilter()) {
                   var tempFilters_ = [];
                   tempFilters_[0] = _filter[0].toFixed(2);
                   tempFilters_[1] = _filter[1].toFixed(2);
