@@ -310,12 +310,7 @@ window.DataManagerForIviz = (function($, _) {
                 }
                 if (['CANCER_TYPE', 'CANCER_TYPE_DETAILED']
                     .indexOf(_metaObj.attr_id) !== -1) {
-                  if (Object.keys(_studyToSampleToPatientMap)
-                      .indexOf('MSKIMPACT') === -1) {
-                    _metaObj.priority = 4.1;
-                  } else {
-                    _metaObj.priority = 0.9;
-                  }
+                  _metaObj.priority = 0.9;
                 }
               });
               _.each(_patientAttributes, function(_metaObj) {
