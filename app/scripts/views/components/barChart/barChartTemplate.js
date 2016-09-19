@@ -12,10 +12,12 @@
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
+    ':title-tooltip="titleTooltip" :show-desp-icon="showDespIcon"' +
     ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
-    '<span class="text-center chart-title-span">{{displayName}}</span>' +
+    '<span class="text-center chart-title-span" ' +
+    'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
     props: [
       'ndx', 'attributes'
@@ -41,7 +43,12 @@
           transitionDuration: iViz.opts.dc.transitionDuration
         },
         opts: {},
-        addingChart: false
+        addingChart: false,
+        showDespIcon: true,
+        titleTooltip: {
+          content: this.attributes.description ?
+            iViz.util.getClinicalAttrTooltipContent(this.attributes) : ''
+        }
       };
     }, watch: {
       'attributes.filter': function(newVal) {

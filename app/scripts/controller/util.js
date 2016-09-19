@@ -642,6 +642,17 @@
       return _str;
     };
 
+    content.getClinicalAttrTooltipContent = function(attribute) {
+      var string = [];
+      if (attribute.display_name) {
+        string.push('<b>' + attribute.display_name + '</b>');
+      }
+      if (attribute.description) {
+        string.push(attribute.description);
+      }
+      return string.join('<br/>');
+    }
+
     return content;
   })();
 })(window.iViz,
