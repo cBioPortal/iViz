@@ -3,11 +3,14 @@
 <head>
   <meta charset="utf-8">
 
+  // This file shouldn't be included in cBioPortal
+  <!-- build:js(.) scripts/iviz-vendor-cbio.js -->
+  <script src="/bower_components/jquery/jquery.min.js"></script>
+  <script src="/bower_components/jquery-ui/ui/jquery-ui.js"></script>
+  <!-- endbuild -->
 
   <!-- build:js(.) scripts/iviz-vendor.js -->
-  <!-- bower:js -->
   <script src="/bower_components/modernizr/modernizr.js"></script>
-  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/bower_components/chosen/chosen.jquery.min.js"></script>
   <script src="/bower_components/datatables/media/js/jquery.dataTables.js"></script>
   <script src="/bower_components/d3/d3.min.js"></script>
@@ -40,9 +43,7 @@
   <script src="/bower_components/fixed-data-table/dist/fixed-data-table.min.js"></script>
   <script src="/bower_components/jstat/dist/jstat.min.js"></script>
   <script src="/bower_components/backbone/backbone.js"></script>
-  <script src="/bower_components/jquery-ui/jquery-ui.js"></script>
   <script src="/bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
-  <!-- endbower -->
   <!-- endbuild -->
 
   <!-- build:css(.) styles/iviz-vendor.css -->
