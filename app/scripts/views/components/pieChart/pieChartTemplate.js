@@ -10,7 +10,6 @@
     '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
     '<chart-operations :has-chart-title="hasChartTitle" ' +
     ':display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
-    ':title-tooltip="titleTooltip" :show-desp-icon="showDespIcon"' +
     ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" ' +
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" ' +
@@ -34,10 +33,6 @@
         chartId: 'chart-' + iViz.util.escape(this.attributes.attr_id),
         chartTableId: 'table-' + iViz.util.escape(this.attributes.attr_id),
         displayName: this.attributes.display_name,
-        titleTooltip: {
-          content: iViz.util.getClinicalAttrTooltipContent(this.attributes)
-        },
-        showDespIcon: true,
         chartInst: '',
         component: '',
         showOperations: false,

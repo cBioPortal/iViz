@@ -12,7 +12,6 @@
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
-    ':title-tooltip="titleTooltip" :show-desp-icon="showDespIcon"' +
     ':attributes="attributes"' +
     ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
@@ -44,12 +43,7 @@
           transitionDuration: iViz.opts.dc.transitionDuration
         },
         opts: {},
-        addingChart: false,
-        showDespIcon: true,
-        titleTooltip: {
-          content: this.attributes.description ?
-            iViz.util.getClinicalAttrTooltipContent(this.attributes) : ''
-        }
+        addingChart: false
       };
     }, watch: {
       'attributes.filter': function(newVal) {

@@ -10,7 +10,6 @@
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':display-name="displayName" :chart-ctrl="chartInst"' +
-    ':title-tooltip="titleTooltip" :show-desp-icon="showDespIcon"' +
     ':has-chart-title="true" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-id="chartId" :attributes="attributes" ' +
     ':filters.sync="attributes.filter"> ' +

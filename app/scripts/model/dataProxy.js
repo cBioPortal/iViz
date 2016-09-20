@@ -1,7 +1,7 @@
 'use strict';
 window.DataManagerForIviz = (function($, _) {
   var content = {};
-  // DESC, all lowercase
+  // DESC
   var clinicalAttrsPriority = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED',
     'GENDER', 'AGE', 'SEQUENCED', 'HAS_CNA_DATA', 'SAMPLE_COUNT_PATIENT'];
 
@@ -48,7 +48,6 @@ window.DataManagerForIviz = (function($, _) {
    * @return {boolean} Whether input attribute is prioritized clinical attribute.
    */
   content.util.isPriorityClinicalAttr = function(attr, studyId) {
-    // Should be all lower case
     var studySpecific = {
       mskimpact: []
     };
@@ -528,8 +527,7 @@ window.DataManagerForIviz = (function($, _) {
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
               }
 
-              if (_hasDFS &&
-                _.intersection(hiddenAttrs_.DFS_SURVIVAL, Object.keys(_studyToSampleToPatientMap)).length === 0) {
+              if (_hasDFS) {
                 var _dfsSurvivalAttrMeta = {};
                 _dfsSurvivalAttrMeta.attr_id = 'DFS_SURVIVAL';
                 _dfsSurvivalAttrMeta.datatype = 'SURVIVAL';
@@ -540,13 +538,15 @@ window.DataManagerForIviz = (function($, _) {
                 _dfsSurvivalAttrMeta.show = true;
                 _dfsSurvivalAttrMeta.keys = {};
                 _dfsSurvivalAttrMeta.numOfDatum = 0;
-                _dfsSurvivalAttrMeta.priority = 1;
+                _dfsSurvivalAttrMeta.priority =
+                  _.intersection(hiddenAttrs_.DFS_SURVIVAL,
+                    Object.keys(_studyToSampleToPatientMap)).length === 0 ?
+                    1 : 1000;
                 _dfsSurvivalAttrMeta.attrList = ['DFS_STATUS', 'DFS_MONTHS'];
                 _patientAttributes[_dfsSurvivalAttrMeta.attr_id] = _dfsSurvivalAttrMeta;
               }
 
-              if (_hasOS &&
-                _.intersection(hiddenAttrs_.OS_SURVIVAL, Object.keys(_studyToSampleToPatientMap)).length === 0) {
+              if (_hasOS) {
                 var _osSurvivalAttrMeta = {};
                 _osSurvivalAttrMeta.attr_id = 'OS_SURVIVAL';
                 _osSurvivalAttrMeta.datatype = 'SURVIVAL';
@@ -557,7 +557,10 @@ window.DataManagerForIviz = (function($, _) {
                 _osSurvivalAttrMeta.show = true;
                 _osSurvivalAttrMeta.keys = {};
                 _osSurvivalAttrMeta.numOfDatum = 0;
-                _osSurvivalAttrMeta.priority = 1;
+                _osSurvivalAttrMeta.priority =
+                  _.intersection(hiddenAttrs_.OS_SURVIVAL,
+                    Object.keys(_studyToSampleToPatientMap)).length === 0 ?
+                    1 : 1000;
                 _osSurvivalAttrMeta.attrList = ['OS_STATUS', 'OS_MONTHS'];
                 _patientAttributes[_osSurvivalAttrMeta.attr_id] = _osSurvivalAttrMeta;
               }

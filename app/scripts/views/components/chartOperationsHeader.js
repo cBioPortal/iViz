@@ -19,8 +19,8 @@
     '<span id="scale-span-{{chartId}}" ' +
     'style="float:left; font-size:10px; margin-right: 15px; color: grey">' +
     'Log Scale X</span></div>' +
-    '<i v-if="this.hasTitleTooltip()" ' +
-    'class="fa fa-question-circle-o icon hover" ' +
+    '<i v-if="hasTitleTooltip()" ' +
+    'class="fa fa-info-circle icon hover" ' +
     'id="{{chartId}}-description-icon"' +
     'aria-hidden="true"></i>' +
     '<i v-if="showTableIcon" class="fa fa-table icon hover" ' +
