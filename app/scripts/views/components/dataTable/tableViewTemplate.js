@@ -39,11 +39,7 @@
         invisibleDimension: {},
         isMutatedGeneCna: false,
         classTableHeight: 'grid-item-h-2',
-        madeSelection: false,
-        showDespIcon: true,
-        titleTooltip: {
-          content: iViz.util.getClinicalAttrTooltipContent(this.attributes)
-        }
+        madeSelection: false
       };
     },
     watch: {

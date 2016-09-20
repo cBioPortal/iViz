@@ -19,7 +19,7 @@
     '<span id="scale-span-{{chartId}}" ' +
     'style="float:left; font-size:10px; margin-right: 15px; color: grey">' +
     'Log Scale X</span></div>' +
-    '<i v-if="showDespIcon && this.hasTitleTooltip()" ' +
+    '<i v-if="this.hasTitleTooltip()" ' +
     'class="fa fa-question-circle-o icon hover" ' +
     'id="{{chartId}}-description-icon"' +
     'aria-hidden="true"></i>' +
@@ -42,7 +42,7 @@
       'showOperations', 'resetBtnId', 'chartCtrl', 'groupid',
       'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon',
       'showTableIcon', 'showLogScale', 'showSurvivalIcon', 'filters',
-      'titleTooltip', 'showDespIcon'
+      'attributes'
     ],
     data: function() {
       return {
@@ -51,7 +51,11 @@
         chartTitle: 'chart-title',
         chartTitleActive: 'chart-title-active',
         logChecked: true,
-        hasFilters: false
+        hasFilters: false,
+        titleTooltip: {
+          content: _.isObject(this.attributes) ?
+            iViz.util.getClinicalAttrTooltipContent(this.attributes) : ''
+        }
       };
     },
     watch: {
@@ -83,7 +87,9 @@
         this.$dispatch('toTableView');
       },
       hasTitleTooltip: function() {
-        return _.isObject(this.titleTooltip) && this.titleTooltip.content;
+        return _.isObject(this.attributes) ?
+          (['survival'].indexOf(this.attributes.view_type) === -1 &&
+          _.isObject(this.titleTooltip) && this.titleTooltip.content) : false;
       }
     },
     ready: function() {
@@ -94,10 +100,7 @@
       var self = this;
 
       if (this.hasTitleTooltip()) {
-        var target = [];
-        if (this.showDespIcon) {
-          target.push('#' + this.chartId + '-description-icon');
-        }
+        var target = ['#' + this.chartId + '-description-icon'];
         if (this.hasChartTitle) {
           target.push('#' + this.chartId + '-title');
         }
