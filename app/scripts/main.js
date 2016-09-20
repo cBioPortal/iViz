@@ -251,19 +251,19 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               ++selectedAttrMeta.numOfDatum;
             });
 
-            if (selectedAttrMeta.datatype === 'STRING' &&
-              Object.keys(selectedAttrMeta.keys).length > 20) {
-              var caseIds = isPatientAttributes ?
-                Object.keys(data_.groups.group_mapping.patient.sample) :
-                Object.keys(data_.groups.group_mapping.sample.patient);
-
-              selectedAttrMeta.view_type = 'table';
-              selectedAttrMeta.type = 'pieLabel';
-              selectedAttrMeta.options = {
-                allCases: caseIds,
-                sequencedCases: caseIds
-              };
-            }
+            // if (selectedAttrMeta.datatype === 'STRING' &&
+            //   Object.keys(selectedAttrMeta.keys).length > 20) {
+            //   var caseIds = isPatientAttributes ?
+            //     Object.keys(data_.groups.group_mapping.patient.sample) :
+            //     Object.keys(data_.groups.group_mapping.sample.patient);
+            //
+            //   selectedAttrMeta.view_type = 'table';
+            //   selectedAttrMeta.type = 'pieLabel';
+            //   selectedAttrMeta.options = {
+            //     allCases: caseIds,
+            //     sequencedCases: caseIds
+            //   };
+            // }
           });
           var type = isPatientAttributes ? 'patient' : 'sample';
           var caseIndices = self_.getCaseIndices(type);

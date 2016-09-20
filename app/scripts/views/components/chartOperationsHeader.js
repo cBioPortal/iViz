@@ -19,6 +19,10 @@
     '<span id="scale-span-{{chartId}}" ' +
     'style="float:left; font-size:10px; margin-right: 15px; color: grey">' +
     'Log Scale X</span></div>' +
+    '<i v-if="hasTitleTooltip()" ' +
+    'class="fa fa-info-circle icon hover" ' +
+    'id="{{chartId}}-description-icon"' +
+    'aria-hidden="true"></i>' +
     '<i v-if="showTableIcon" class="fa fa-table icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
     '<i v-if="showPieIcon" class="fa fa-pie-chart icon hover" ' +
@@ -37,7 +41,8 @@
     props: [
       'showOperations', 'resetBtnId', 'chartCtrl', 'groupid',
       'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon',
-      'showTableIcon', 'showLogScale', 'showSurvivalIcon', 'filters'
+      'showTableIcon', 'showLogScale', 'showSurvivalIcon', 'filters',
+      'attributes'
     ],
     data: function() {
       return {
@@ -46,7 +51,11 @@
         chartTitle: 'chart-title',
         chartTitleActive: 'chart-title-active',
         logChecked: true,
-        hasFilters: false
+        hasFilters: false,
+        titleTooltip: {
+          content: _.isObject(this.attributes) ?
+            iViz.util.getClinicalAttrTooltipContent(this.attributes) : ''
+        }
       };
     },
     watch: {
@@ -76,22 +85,36 @@
         this.showTableIcon = !this.showTableIcon;
         this.showPieIcon = !this.showPieIcon;
         this.$dispatch('toTableView');
+      },
+      hasTitleTooltip: function() {
+        return _.isObject(this.attributes) ?
+          (['survival'].indexOf(this.attributes.view_type) === -1 &&
+          _.isObject(this.titleTooltip) && this.titleTooltip.content) : false;
       }
     },
     ready: function() {
       $('#' + this.chartId + '-download').qtip('destroy', true);
       $('#' + this.chartId + '-download-icon-wrapper').qtip('destroy', true);
+      $('#' + this.chartId + '-title').qtip('destroy', true);
       var chartId = this.chartId;
       var self = this;
 
-      $('#' + this.chartId + '-title').qtip({
-        id: '#' + this.chartId + '-title-qtip',
-        content: {text: this.displayName},
-        style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
-        show: {event: 'mouseover'},
-        hide: {fixed: true, delay: 100, event: 'mouseout'},
-        position: {my: 'right bottom', at: 'top left', viewport: $(window)}
-      });
+      if (this.hasTitleTooltip()) {
+        var target = ['#' + this.chartId + '-description-icon'];
+        if (this.hasChartTitle) {
+          target.push('#' + this.chartId + '-title');
+        }
+        $(target).qtip({
+          id: this.chartId + '-title-qtip',
+          content: {
+            text: this.titleTooltip.content
+          },
+          style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
+          show: {event: 'mouseover'},
+          hide: {fixed: true, delay: 100, event: 'mouseout'},
+          position: {my: 'right bottom', at: 'top left', viewport: $(window)}
+        });
+      }
 
       $('#' + this.chartId + '-download-icon-wrapper').qtip({
         style: {classes: 'qtip-light qtip-rounded qtip-shadow'},

@@ -10,8 +10,9 @@
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':display-name="displayName" :chart-ctrl="chartInst"' +
-    ':has-chart-title="true" :groupid="attributes.group_id" :reset-btn-id="resetBtnId" ' +
-    ':chart-id="chartId" :attributes="attributes" :filters.sync="attributes.filter"> ' +
+    ':has-chart-title="true" :groupid="attributes.group_id" ' +
+    ':reset-btn-id="resetBtnId" :chart-id="chartId" :attributes="attributes" ' +
+    ':filters.sync="attributes.filter"> ' +
     '</chart-operations><div class="dc-chart dc-table-plot" ' +
     ':class="{\'start-loading\': showLoad}" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +

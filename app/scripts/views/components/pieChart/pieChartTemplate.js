@@ -26,8 +26,10 @@
     data: function() {
       return {
         v: {},
-        chartDivId: 'chart-' + iViz.util.escape(this.attributes.attr_id) + '-div',
-        resetBtnId: 'chart-' + iViz.util.escape(this.attributes.attr_id) + '-reset',
+        chartDivId: 'chart-' +
+        iViz.util.escape(this.attributes.attr_id) + '-div',
+        resetBtnId: 'chart-' +
+        iViz.util.escape(this.attributes.attr_id) + '-reset',
         chartId: 'chart-' + iViz.util.escape(this.attributes.attr_id),
         chartTableId: 'table-' + iViz.util.escape(this.attributes.attr_id),
         displayName: this.attributes.display_name,

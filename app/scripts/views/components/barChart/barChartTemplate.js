@@ -12,10 +12,12 @@
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
+    ':attributes="attributes"' +
     ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
-    '<span class="text-center chart-title-span">{{displayName}}</span>' +
+    '<span class="text-center chart-title-span" ' +
+    'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
     props: [
       'ndx', 'attributes'
@@ -104,7 +106,7 @@
               self_.chartInst.select('.brush').on('mouseup', function() {
                 self_.filtersUpdated = true;
                 if (typeof _filter !== 'undefined' && _filter !== null &&
-                    _filter.length > 1 && self_.chartInst.hasFilter()) {
+                  _filter.length > 1 && self_.chartInst.hasFilter()) {
                   var tempFilters_ = [];
                   tempFilters_[0] = _filter[0].toFixed(2);
                   tempFilters_[1] = _filter[1].toFixed(2);
