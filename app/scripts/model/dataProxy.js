@@ -927,7 +927,7 @@ window.DataManagerForIviz = (function($, _) {
                 }
                 // set patient list in studyCasesMap if sample list is
                 // passed in the input
-                if (_studyCasesMap[cancer_study_id].samples !== undefined && _studyCasesMap[cancer_study_id].samples.length > 0) {
+                if (_.isArray(_studyCasesMap[cancer_study_id].samples)) {
                   self.studyCasesMap[cancer_study_id].patients = _.unique(patientList);
                 }
                 study_to_sample_to_patient[cancer_study_id] = sample_to_patient;
