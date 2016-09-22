@@ -28,14 +28,17 @@
         virtualCohorts: []
       }
     }, events: {
-      'remove-cohort': function (cohort) {
+      'remove-cohort': function(cohort) {
         this.virtualCohorts.$remove(cohort);
       }
     }, methods: {
-      manageCohorts: function () {
-        this.showVCList = true;
-        if (this.userid !== undefined && this.userid !== 'DEFAULT') {
-          this.virtualCohorts = vcSession.model.loadUserVirtualCohorts();
+      manageCohorts: function() {
+        var self = this;
+        self.showVCList = true;
+        if (self.userid !== undefined && self.userid !== 'DEFAULT') {
+          $.when(vcSession.model.loadUserVirtualCohorts(self.userid)).then(function(_virtualCohorts){
+            self.virtualCohorts = _virtualCohorts;
+          });
         } else {
           this.virtualCohorts = vcSession.utils.getVirtualCohorts();
         }
