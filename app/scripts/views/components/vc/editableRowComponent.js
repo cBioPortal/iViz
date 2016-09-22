@@ -113,7 +113,8 @@
       },
       clickImport: function(_virtualStudy) {
         this.showmodal = false;
-        window.open(window.cbioURL + 'study?cohorts=' + _virtualStudy.virtualCohortID);
+        //TODO: need to update functionality
+        //iViz.applyVC(_virtualStudy);
       },
       clickShare: function(_virtualStudy) {
         // TODO: Create Bitly URL
