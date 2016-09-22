@@ -54,10 +54,10 @@
     ' !share}"><div class="input-group"> ' +
     '<input type="text" id="link-to-share" class="form-control"' +
     'v-model="shortenedLink" disabled><span class="input-group-btn">' +
-    '<button class="btn btn-default btn-share" ' +
+    '<button class="btn btn-default btn-share custom-btn" ' +
     ' data-clipboard-action="copy" data-clipboard-text={{shortenedLink}}><em' +
     ' class="fa fa-clipboard" alt="Copy to clipboard"></em></button><button' +
-    ' class="btn btn-default" @click="clickCancel()"><em class="fa' +
+    ' class="btn btn-default custom-btn" @click="clickCancel()"><em class="fa' +
     ' fa-times"></em></button></span></div></div><div class="buttons"' +
     ' :class="{view: edit||share}"><button class="btn btn-info"' +
     ' @click="clickEdit(data)"><em class="fa' +
