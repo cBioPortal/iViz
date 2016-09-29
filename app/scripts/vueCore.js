@@ -277,8 +277,8 @@
                 this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
               }
             });
-            $('.iviz-header-left-5').qtip({
-              content: {text: 'Click to view the selected cases'},
+            $('#iviz-header-left-patient-select').qtip({
+              content: {text: 'View the selected patients.'},
               style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
               show: {event: 'mouseover'},
               hide: {fixed: true, delay: 100, event: 'mouseout'},
@@ -288,8 +288,19 @@
                 viewport: $(window)
               }
             });
-            $('#iviz-header-left-6').qtip({
-              content: {text: 'Click to download the selected cases'},
+            $('#iviz-header-left-case-download').qtip({
+              content: {text: 'Download clinical data for the selected cases.'},
+              style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
+              show: {event: 'mouseover'},
+              hide: {fixed: true, delay: 100, event: 'mouseout'},
+              position: {
+                my: 'bottom center',
+                at: 'top center',
+                viewport: $(window)
+              }
+            });
+            $('#iviz-form').qtip({
+              content: {text: 'Query the selected samples.'},
               style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
               show: {event: 'mouseover'},
               hide: {fixed: true, delay: 100, event: 'mouseout'},
