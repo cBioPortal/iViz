@@ -151,16 +151,10 @@ div.geneAddedNotification {
     color: black;
   }
   .content {
-    color: orange;
+    color: $msk-blue;
     line-height: 26px;
     span {
       margin: 2px 2px;
-    }
-    span.number {
-      border-bottom: 2px dotted darkgray;
-    }
-    span.number:hover {
-      border-bottom: 2px solid orange;
     }
   }
 }
@@ -178,7 +172,7 @@ div.geneAddedNotification {
   float: left;
   padding: 0px 5px;
   i {
-    color: skyblue;
+    color: $msk-blue;
     font-size: 22px;
   }
 }
