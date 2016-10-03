@@ -53,7 +53,6 @@
         xaxis: {
           title: 'Fraction of copy number altered genome',
           range: [d3.min(_xArr) - _marginX, d3.max(_xArr) + _marginX],
-          fixedrange: true,
           zeroline: false,
           showline: true
         },
@@ -64,6 +63,7 @@
           showline: true
         },
         hovermode: 'closest',
+        dragmode: 'select',
         showlegend: false,
         width: 370,
         height: 320,
@@ -79,7 +79,7 @@
         displaylogo: false,
         modeBarButtonsToRemove: ['sendDataToCloud', 'pan2d',
           'zoomIn2d', 'zoomOut2d', 'resetScale2d',
-          'hoverClosestCartesian', 'hoverCompareCartesian']
+          'hoverClosestCartesian', 'hoverCompareCartesian', 'toImage']
       });
 
       // link to sample view
