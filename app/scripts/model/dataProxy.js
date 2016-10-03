@@ -482,7 +482,9 @@ window.DataManagerForIviz = (function($, _) {
                   _cnaAttrMeta.type = 'cna';
                   _cnaAttrMeta.view_type = 'table';
                   _cnaAttrMeta.display_name = 'CNA Genes';
-                  _cnaAttrMeta.description = '';
+                  _cnaAttrMeta.description = 'This table only shows ' +
+                    'cbio cancer genes and recurrently copy number ' +
+                    'altered genes in the cohort.';
                   _cnaAttrMeta.attr_id = 'cna_details';
                   _cnaAttrMeta.filter = [];
                   _cnaAttrMeta.show = true;
