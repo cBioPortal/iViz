@@ -521,18 +521,22 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       if (possibleTOQuery) {
         $('#iviz-form').get(0).setAttribute(
           'action', window.cbioURL + 'index.do');
+
+        $('#iviz-form input[name="cancer_study_id"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: studyId_,
           name: 'cancer_study_id'
         }).appendTo('#iviz-form');
 
+        $('#iviz-form input[name="case_set_id"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: window.case_set_id,
           name: 'case_set_id'
         }).appendTo('#iviz-form');
 
+        $('#iviz-form input[name="case_ids"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: selectedCases_.join(' '),
