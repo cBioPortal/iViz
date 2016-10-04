@@ -48,7 +48,11 @@
               // TODO: need to update setting timeout
               var interval = setTimeout(function() {
                 clearInterval(interval);
-                self_.$broadcast('update-special-charts');
+                var _attrs = [];
+                _.each(self_.groups, function(group) {
+                  _attrs = _attrs.concat(group.attributes);
+                });
+                self_.$broadcast('update-special-charts', _attrs);
               }, 500);
             },
             updateStats: function() {
@@ -116,9 +120,14 @@
               }
               if (includeNextTickFlag) {
                 self_.$nextTick(function() {
+                  var _attrs = [];
+                  _.each(self_.groups, function(group) {
+                    _attrs = _attrs.concat(group.attributes);
+                  });
+
                   self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
                   self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
-                  self_.$broadcast('update-special-charts');
+                  self_.$broadcast('update-special-charts', _attrs);
                   self_.clearAll = false;
                   _.each(this.groups, function(group) {
                     dc.redrawAll(group.id);
