@@ -9,6 +9,7 @@
     var chartId_;
     var data_;
     var opts_;
+    var layout_;
     var getQtipString = function(_data) {
       var toReturn = 'Cancer Study:' + _data.study_id + '<br>Sample Id: ' +
         _data.sample_id + '<br>CNA fraction: ';
@@ -49,7 +50,7 @@
       var data = [trace];
       var _marginX = (d3.max(_xArr) - d3.min(_xArr)) * 0.05;
       var _marginY = (d3.max(_yArr) - d3.min(_yArr)) * 0.05;
-      var layout = {
+      layout_ = {
         xaxis: {
           title: 'Fraction of copy number altered genome',
           range: [d3.min(_xArr) - _marginX, d3.max(_xArr) + _marginX],
@@ -75,7 +76,7 @@
           pad: 0
         }
       };
-      Plotly.plot(document.getElementById(chartId_), data, layout, {
+      Plotly.plot(document.getElementById(chartId_), data, layout_, {
         displaylogo: false,
         modeBarButtonsToRemove: ['sendDataToCloud', 'pan2d',
           'zoomIn2d', 'zoomOut2d', 'resetScale2d',
@@ -153,7 +154,9 @@
           line: {color: 'white'}
         }
       };
-      Plotly.redraw(document.getElementById(chartId_));
+
+      Plotly.newPlot(document.getElementById(chartId_), document.getElementById(chartId_).data, layout_);
+
     };
 
     content.updateDataForDownload = function(fileType) {
