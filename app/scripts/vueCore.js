@@ -34,8 +34,6 @@
             userid: 'DEFAULT',
             stats: '',
             updateStats: false,
-            highlightAllButtons: false,
-            highlightCaseButtons: false,
             clearAll: false,
             showScreenLoad: false,
             showDropDown: false
@@ -52,7 +50,7 @@
                 _.each(self_.groups, function(group) {
                   _attrs = _attrs.concat(group.attributes);
                 });
-                self_.$broadcast('update-special-charts', _attrs);
+                self_.$broadcast('update-special-charts', self_.hasFilters(_attrs));
               }, 500);
             },
             updateStats: function() {
@@ -127,7 +125,7 @@
 
                   self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
                   self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
-                  self_.$broadcast('update-special-charts', _attrs);
+                  self_.$broadcast('update-special-charts', self_.hasFilters(_attrs));
                   self_.clearAll = false;
                   _.each(this.groups, function(group) {
                     dc.redrawAll(group.id);
@@ -136,6 +134,17 @@
               } else {
                 self_.clearAll = false;
               }
+            },
+            hasFilters: function(attrs) {
+              var _hasFilters = false;
+              _.every(attrs, function(attribute) {
+                if (attribute.filter.length > 0) {
+                  _hasFilters = true;
+                  return false;
+                }
+                return true;
+              });
+              return _hasFilters;
             },
             addChart: function(attrId) {
               var self_ = this;

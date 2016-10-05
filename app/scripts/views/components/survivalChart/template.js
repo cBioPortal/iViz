@@ -45,19 +45,11 @@
       'show-loader': function() {
         this.showLoad = true;
       },
-      'update-special-charts': function(allAttrs_) {
+      'update-special-charts': function(hasFilters) {
         var attrId =
           this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
-        var _hasFilter = false;
-        _.every(allAttrs_, function(attribute) {
-          if (attribute.filter.length > 0) {
-            _hasFilter = true;
-            return false;
-          }
-          return true;
-        });
         var _selectedCases = [];
-        if (_hasFilter) {
+        if (hasFilters) {
           _selectedCases =
             _.pluck(this.invisibleDimension.top(Infinity), attrId);
         }

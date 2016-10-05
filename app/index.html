@@ -135,15 +135,13 @@
         </div>
         <span id="iviz-header-left-patient-select" class="iviz-header-button"
               @click="openCases('patient')" class="number"
-              :class="{'iviz-button-hover':highlightAllButtons||highlightCaseButtons}"
               role="button" tabindex="0" style="display: block;"><i class="fa fa-user" aria-hidden="true"></i></span>
         <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()" 
               role="button" 
               tabindex="0"><i class="fa fa-download" alt="download"></i></span>
       
       <span id="query-by-gene-span">
-          <textarea id="query-by-gene-textarea" class="expand expandFocusOut" 
-                    :class="{'iviz-button-hover':highlightAllButtons}" rows="1" cols="10"></textarea>
+          <textarea id="query-by-gene-textarea" class="expand expandFocusOut" rows="1" cols="10"></textarea>
       </span>
         <span class="iviz-header-arrow">
           <i  class="fa fa-arrow-right fa-lg" aria-hidden="true"></i>
