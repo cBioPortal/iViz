@@ -50,7 +50,7 @@
                 _.each(self_.groups, function(group) {
                   _attrs = _attrs.concat(group.attributes);
                 });
-                self_.$broadcast('update-special-charts', self_.hasFilters(_attrs));
+                self_.$broadcast('update-special-charts', self_.hasfilters);
               }, 500);
             },
             updateStats: function() {
@@ -110,7 +110,7 @@
             clearAllCharts: function(includeNextTickFlag) {
               var self_ = this;
               self_.clearAll = true;
-              this.hasfilters = false;
+              self_.hasfilters = false;
               if (self_.customfilter.patientIds.length > 0 ||
                 self_.customfilter.sampleIds.length > 0) {
                 self_.customfilter.sampleIds = [];
@@ -118,14 +118,9 @@
               }
               if (includeNextTickFlag) {
                 self_.$nextTick(function() {
-                  var _attrs = [];
-                  _.each(self_.groups, function(group) {
-                    _attrs = _attrs.concat(group.attributes);
-                  });
-
                   self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
                   self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
-                  self_.$broadcast('update-special-charts', self_.hasFilters(_attrs));
+                  self_.$broadcast('update-special-charts', self_.hasfilters);
                   self_.clearAll = false;
                   _.each(this.groups, function(group) {
                     dc.redrawAll(group.id);
@@ -134,17 +129,6 @@
               } else {
                 self_.clearAll = false;
               }
-            },
-            hasFilters: function(attrs) {
-              var _hasFilters = false;
-              _.every(attrs, function(attribute) {
-                if (attribute.filter.length > 0) {
-                  _hasFilters = true;
-                  return false;
-                }
-                return true;
-              });
-              return _hasFilters;
             },
             addChart: function(attrId) {
               var self_ = this;
