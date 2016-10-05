@@ -50,23 +50,14 @@
       'show-loader': function() {
         this.showLoad = true;
       },
-      'update-special-charts': function(allAttrs_) {
+      'update-special-charts': function(hasFilters) {
         var attrId =
           this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
         var _selectedCases =
           _.pluck(this.invisibleDimension.top(Infinity), attrId);
 
-        var _hasFilter = false;
-        _.every(allAttrs_, function(attribute) {
-          if (attribute.filter.length > 0) {
-            _hasFilter = true;
-            return false;
-          }
-          return true;
-        });
-
         this.selectedSamples = _selectedCases;
-        if (_hasFilter) {
+        if (hasFilters) {
           this.chartInst.update(_selectedCases);
         } else {
           this.chartInst.update([]);
