@@ -99,9 +99,6 @@
         var _self = this;
         var data = iViz.getGroupNdx(_self.attributes.group_id);
 
-        // Just want to make sure the event has been removed.
-        // Technicoly, it should be remvoed after creating new plotly.
-        document.getElementById(this.chartId).removeEventListener('plotly_selected');
         document.getElementById(this.chartId).on('plotly_selected',
           function(_eventData) {
             if (typeof _eventData !== 'undefined') {
