@@ -62,6 +62,7 @@
         } else {
           this.chartInst.update([]);
         }
+        this.attachPlotlySelectedEvent();
         this.showLoad = false;
       },
       'closeChart': function() {
@@ -93,6 +94,47 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
+      },
+      attachPlotlySelectedEvent: function() {
+        var _self = this;
+        var data = iViz.getGroupNdx(_self.attributes.group_id);
+
+        // Just want to make sure the event has been removed.
+        // Technicoly, it should be remvoed after creating new plotly.
+        document.getElementById(this.chartId).removeEventListener('plotly_selected');
+        document.getElementById(this.chartId).on('plotly_selected',
+          function(_eventData) {
+            if (typeof _eventData !== 'undefined') {
+              var _selectedData = [];
+              // create hash map for (overall) data with cna_fraction + mutation
+              // count as key, dataObj as value (performance concern)
+              var _CnaFracMutCntMap = {};
+              _.each(data, function(_dataObj) {
+                var _key = _dataObj.cna_fraction + '||' + _dataObj.mutation_count;
+                _CnaFracMutCntMap[_key] = _dataObj;
+              });
+              _.each(_eventData.points, function(_pointObj) {
+                if (_pointObj.x) {
+                  _selectedData.push(
+                    _CnaFracMutCntMap[_pointObj.x + '||' + _pointObj.y]);
+                }
+              });
+              var _selectedCases = _.pluck(_selectedData, 'sample_id').sort();
+              _self.selectedSamples = _selectedCases;
+              _self.attributes.filter = _selectedCases;
+
+              var filtersMap = {};
+              _.each(_selectedCases, function(filter) {
+                if (filtersMap[filter] === undefined) {
+                  filtersMap[filter] = true;
+                }
+              });
+              _self.invisibleDimension.filterFunction(function(d) {
+                return (filtersMap[d] !== undefined);
+              });
+              dc.redrawAll(_self.attributes.group_id);
+            }
+          });
       }
     },
     ready: function() {
@@ -114,39 +156,7 @@
       _self.chartInst.init(data, _opts);
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
-      document.getElementById(this.chartId).on('plotly_selected',
-        function(_eventData) {
-          if (typeof _eventData !== 'undefined') {
-            var _selectedData = [];
-            // create hash map for (overall) data with cna_fraction + mutation
-            // count as key, dataObj as value (performance concern)
-            var _CnaFracMutCntMap = {};
-            _.each(data, function(_dataObj) {
-              var _key = _dataObj.cna_fraction + '||' + _dataObj.mutation_count;
-              _CnaFracMutCntMap[_key] = _dataObj;
-            });
-            _.each(_eventData.points, function(_pointObj) {
-              if (_pointObj.x) {
-                _selectedData.push(
-                  _CnaFracMutCntMap[_pointObj.x + '||' + _pointObj.y]);
-              }
-            });
-            var _selectedCases = _.pluck(_selectedData, 'sample_id').sort();
-            _self.selectedSamples = _selectedCases;
-            _self.attributes.filter = _selectedCases;
-
-            var filtersMap = {};
-            _.each(_selectedCases, function(filter) {
-              if (filtersMap[filter] === undefined) {
-                filtersMap[filter] = true;
-              }
-            });
-            _self.invisibleDimension.filterFunction(function(d) {
-              return (filtersMap[d] !== undefined);
-            });
-            dc.redrawAll(_self.attributes.group_id);
-          }
-        });
+      _self.attachPlotlySelectedEvent();
       _self.showLoad = false;
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
