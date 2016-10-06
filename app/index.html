@@ -4,10 +4,14 @@
   <meta charset="utf-8">
 
 
+  <!-- This file shouldn't be included in final build libray -->
+  <!-- build:js(.) scripts/iviz-vendor-cbio.js -->
+  <script src="/bower_components/jquery/jquery.min.js"></script>
+  <!-- endbuild -->
+
   <!-- build:js(.) scripts/vc-session-vendor.js -->
   <!-- bower:js -->
   <script src="/bower_components/modernizr/modernizr.js"></script>
-  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/bower_components/underscore/underscore.js"></script>
   <script src="/bower_components/vue/dist/vue.js"></script>
   <script src="/bower_components/clipboard/dist/clipboard.js"></script>
@@ -40,8 +44,12 @@
 <body>
 
 <div id="cohort-component">
-  <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"  :selected-patients-num="selectedPatientsNum"
-                     :selected-samples-num="selectedSamplesNum" :userid="userid" :stats="stats" :update-stats.sync="updateStats"></session-component>
+  <session-component :show-save-button="showSaveButton"
+                     :show-manage-button="showManageButton"
+                     :selected-patients-num="selectedPatientsNum"
+                     :selected-samples-num="selectedSamplesNum"
+                     :userid="userid" :stats="stats"
+                     :update-stats.sync="updateStats"></session-component>
 </div>
 
 
@@ -51,8 +59,7 @@
   $(document).ready(function () {
     vcSession.URL = "http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/";
     window.cbioURL = 'http://localhost:8080/cbioportal/';
-    vcSessionTemp.init();
-    var obj_ = vcSessionTemp.getInstance();
+    var obj_ = vcSessionsManagement.getInstance();
 
     $.getJSON('/data/sample.json', function(_data) {
       obj_.stats = _data;

@@ -1,9 +1,9 @@
 {
-  "name": "iViz-session",
+  "name": "iviz-session",
   "private": true,
   "dependencies": {
     "bootstrap": "^3.3.6",
-    "jquery": "#2.1.4",
+    "jquery": "2.0.3",
     "modernizr": "~2.8.2",
     "underscore": "~1.8.3",
     "vue": "~1.0.15",
