@@ -25,7 +25,9 @@
     content.init = function(_data, opts) {
       opts_ = $.extend(true, {}, opts);
       chartId_ = opts_.chartId;
-      data_ = _data;
+      data_ = _.filter(_data, function(datum) {
+        return !isNaN(datum.cna_fraction) && !isNaN(datum.mutation_count);
+      });
       var _xArr = _.pluck(data_, 'cna_fraction');
       var _yArr = _.pluck(data_, 'mutation_count');
       var _qtips = [];
@@ -55,7 +57,8 @@
           title: 'Fraction of copy number altered genome',
           range: [d3.min(_xArr) - _marginX, d3.max(_xArr) + _marginX],
           zeroline: false,
-          showline: true
+          showline: true,
+          tickangle: -45
         },
         yaxis: {
           title: '# of mutations',

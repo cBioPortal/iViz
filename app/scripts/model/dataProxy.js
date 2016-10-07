@@ -330,9 +330,11 @@ window.DataManagerForIviz = (function($, _) {
                       .indexOf(_metaObj.attr_id) !== -1) {
                     if (_.intersection(['mskimpact', 'genie'],
                         Object.keys(_studyToSampleToPatientMap)).length === 0) {
-                      _metaObj.priority = 4.1;
+                      _metaObj.priority = _metaObj.attr_id === 'CANCER_TYPE' ?
+                        4.1 : 4.2;
                     } else {
-                      _metaObj.priority = 0.9;
+                      _metaObj.priority = _metaObj.attr_id === 'CANCER_TYPE' ?
+                        0.8 : 0.9;
                     }
                   }
                 });
