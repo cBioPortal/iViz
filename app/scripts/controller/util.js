@@ -219,7 +219,7 @@
           pieChartCanvasDownload(content, {
             filename: content.fileName + '.pdf',
             contentType: 'application/pdf',
-            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+            servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
         default:
@@ -517,7 +517,7 @@
           survivalChartCanvasDownload(content, {
             filename: content.fileName + '.pdf',
             contentType: 'application/pdf',
-            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+            servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
         default:
@@ -585,7 +585,7 @@
           barChartCanvasDownload(content, {
             filename: content.fileName + '.pdf',
             contentType: 'application/pdf',
-            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+            servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
         default:
