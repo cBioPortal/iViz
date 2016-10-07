@@ -28,7 +28,7 @@ window.DataManagerForIviz = (function($, _) {
    * Survival Plots: 1; Scatter Plot: 2;
    * Mutated Genes table: 3; CNA table: 4;
    * Mutated Count bar chart: 5; CNA bar chart:6
-   * Cancer Type/Cancer Type details: 4.1 but MSKIMPACT: 0.9
+   * Cancer Type/Cancer Type details: 4.1 but mskimpact/genie: 0.9
    */
 
   /**
@@ -328,7 +328,12 @@ window.DataManagerForIviz = (function($, _) {
                   }
                   if (['CANCER_TYPE', 'CANCER_TYPE_DETAILED']
                       .indexOf(_metaObj.attr_id) !== -1) {
-                    _metaObj.priority = 0.9;
+                    if (_.intersection(['mskimpact', 'genie'],
+                        Object.keys(_studyToSampleToPatientMap)).length === 0) {
+                      _metaObj.priority = 4.1;
+                    } else {
+                      _metaObj.priority = 0.9;
+                    }
                   }
                 });
                 _.each(_patientAttributes, function(_metaObj) {

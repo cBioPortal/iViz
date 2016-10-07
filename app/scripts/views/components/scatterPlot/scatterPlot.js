@@ -66,8 +66,8 @@
         hovermode: 'closest',
         dragmode: 'select',
         showlegend: false,
-        width: 370,
-        height: 320,
+        width: opts_.width || 370,
+        height: opts_.height || 320,
         margin: {
           l: 60,
           r: 10,
