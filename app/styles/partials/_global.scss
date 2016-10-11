@@ -66,6 +66,11 @@
   text-align: center;
 }
 
+.bar-chart .chart-title-span {
+  // There is a ghost 5px height of the dc-bar-chart, this needs to be removed once figure out the reason.
+  margin-bottom: -5px;
+}
+
 #iviz-case-select-custom-dialog input[type="radio"] {
   margin: 3px;
 }
@@ -80,11 +85,6 @@
 
 .show {
   display: block;
-}
-
-#iviz-header-right-1 {
-  /*font-size: 1.1em;
-  width: 160px;*/
 }
 
 .iviz-header-button {
@@ -111,8 +111,11 @@
   display: inline-block;
 }
 
-#iviz-header-right {
-  float: right;
+@media screen and (min-width: 1200px) {
+  #iviz-header-right {
+    float: right;
+    margin: $iviz-header-right-margin;
+  }
 }
 
 #iviz_add_chart_chosen {
@@ -143,7 +146,7 @@ div.geneAddedNotification {
   vertical-align: middle;
   float: left;
   line-height: 30px;
-  margin: 0 5px;
+  margin: $iviz-header-left-case-margin;
   span {
     float: left;
   }
@@ -181,7 +184,7 @@ div.geneAddedNotification {
   outline: -webkit-focus-ring-color auto 5px;
 }
 
-.iviz-cohort-component .btn{
+.iviz-cohort-component .btn {
   line-height: 18px;
   padding: 5px 12px;
 }

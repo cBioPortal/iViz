@@ -244,7 +244,9 @@
                   (radioVal === 'patient' ? 'patient' : 'sample') +
                   ' ID' + (unmappedCaseIds.length === 1 ? ' was' : 's were') +
                   ' not found in this study: ' +
-                  unmappedCaseIds.join(', '), {message_type: 'warning'});
+                  unmappedCaseIds.join(', '), {
+                    message_type: 'danger'
+                  });
               } else {
                 new Notification().createNotification(selectedCaseIds.length +
                   ' case(s) selected.', {message_type: 'info'});

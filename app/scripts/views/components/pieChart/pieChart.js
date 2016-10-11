@@ -24,13 +24,13 @@
     v.data = $.extend(true, v.data, attributes);
     v.data.ndx = ndx;
 
-    var labels = [];
+    var labels = {};
     var reactTableData = {};
     reactTableData.attributes = [{
       attr_id: 'name',
       display_name: v.data.display_name,
       datatype: 'STRING',
-      column_width: 213
+      column_width: 247
     }, {
       attr_id: 'color',
       display_name: 'Color',
@@ -227,7 +227,7 @@
     function initTsvDownloadData() {
       var data = v.data.display_name + '\tCount';
 
-      var meta = labels || [];
+      var meta = labels || {};
 
       for (var i = 0; i < meta.length; i++) {
         data += '\r\n';
@@ -258,12 +258,15 @@
     }
 
     function animateTable(target, view, callback) {
-      var width = window.style['grid-w-1'] || '180px';
-      var height = window.style['grid-h-1'] || '165px';
+      var width = window.style.vars.width.one;
+      var height = window.style.vars.height.one;
 
       if (view === 'table') {
-        width = window.style['grid-w-2'] || '375px';
-        height = window.style['grid-h-2'] || '340px';
+        width = window.style.vars.width.two;
+        height = window.style.vars.height.two;
+        if (Object.keys(labels).length <= 3) {
+          height = window.style.vars.height.one;
+        }
       }
 
       $(target).animate({
@@ -295,7 +298,9 @@
 
     function updateReactTable() {
       var data = $.extend(true, {}, reactTableData);
-      initReactTable(v.opts.chartTableId, data);
+      initReactTable(v.opts.chartTableId, data, {
+        tableWidth: window.style.vars.specialTables.width
+      });
     }
 
     function updateQtipReactTable() {

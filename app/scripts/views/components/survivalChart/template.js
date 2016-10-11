@@ -97,8 +97,8 @@
         return d[attrId];
       });
       var _opts = {
-        width: window.style.vars.survivalWidth,
-        height: window.style.vars.survivalHeight,
+        width: window.style.vars.survival.width,
+        height: window.style.vars.survival.height,
         chartId: this.chartId,
         attrId: this.attributes.attr_id,
         title: this.attributes.display_name,

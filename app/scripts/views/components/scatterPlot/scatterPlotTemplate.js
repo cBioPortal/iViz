@@ -140,7 +140,9 @@
       var _opts = {
         chartId: this.chartId,
         chartDivId: this.chartDivId,
-        title: this.attributes.display_name
+        title: this.attributes.display_name,
+        width: window.style.vars.scatter.width,
+        height: window.style.vars.scatter.height
       };
       var attrId =
         this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';

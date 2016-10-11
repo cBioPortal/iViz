@@ -20,8 +20,11 @@ body {
 @import "vendor/efdt";
 @import "vendor/geneSelect";
 
-#iviz-case-select-custom-dialog input[type="radio"] {
-  margin: 3px;
+#iviz-case-select-custom-dialog {
+  width: 270px;
+  input[type="radio"] {
+    margin: 3px;
+  }
 }
 
 .qtip-wide{max-width:380px !important;}
