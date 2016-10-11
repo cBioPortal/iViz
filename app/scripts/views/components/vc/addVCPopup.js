@@ -12,7 +12,7 @@
     ' type="text" class="form-control" v-model="name"  placeholder="My' +
     ' Virtual Cohort" value="My Virtual Cohort"></div><br><div' +
     ' class="form-group"><label' +
-    ' for="description">Decription:</label><textarea class="form-control"' +
+    ' for="description">Decription:</label><textarea class="form-control popup-textarea"' +
     ' rows="4" cols="50"' +
     ' v-model="description"></textarea></div></div><div' +
     ' slot="footer"><button type="button" class="btn btn-default"' +
