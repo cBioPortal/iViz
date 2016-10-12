@@ -483,6 +483,21 @@ module.exports = function(grunt) {
     'htmlmin'
   ]);
 
+  grunt.registerTask('portal', [
+    'clean:dist',
+    'wiredep',
+    'useminPrepare',
+    'concurrent:dist',
+    'postcss',
+    'concat:generated',
+    'cssmin:generated',
+    // 'uglify:generated',
+    'copy:dist',
+    'modernizr',
+    'usemin',
+    'htmlmin'
+  ]);
+
   grunt.registerTask('default', [
     'newer:eslint',
     'test',
