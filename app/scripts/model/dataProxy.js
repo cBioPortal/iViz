@@ -3,10 +3,11 @@ window.DataManagerForIviz = (function($, _) {
   var content = {};
   // DESC
   var clinicalAttrsPriority = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED',
-    'GENDER', 'AGE', 'sequenced', 'has_cna_data', 'sample_count_patient'];
+    'GENDER', 'SEX', 'AGE', 'sequenced', 'has_cna_data', 'sample_count_patient'];
 
   var studyClinicalAttrsPriority = {
-    mskimpact: ['DARWIN_PATIENT_AGE', 'OS_STATUS']
+    mskimpact: ['DARWIN_PATIENT_AGE', 'OS_STATUS', 'SAMPLE_TYPE',
+      'DARWIN_VITAL_STATUS']
   };
 
   // Clinical attributes will be transfered into table.
