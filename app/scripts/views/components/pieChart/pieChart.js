@@ -30,7 +30,7 @@
       attr_id: 'name',
       display_name: v.data.display_name,
       datatype: 'STRING',
-      column_width: 247
+      column_width: 235
     }, {
       attr_id: 'color',
       display_name: 'Color',
@@ -86,7 +86,11 @@
       chartDivDom.qtip('destroy', true);
 
       if (currentView === 'table') {
-        updateReactTable();
+        if (qtipRendered) {
+          updateReactTable();
+        } else {
+          updatePieLabels();
+        }
         animateTable('#' + v.opts.chartDivId, 'table', function() {
           vm.$dispatch('update-grid');
           $('#' + v.opts.chartDivId).css('z-index', '');
