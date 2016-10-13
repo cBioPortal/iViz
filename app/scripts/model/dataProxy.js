@@ -913,29 +913,68 @@ window.DataManagerForIviz = (function($, _) {
         function(self, fetch_promise) {
           var study_to_sample_to_patient = {};
           var _studyCasesMap = self.getStudyCasesMap();
+          var getSamplesCall = function(cancerStudyId) {
+            var def = new $.Deferred();
+            window.cbioportal_client.getSamples({
+              study_id: [cancerStudyId],
+              sample_ids: _studyCasesMap[cancerStudyId].samples
+            }).then(function(data) {
+              var sample_to_patient = {};
+              var patientList = [];
+              for (var i = 0; i < data.length; i++) {
+                sample_to_patient[data[i].id] = data[i].patient_id;
+                patientList.push(data[i].patient_id);
+              }
+              // set patient list in studyCasesMap if sample list is
+              // passed in the input
+              if (_.isArray(_studyCasesMap[cancerStudyId].samples) &&
+                _studyCasesMap[cancerStudyId].samples.length > 0) {
+                self.studyCasesMap[cancerStudyId].patients = _.unique(patientList);
+              }
+              study_to_sample_to_patient[cancerStudyId] = sample_to_patient;
+              def.resolve();
+            }).fail(function() {
+              def.reject();
+            });
+            return def.promise();
+          };
+
           var requests = self.getCancerStudyIds().map(
             function(cancer_study_id) {
               var def = new $.Deferred();
-              window.cbioportal_client.getSamples({
-                study_id: [cancer_study_id],
-                sample_ids: _studyCasesMap[cancer_study_id].samples
-              }).then(function(data) {
-                var sample_to_patient = {};
-                var patientList = [];
-                for (var i = 0; i < data.length; i++) {
-                  sample_to_patient[data[i].id] = data[i].patient_id;
-                  patientList.push(data[i].patient_id);
-                }
-                // set patient list in studyCasesMap if sample list is
-                // passed in the input
-                if (_.isArray(_studyCasesMap[cancer_study_id].samples) && _studyCasesMap[cancer_study_id].samples.length > 0) {
-                  self.studyCasesMap[cancer_study_id].patients = _.unique(patientList);
-                }
-                study_to_sample_to_patient[cancer_study_id] = sample_to_patient;
-                def.resolve();
-              }).fail(function() {
-                fetch_promise.reject();
-              });
+              if (!_studyCasesMap.hasOwnProperty(cancer_study_id)) {
+                _studyCasesMap[cancer_study_id] = {};
+              }
+              if (_.isArray(_studyCasesMap[cancer_study_id].samples)) {
+                getSamplesCall(cancer_study_id)
+                  .then(function() {
+                    def.resolve();
+                  })
+                  .fail(function() {
+                    fetch_promise.reject();
+                  });
+              } else {
+                window.cbioportal_client
+                  .getSampleLists({study_id: [cancer_study_id]})
+                  .then(function(_sampleLists) {
+                    _.each(_sampleLists, function(_sampleList) {
+                      if (_sampleList.id === cancer_study_id + '_all') {
+                        _studyCasesMap[cancer_study_id].samples =
+                          _sampleList.sample_ids;
+                      }
+                    });
+                    getSamplesCall(cancer_study_id)
+                      .then(function() {
+                        def.resolve();
+                      })
+                      .fail(function() {
+                        fetch_promise.reject();
+                      });
+                  })
+                  .fail(function() {
+                    fetch_promise.reject();
+                  });
+              }
               return def.promise();
             });
           $.when.apply($, requests).then(function() {
