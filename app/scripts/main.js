@@ -509,6 +509,10 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var selectedCases_ = vm_.selectedsamples;
       var studyId_ = '';
       var possibleTOQuery = true;
+
+      // Remove all hidden inputs
+      $('#iviz-form input:not(:first)').remove();
+
       _.each(selectedCases_, function(_caseId, key) {
         var index_ = data_.groups.sample.data_indices.sample_id[_caseId];
         if (key === 0) {
@@ -522,21 +526,18 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         $('#iviz-form').get(0).setAttribute(
           'action', window.cbioURL + 'index.do');
 
-        $('#iviz-form input[name="cancer_study_id"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: studyId_,
           name: 'cancer_study_id'
         }).appendTo('#iviz-form');
 
-        $('#iviz-form input[name="case_set_id"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: -1,
           name: 'case_set_id'
         }).appendTo('#iviz-form');
 
-        $('#iviz-form input[name="case_ids"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: selectedCases_.join(' '),
