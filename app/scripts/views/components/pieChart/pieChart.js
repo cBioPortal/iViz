@@ -262,14 +262,14 @@
     }
 
     function animateTable(target, view, callback) {
-      var width = window.style.vars.width.one;
-      var height = window.style.vars.height.one;
+      var width = window.iViz.styles.vars.width.one;
+      var height = window.iViz.styles.vars.height.one;
 
       if (view === 'table') {
-        width = window.style.vars.width.two;
-        height = window.style.vars.height.two;
+        width = window.iViz.styles.vars.width.two;
+        height = window.iViz.styles.vars.height.two;
         if (Object.keys(labels).length <= 3) {
-          height = window.style.vars.height.one;
+          height = window.iViz.styles.vars.height.one;
         }
       }
 
@@ -303,7 +303,7 @@
     function updateReactTable() {
       var data = $.extend(true, {}, reactTableData);
       initReactTable(v.opts.chartTableId, data, {
-        tableWidth: window.style.vars.specialTables.width
+        tableWidth: window.iViz.styles.vars.specialTables.width
       });
     }
 

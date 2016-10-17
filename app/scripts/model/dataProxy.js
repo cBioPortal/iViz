@@ -214,11 +214,22 @@ window.DataManagerForIviz = (function($, _) {
     return array;
   };
 
+  content.util.pxStringToNumber = function(_str) {
+    var result;
+    if (_.isString(_str)) {
+      var tmp = _str.split('px');
+      if (tmp.length > 0) {
+        result = Number(tmp[0]);
+      }
+    }
+    return result;
+  };
+
   content.init = function(_portalUrl, _study_cases_map) {
     var initialSetup = function() {
       var _def = new $.Deferred();
       var self = this;
-      $.when(self.getStudyToSampleToPatientdMap()).then(function(_studyToSampleToPatientMap) {
+      $.when(self.getStudyToSampleToPatientdMap(), self.getAttrs()).then(function(_studyToSampleToPatientMap) {
         $.when(self.getGeneticProfiles(), self.getCaseLists(),
           self.getClinicalAttributesByStudy(),
           self.getCnaFractionData())
@@ -807,6 +818,77 @@ window.DataManagerForIviz = (function($, _) {
       getStudyCasesMap: function() {
         return window.cbio.util.deepCopyObject(this.studyCasesMap);
       },
+
+      // The reason to separate style variable into individual json is
+      // that the scss file can also rely on this file.
+      getStyleVars: window.cbio.util.makeCachedPromiseFunction(
+        function(self, fetch_promise) {
+          $.getJSON(window.cbioResourceURL + 'vars.json')
+            .then(function(data) {
+              var styles = {
+                vars: {}
+              };
+              styles.vars.width = {
+                one: content.util.pxStringToNumber(data['grid-w-1']) || 195,
+                two: content.util.pxStringToNumber(data['grid-w-2']) || 400
+              };
+              styles.vars.height = {
+                one: content.util.pxStringToNumber(data['grid-h-1']) || 170,
+                two: content.util.pxStringToNumber(data['grid-h-2']) || 350
+              };
+              styles.vars.chartHeader = 17;
+              styles.vars.borderWidth = 2;
+              styles.vars.scatter = {
+                width: (
+                styles.vars.width.two -
+                styles.vars.borderWidth) || 400,
+                height: (
+                styles.vars.height.two -
+                styles.vars.chartHeader -
+                styles.vars.borderWidth) || 350
+              };
+              styles.vars.survival = {
+                width: styles.vars.scatter.width,
+                height: styles.vars.scatter.height
+              };
+              styles.vars.specialTables = {
+                width: styles.vars.scatter.width,
+                height: styles.vars.scatter.height - 25
+              };
+              styles.vars.piechart = {
+                width: 140,
+                height: 140
+              };
+              styles.vars.barchart = {
+                width: (
+                styles.vars.width.two -
+                styles.vars.borderWidth) || 400,
+                height: (
+                styles.vars.height.one -
+                styles.vars.chartHeader * 2 -
+                styles.vars.borderWidth) || 130
+              };
+              fetch_promise.resolve(styles);
+            })
+            .fail(function() {
+              fetch_promise.resolve();
+            });
+        }),
+      getAttrs: window.cbio.util.makeCachedPromiseFunction(
+        function(self, fetch_promise) {
+          $.getJSON(window.cbioResourceURL + 'attributes.json')
+            .then(function(data) {
+              clinicalAttrsPriority = data.clinicalAttrsPriority.general;
+              studyClinicalAttrsPriority = data.clinicalAttrsPriority.study;
+              tableAttrs_ = data.tableAttrs;
+              hiddenAttrs_ = data.hiddenAttrs;
+              fetch_promise.resolve();
+            })
+            .fail(function() {
+              // TODO: maybe move the predefined attributes to here
+              fetch_promise.resolve();
+            });
+        }),
       getGeneticProfiles: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           var _profiles = [];

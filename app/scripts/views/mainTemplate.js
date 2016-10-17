@@ -72,8 +72,8 @@
         if (this.grid_ === '') {
           self_.grid_ = new Packery(document.querySelector('.grid'), {
             itemSelector: '.grid-item',
-            columnWidth: window.style.vars.width.one + 5,
-            rowHeight: window.style.vars.height.one + 5,
+            columnWidth: window.iViz.styles.vars.width.one + 5,
+            rowHeight: window.iViz.styles.vars.height.one + 5,
             gutter: 5,
             initLayout: false
           });

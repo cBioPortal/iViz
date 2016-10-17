@@ -153,8 +153,8 @@
       processTableData: function(_data) {
         var data = iViz.getGroupNdx(this.attributes.group_id);
         var opts = {
-          width: window.style.vars.specialTables.width,
-          height: window.style.vars.specialTables.height,
+          width: window.iViz.styles.vars.specialTables.width,
+          height: window.iViz.styles.vars.specialTables.height,
           chartId: this.chartId
         };
         this.chartInst.init(this.attributes, opts, this.$root.selectedsamples,

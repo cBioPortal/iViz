@@ -1,0 +1,38 @@
+{
+  "clinicalAttrsPriority": {
+    "general": [
+      "CANCER_TYPE",
+      "CANCER_TYPE_DETAILED",
+      "GENDER",
+      "SEX",
+      "AGE",
+      "sequenced",
+      "has_cna_data",
+      "sample_count_patient"
+    ],
+    "study": {
+      "mskimpact": [
+        "DARWIN_PATIENT_AGE",
+        "OS_STATUS",
+        "SAMPLE_TYPE",
+        "DARWIN_VITAL_STATUS"
+      ]
+    }
+  },
+  
+  "tableAttrs": [
+    "CANCER_TYPE",
+    "CANCER_TYPE_DETAILED"
+  ],
+  "hiddenAttrs": {
+    "OS_SURVIVAL": [
+      "mskimpact"
+    ],
+    "DFS_SURVIVAL": [
+      "mskimpact"
+    ],
+    "AGE": [
+      "mskimpact"
+    ]
+  }
+}

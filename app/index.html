@@ -73,6 +73,8 @@
   <script src="_components/QueryByGeneUtil.js"></script>
   <script src="_components/QueryByGeneTextArea.js"></script>
   <script src="_components/MutatedGeneCNATable.js"></script>
+  <script src="scripts/model/dataProxy.js"></script>
+  <script src="_components/cbioportal-client.js"></script>
   <!-- endbuild -->
 
   <!-- build:js scripts/vc-session.js -->
@@ -106,16 +108,12 @@
   <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <!-- endbuild -->
-
-  <script src="scripts/model/dataProxy.js"></script>
-  <script src="_components/cbioportal-client.js"></script>
-
 </head>
 <body>
 
 <div class="container-fluid" id="complete-screen">
-  <div id="complete-screen-loader" 
-       :class="{'show-loading': showScreenLoad}" 
+  <div id="complete-screen-loader"
+       :class="{'show-loading': showScreenLoad}"
        class="chart-loader" style="top: 30%; left: 30%; display: none;"><img
     src="images/ajax-loader.gif" alt="loading"></div>
   <nav class="navbar navbar-default navbar-fixed-top">
@@ -136,62 +134,67 @@
         <span id="iviz-header-left-patient-select" class="iviz-header-button"
               @click="openCases('patient')" class="number"
               role="button" tabindex="0" style="display: block;"><i class="fa fa-user" aria-hidden="true"></i></span>
-        <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()" 
-              role="button" 
+        <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()"
+              role="button"
               tabindex="0"><i class="fa fa-download" alt="download"></i></span>
-      
-      <span id="query-by-gene-span">
+
+        <span id="query-by-gene-span">
           <textarea id="query-by-gene-textarea" class="expand expandFocusOut" rows="1" cols="10"></textarea>
       </span>
         <span class="iviz-header-arrow">
-          <i  class="fa fa-arrow-right fa-lg" aria-hidden="true"></i>
+          <i class="fa fa-arrow-right fa-lg" aria-hidden="true"></i>
         </span>
-        <form id="iviz-form"  v-on:submit.prevent="submitForm" method="post" target="_blank" style="float: left;">
+        <form id="iviz-form" v-on:submit.prevent="submitForm" method="post" target="_blank" style="float: left;">
           <input type="submit" id="iviz-header-left-1" value="Query" class="iviz-header-button" style="display: block;">
         </form>
-      
+
       </div>
-      
+
       <div id="iviz-header-right">
         <custom-case-input></custom-case-input>
-        
+
         <select id="iviz-add-chart" class="chosen-select"
                 v-select :charts="charts" v-if="showDropDown">
           <option id='' value="">Add Chart</option>
-          <option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}" v-for="(index,data) in charts">{{data.display_name}}</option>
+          <option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}" v-for="(index,data) in charts">
+            {{data.display_name}}
+          </option>
         </select>
       </div>
 
       <div id="breadcrumbs_container" v-if="hasfilters">
-        <div style="float:left;" >
+        <div style="float:left;">
           <span class="breadcrumb_container">Your selections: </span>
         </div>
 
         <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
           <span>{{customfilter.display_name}}</span>
-          <i class="fa fa-times breadcrumb_remove" 
+          <i class="fa fa-times breadcrumb_remove"
              @click="clearAllCharts(true)"></i>
         </span>
         <div style="float:left" v-for="group in groups">
           <bread-crumb :attributes.sync="item"
                        :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
-                       v-if="item.filter.length>0" ></bread-crumb>
+                       v-if="item.filter.length>0"></bread-crumb>
         </div>
-        <div style="float:left"><button type='button' @click="clearAllCharts(true)" 
-                     class="btn btn-default btn-xs">Clear All</button></div>
+        <div style="float:left">
+          <button type='button' @click="clearAllCharts(true)"
+                  class="btn btn-default btn-xs">Clear All
+          </button>
+        </div>
       </div>
     </div>
   </nav>
   <div :class="{'start-loading': showScreenLoad}">
-  <div class="grid" id="main-grid" 
-       :class="{loading:isloading}">
-    <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
-                   :selectedpatients.sync="selectedpatients"
-                   :selectedsamples.sync="selectedsamples"
-                   :hasfilters.sync="hasfilters" 
-                   :customfilter.sync="customfilter" 
-                   :clear-all="clearAll"></main-template>
-  </div>
+    <div class="grid" id="main-grid"
+         :class="{loading:isloading}">
+      <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
+                     :selectedpatients.sync="selectedpatients"
+                     :selectedsamples.sync="selectedsamples"
+                     :hasfilters.sync="hasfilters"
+                     :customfilter.sync="customfilter"
+                     :clear-all="clearAll"></main-template>
+    </div>
   </div>
 
 </div>
@@ -200,95 +203,31 @@
 <script>
   $(document).ready(function() {
     //Include style variables
-    window.style = {
-      vars: {}
-    };
     iViz.vue.manage.init();
 
     // This is used to indicate how to disable two buttons. By default, they are set to true.
     iViz.vue.manage.getInstance().showManageButton = true;
     iViz.vue.manage.getInstance().showSaveButton = true;
 
-    $.getJSON('resources/vars.json')
-      .then(function(data) {
-        window.style.vars.width = {
-          one: iViz.util.pxStringToNumber(data['grid-w-1']) || 195,
-          two: iViz.util.pxStringToNumber(data['grid-w-2']) || 400
-        };
-        window.style.vars.height = {
-          one: iViz.util.pxStringToNumber(data['grid-h-1']) || 170,
-          two: iViz.util.pxStringToNumber(data['grid-h-2']) || 350
-        };
-        window.style.vars.chartHeader = 17;
-        window.style.vars.borderWidth = 2;
-        Window
-        window.style.vars.scatter = {
-          width: (window.style.vars.width.two - window.style.vars.borderWidth) || 400,
-          height: (window.style.vars.height.two - window.style.vars.chartHeader
-          - window.style.vars.borderWidth) || 350
-        };
-        window.style.vars.survival = {
-          width: window.style.vars.scatter.width,
-          height: window.style.vars.scatter.height
-        };
-        window.style.vars.specialTables = {
-          width: window.style.vars.scatter.width,
-          height: window.style.vars.scatter.height - 25
-        };
-        window.style.vars.piechart = {
-          width: 140,
-          height: 140
-        };
-        window.style.vars.barchart = {
-          width: (window.style.vars.width.two - window.style.vars.borderWidth) || 400,
-          height: (window.style.vars.height.one - window.style.vars.chartHeader * 2
-          - window.style.vars.borderWidth) || 130
-        };
-      })
-      .fail(function() {
-        window.style.vars = {
-          width: {
-            one: 195,
-            two: 400
-          },
-          height: {
-            one: 170,
-            two: 350
-          },
-          chartHeader: 15,
-          borderWidth: 2,
-          scatter: {
-            width: 400,
-            height: 350
-          },
-          survival: {
-            width: 400,
-            height: 350
-          },
-          specialTables: {
-            width: 400,
-            height:350
-          },
-          piechart: {
-            width: 180,
-            height: 140
-          },
-          barchart: {
-            width: 400,
-            height: 30
-          }
-        }
-      });
     window.cbioURL = 'http://www.cbioportal.org/';
-    window.mutationProfileId ='hnsc_tcga_mutations';
+    window.cbioResourceURL = 'resources/';
+    window.mutationProfileId = 'hnsc_tcga_mutations';
     window.cnaProfileId = 'hnsc_tcga_gistic';
     window.case_set_id = '-1';
     var studyCasesMap = {};
-    studyCasesMap['hnsc_tcga']={};
+    studyCasesMap['hnsc_tcga'] = {};
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
-    $.when(window.iviz.datamanager.initialSetup()).then(function(_data) {
-      iViz.init(_data);
+    $.when(
+      window.iviz.datamanager.initialSetup(),
+      window.iviz.datamanager.getStyleVars()
+    ).then(function(_data, styles) {
+      var opts = {};
+      
+      if(_.isObject(styles)) {
+        opts.styles = styles;
+      }
+      iViz.init(_data, opts);
     });
 
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {

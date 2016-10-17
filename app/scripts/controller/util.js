@@ -653,17 +653,6 @@
       return string.join('<br/>');
     };
 
-    content.pxStringToNumber = function(_str) {
-      var result;
-      if (_.isString(_str)) {
-        var tmp = _str.split('px');
-        if (tmp.length > 0) {
-          result = Number(tmp[0]);
-        }
-      }
-      return result;
-    };
-
     return content;
   })();
 })(window.iViz,
