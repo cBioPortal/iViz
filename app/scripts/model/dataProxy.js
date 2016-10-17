@@ -994,12 +994,11 @@ window.DataManagerForIviz = (function($, _) {
       getStudyToSampleToPatientdMap: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           var study_to_sample_to_patient = {};
-          var _studyCasesMap = self.getStudyCasesMap();
           var getSamplesCall = function(cancerStudyId) {
             var def = new $.Deferred();
             window.cbioportal_client.getSamples({
               study_id: [cancerStudyId],
-              sample_ids: _studyCasesMap[cancerStudyId].samples
+              sample_ids: self.studyCasesMap[cancerStudyId].samples
             }).then(function(data) {
               var sample_to_patient = {};
               var patientList = [];
@@ -1009,8 +1008,8 @@ window.DataManagerForIviz = (function($, _) {
               }
               // set patient list in studyCasesMap if sample list is
               // passed in the input
-              if (_.isArray(_studyCasesMap[cancerStudyId].samples) &&
-                _studyCasesMap[cancerStudyId].samples.length > 0) {
+              if (_.isArray(self.studyCasesMap[cancerStudyId].samples) &&
+                self.studyCasesMap[cancerStudyId].samples.length > 0) {
                 self.studyCasesMap[cancerStudyId].patients = _.unique(patientList);
               }
               study_to_sample_to_patient[cancerStudyId] = sample_to_patient;
@@ -1024,10 +1023,10 @@ window.DataManagerForIviz = (function($, _) {
           var requests = self.getCancerStudyIds().map(
             function(cancer_study_id) {
               var def = new $.Deferred();
-              if (!_studyCasesMap.hasOwnProperty(cancer_study_id)) {
-                _studyCasesMap[cancer_study_id] = {};
+              if (!self.studyCasesMap.hasOwnProperty(cancer_study_id)) {
+                self.studyCasesMap[cancer_study_id] = {};
               }
-              if (_.isArray(_studyCasesMap[cancer_study_id].samples)) {
+              if (_.isArray(self.studyCasesMap[cancer_study_id].samples)) {
                 getSamplesCall(cancer_study_id)
                   .then(function() {
                     def.resolve();
@@ -1041,7 +1040,7 @@ window.DataManagerForIviz = (function($, _) {
                   .then(function(_sampleLists) {
                     _.each(_sampleLists, function(_sampleList) {
                       if (_sampleList.id === cancer_study_id + '_all') {
-                        _studyCasesMap[cancer_study_id].samples =
+                        self.studyCasesMap[cancer_study_id].samples =
                           _sampleList.sample_ids;
                       }
                     });
