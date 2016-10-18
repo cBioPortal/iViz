@@ -1,38 +1,35 @@
 {
-  "clinicalAttrsPriority": {
-    "general": [
-      "CANCER_TYPE",
-      "CANCER_TYPE_DETAILED",
-      "GENDER",
-      "SEX",
-      "AGE",
-      "sequenced",
-      "has_cna_data",
-      "sample_count_patient"
-    ],
-    "study": {
-      "mskimpact": [
-        "DARWIN_PATIENT_AGE",
-        "OS_STATUS",
-        "SAMPLE_TYPE",
-        "DARWIN_VITAL_STATUS"
-      ]
+  "clinicalAttrs": {
+    "general": {
+      "priority": [
+        "CANCER_TYPE",
+        "CANCER_TYPE_DETAILED",
+        "GENDER",
+        "SEX",
+        "sequenced",
+        "has_cna_data",
+        "sample_count_patient"
+      ],
+      "hidden": []
+    },
+    "studies": {
+      "mskimpact": {
+        "priority":[
+          "DARWIN_PATIENT_AGE",
+          "OS_STATUS",
+          "SAMPLE_TYPE",
+          "DARWIN_VITAL_STATUS"
+        ],
+        "hidden": [
+          "OS_SURVIVAL",
+          "DFS_SURVIVAL",
+          "AGE"
+        ]
+      }
     }
   },
-  
   "tableAttrs": [
     "CANCER_TYPE",
     "CANCER_TYPE_DETAILED"
-  ],
-  "hiddenAttrs": {
-    "OS_SURVIVAL": [
-      "mskimpact"
-    ],
-    "DFS_SURVIVAL": [
-      "mskimpact"
-    ],
-    "AGE": [
-      "mskimpact"
-    ]
-  }
+  ]
 }

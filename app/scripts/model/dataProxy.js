@@ -1,25 +1,25 @@
 'use strict';
 window.DataManagerForIviz = (function($, _) {
   var content = {};
-  // DESC
-  var clinicalAttrsPriority = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED',
-    'GENDER', 'SEX', 'AGE', 'sequenced', 'has_cna_data', 'sample_count_patient'];
-
-  var studyClinicalAttrsPriority = {
-    mskimpact: ['DARWIN_PATIENT_AGE', 'OS_STATUS', 'SAMPLE_TYPE',
-      'DARWIN_VITAL_STATUS']
-  };
 
   // Clinical attributes will be transfered into table.
   var tableAttrs_ = ['CANCER_TYPE', 'CANCER_TYPE_DETAILED'];
   content.util = {};
 
-  // clinical attr id as key, designed for specific studies.
-  // TODO: how do work with merged studies(virtual studies)
-  var hiddenAttrs_ = {
-    OS_SURVIVAL: ['mskimpact'],
-    DFS_SURVIVAL: ['mskimpact'],
-    AGE: ['mskimpact']
+  var clinAttrs_ = {
+    general: {
+      priority: [
+        'CANCER_TYPE',
+        'CANCER_TYPE_DETAILED',
+        'GENDER',
+        'SEX',
+        'AGE',
+        'sequenced',
+        'has_cna_data',
+        'sample_count_patient'
+      ],
+      hidden: []
+    }
   };
 
   /**
@@ -56,16 +56,18 @@ window.DataManagerForIviz = (function($, _) {
   content.util.isPriorityClinicalAttr = function(attr, studyId) {
     if (_.isString(attr)) {
       if (_.isString(studyId) &&
-        studyClinicalAttrsPriority.hasOwnProperty(studyId) &&
-        studyClinicalAttrsPriority[studyId].indexOf(attr) !== -1) {
+        clinAttrs_.studies.hasOwnProperty(studyId) &&
+        _.isArray(clinAttrs_.studies[studyId].priority) &&
+        clinAttrs_.studies[studyId].priority.indexOf(attr) !== -1) {
         return true;
       } else if (_.isArray(studyId)) {
         var sameStudies = _.intersection(
-          Object.keys(studyClinicalAttrsPriority), studyId);
+          Object.keys(clinAttrs_.studies), studyId);
         if (sameStudies.length > 0) {
           var contain = false;
           _.every(sameStudies, function(study) {
-            if (studyClinicalAttrsPriority[study].indexOf(attr) !== -1) {
+            if (_.isArray(clinAttrs_.studies[study].priority) &&
+              clinAttrs_.studies[study].priority.indexOf(attr) !== -1) {
               contain = true;
               return true;
             }
@@ -75,7 +77,7 @@ window.DataManagerForIviz = (function($, _) {
           }
         }
       }
-      if (clinicalAttrsPriority.indexOf(attr) !== -1) {
+      if (clinAttrs_.general.priority.indexOf(attr) !== -1) {
         return true;
       }
     }
@@ -134,14 +136,14 @@ window.DataManagerForIviz = (function($, _) {
     if (!_.isString(b)) {
       return -1;
     }
-    var aI = clinicalAttrsPriority.indexOf(a);
-    var bI = clinicalAttrsPriority.indexOf(b);
+    var aI = clinAttrs_.general.priority.indexOf(a);
+    var bI = clinAttrs_.general.priority.indexOf(b);
     return aI - bI;
   };
 
   /**
    * There are few steps to detemine the priority.
-   * Step 1: whether it is in clinicalAttrsPriority list
+   * Step 1: whether it is in clinAttrs_.general.priority list
    * Step 2: whether it will pass preSelectedAttr Regex check
    * Step 3: Sort the rest based on data availability. Notice that: at this
    * Step, attribute with only one category will be moved to end. Number of
@@ -223,6 +225,29 @@ window.DataManagerForIviz = (function($, _) {
       }
     }
     return result;
+  };
+
+  content.util.getHiddenAttrs = function() {
+    var hiddenAttrs = {};
+    if (_.isArray(clinAttrs_.general.hidden)) {
+      _.each(clinAttrs_.general.hidden, function(attr) {
+        if (!hiddenAttrs.hasOwnProperty(attr)) {
+          hiddenAttrs[attr] = [];
+        }
+        hiddenAttrs[attr].push('general');
+      });
+    }
+    _.each(clinAttrs_.studies, function(item, studyId) {
+      if (_.isArray(item.hidden)) {
+        _.each(item.hidden, function(attr) {
+          if (!hiddenAttrs.hasOwnProperty(attr)) {
+            hiddenAttrs[attr] = [];
+          }
+          hiddenAttrs[attr].push(studyId);
+        });
+      }
+    });
+    return hiddenAttrs;
   };
 
   content.init = function(_portalUrl, _study_cases_map) {
@@ -631,6 +656,8 @@ window.DataManagerForIviz = (function($, _) {
                     show: true
                   };
                 }
+
+                var hiddenAttrs = content.util.getHiddenAttrs();
                 _.each(content.util.sortClinicalAttrs(
                   _.values(_.extend({}, _patientAttributes, _sampleAttributes))
                 ), function(attr, index) {
@@ -641,9 +668,10 @@ window.DataManagerForIviz = (function($, _) {
                     groupRef = _patientAttributes;
                   }
 
-                  if (hiddenAttrs_.hasOwnProperty(attrId) &&
-                    _.intersection(hiddenAttrs_[attrId],
-                      Object.keys(_studyToSampleToPatientMap)).length !== 0) {
+                  if (hiddenAttrs.hasOwnProperty(attrId) &&
+                    (hiddenAttrs[attrId].indexOf('general') !== -1 ||
+                    _.intersection(hiddenAttrs[attrId],
+                      Object.keys(_studyToSampleToPatientMap)).length !== 0)) {
                     groupRef[attrId].priority = 1000;
                   } else if (attr.priority === -1) {
                     groupRef[attrId].priority = 10 + index;
@@ -878,10 +906,14 @@ window.DataManagerForIviz = (function($, _) {
         function(self, fetch_promise) {
           $.getJSON(window.cbioResourceURL + 'attributes.json')
             .then(function(data) {
-              clinicalAttrsPriority = data.clinicalAttrsPriority.general;
-              studyClinicalAttrsPriority = data.clinicalAttrsPriority.study;
-              tableAttrs_ = data.tableAttrs;
-              hiddenAttrs_ = data.hiddenAttrs;
+              if (_.isObject(data)) {
+                if (_.isObject(data.clinicalAttrs)) {
+                  clinAttrs_ = data.clinicalAttrs;
+                }
+                if (_.isObject(data.tableAttrs)) {
+                  tableAttrs_ = data.tableAttrs;
+                }
+              }
               fetch_promise.resolve();
             })
             .fail(function() {
