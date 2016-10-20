@@ -713,6 +713,23 @@ window.DataManagerForIviz = (function($, _) {
       return _def.promise();
     };
 
+    // Borrowed from cbioportal-client.js
+    var getApiCallPromise = function(endpt, args) {
+      var arg_strings = [];
+      for (var k in args) {
+        if (args.hasOwnProperty(k)) {
+          arg_strings.push(k + '=' + [].concat(args[k]).join(','));
+        }
+      }
+      var arg_string = arg_strings.join('&') || '?';
+      return $.ajax({
+        type: 'POST',
+        url: window.cbioURL + endpt,
+        data: arg_string,
+        dataType: 'json'
+      });
+    };
+
     var getPatientClinicalData = function(self, attr_ids) {
       var def = new $.Deferred();
       var fetch_promises = [];
@@ -742,19 +759,22 @@ window.DataManagerForIviz = (function($, _) {
 
           fetch_promises = fetch_promises.concat(Object.keys(studyAttributesMap).map(function(_studyId) {
             var _def = new $.Deferred();
-            window.cbioportal_client.getPatientClinicalData({
+            // Bypass cBioPortal client for clinical data call.
+            // Checking whether sample clinical data is available takes too much
+            // time. This is temporary solution, should be replaced with
+            // better solution.
+            getApiCallPromise('api-legacy/clinicaldata/patients', {
               study_id: [_studyId],
               attribute_ids: studyAttributesMap[_studyId],
               patient_ids: studyCasesMap[_studyId].patients
-            })
-              .then(function(data) {
-                for (var i = 0; i < data.length; i++) {
-                  var attr_id = data[i].attr_id;
-                  clinical_data[attr_id] = clinical_data[attr_id] || [];
-                  clinical_data[attr_id].push(data[i]);
-                }
-                _def.resolve();
-              }).fail(
+            }).then(function(data) {
+              for (var i = 0; i < data.length; i++) {
+                var attr_id = data[i].attr_id;
+                clinical_data[attr_id] = clinical_data[attr_id] || [];
+                clinical_data[attr_id].push(data[i]);
+              }
+              _def.resolve();
+            }).fail(
               function() {
                 def.reject();
               });
@@ -798,19 +818,22 @@ window.DataManagerForIviz = (function($, _) {
           fetch_promises = fetch_promises.concat(Object.keys(studyAttributesMap)
             .map(function(_studyId) {
               var _def = new $.Deferred();
-              window.cbioportal_client.getSampleClinicalData({
+              // Bypass cBioPortal client for clinical data call.
+              // Checking whether sample clinical data is available takes too much
+              // time. This is temporary solution, should be replaced with
+              // better solution.
+              getApiCallPromise('api-legacy/clinicaldata/samples', {
                 study_id: [_studyId],
                 attribute_ids: studyAttributesMap[_studyId],
                 sample_ids: studyCasesMap[_studyId].samples
-              })
-                .then(function(data) {
-                  for (var i = 0; i < data.length; i++) {
-                    var attr_id = data[i].attr_id;
-                    clinical_data[attr_id] = clinical_data[attr_id] || [];
-                    clinical_data[attr_id].push(data[i]);
-                  }
-                  _def.resolve();
-                }).fail(
+              }).then(function(data) {
+                for (var i = 0; i < data.length; i++) {
+                  var attr_id = data[i].attr_id;
+                  clinical_data[attr_id] = clinical_data[attr_id] || [];
+                  clinical_data[attr_id].push(data[i]);
+                }
+                _def.resolve();
+              }).fail(
                 function() {
                   def.reject();
                 });
