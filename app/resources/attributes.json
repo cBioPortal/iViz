@@ -6,6 +6,7 @@
         "CANCER_TYPE_DETAILED",
         "GENDER",
         "SEX",
+        "AGE",
         "sequenced",
         "has_cna_data",
         "sample_count_patient"
