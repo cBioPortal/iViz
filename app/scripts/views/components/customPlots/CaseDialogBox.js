@@ -47,7 +47,7 @@
     methods: {
       SetCasesSelection: function() {
         var caseIds = this.casesIdsList.trim().split(/\s+/);
-        this.$dispatch('set-selected-cases', this.caseSelection, caseIds);
+        this.$dispatch('set-selected-cases', this.caseSelection, _.uniq(caseIds));
       }
     },
     ready: function() {

@@ -10,7 +10,7 @@ window.cbioportal_client = (function() {
       var arg_string = arg_strings.join("&") || "?";
       return $.ajax({
         type: "POST",
-        url: window.cbioURL + '/' + endpt,
+        url: window.cbioURL + endpt,
         data: arg_string,
         dataType: "json"
       });

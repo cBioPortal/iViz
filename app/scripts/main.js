@@ -10,6 +10,40 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
   var patientData_;
   var sampleData_;
   var charts = {};
+  var styles_ = {
+    vars: {
+      width: {
+        one: 195,
+        two: 400
+      },
+      height: {
+        one: 170,
+        two: 350
+      },
+      chartHeader: 17,
+      borderWidth: 2,
+      scatter: {
+        width: 398,
+        height: 331
+      },
+      survival: {
+        width: 398,
+        height: 331
+      },
+      specialTables: {
+        width: 398,
+        height: 306
+      },
+      piechart: {
+        width: 140,
+        height: 140
+      },
+      barchart: {
+        width: 398,
+        height: 134
+      }
+    }
+  };
 
   function getAttrVal(attrs, arr) {
     var str = [];
@@ -29,10 +63,16 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
   return {
 
-    init: function(_rawDataJSON) {
+    init: function(_rawDataJSON, opts) {
       vm_ = iViz.vue.manage.getInstance();
 
       data_ = _rawDataJSON;
+
+      if (_.isObject(opts)) {
+        if (_.isObject(opts.styles)) {
+          styles_ = _.extend(styles_, opts.styles);
+        }
+      }
 
       hasPatientAttrDataMap_ = data_.groups.patient.hasAttrData;
       hasSampleAttrDataMap_ = data_.groups.sample.hasAttrData;
@@ -509,6 +549,10 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var selectedCases_ = vm_.selectedsamples;
       var studyId_ = '';
       var possibleTOQuery = true;
+
+      // Remove all hidden inputs
+      $('#iviz-form input:not(:first)').remove();
+
       _.each(selectedCases_, function(_caseId, key) {
         var index_ = data_.groups.sample.data_indices.sample_id[_caseId];
         if (key === 0) {
@@ -522,21 +566,18 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         $('#iviz-form').get(0).setAttribute(
           'action', window.cbioURL + 'index.do');
 
-        $('#iviz-form input[name="cancer_study_id"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: studyId_,
           name: 'cancer_study_id'
         }).appendTo('#iviz-form');
 
-        $('#iviz-form input[name="case_set_id"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: -1,
           name: 'case_set_id'
         }).appendTo('#iviz-form');
 
-        $('#iviz-form input[name="case_ids"]').remove();
         $('<input>').attr({
           type: 'hidden',
           value: selectedCases_.join(' '),
@@ -645,6 +686,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       }
     },
     data: {},
+    styles: styles_,
     applyVC: function(_vc) {
       var _selectedSamples = [];
       var _selectedPatients = [];
