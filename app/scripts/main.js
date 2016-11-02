@@ -439,6 +439,14 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       }
       return data_.groups.patient.data_indices.patient_id;
     },
+    getPatientIds: function(sampleId) {
+      var map = this.getCasesMap('sample');
+      return map[sampleId];
+    },
+    getSampleIds: function(patientId) {
+      var map = this.getCasesMap('patient');
+      return map[patientId];
+    },
     openCases: function(type) {
       if (type !== 'patient') {
         type = 'sample';

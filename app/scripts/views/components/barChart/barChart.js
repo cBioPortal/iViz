@@ -148,20 +148,47 @@
     }
 
     function initTsvDownloadData() {
-      var data = '';
+      var data = [];
       var _cases = chartInst_.dimension().top(Infinity);
+      var header = ['Patient ID', 'Sample ID', opts_.displayName];
 
-      data = 'Sample ID\tPatient ID\t' + opts_.displayName;
+      if (opts_.groupType === 'sample') {
+        var tmp = header[0];
+        header[0] = header[1];
+        header[1] = tmp;
+      }
+      data.push(header.join('\t'));
 
       for (var i = 0; i < _cases.length; i++) {
-        data += '\r\n';
-        data += _cases[i].sample_id + '\t';
-        data += _cases[i].patient_id + '\t';
-        data += iViz.util.restrictNumDigits(_cases[i][data_.attrId]);
+        var sampleId = _cases[i].sample_id;
+        var patientId = _cases[i].patient_id;
+        var row = [];
+        if (opts_.groupType === 'patient') {
+          sampleId = iViz.getSampleIds(patientId);
+          if (_.isArray(sampleId)) {
+            sampleId = sampleId.join(', ');
+          } else {
+            sampleId = '';
+          }
+          row.push(patientId);
+          row.push(sampleId);
+        } else {
+          patientId = iViz.getPatientIds(sampleId);
+          if (_.isArray(patientId)) {
+            patientId = patientId.join(', ');
+          } else {
+            patientId = '';
+          }
+          row.push(sampleId);
+          row.push(patientId);
+        }
+        row.push(_.isUndefined(_cases[i][data_.attrId]) ? 'NA' :
+          iViz.util.restrictNumDigits(_cases[i][data_.attrId]));
+        data.push(row.join('\t'));
       }
       content.setDownloadData('tsv', {
         fileName: opts_.displayName,
-        data: data
+        data: data.join('\n')
       });
     }
 

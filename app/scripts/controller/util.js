@@ -382,13 +382,17 @@
 
     function barChartCanvasDownload(data, downloadOpts) {
       var _svgElement = '';
-      var _svg = $('#' + data.chartId + ' svg');
+      var _svg = $('#' + data.chartId + '>svg').clone();
+      var _svgWidth = Number(_svg.attr('width'));
+      var _svgHeight = Number(_svg.attr('height')) + 20;
       var _brush = _svg.find('g.brush');
       var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
       var i = 0;
 
+      // Remove brush if the width is zero(no rush presents)
+      // Otherwise width 0 brush will still show in the PDF
       if (_brushWidth === 0) {
-        _brush.css('display', 'none');
+        _brush.remove();
       }
 
       _brush.find('rect.extent')
@@ -436,6 +440,11 @@
         });
       }
 
+      // Remove clip-path from chart-body. Clip-path causes issue when
+      // generating pdf and useless in here.
+      // Related topic: https://github.com/dc-js/dc.js/issues/730
+      _chartBody.attr('clip-path', '');
+
       // Change x/y axis text size
       var _chartText = _svg.find('.axis text');
       var _chartTextLength = _chartText.length;
@@ -446,16 +455,13 @@
         });
       }
 
-      $('#' + data.chartId + ' svg>g').each(function(i, e) {
-        _svgElement += cbio.download.serializeHtml(e);
-      });
-      $('#' + data.chartId + ' svg>defs').each(function(i, e) {
+      _svg.children().each(function(i, e) {
         _svgElement += cbio.download.serializeHtml(e);
       });
 
       var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ' +
-        'width="370" height="200">' +
-        '<g><text x="180" y="20" ' +
+        'width="' + _svgWidth + '" height="' + _svgHeight + '">' +
+        '<g><text x="' + (_svgWidth / 2) + '" y="20" ' +
         'style="font-weight: bold; text-anchor: middle">' +
         data.title + '</text></g>' +
         '<g transform="translate(0, 20)">' + _svgElement + '</g></svg>';
@@ -464,46 +470,6 @@
         svg, downloadOpts);
 
       _brush.css('display', '');
-
-      // Remove added styles
-      _brush.find('rect.extent')
-        .css({
-          'fill-opacity': '',
-          'fill': ''
-        });
-
-      _brush.find('.resize path')
-        .css({
-          fill: '',
-          stroke: ''
-        });
-
-      for (i = 0; i < _deselectedChartsLength; i++) {
-        $(_deselectedCharts[i]).css({
-          stroke: '',
-          fill: ''
-        });
-      }
-
-      for (i = 0; i < _axisDomainLength; i++) {
-        $(_axisDomain[i]).css({
-          'fill': '',
-          'fill-opacity': '',
-          'stroke': ''
-        });
-      }
-
-      for (i = 0; i < _axisTickLength; i++) {
-        $(_axisTick[i]).css({
-          stroke: ''
-        });
-      }
-
-      for (i = 0; i < _chartTextLength; i++) {
-        $(_chartText[i]).css({
-          'font-size': ''
-        });
-      }
     }
 
     function survivalChartDownload(fileType, content) {
@@ -530,8 +496,8 @@
       var _svgTitle;
       var _labelTextMaxLength = 0;
       var _numOfLabels = 0;
-      var _svgWidth = 380;
-      var _svgheight = 380;
+      var _svgWidth = Number($('#' + data.chartDivId + ' svg').attr('width')) + 50;
+      var _svgheight = Number($('#' + data.chartDivId + ' svg').attr('height')) + 50;
 
       _svgElement = cbio.download.serializeHtml(
         $('#' + data.chartDivId + ' svg')[0]);
