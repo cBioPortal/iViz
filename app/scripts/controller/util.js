@@ -482,19 +482,23 @@
       var _svgTitle;
       var _labelTextMaxLength = 0;
       var _numOfLabels = 0;
+      var _svg = $('#' + data.chartDivId).clone();
       var _svgWidth = Number($('#' + data.chartDivId + ' svg').attr('width')) + 50;
       var _svgheight = Number($('#' + data.chartDivId + ' svg').attr('height')) + 50;
 
-      _svgElement = cbio.download.serializeHtml(
-        $('#' + data.chartDivId + ' svg')[0]);
+      // This is for PDF download. fill transparent will be treated as black.
+      _svg.find('rect').each(function(index, item) {
+        if($(item).css('fill') === 'transparent') {
+          $(item).css('fill', 'white');
+        }
+      });
+      _svgElement = cbio.download.serializeHtml(_svg.find('svg')[0]);
 
       _svgWidth += _labelTextMaxLength * 14;
 
       if (_svgheight < _numOfLabels * 20) {
         _svgheight = _numOfLabels * 20 + 40;
       }
-
-      // _svgLabels = cbio.download.serializeHtml(_svgLabels[0]);
 
       _svgTitle = '<g><text text-anchor="middle" x="210" y="30" ' +
         'style="font-weight:bold">' + data.title + '</text></g>';
@@ -504,8 +508,6 @@
         'px" style="font-size:14px">' +
         _svgTitle + '<g transform="translate(0,40)">' +
         _svgElement + '</g>' +
-        // '<g transform="translate(370,50)">' +
-        // _svgLabels + '</g>' +
         '</svg>';
 
       cbio.download.initDownload(
