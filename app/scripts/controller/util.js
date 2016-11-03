@@ -229,12 +229,12 @@
 
     function getPieWidthInfo(data) {
       var length = data.title.length;
-      var labels = data.labels;
+      var labels = _.values(data.labels);
       var labelMaxName = _.last(_.sortBy(_.pluck(labels, 'name'),
         function(item) {
           return item.toString().length;
         })).toString().length;
-      var labelMaxNumber = _.last(_.sortBy(_.pluck(labels, 'samples'),
+      var labelMaxNumber = _.last(_.sortBy(_.pluck(labels, 'cases'),
         function(item) {
           return item.toString().length;
         })).toString().length;
@@ -258,12 +258,13 @@
     }
 
     function pieChartCanvasDownload(data, downloadOpts) {
-      var _svgElement;
+      var _svgElement = '';
 
       var _width = getPieWidthInfo(data);
       var _pieLabelString = '';
       var _pieLabelYCoord = 0;
       var _svg = $('#' + data.chartId + ' svg');
+      var _svgClone = _svg.clone();
       var _previousHidden = false;
 
       if ($('#' + data.chartDivId).css('display') === 'none') {
@@ -272,11 +273,13 @@
       }
 
       var _svgHeight = _svg.height();
-      var _text = _svg.find('text');
+      var _text = _svgClone.find('text');
       var _textLength = _text.length;
-      var _slice = _svg.find('g .pie-slice');
+      var _slice = _svgClone.find('g .pie-slice');
       var _sliceLength = _slice.length;
-      var _pieLabel = data.labels;
+      var _pieLabel = _.sortBy(_.values(data.labels), function(item) {
+        return -item.cases;
+      });
       var _pieLabelLength = _pieLabel.length;
       var i = 0;
 
@@ -337,7 +340,7 @@
           _label.color + '"></rect><text x="13" y="10" ' +
           'style="font-size:15px">' + _label.name + '</text>' +
           '<text x="' + _width.name * 10 + '" y="10" ' +
-          'style="font-size:15px">' + _label.samples + '</text>' +
+          'style="font-size:15px">' + _label.cases + '</text>' +
           '<text x="' + (_width.name + _width.number) * 10 + '" y="10" ' +
           'style="font-size:15px">' + _label.sampleRate + '</text>' +
           '</g>';
@@ -345,8 +348,9 @@
         _pieLabelYCoord += 15;
       }
 
-      _svgElement = cbio.download.serializeHtml(
-        $('#' + data.chartId + ' svg>g')[0]);
+      _svgClone.children().each(function(i, e) {
+        _svgElement += cbio.download.serializeHtml(e);
+      });
 
       var svg = '<svg xmlns="http://www.w3.org/2000/svg" ' +
         'version="1.1" width="' + _width.svg + '" height="' +
@@ -360,24 +364,6 @@
         _pieLabelString + '</g></svg>';
 
       cbio.download.initDownload(svg, downloadOpts);
-
-      // Remove pie slice text styles
-      for (i = 0; i < _textLength; i++) {
-        $(_text[i]).css({
-          'fill': '',
-          'font-size': '',
-          'stroke': '',
-          'stroke-width': ''
-        });
-      }
-
-      // Remove pie slice styles
-      for (i = 0; i < _sliceLength; i++) {
-        $($(_slice[i]).find('path')[0]).css({
-          'stroke': '',
-          'stroke-width': ''
-        });
-      }
     }
 
     function barChartCanvasDownload(data, downloadOpts) {

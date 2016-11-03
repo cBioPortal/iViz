@@ -149,7 +149,9 @@
 
     function initTsvDownloadData() {
       var data = [];
-      var _cases = chartInst_.dimension().top(Infinity);
+      var _cases = _.sortBy(chartInst_.dimension().top(Infinity), function(item) {
+        return isNaN(item[data_.attrId]) ? Infinity : -item[data_.attrId];
+      });
       var header = ['Patient ID', 'Sample ID', opts_.displayName];
 
       if (opts_.groupType === 'sample') {
