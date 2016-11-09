@@ -252,7 +252,7 @@
                   ' case(s) selected.', {message_type: 'info'});
               }
 
-              $('#iviz-header-right-1').qtip('toggle');
+              $('#custom-case-input-button').qtip('toggle');
               if (selectedCaseIds.length > 0) {
                 this.clearAllCharts(false);
                 var self_ = this;
