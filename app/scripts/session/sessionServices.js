@@ -6,8 +6,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
     vcSession = {};
   }
   vcSession.model = (function() {
-    var localStorageAdd_ = function(id, virtualCohort) {
-      virtualCohort.virtualCohortID = id;
+    var localStorageAdd_ = function(virtualCohort) {
       var _virtualCohorts = vcSession.utils.getVirtualCohorts();
       _virtualCohorts.push(virtualCohort);
       vcSession.utils.setVirtualCohorts(_virtualCohorts);
@@ -30,21 +29,19 @@ window.vcSession = window.vcSession ? window.vcSession : {};
 
     return {
       saveSession: function(virtualCohort) {
-        var data = {
-          virtualCohort: virtualCohort
-        };
         $.ajax({
           type: 'POST',
           url: vcSession.URL,
           contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify(data)
+          data: JSON.stringify(virtualCohort)
         }).done(function(response) {
-          if (virtualCohort.userID === 'DEFAULT')
-            localStorageAdd_(response.id,
-              virtualCohort);
+          if (virtualCohort.userID === 'DEFAULT') {
+            virtualCohort.virtualCohortID = response.id;
+            localStorageAdd_(virtualCohort);
+          }
         }).fail(function() {
-          localStorageAdd_(vcSession.utils.generateUUID(),
-            virtualCohort);
+          virtualCohort.virtualCohortID = vcSession.utils.generateUUID();
+          localStorageAdd_(virtualCohort);
         });
       },
       removeSession: function(_virtualCohort) {
@@ -53,24 +50,23 @@ window.vcSession = window.vcSession ? window.vcSession : {};
           url: vcSession.URL + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8'
         }).done(function() {
-          if (_virtualCohort.userID === 'DEFAULT')
+          if (_virtualCohort.userID === 'DEFAULT') {
             localStorageDelete_(_virtualCohort);
+          }
         }).fail(function() {
           localStorageDelete_(_virtualCohort);
         });
       },
       editSession: function(_virtualCohort) {
-        var data = {
-          virtualCohort: _virtualCohort
-        };
         $.ajax({
           type: 'PUT',
           url: vcSession.URL + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify(data)
-        }).done(function(response) {
-          if (_virtualCohort.userID === 'DEFAULT')
-            localStorageEdit_(data.virtualCohort);
+          data: JSON.stringify(_virtualCohort)
+        }).done(function() {
+          if (_virtualCohort.userID === 'DEFAULT') {
+            localStorageEdit_(_virtualCohort);
+          }
         }).fail(function(jqXHR) {
           if (jqXHR.status === 404) {
             localStorageDelete_(_virtualCohort);
@@ -84,24 +80,21 @@ window.vcSession = window.vcSession ? window.vcSession : {};
         var def = new $.Deferred();
         $.ajax({
           type: 'GET',
-          url: vcSession.URL + 'query/',
+          url: vcSession.URL + '/get-user-cohorts',
           contentType: 'application/json;charset=UTF-8',
           data: {
-            field: 'data.virtualCohort.userID',
-            value: userID
+            email: userID
           }
         }).done(function(response) {
           var _virtualCohorts = [];
           $.each(response, function(key, val) {
-            var _virtualCohort = val.data.virtualCohort;
+            var _virtualCohort = val.data;
             _virtualCohort.virtualCohortID = val.id;
             _virtualCohorts.push(_virtualCohort);
           });
           def.resolve(_virtualCohorts);
-          //vcSession.utils.setVirtualCohorts(_virtualCohorts);
         }).fail(function() {
-          console.log('unable to get user virtual cohorts');
-          def.reject();
+          def.resolve([]);
         });
         return def.promise();
       }
