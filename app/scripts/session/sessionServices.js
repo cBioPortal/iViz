@@ -1,5 +1,4 @@
 'use strict';
-window.vcSession = window.vcSession ? window.vcSession : {};
 
 (function(vcSession, _, $) {
   if (!_.isObject(vcSession)) {
@@ -68,6 +67,8 @@ window.vcSession = window.vcSession ? window.vcSession : {};
             localStorageEdit_(_virtualCohort);
           }
         }).fail(function(jqXHR) {
+          // TODO: should we delete the virtual cohort if no record found
+          // in the database? Should we add it into database?
           if (jqXHR.status === 404) {
             localStorageDelete_(_virtualCohort);
             vcSession.model.saveSession(_virtualCohort);
@@ -76,6 +77,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
           }
         });
       },
+      // TODO: should we send request without validating userID?
       loadUserVirtualCohorts: function(userID) {
         var def = new $.Deferred();
         $.ajax({

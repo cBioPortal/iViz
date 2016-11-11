@@ -79,6 +79,13 @@
       },
       clickImport: function(_virtualStudy) {
         this.showmodal = false;
+        // TODO: from my test cases, I have some visual cohorts stored in my
+        // localstorage without virtualCohortID. Should we hide Visualize AND share
+        // buttons if the id is not available or virtual study will always have
+        // a virtualCohortID? What if the session service is not available?
+        // This back to my previous question, if the virtual cohort is not
+        // available in database and API returnS 404, should we insert to
+        // databAse, or delete from localstorage?
         window.open(window.cbioURL + 'study?cohorts=' + _virtualStudy.virtualCohortID);
       },
       clickShare: function(_virtualStudy) {
