@@ -47,7 +47,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       removeSession: function(_virtualCohort) {
         $.ajax({
           type: 'DELETE',
-          url: vcSession.URL + _virtualCohort.virtualCohortID,
+          url: vcSession.URL + '/' + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8'
         }).done(function() {
           if (_virtualCohort.userID === 'DEFAULT') {
@@ -60,7 +60,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       editSession: function(_virtualCohort) {
         $.ajax({
           type: 'PUT',
-          url: vcSession.URL + _virtualCohort.virtualCohortID,
+          url: vcSession.URL + '/' + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(_virtualCohort)
         }).done(function() {
