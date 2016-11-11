@@ -14,7 +14,8 @@ var vcSessionsManagement = (function(Vue) {
           showManageButton: true,
           cohortData: {},
           stats: {},
-          updateStats: false
+          updateStats: false,
+          showShareButton: true
         },
         watch: {
           updateStats: function(newVal) {

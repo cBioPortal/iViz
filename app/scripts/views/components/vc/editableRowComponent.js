@@ -29,12 +29,12 @@
     ' @click="clickEdit(data)"><em class="fa' +
     ' fa-pencil"></em></button><button class="btn btn-danger"' +
     ' @click="clickDelete(data)"><em class="fa' +
-    ' fa-trash"></em></button><button class="btn btn-success"' +
+    ' fa-trash"></em></button><button v-show="showShareButton" class="btn btn-success"' +
     ' @click="clickShare(data)"><em class="fa' +
     ' fa-share-alt"></em></button><button class="btn btn-default"' +
     ' @click="clickImport(data)">Visualize</button></div></td></tr>',
     props: [
-      'data', 'showmodal'
+      'data', 'showmodal', 'showShareButton'
     ], created: function() {
       this.edit = false;
       this.share = false;

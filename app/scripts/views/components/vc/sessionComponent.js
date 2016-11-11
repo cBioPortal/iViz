@@ -20,11 +20,11 @@
       ' style="width:10%">Samples</td> <td' +
       ' style="width:20%">Operations</td> </tr> </thead> <tr' +
       ' is="editable-row" :data="virtualCohort"' +
-      ' :showmodal.sync="showVCList" v-for="virtualCohort in' +
+      ' :showmodal.sync="showVCList" :show-share-button="showShareButton" v-for="virtualCohort in' +
       ' virtualCohorts"> </tr> </table> </div> <div slot="footer"> </div>' +
       ' </modaltemplate> </div> </nav> </div>',
     props: [
-      'selectedPatientsNum', 'selectedSamplesNum', 'userid', 'showSaveButton', 'showManageButton', 'stats', 'updateStats'
+      'selectedPatientsNum', 'selectedSamplesNum', 'userid', 'showSaveButton', 'showManageButton', 'stats', 'updateStats', 'showShareButton'
     ],
     data: function() {
       return {
