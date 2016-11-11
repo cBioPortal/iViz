@@ -118,7 +118,9 @@
         <div class="iviz-cohort-component" style="float: left; margin-right: 10px;">
           <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
                              :selected-patients-num="selectedPatientsNum" :selected-samples-num="selectedSamplesNum"
-                             :userid="userid" :stats="stats" :update-stats.sync="updateStats"></session-component>
+                             :userid="userid" :stats="stats"
+                             :update-stats.sync="updateStats"
+                             :show-share-button="false"></session-component>
         </div>
 
         <div class="iviz-header-left-case">
