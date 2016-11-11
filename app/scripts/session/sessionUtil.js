@@ -6,13 +6,11 @@
   }
   vcSession.utils = (function() {
     var virtualCohort_ = {
-      studyName: 'My virtual study',
-      description: 'My virtual study - Description',
+      studyName: '',
+      description: '',
       userID: 'DEFAULT',
       created: '',
       filters: '',
-      samplesLength: '',
-      patientsLength: '',
       selectedCases: ''
     };
 
@@ -46,14 +44,11 @@
       localStorage.setItem('virtual-cohorts', JSON.stringify(virtualCohorts));
     };
 
-    var buildVCObject_ = function(filters, patientsLength,
-                                  samplesLength, cases, userID, name,
+    var buildVCObject_ = function(filters, cases, userID, name,
                                   description) {
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
       _virtualCohort.filters = filters;
       _virtualCohort.selectedCases = cases;
-      _virtualCohort.samplesLength = samplesLength;
-      _virtualCohort.patientsLength = patientsLength;
       _virtualCohort.created = new Date().getTime();
       if (name) {
         _virtualCohort.studyName = name;

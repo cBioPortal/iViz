@@ -10,29 +10,37 @@
     ' :&nbsp;</label><span>{{selectedPatientsNum}}</span></div><br><div' +
     ' class="form-group"><label for="name">Name:</label><input' +
     ' type="text" class="form-control" v-model="name"  placeholder="My' +
-    ' Virtual Cohort" value="My Virtual Cohort"></div><br><div' +
+    ' Virtual Cohort"></div><br><div' +
     ' class="form-group"><label' +
-    ' for="description">Decription:</label><textarea class="form-control popup-textarea"' +
+    ' for="description">Decription:</label><textarea placeholder="Virtual Cohort Description" class="form-control popup-textarea"' +
     ' rows="4" cols="50"' +
     ' v-model="description"></textarea></div></div><div' +
     ' slot="footer"><button type="button" class="btn btn-default"' +
     ' @click="addNewVc = false">Cancel</button><button type="button"' +
-    ' class="btn' +
-    ' btn-default"@click="saveCohort()">Save</button></div></modaltemplate>',
-    props: ['selectedSamplesNum',
-      'selectedPatientsNum',
-      'userid',
-      'stats', 'addNewVc', 'updateStats'],
+    ' class="btn btn-default" v-if="selectedSamplesNum>0 || selectedPatientsNum>0" @click="saveCohort()">Save</button></div></modaltemplate>',
+    props: ['userid', 'stats', 'addNewVc', 'updateStats'],
     data: function() {
       return {
-        name: 'My Virtual Cohort',
-        description: ''
+        name: ' ',
+        description: '',
+        selectedSamplesNum: 0,
+        selectedPatientsNum: 0
       };
     },
     watch: {
       addNewVc: function() {
-        this.name = 'My Virtual Cohort';
+        this.name = '';
         this.description = '';
+        var _selectedSamplesNum = 0;
+        var _selectedPatientsNum = 0;
+        if (_.isObject(this.stats.selectedCases)) {
+          _.each(this.stats.selectedCases, function(studyCasesMap) {
+            _selectedSamplesNum += studyCasesMap.samples.length;
+            _selectedPatientsNum += studyCasesMap.patients.length;
+          });
+          this.selectedSamplesNum = _selectedSamplesNum;
+          this.selectedPatientsNum = _selectedPatientsNum;
+        }
       }
     },
     methods: {
@@ -42,7 +50,7 @@
           self_.updateStats = true;
           self_.$nextTick(function() {
             vcSession.events.saveCohort(self_.stats,
-              self_.selectedPatientsNum, self_.selectedSamplesNum, self_.userid, self_.name,
+              self_.userid, self_.name || 'My Virtual Cohort',
               self_.description || '');
             self_.addNewVc = false;
             jQuery.notify('Added to new Virtual Study', 'success');

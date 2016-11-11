@@ -77,16 +77,16 @@
           }
         });
       },
-      // TODO: should we send request without validating userID?
-      loadUserVirtualCohorts: function(userID) {
+      /*
+      This method would be used in cbio to get user specific cohorts
+       // TODO: should we send request without validating userID?
+       */
+      loadUserVirtualCohorts: function() {
         var def = new $.Deferred();
         $.ajax({
           type: 'GET',
           url: vcSession.URL + '/get-user-cohorts',
-          contentType: 'application/json;charset=UTF-8',
-          data: {
-            email: userID
-          }
+          contentType: 'application/json;charset=UTF-8'
         }).done(function(response) {
           var _virtualCohorts = [];
           $.each(response, function(key, val) {

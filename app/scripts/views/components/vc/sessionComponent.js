@@ -7,9 +7,7 @@
       ' <button class="cohort-manage-button"' +
       ' v-if="showManageButton" type="button" class="btn btn-default"' +
       ' @click="manageCohorts()"> Manage Cohorts</i> </button>' +
-      ' <add-vc :add-new-vc.sync="addNewVC"' +
-      ' :selected-samples-num="selectedSamplesNum"' +
-      ' :selected-patients-num="selectedPatientsNum" :userid="userid"' +
+      ' <add-vc :add-new-vc.sync="addNewVC" :userid="userid"' +
       ' :stats="stats" :update-stats.sync="updateStats"></add-vc>' +
       ' <modaltemplate :show.sync="showVCList" size="modal-xlg"> <div' +
       ' slot="header"> <h4 class="modal-title">Virtual Cohorts</h4> </div>' +
@@ -24,7 +22,7 @@
       ' virtualCohorts"> </tr> </table> </div> <div slot="footer"> </div>' +
       ' </modaltemplate> </div> </nav> </div>',
     props: [
-      'selectedPatientsNum', 'selectedSamplesNum', 'userid', 'showSaveButton', 'showManageButton', 'stats', 'updateStats', 'showShareButton'
+      'userid', 'showSaveButton', 'showManageButton', 'stats', 'updateStats', 'showShareButton'
     ],
     data: function() {
       return {

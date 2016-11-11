@@ -10,8 +10,8 @@
     ' :name.sync="data.studyName" :edit="edit" type="text"/></td><td' +
     ' class="text center" ><editable-field :name.sync="data.description"' +
     ' :edit="edit" type="textarea"/></td><td class="text center"' +
-    ' ><span>{{data.patientsLength}}</span></td><td class="text center"' +
-    ' ><span>{{data.samplesLength}}</span></td><td><div class="buttons"' +
+    ' ><span>{{selectedSamplesNum}}</span></td><td class="text center"' +
+    ' ><span>{{selectedPatientsNum}}</span></td><td><div class="buttons"' +
     ' :class="{view: !edit}"><button class="btn btn-info"' +
     ' @click="clickSave(data)"><em class="fa' +
     ' fa-save"></em></button><button class="btn btn-default"' +
@@ -36,6 +36,17 @@
     props: [
       'data', 'showmodal', 'showShareButton'
     ], created: function() {
+      var _selectedSamplesNum = 0;
+      var _selectedPatientsNum = 0;
+      console.log(this.data);
+      if (_.isObject(this.data.selectedCases)) {
+        _.each(this.data.selectedCases, function(studyCasesMap) {
+          _selectedSamplesNum += studyCasesMap.samples.length;
+          _selectedPatientsNum += studyCasesMap.patients.length;
+        });
+        this.selectedSamplesNum = _selectedSamplesNum;
+        this.selectedPatientsNum = _selectedPatientsNum;
+      }
       this.edit = false;
       this.share = false;
       this.shortenedLink = '---';
@@ -44,7 +55,9 @@
       return {
         edit: false,
         share: false,
-        shortenedLink: '---'
+        shortenedLink: '---',
+        selectedSamplesNum: 0,
+        selectedPatientsNum: 0
       };
     },
     methods: {
