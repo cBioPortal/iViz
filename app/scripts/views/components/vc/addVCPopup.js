@@ -47,6 +47,10 @@
             self_.addNewVc = false;
             jQuery.notify('Added to new Virtual Study', 'success');
           });
+        } else {
+          // TODO: if we need to consider whether vcSession is available,
+          // should we have similar notify as well like
+          // jQuery.notify('Session service is not available', 'Warning');
         }
       }
     }
