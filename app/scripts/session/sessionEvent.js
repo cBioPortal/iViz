@@ -1,6 +1,4 @@
 'use strict';
-window.vcSession = window.vcSession ? window.vcSession : {};
-
 (function(vcSession, _) {
   if (!_.isObject(vcSession)) {
     vcSession = {};

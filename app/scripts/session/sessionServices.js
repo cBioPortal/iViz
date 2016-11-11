@@ -1,6 +1,4 @@
 'use strict';
-// TODO: should we initialize vcSession in vueSession.js? Currently, the initialization has been duplicated several times.
-window.vcSession = window.vcSession ? window.vcSession : {};
 
 (function(vcSession, _, $) {
   if (!_.isObject(vcSession)) {
