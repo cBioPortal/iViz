@@ -3,12 +3,12 @@
   Vue.component('sessionComponent', {
     template: '<div id="cohort-component"><button  class="cohort-save-button"' +
       ' v-if="showSaveButton" type="button" class="btn btn-default"' +
-      ' @click="addNewVC = true" id="save_cohort_btn">Save Cohort </button>' +
+      ' @click="saveCohort()" id="save_cohort_btn">Save Cohort </button>' +
       ' <button class="cohort-manage-button"' +
       ' v-if="showManageButton" type="button" class="btn btn-default"' +
       ' @click="manageCohorts()"> Manage Cohorts</i> </button>' +
       ' <add-vc :add-new-vc.sync="addNewVC" :userid="userid"' +
-      ' :stats="stats" :update-stats.sync="updateStats"></add-vc>' +
+      ' :stats="stats"></add-vc>' +
       ' <modaltemplate :show.sync="showVCList" size="modal-xlg"> <div' +
       ' slot="header"> <h4 class="modal-title">Virtual Cohorts</h4> </div>' +
       ' <div slot="body"> <table class="table table-bordered table-hover' +
@@ -46,6 +46,13 @@
         } else {
           this.virtualCohorts = vcSession.utils.getVirtualCohorts();
         }
+      },
+      saveCohort: function() {
+        var _self = this;
+        _self.updateStats = true;
+        _self.$nextTick(function() {
+          _self.addNewVC = true;
+        });
       }
     }
   });
