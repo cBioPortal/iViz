@@ -7,7 +7,7 @@ var vcSessionsManagement = (function(Vue) {
       vmInstance_ = new Vue({
         el: '#cohort-component',
         data: {
-          userid: 'DEFAULT',
+          loadUserSpecificCohorts: false,
           showSaveButton: true,
           showManageButton: true,
           cohortData: {},

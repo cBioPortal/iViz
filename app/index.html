@@ -46,7 +46,8 @@
 <div id="cohort-component">
   <session-component :show-save-button="showSaveButton"
                      :show-manage-button="showManageButton"
-                     :userid="userid" :stats="stats"
+                     :load-user-specific-cohorts="loadUserSpecificCohorts"
+                     :stats="stats"
                      :update-stats.sync="updateStats"
                      :show-share-button="showShareButton"></session-component>
 </div>
