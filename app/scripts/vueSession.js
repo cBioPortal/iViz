@@ -41,7 +41,3 @@ var vcSessionsManagement = (function(Vue) {
     }
   };
 })(window.Vue);
-
-// Move vcSession initialization to here since the vueSession.js
-// is the dependency of other JS files.
-window.vcSession = window.vcSession ? window.vcSession : {};
