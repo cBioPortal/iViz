@@ -44,7 +44,7 @@
       localStorage.setItem('virtual-cohorts', JSON.stringify(virtualCohorts));
     };
 
-    var buildVCObject_ = function(filters, cases, userID, name,
+    var buildVCObject_ = function(filters, cases, name,
                                   description) {
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
       _virtualCohort.filters = filters;
@@ -55,9 +55,6 @@
       }
       if (description) {
         _virtualCohort.description = description;
-      }
-      if (userID) {
-        _virtualCohort.userID = userID;
       }
       return _virtualCohort;
     };

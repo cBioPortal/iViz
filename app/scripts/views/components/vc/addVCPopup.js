@@ -18,7 +18,7 @@
     ' slot="footer"><button type="button" class="btn btn-default"' +
     ' @click="addNewVc = false">Cancel</button><button type="button"' +
     ' class="btn btn-default" v-if="selectedSamplesNum>0 || selectedPatientsNum>0" @click="saveCohort()">Save</button></div></modaltemplate>',
-    props: ['userid', 'stats', 'addNewVc'],
+    props: ['stats', 'addNewVc'],
     data: function() {
       return {
         name: ' ',
@@ -47,8 +47,7 @@
       saveCohort: function() {
         if (_.isObject(vcSession)) {
           var self_ = this;
-          vcSession.events.saveCohort(self_.stats,
-            self_.userid, self_.name || 'My Virtual Cohort',
+          vcSession.events.saveCohort(self_.stats, self_.name || 'My Virtual Cohort',
             self_.description || '');
           self_.addNewVc = false;
           jQuery.notify('Added to new Virtual Study', 'success');

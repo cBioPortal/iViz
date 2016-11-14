@@ -9,10 +9,8 @@ window.vcSession = window.vcSession ? window.vcSession : {};
   }
   vcSession.events = (function() {
     return {
-      saveCohort: function(stats,
-                           userID, name, description) {
+      saveCohort: function(stats, name, description) {
         var _virtualCohort = vcSession.utils.buildVCObject(stats.filters, stats.selectedCases,
-          userID,
           name, description);
         vcSession.model.saveSession(_virtualCohort);
       },
