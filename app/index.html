@@ -117,7 +117,6 @@
       <div id="iviz-header-left">
         <div class="iviz-cohort-component" style="float: left; margin-right: 10px;">
           <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
-                             :selected-patients-num="selectedPatientsNum" :selected-samples-num="selectedSamplesNum"
                              :userid="userid" :stats="stats"
                              :update-stats.sync="updateStats"
                              :show-share-button="false"></session-component>
@@ -204,8 +203,8 @@
     iViz.vue.manage.init();
 
     // This is used to indicate how to disable two buttons. By default, they are set to false.
-    iViz.vue.manage.getInstance().showManageButton = false;
-    iViz.vue.manage.getInstance().showSaveButton = false;
+    iViz.vue.manage.getInstance().showManageButton = true;
+    iViz.vue.manage.getInstance().showSaveButton = true;
 
     window.cbioURL = 'http://www.cbioportal.org/';
     window.cbioResourceURL = 'resources/';

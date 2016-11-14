@@ -677,7 +677,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _result.filters.samples = array;
         }
       });
-      _result.selected_cases = _selectedCases;
+      _result.selectedCases = _selectedCases;
       return _result;
     },
 
