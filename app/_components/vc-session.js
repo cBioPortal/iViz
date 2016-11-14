@@ -9,10 +9,8 @@ window.vcSession = window.vcSession ? window.vcSession : {};
   }
   vcSession.events = (function() {
     return {
-      saveCohort: function(stats,
-                           userID, name, description) {
+      saveCohort: function(stats, name, description) {
         var _virtualCohort = vcSession.utils.buildVCObject(stats.filters, stats.selectedCases,
-          userID,
           name, description);
         vcSession.model.saveSession(_virtualCohort);
       },
@@ -107,7 +105,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       localStorage.setItem('virtual-cohorts', JSON.stringify(virtualCohorts));
     };
 
-    var buildVCObject_ = function(filters, cases, userID, name,
+    var buildVCObject_ = function(filters, cases, name,
                                   description) {
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
       _virtualCohort.filters = filters;
@@ -118,9 +116,6 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       }
       if (description) {
         _virtualCohort.description = description;
-      }
-      if (userID) {
-        _virtualCohort.userID = userID;
       }
       return _virtualCohort;
     };
@@ -460,7 +455,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
     ' slot="footer"><button type="button" class="btn btn-default"' +
     ' @click="addNewVc = false">Cancel</button><button type="button"' +
     ' class="btn btn-default" v-if="selectedSamplesNum>0 || selectedPatientsNum>0" @click="saveCohort()">Save</button></div></modaltemplate>',
-    props: ['userid', 'stats', 'addNewVc'],
+    props: ['stats', 'addNewVc'],
     data: function() {
       return {
         name: ' ',
@@ -489,8 +484,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       saveCohort: function() {
         if (_.isObject(vcSession)) {
           var self_ = this;
-          vcSession.events.saveCohort(self_.stats,
-            self_.userid, self_.name || 'My Virtual Cohort',
+          vcSession.events.saveCohort(self_.stats, self_.name || 'My Virtual Cohort',
             self_.description || '');
           self_.addNewVc = false;
           jQuery.notify('Added to new Virtual Study', 'success');
@@ -513,7 +507,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       ' <button class="cohort-manage-button"' +
       ' v-if="showManageButton" type="button" class="btn btn-default"' +
       ' @click="manageCohorts()"> Manage Cohorts</i> </button>' +
-      ' <add-vc :add-new-vc.sync="addNewVC" :userid="userid"' +
+      ' <add-vc :add-new-vc.sync="addNewVC"' +
       ' :stats="stats"></add-vc>' +
       ' <modaltemplate :show.sync="showVCList" size="modal-xlg"> <div' +
       ' slot="header"> <h4 class="modal-title">Virtual Cohorts</h4> </div>' +
@@ -528,7 +522,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       ' virtualCohorts"> </tr> </table> </div> <div slot="footer"> </div>' +
       ' </modaltemplate> </div> </nav> </div>',
     props: [
-      'userid', 'showSaveButton', 'showManageButton', 'stats', 'updateStats', 'showShareButton'
+      'loadUserSpecificCohorts', 'showSaveButton', 'showManageButton', 'stats', 'updateStats', 'showShareButton'
     ],
     data: function() {
       return {
@@ -544,9 +538,8 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       manageCohorts: function() {
         var self = this;
         self.showVCList = true;
-        if (self.userid !== undefined && self.userid !== '' &&
-          self.userid.length > 0 && self.userid !== 'DEFAULT') {
-          $.when(vcSession.model.loadUserVirtualCohorts(self.userid)).then(function(_virtualCohorts) {
+        if (self.loadUserSpecificCohorts) {
+          $.when(vcSession.model.loadUserVirtualCohorts()).then(function(_virtualCohorts) {
             self.virtualCohorts = _virtualCohorts;
           });
         } else {

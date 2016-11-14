@@ -31,7 +31,7 @@
             updateSpecialCharts: false,
             showSaveButton: false,
             showManageButton: false,
-            userid: 'DEFAULT',
+            loadUserSpecificCohorts: false,
             stats: '',
             updateStats: false,
             clearAll: false,

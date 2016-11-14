@@ -117,7 +117,7 @@
       <div id="iviz-header-left">
         <div class="iviz-cohort-component" style="float: left; margin-right: 10px;">
           <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
-                             :userid="userid" :stats="stats"
+                             :load-user-specific-cohorts="loadUserSpecificCohorts" :stats="stats"
                              :update-stats.sync="updateStats"
                              :show-share-button="false"></session-component>
         </div>
@@ -202,9 +202,15 @@
     //Include style variables
     iViz.vue.manage.init();
 
+    vcSession.URL =
+            'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
+
     // This is used to indicate how to disable two buttons. By default, they are set to false.
     iViz.vue.manage.getInstance().showManageButton = true;
     iViz.vue.manage.getInstance().showSaveButton = true;
+
+    //Set this to true if want to load user specific cohorts(this is for cbioportal)
+    iViz.vue.manage.getInstance().loadUserSpecificCohorts = false;
 
     window.cbioURL = 'http://www.cbioportal.org/';
     window.cbioResourceURL = 'resources/';
