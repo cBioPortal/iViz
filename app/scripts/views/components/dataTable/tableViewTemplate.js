@@ -152,8 +152,13 @@
       },
       processTableData: function(_data) {
         var data = iViz.getGroupNdx(this.attributes.group_id);
-        this.chartInst.init(this.attributes, this.$root.selectedsamples,
-          this.$root.selectedgenes, data, this.chartId, {
+        var opts = {
+          width: window.iViz.styles.vars.specialTables.width,
+          height: window.iViz.styles.vars.specialTables.height,
+          chartId: this.chartId
+        };
+        this.chartInst.init(this.attributes, opts, this.$root.selectedsamples,
+          this.$root.selectedgenes, data, {
             addGeneClick: this.addGeneClick,
             submitClick: this.submitClick
           }, this.isMutatedGeneCna ? _data.geneMeta : null, this.invisibleDimension);

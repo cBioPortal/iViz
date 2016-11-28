@@ -30,6 +30,7 @@
     var dimension = {};
     var group = {};
     var labelInitData = {};
+    var opts = {};
 
     // Category based color assignment. Avoid color changing
     var assignedColors = {
@@ -50,8 +51,8 @@
     };
 
     content.init =
-      function(_attributes, _selectedSamples, _selectedGenes,
-               _data, _chartId, _callbacks, _geneData, _dimension) {
+      function(_attributes, _opts, _selectedSamples, _selectedGenes,
+        _data, _callbacks, _geneData, _dimension) {
         initialized = false;
         allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
@@ -59,7 +60,8 @@
         sequencedSampleIds = _attributes.options.sequencedCases;
         sequencedSampleIds.sort();
         selectedGenes = _selectedGenes;
-        chartId_ = _chartId;
+        chartId_ = _opts.chartId;
+        opts = _opts;
         caseIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
         geneData_ = _geneData;
@@ -169,8 +171,8 @@
         fixedChoose: false,
         uniqueId: 'uniqueId',
         rowHeight: 25,
-        tableWidth: 373,
-        maxHeight: 290,
+        tableWidth: opts.width,
+        maxHeight: opts.height,
         headerHeight: 26,
         groupHeaderHeight: 40,
         autoColumnWidth: false,
@@ -383,28 +385,41 @@
     function initTsvDownloadData() {
       var attrs =
         iViz.util.tableView.getAttributes(type_).filter(function(attr) {
-          return attr.attr_id !== 'uniqueId';
+          return attr.attr_id !== 'uniqueId' && (_.isBoolean(attr.show) ? attr.show : true);
         });
       var downloadOpts = {
         fileName: displayName,
         data: ''
       };
+      var rowsData;
+
+      if (isMutatedGeneCna) {
+        rowsData = selectedGeneData;
+      } else {
+        rowsData = _.values(categories_);
+      }
+      rowsData = _.sortBy(rowsData, function(item) {
+        return -item.cases;
+      });
 
       if (_.isArray(attrs) && attrs.length > 0) {
-        var data = attrs.map(
-            function(attr) {
-              return attr.display_name;
-            }).join('\t') + '\n';
+        var data = [attrs.map(
+          function(attr) {
+            if (attr.attr_id === 'name') {
+              attr.display_name = displayName;
+            }
+            return attr.display_name;
+          }).join('\t')];
 
-        _.each(selectedGeneData, function(row) {
+        _.each(rowsData, function(row) {
           var _tmp = [];
           _.each(attrs, function(attr) {
             _tmp.push(row[attr.attr_id] || '');
           });
-          data += _tmp.join('\t') + '\n';
+          data.push(_tmp.join('\t'));
         });
 
-        downloadOpts.data = data;
+        downloadOpts.data = data.join('\n');
       }
       content.setDownloadData('tsv', downloadOpts);
     }
@@ -436,18 +451,18 @@
               attr_id: 'gene',
               display_name: 'Gene',
               datatype: 'STRING',
-              column_width: 100
+              column_width: 110
             }, {
               attr_id: 'numOfMutations',
               display_name: '# Mut',
               datatype: 'NUMBER',
-              column_width: 90
+              column_width: 95
             },
             {
               attr_id: 'cases',
               display_name: '#',
               datatype: 'NUMBER',
-              column_width: 90
+              column_width: 95
             },
             {
               attr_id: 'sampleRate',
@@ -481,13 +496,13 @@
               attr_id: 'gene',
               display_name: 'Gene',
               datatype: 'STRING',
-              column_width: 80
+              column_width: 85
             },
             {
               attr_id: 'cytoband',
               display_name: 'Cytoband',
               datatype: 'STRING',
-              column_width: 90
+              column_width: 100
             },
             {
               attr_id: 'altType',
@@ -499,7 +514,7 @@
               attr_id: 'cases',
               display_name: '#',
               datatype: 'NUMBER',
-              column_width: 70
+              column_width: 75
             },
             {
               attr_id: 'altrateInSample',
@@ -533,7 +548,7 @@
               attr_id: 'name',
               display_name: 'Unknown',
               datatype: 'STRING',
-              column_width: 213
+              column_width: 230
             }, {
               attr_id: 'color',
               display_name: 'Color',
@@ -543,7 +558,7 @@
               attr_id: 'cases',
               display_name: '#',
               datatype: 'NUMBER',
-              column_width: 70
+              column_width: 75
             }, {
               attr_id: 'caseRate',
               display_name: 'Freq',

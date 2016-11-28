@@ -95,10 +95,19 @@
             this.type + '_id').sort();
           // Hacked way to check if filter selected filter cases is same
           // as original case list
-          if (filteredCases.length === this.ndx.size()) {
-            iViz.deleteGroupFilteredCases(this.id);
-          } else {
+
+          var _hasFilter = false;
+          _.every(this.attributes, function(attribute) {
+            if (attribute.filter.length > 0) {
+              _hasFilter = true;
+              return false;
+            }
+            return true;
+          });
+          if (_hasFilter) {
             iViz.setGroupFilteredCases(this.id, this.type, filteredCases);
+          } else {
+            iViz.deleteGroupFilteredCases(this.id);
           }
 
           if (this.invisibleChartFilters.length > 0) {

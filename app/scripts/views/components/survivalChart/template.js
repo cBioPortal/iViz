@@ -45,11 +45,14 @@
       'show-loader': function() {
         this.showLoad = true;
       },
-      'update-special-charts': function() {
+      'update-special-charts': function(hasFilters) {
         var attrId =
           this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
-        var _selectedCases =
-          _.pluck(this.invisibleDimension.top(Infinity), attrId);
+        var _selectedCases = [];
+        if (hasFilters) {
+          _selectedCases =
+            _.pluck(this.invisibleDimension.top(Infinity), attrId);
+        }
         this.chartInst.update(
           _selectedCases, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
@@ -94,8 +97,8 @@
         return d[attrId];
       });
       var _opts = {
-        width: window.style.vars.survivalWidth,
-        height: window.style.vars.survivalHeight,
+        width: window.iViz.styles.vars.survival.width,
+        height: window.iViz.styles.vars.survival.height,
         chartId: this.chartId,
         attrId: this.attributes.attr_id,
         title: this.attributes.display_name,

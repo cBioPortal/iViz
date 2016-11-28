@@ -21,7 +21,9 @@
 
     // init axis
     _self.elem_.xScale = d3.scale.linear()
-      .domain([0, d3.max(_.pluck(_self.data_, 'time'))])
+      .domain([0,
+        d3.max(_.pluck(_self.data_, 'time')) +
+        d3.max(_.pluck(_self.data_, 'time')) / 15])
       .range([leftMargin_, _opts.width - rightMargin_]);
     _self.elem_.yScale = d3.scale.linear()
       .domain([-0.03, 1.05]) // fixed to be 0-1

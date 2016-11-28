@@ -65,8 +65,11 @@
       },
       changeLogScale: function(logScaleChecked) {
         $('#' + this.chartId).find('svg').remove();
+        this.chartInst.filterAll();
+        this.$dispatch('update-filters', true);
         dc.deregisterChart(this.chartInst, this.attributes.group_id);
         this.initChart(logScaleChecked);
+        this.chartInst.render();
       },
       addingChart: function(groupId, val) {
         if (this.attributes.group_id === groupId) {
@@ -125,8 +128,8 @@
     ready: function() {
       this.barChart = new iViz.view.component.BarChart();
       this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
-      this.settings.width = window.style.vars.barchartWidth || 150;
-      this.settings.height = window.style.vars.barchartHeight || 150;
+      this.settings.width = window.iViz.styles.vars.barchart.width;
+      this.settings.height = window.iViz.styles.vars.barchart.height;
 
       this.opts = _.extend(this.opts, {
         groupType: this.attributes.group_type,

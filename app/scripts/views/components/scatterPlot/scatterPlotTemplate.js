@@ -50,19 +50,19 @@
       'show-loader': function() {
         this.showLoad = true;
       },
-      'update-special-charts': function() {
+      'update-special-charts': function(hasFilters) {
         var attrId =
           this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
         var _selectedCases =
           _.pluck(this.invisibleDimension.top(Infinity), attrId);
-        var data = iViz.getGroupNdx(this.attributes.group_id);
-        if (_selectedCases.length === data.length) {
-          this.selectedSamples = _selectedCases;
-          this.chartInst.update([]);
-        } else {
-          this.selectedSamples = _selectedCases;
+
+        this.selectedSamples = _selectedCases;
+        if (hasFilters) {
           this.chartInst.update(_selectedCases);
+        } else {
+          this.chartInst.update([]);
         }
+        this.attachPlotlySelectedEvent();
         this.showLoad = false;
       },
       'closeChart': function() {
@@ -94,6 +94,44 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
+      },
+      attachPlotlySelectedEvent: function() {
+        var _self = this;
+        var data = iViz.getGroupNdx(_self.attributes.group_id);
+
+        document.getElementById(this.chartId).on('plotly_selected',
+          function(_eventData) {
+            if (typeof _eventData !== 'undefined') {
+              var _selectedData = [];
+              // create hash map for (overall) data with cna_fraction + mutation
+              // count as key, dataObj as value (performance concern)
+              var _CnaFracMutCntMap = {};
+              _.each(data, function(_dataObj) {
+                var _key = _dataObj.cna_fraction + '||' + _dataObj.mutation_count;
+                _CnaFracMutCntMap[_key] = _dataObj;
+              });
+              _.each(_eventData.points, function(_pointObj) {
+                if (_pointObj.x) {
+                  _selectedData.push(
+                    _CnaFracMutCntMap[_pointObj.x + '||' + _pointObj.y]);
+                }
+              });
+              var _selectedCases = _.pluck(_selectedData, 'sample_id').sort();
+              _self.selectedSamples = _selectedCases;
+              _self.attributes.filter = _selectedCases;
+
+              var filtersMap = {};
+              _.each(_selectedCases, function(filter) {
+                if (filtersMap[filter] === undefined) {
+                  filtersMap[filter] = true;
+                }
+              });
+              _self.invisibleDimension.filterFunction(function(d) {
+                return (filtersMap[d] !== undefined);
+              });
+              dc.redrawAll(_self.attributes.group_id);
+            }
+          });
       }
     },
     ready: function() {
@@ -102,7 +140,9 @@
       var _opts = {
         chartId: this.chartId,
         chartDivId: this.chartDivId,
-        title: this.attributes.display_name
+        title: this.attributes.display_name,
+        width: window.iViz.styles.vars.scatter.width,
+        height: window.iViz.styles.vars.scatter.height
       };
       var attrId =
         this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
@@ -115,39 +155,7 @@
       _self.chartInst.init(data, _opts);
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
-      document.getElementById(this.chartId).on('plotly_selected',
-        function(_eventData) {
-          if (typeof _eventData !== 'undefined') {
-            var _selectedData = [];
-            // create hash map for (overall) data with cna_fraction + mutation
-            // count as key, dataObj as value (performance concern)
-            var _CnaFracMutCntMap = {};
-            _.each(data, function(_dataObj) {
-              var _key = _dataObj.cna_fraction + '||' + _dataObj.mutation_count;
-              _CnaFracMutCntMap[_key] = _dataObj;
-            });
-            _.each(_eventData.points, function(_pointObj) {
-              if (_pointObj.x) {
-                _selectedData.push(
-                  _CnaFracMutCntMap[_pointObj.x + '||' + _pointObj.y]);
-              }
-            });
-            var _selectedCases = _.pluck(_selectedData, 'sample_id').sort();
-            _self.selectedSamples = _selectedCases;
-            _self.attributes.filter = _selectedCases;
-
-            var filtersMap = {};
-            _.each(_selectedCases, function(filter) {
-              if (filtersMap[filter] === undefined) {
-                filtersMap[filter] = true;
-              }
-            });
-            _self.invisibleDimension.filterFunction(function(d) {
-              return (filtersMap[d] !== undefined);
-            });
-            dc.redrawAll(_self.attributes.group_id);
-          }
-        });
+      _self.attachPlotlySelectedEvent();
       _self.showLoad = false;
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }

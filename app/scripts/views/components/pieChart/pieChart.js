@@ -1,4 +1,3 @@
-
 /**
  * @author Hongxin Zhang on 3/10/16.
  */
@@ -24,13 +23,13 @@
     v.data = $.extend(true, v.data, attributes);
     v.data.ndx = ndx;
 
-    var labels = [];
+    var labels = {};
     var reactTableData = {};
     reactTableData.attributes = [{
       attr_id: 'name',
       display_name: v.data.display_name,
       datatype: 'STRING',
-      column_width: 213
+      column_width: 235
     }, {
       attr_id: 'color',
       display_name: 'Color',
@@ -86,7 +85,11 @@
       chartDivDom.qtip('destroy', true);
 
       if (currentView === 'table') {
-        updateReactTable();
+        if (qtipRendered) {
+          updateReactTable();
+        } else {
+          updatePieLabels();
+        }
         animateTable('#' + v.opts.chartDivId, 'table', function() {
           vm.$dispatch('update-grid');
           $('#' + v.opts.chartDivId).css('z-index', '');
@@ -106,7 +109,7 @@
         style: {
           classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width iviz-pie-qtip iviz-pie-label-qtip'
         },
-        show: {event: 'mouseover', delay: 0, ready: true},
+        show: {event: 'mouseover', delay: 300, ready: true},
         hide: {fixed: true, delay: 300, event: 'mouseleave'},
         // hide: false,
         position: {my: 'left center', at: 'center right', viewport: $(window)},
@@ -225,18 +228,15 @@
     }
 
     function initTsvDownloadData() {
-      var data = v.data.display_name + '\tCount';
+      var data = [v.data.display_name + '\tCount'];
 
-      var meta = labels || [];
-
-      for (var i = 0; i < meta.length; i++) {
-        data += '\r\n';
-        data += meta[i].name + '\t';
-        data += meta[i].cases;
-      }
+      _.each(labels, function(label, key) {
+        data.push(label.name + '\t' + label.cases);
+      });
+      
       content.setDownloadData('tsv', {
         fileName: v.data.display_name || 'Pie Chart',
-        data: data
+        data: data.join('\n')
       });
     }
 
@@ -258,12 +258,15 @@
     }
 
     function animateTable(target, view, callback) {
-      var width = window.style['grid-w-1'] || '180px';
-      var height = window.style['grid-h-1'] || '165px';
+      var width = window.iViz.styles.vars.width.one;
+      var height = window.iViz.styles.vars.height.one;
 
       if (view === 'table') {
-        width = window.style['grid-w-2'] || '375px';
-        height = window.style['grid-h-2'] || '340px';
+        width = window.iViz.styles.vars.width.two;
+        height = window.iViz.styles.vars.height.two;
+        if (Object.keys(labels).length <= 3) {
+          height = window.iViz.styles.vars.height.one;
+        }
       }
 
       $(target).animate({
@@ -295,7 +298,9 @@
 
     function updateReactTable() {
       var data = $.extend(true, {}, reactTableData);
-      initReactTable(v.opts.chartTableId, data);
+      initReactTable(v.opts.chartTableId, data, {
+        tableWidth: window.iViz.styles.vars.specialTables.width
+      });
     }
 
     function updateQtipReactTable() {

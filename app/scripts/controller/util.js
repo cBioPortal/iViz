@@ -219,7 +219,7 @@
           pieChartCanvasDownload(content, {
             filename: content.fileName + '.pdf',
             contentType: 'application/pdf',
-            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+            servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
         default:
@@ -229,12 +229,12 @@
 
     function getPieWidthInfo(data) {
       var length = data.title.length;
-      var labels = data.labels;
+      var labels = _.values(data.labels);
       var labelMaxName = _.last(_.sortBy(_.pluck(labels, 'name'),
         function(item) {
           return item.toString().length;
         })).toString().length;
-      var labelMaxNumber = _.last(_.sortBy(_.pluck(labels, 'samples'),
+      var labelMaxNumber = _.last(_.sortBy(_.pluck(labels, 'cases'),
         function(item) {
           return item.toString().length;
         })).toString().length;
@@ -258,12 +258,13 @@
     }
 
     function pieChartCanvasDownload(data, downloadOpts) {
-      var _svgElement;
+      var _svgElement = '';
 
       var _width = getPieWidthInfo(data);
       var _pieLabelString = '';
       var _pieLabelYCoord = 0;
       var _svg = $('#' + data.chartId + ' svg');
+      var _svgClone = _svg.clone();
       var _previousHidden = false;
 
       if ($('#' + data.chartDivId).css('display') === 'none') {
@@ -272,11 +273,13 @@
       }
 
       var _svgHeight = _svg.height();
-      var _text = _svg.find('text');
+      var _text = _svgClone.find('text');
       var _textLength = _text.length;
-      var _slice = _svg.find('g .pie-slice');
+      var _slice = _svgClone.find('g .pie-slice');
       var _sliceLength = _slice.length;
-      var _pieLabel = data.labels;
+      var _pieLabel = _.sortBy(_.values(data.labels), function(item) {
+        return -item.cases;
+      });
       var _pieLabelLength = _pieLabel.length;
       var i = 0;
 
@@ -337,7 +340,7 @@
           _label.color + '"></rect><text x="13" y="10" ' +
           'style="font-size:15px">' + _label.name + '</text>' +
           '<text x="' + _width.name * 10 + '" y="10" ' +
-          'style="font-size:15px">' + _label.samples + '</text>' +
+          'style="font-size:15px">' + _label.cases + '</text>' +
           '<text x="' + (_width.name + _width.number) * 10 + '" y="10" ' +
           'style="font-size:15px">' + _label.sampleRate + '</text>' +
           '</g>';
@@ -345,8 +348,9 @@
         _pieLabelYCoord += 15;
       }
 
-      _svgElement = cbio.download.serializeHtml(
-        $('#' + data.chartId + ' svg>g')[0]);
+      _svgClone.children().each(function(i, e) {
+        _svgElement += cbio.download.serializeHtml(e);
+      });
 
       var svg = '<svg xmlns="http://www.w3.org/2000/svg" ' +
         'version="1.1" width="' + _width.svg + '" height="' +
@@ -360,35 +364,21 @@
         _pieLabelString + '</g></svg>';
 
       cbio.download.initDownload(svg, downloadOpts);
-
-      // Remove pie slice text styles
-      for (i = 0; i < _textLength; i++) {
-        $(_text[i]).css({
-          'fill': '',
-          'font-size': '',
-          'stroke': '',
-          'stroke-width': ''
-        });
-      }
-
-      // Remove pie slice styles
-      for (i = 0; i < _sliceLength; i++) {
-        $($(_slice[i]).find('path')[0]).css({
-          'stroke': '',
-          'stroke-width': ''
-        });
-      }
     }
 
     function barChartCanvasDownload(data, downloadOpts) {
       var _svgElement = '';
-      var _svg = $('#' + data.chartId + ' svg');
+      var _svg = $('#' + data.chartId + '>svg').clone();
+      var _svgWidth = Number(_svg.attr('width'));
+      var _svgHeight = Number(_svg.attr('height')) + 20;
       var _brush = _svg.find('g.brush');
       var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
       var i = 0;
 
+      // Remove brush if the width is zero(no rush presents)
+      // Otherwise width 0 brush will still show in the PDF
       if (_brushWidth === 0) {
-        _brush.css('display', 'none');
+        _brush.remove();
       }
 
       _brush.find('rect.extent')
@@ -436,6 +426,11 @@
         });
       }
 
+      // Remove clip-path from chart-body. Clip-path causes issue when
+      // generating pdf and useless in here.
+      // Related topic: https://github.com/dc-js/dc.js/issues/730
+      _chartBody.attr('clip-path', '');
+
       // Change x/y axis text size
       var _chartText = _svg.find('.axis text');
       var _chartTextLength = _chartText.length;
@@ -446,16 +441,13 @@
         });
       }
 
-      $('#' + data.chartId + ' svg>g').each(function(i, e) {
-        _svgElement += cbio.download.serializeHtml(e);
-      });
-      $('#' + data.chartId + ' svg>defs').each(function(i, e) {
+      _svg.children().each(function(i, e) {
         _svgElement += cbio.download.serializeHtml(e);
       });
 
       var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ' +
-        'width="370" height="200">' +
-        '<g><text x="180" y="20" ' +
+        'width="' + _svgWidth + '" height="' + _svgHeight + '">' +
+        '<g><text x="' + (_svgWidth / 2) + '" y="20" ' +
         'style="font-weight: bold; text-anchor: middle">' +
         data.title + '</text></g>' +
         '<g transform="translate(0, 20)">' + _svgElement + '</g></svg>';
@@ -464,46 +456,6 @@
         svg, downloadOpts);
 
       _brush.css('display', '');
-
-      // Remove added styles
-      _brush.find('rect.extent')
-        .css({
-          'fill-opacity': '',
-          'fill': ''
-        });
-
-      _brush.find('.resize path')
-        .css({
-          fill: '',
-          stroke: ''
-        });
-
-      for (i = 0; i < _deselectedChartsLength; i++) {
-        $(_deselectedCharts[i]).css({
-          stroke: '',
-          fill: ''
-        });
-      }
-
-      for (i = 0; i < _axisDomainLength; i++) {
-        $(_axisDomain[i]).css({
-          'fill': '',
-          'fill-opacity': '',
-          'stroke': ''
-        });
-      }
-
-      for (i = 0; i < _axisTickLength; i++) {
-        $(_axisTick[i]).css({
-          stroke: ''
-        });
-      }
-
-      for (i = 0; i < _chartTextLength; i++) {
-        $(_chartText[i]).css({
-          'font-size': ''
-        });
-      }
     }
 
     function survivalChartDownload(fileType, content) {
@@ -517,7 +469,7 @@
           survivalChartCanvasDownload(content, {
             filename: content.fileName + '.pdf',
             contentType: 'application/pdf',
-            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+            servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
         default:
@@ -530,19 +482,23 @@
       var _svgTitle;
       var _labelTextMaxLength = 0;
       var _numOfLabels = 0;
-      var _svgWidth = 380;
-      var _svgheight = 380;
+      var _svg = $('#' + data.chartDivId).clone();
+      var _svgWidth = Number($('#' + data.chartDivId + ' svg').attr('width')) + 50;
+      var _svgheight = Number($('#' + data.chartDivId + ' svg').attr('height')) + 50;
 
-      _svgElement = cbio.download.serializeHtml(
-        $('#' + data.chartDivId + ' svg')[0]);
+      // This is for PDF download. fill transparent will be treated as black.
+      _svg.find('rect').each(function(index, item) {
+        if($(item).css('fill') === 'transparent') {
+          $(item).css('fill', 'white');
+        }
+      });
+      _svgElement = cbio.download.serializeHtml(_svg.find('svg')[0]);
 
       _svgWidth += _labelTextMaxLength * 14;
 
       if (_svgheight < _numOfLabels * 20) {
         _svgheight = _numOfLabels * 20 + 40;
       }
-
-      // _svgLabels = cbio.download.serializeHtml(_svgLabels[0]);
 
       _svgTitle = '<g><text text-anchor="middle" x="210" y="30" ' +
         'style="font-weight:bold">' + data.title + '</text></g>';
@@ -552,8 +508,6 @@
         'px" style="font-size:14px">' +
         _svgTitle + '<g transform="translate(0,40)">' +
         _svgElement + '</g>' +
-        // '<g transform="translate(370,50)">' +
-        // _svgLabels + '</g>' +
         '</svg>';
 
       cbio.download.initDownload(
@@ -585,7 +539,7 @@
           barChartCanvasDownload(content, {
             filename: content.fileName + '.pdf',
             contentType: 'application/pdf',
-            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+            servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
         default:
@@ -651,7 +605,7 @@
         string.push(attribute.description);
       }
       return string.join('<br/>');
-    }
+    };
 
     return content;
   })();

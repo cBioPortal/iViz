@@ -43,9 +43,6 @@ module.exports = function(grunt) {
         files: ['test/spec/{,*/}*.js'],
         tasks: ['babel:test', 'test:watch']
       },
-      gruntfile: {
-        files: ['Gruntfile.js']
-      },
       sass: {
         files: ['<%= config.app %>/styles/{,*/}*.{scss,sass}'],
         tasks: ['sass', 'postcss']
@@ -57,6 +54,12 @@ module.exports = function(grunt) {
       json_to_sass: {
         files: ['<%= config.app %>/resources/vars.json'],
         tasks: ['json_to_sass', 'newer:copy:styles', 'postcss']
+      },
+      configFiles: {
+        files: ['<%= config.app %>/resources/attributes.json', 'Gruntfile.js'],
+        options: {
+          reload: true
+        }
       }
     },
 

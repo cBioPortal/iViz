@@ -72,8 +72,8 @@
         if (this.grid_ === '') {
           self_.grid_ = new Packery(document.querySelector('.grid'), {
             itemSelector: '.grid-item',
-            columnWidth: 190,
-            rowHeight: 170,
+            columnWidth: window.iViz.styles.vars.width.one + 5,
+            rowHeight: window.iViz.styles.vars.height.one + 5,
             gutter: 5,
             initLayout: false
           });
@@ -165,21 +165,24 @@
                   iViz.util.intersection(_selectedCasesByFilters,
                     _groupFilteredCases);
               }
+            } else {
+              _selectedCasesByFilters = (updateType_ === 'patient') ?
+                self_.completePatientsList : self_.completeSamplesList;
             }
           }
         });
         self_.hasfilters = _hasFilters;
         if (updateType_ === 'patient') {
           self_.selectedPatientsByFilters = _selectedCasesByFilters.sort();
-         // _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
-         //   self_.completePatientsList : _selectedCasesByFilters;
+          // _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
+          //   self_.completePatientsList : _selectedCasesByFilters;
           _counterSelectedCasesByFilters =
             this.selectedSamplesByFilters.length === 0 ?
               self_.completeSamplesList : this.selectedSamplesByFilters;
         } else {
           self_.selectedSamplesByFilters = _selectedCasesByFilters.sort();
-         // _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
-         //   self_.completeSamplesList : _selectedCasesByFilters;
+          // _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
+          //   self_.completeSamplesList : _selectedCasesByFilters;
           _counterSelectedCasesByFilters =
             this.selectedPatientsByFilters.length === 0 ?
               self_.completePatientsList : this.selectedPatientsByFilters;

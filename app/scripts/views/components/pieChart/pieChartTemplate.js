@@ -117,8 +117,8 @@
         groupid: _self.attributes.group_id,
         chartTableId: _self.chartTableId,
         transitionDuration: iViz.opts.dc.transitionDuration,
-        width: window.style['piechart-svg-width'] | 130,
-        height: window.style['piechart-svg-height'] | 130
+        width: window.iViz.styles.vars.piechart.width,
+        height: window.iViz.styles.vars.piechart.height
       };
       _self.piechart = new iViz.view.component.PieChart(
         _self.ndx, _self.attributes, opts, _cluster);
