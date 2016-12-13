@@ -596,7 +596,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         if (QueryByGeneTextArea.isEmpty()) {
           $('#iviz-form').trigger('submit');
         } else {
-          window.event.preventDefault();
           QueryByGeneTextArea.validateGenes(this.decideSubmit, false);
         }
       } else {
