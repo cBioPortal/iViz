@@ -571,30 +571,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         }
       });
       if (possibleTOQuery) {
-        $('#iviz-form').get(0).setAttribute(
-          'action', window.cbioURL + 'index.do');
-
-        $('<input>').attr({
-          type: 'hidden',
-          value: studyId_,
-          name: 'cancer_study_id'
-        }).appendTo('#iviz-form');
-
-        $('<input>').attr({
-          type: 'hidden',
-          value: -1,
-          name: 'case_set_id'
-        }).appendTo('#iviz-form');
-
-        $('<input>').attr({
-          type: 'hidden',
-          value: selectedCases_.join(' '),
-          name: 'case_ids'
-        }).appendTo('#iviz-form');
-
         window.studyId = studyId_;
         if (QueryByGeneTextArea.isEmpty()) {
-          $('#iviz-form').trigger('submit');
+          QueryByGeneUtil.toMainPage(studyId_, selectedCases_);
         } else {
           QueryByGeneTextArea.validateGenes(this.decideSubmit, false);
         }
@@ -607,9 +586,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     decideSubmit: function(allValid) {
       // if all genes are valid, submit, otherwise show a notification
       if (allValid) {
-        new QueryByGeneUtil().addStudyViewFields(
-          window.studyId, window.mutationProfileId, window.cnaProfileId);
-        $('#iviz-form').trigger('submit');
+        QueryByGeneUtil.toQueryPage(window.studyId, vm_.selectedsamples,
+          QueryByGeneTextArea.getGenes(), window.mutationProfileId,
+          window.cnaProfileId);
       } else {
         new Notification().createNotification(
           'There were problems with the selected genes. Please fix.',
