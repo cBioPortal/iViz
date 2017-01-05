@@ -83,6 +83,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var _sampleIds = _.keys(data_.groups.sample.data_indices.sample_id);
 
       var chartsCount = 0;
+      var patientChartsCount = 0;
       var groupAttrs = [];
       var group = {};
       var groups = [];
@@ -94,11 +95,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.hasfilters = false;
       _.each(data_.groups.patient.attr_meta, function(attrData) {
         attrData.group_type = group.type;
-        if (chartsCount < 10) {
+        if (chartsCount < 20 && patientChartsCount < 10) {
           if (attrData.show) {
             attrData.group_id = group.id;
             groupAttrs.push(attrData);
             chartsCount++;
+            patientChartsCount++;
           }
         } else {
           attrData.show = false;
@@ -108,7 +110,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.attributes = groupAttrs;
       groups.push(group);
 
-      chartsCount = 0;
       groupAttrs = [];
       group = {};
       vm_.groupCount += 1;
@@ -119,7 +120,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       group.hasfilters = false;
       _.each(data_.groups.sample.attr_meta, function(attrData) {
         attrData.group_type = group.type;
-        if (chartsCount < 10) {
+        if (chartsCount < 20) {
           if (attrData.show) {
             attrData.group_id = group.id;
             groupAttrs.push(attrData);
