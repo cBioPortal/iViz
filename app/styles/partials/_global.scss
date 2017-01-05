@@ -121,6 +121,7 @@
 #iviz_add_chart_chosen {
   width: $add-chart-chosen-width !important;
   background-image: none !important;
+  margin-top: -4px;
 }
 
 #iviz_add_chart_chosen > a {
@@ -138,10 +139,6 @@ div.geneAddedNotification {
 
 #iviz-header-left-1 {
   font-size: 1.1em;
-}
-
-#iviz-header-right-1 {
-  padding: 3px 10px 7px;
 }
 
 .iviz-header-left-case {
