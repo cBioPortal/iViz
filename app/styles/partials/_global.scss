@@ -126,7 +126,7 @@
 #iviz_add_chart_chosen > a {
   background-image: none;
   height: 30px;
-  line-height: 30px;
+  line-height: 28px;
 }
 
 div.geneValidationNotification,
@@ -138,6 +138,10 @@ div.geneAddedNotification {
 
 #iviz-header-left-1 {
   font-size: 1.1em;
+}
+
+#iviz-header-right-1 {
+  padding: 3px 10px 7px;
 }
 
 .iviz-header-left-case {
