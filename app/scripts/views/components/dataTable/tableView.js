@@ -32,6 +32,7 @@
     var labelInitData = {};
     var opts = {};
     var genePanelMap = {};
+    var renderedReactTable;
 
     // Category based color assignment. Avoid color changing
     var assignedColors = {
@@ -198,10 +199,18 @@
           selectButtonClickCallback: reactSubmitClickCallback
         });
       }
+
+      // Check whether the react table has been initialized
+      if (renderedReactTable) {
+        // Get sort settings from the initialized react table
+        var sort_ = renderedReactTable.getCurrentSort();
+        _opts = $.extend(_opts, sort_);
+      }
+
       var testElement = React.createElement(EnhancedFixedDataTableSpecial,
         _opts);
 
-      ReactDOM.render(testElement, document.getElementById(chartId_));
+      renderedReactTable = ReactDOM.render(testElement, document.getElementById(chartId_));
     }
 
     function initRegularTableData() {
