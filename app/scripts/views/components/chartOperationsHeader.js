@@ -142,7 +142,7 @@
             var downloadFileTypes = self.chartCtrl.getDownloadFileTypes();
             var content = [];
             _.each(downloadFileTypes, function(item) {
-              content.push('<div style="display:inline-block;"><button id="' + self.chartId + '-' + item + '" style="width:50px">' + item.toUpperCase() + '</button></div>');
+              content.push('<div style="display:inline-block;"><button id="' + self.chartId + '-' + item + '" style="width:50px">' + (item === 'tsv' ? 'DATA' : item.toUpperCase()) + '</button></div>');
             });
 
             api.set('content.text', content.join('<br/>'));
