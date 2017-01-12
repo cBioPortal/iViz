@@ -9,15 +9,7 @@ Stand-alone library to analysis cohorts. It's seperated from cBioPortal Study Vi
 
 - Run: `npm install`
 - Run: `bower install`
-- Run `grunt` for building and `grunt serve` for preview.
-
-## Dist
-
-- Run: `grunt build`
-
-## Preview
-
-- Run: `grunt serve`
+- Run `grunt build` for building and `grunt serve` for preview.
 
 ## Feature highlights from generator-webapp
 
