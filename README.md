@@ -13,11 +13,11 @@ Stand-alone library to analysis cohorts. It's seperated from cBioPortal Study Vi
 
 ## Dist
 
-- Run: 'grunt build'
+- Run: `grunt build`
 
 ## Preview
 
-- Run: 'grunt serve'
+- Run: `grunt serve`
 
 ## Feature highlights from generator-webapp
 
