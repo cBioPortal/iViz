@@ -288,7 +288,7 @@
     }
 
     function updateTables() {
-      if (currentView === 'pie') {
+      if (currentView === 'pie' && qtipRendered) {
         updateQtipReactTable();
       }
       if (currentView === 'table') {
