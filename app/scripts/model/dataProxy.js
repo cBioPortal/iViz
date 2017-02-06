@@ -1284,17 +1284,28 @@ window.DataManagerForIviz = (function($, _) {
       getAllGenePanelSampleIds: window.cbio.util.makeCachedPromiseFunction(
         function (self, fetch_promise) {
           var _map = {};
-          $.ajax({
-            type: "GET",
-            url: window.cbioURL + "api-legacy/genepanel/data",
-            contentType: "application/json",
-            data: ["profile_id=genie_public_mutations", "genes="].join("&")
-          }).then(function (response) {
-            _.each(response, function(_panelMeta) {
+          var asyncAjaxCalls = [];
+          var responses = [];
+          _.each(self.getCancerStudyIds(), function(_studyId) {
+            asyncAjaxCalls.push(
+              $.ajax({
+                url: window.cbioURL + 'api-legacy/genepanel/data',
+                contentType: "application/json",
+                data: ["profile_id=genie_public_mutations", "genes="].join("&"),
+                type: 'GET',
+                success: function(_res) {
+                  responses.push(_res);
+                }
+              })
+            );
+          });
+          $.when.apply($, asyncAjaxCalls).done(function(){
+            var _panelMetaArr = _.flatten(responses);
+            _.each(_panelMetaArr, function(_panelMeta) {
               _map[_panelMeta.stableId] = (_panelMeta.samples);
             });
             fetch_promise.resolve(_map);
-          }).fail(function () {
+          }).fail(function(){
             fetch_promise.reject();
           });
         }

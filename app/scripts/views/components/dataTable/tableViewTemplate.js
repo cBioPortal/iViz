@@ -199,7 +199,7 @@
       _self.chartInst.setDownloadDataTypes(['tsv']);
       if (_self.isMutatedGeneCna) {
         $.when(iViz.getTableData(_self.attributes.attr_id)).then(function(_tableData) {
-          $.when(window.iviz.datamanager.getGenePanelMap(_tableData)).then(function (_genePanelMap) {
+          $.when(window.iviz.datamanager.getGenePanelMap()).then(function (_genePanelMap) {
             //create gene panel map
             _self.genePanelMap = _genePanelMap;
             _self.processTableData(_tableData);
