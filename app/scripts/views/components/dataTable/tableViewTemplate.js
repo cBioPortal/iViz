@@ -38,7 +38,8 @@
         invisibleDimension: {},
         isMutatedGeneCna: false,
         classTableHeight: 'grid-item-h-2',
-        madeSelection: false
+        madeSelection: false,
+        genePanelMap: {}
       };
     },
     watch: {
@@ -161,7 +162,7 @@
           this.$root.selectedgenes, data, {
             addGeneClick: this.addGeneClick,
             submitClick: this.submitClick
-          }, this.isMutatedGeneCna ? _data.geneMeta : null, this.invisibleDimension);
+          }, this.isMutatedGeneCna ? _data.geneMeta : null, this.invisibleDimension, this.genePanelMap);
         this.setDisplayTitle(this.chartInst.getCases().length);
         if (!this.isMutatedGeneCna &&
           Object.keys(this.attributes.keys).length <= 3) {
@@ -196,11 +197,16 @@
       callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.TableView();
       _self.chartInst.setDownloadDataTypes(['tsv']);
-      if (this.isMutatedGeneCna) {
-        $.when(iViz.getTableData(_self.attributes.attr_id))
-          .then(this.processTableData);
+      if (_self.isMutatedGeneCna) {
+        $.when(iViz.getTableData(_self.attributes.attr_id)).then(function(_tableData) {
+          $.when(window.iviz.datamanager.getGenePanelMap()).then(function (_genePanelMap) {
+            //create gene panel map
+            _self.genePanelMap = _genePanelMap;
+            _self.processTableData(_tableData);
+          });
+        });
       } else {
-        this.processTableData();
+        _self.processTableData();
       }
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }

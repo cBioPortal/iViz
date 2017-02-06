@@ -31,6 +31,7 @@
     var group = {};
     var labelInitData = {};
     var opts = {};
+    var genePanelMap = {};
 
     // Category based color assignment. Avoid color changing
     var assignedColors = {
@@ -52,7 +53,7 @@
 
     content.init =
       function(_attributes, _opts, _selectedSamples, _selectedGenes,
-        _data, _callbacks, _geneData, _dimension) {
+        _data, _callbacks, _geneData, _dimension, _genePanelMap) {
         initialized = false;
         allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
@@ -62,6 +63,7 @@
         selectedGenes = _selectedGenes;
         chartId_ = _opts.chartId;
         opts = _opts;
+        genePanelMap = _genePanelMap;
         caseIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
         geneData_ = _geneData;
@@ -136,7 +138,7 @@
               });
             }
           });
-          initReactTable(true, selectedMap_);
+          initReactTable(true, selectedMap_, selectedSamples);
         }
       } else {
         initReactTable(false);
@@ -154,9 +156,9 @@
       }
     };
 
-    function initReactTable(_reloadData, _selectedMap) {
+    function initReactTable(_reloadData, _selectedMap, _selectedSampleIds) {
       if (_reloadData) {
-        reactTableData = initReactData(_selectedMap);
+        reactTableData = initReactData(_selectedMap, _selectedSampleIds);
       }
       var _opts = {
         input: reactTableData,
@@ -264,9 +266,10 @@
       categories_ = _labels;
     }
 
-    function mutatedGenesData(_selectedGenesMap) {
-      var numOfCases_ = content.getCases().length;
+    function mutatedGenesData(_selectedGenesMap, _selectedSampleIds) {
 
+      genePanelMap = window.iviz.datamanager.updateGenePanelMap(genePanelMap, _selectedSampleIds);
+      
       selectedGeneData.length = 0;
 
       if (geneData_) {
@@ -278,7 +281,11 @@
             datum.caseIds = iViz.util.unique(item.caseIds);
             datum.cases = datum.caseIds.length;
             datum.uniqueId = index;
-            freq = iViz.util.calcFreq(datum.cases, numOfCases_);
+            if (typeof genePanelMap[item.gene] !== 'undefined') {
+              freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
+            } else {
+              freq = 'NA';
+            }
             switch (type_) {
               case 'mutatedGene':
                 datum.numOfMutations = item.num_muts;
@@ -299,7 +306,11 @@
             datum.caseIds =
               iViz.util.unique(_selectedGenesMap[item.index].caseIds);
             datum.cases = datum.caseIds.length;
-            freq = iViz.util.calcFreq(datum.cases, numOfCases_);
+            if (typeof genePanelMap[item.gene] !== 'undefined') {
+              freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
+            } else {
+              freq = 'NA';
+            }
             switch (type_) {
               case 'mutatedGene':
                 datum.numOfMutations = _selectedGenesMap[item.index].num_muts;
@@ -333,7 +344,7 @@
       return selectedGeneData;
     }
 
-    function initReactData(_selectedMap) {
+    function initReactData(_selectedMap, _selectedSampleIds) {
       attr_ = iViz.util.tableView.getAttributes(type_);
       var result = {
         data: [],
@@ -341,7 +352,7 @@
       };
 
       if (isMutatedGeneCna) {
-        var _mutationData = mutatedGenesData(_selectedMap);
+        var _mutationData = mutatedGenesData(_selectedMap, _selectedSampleIds);
         _.each(_mutationData, function(item) {
           for (var key in item) {
             if (item.hasOwnProperty(key)) {
