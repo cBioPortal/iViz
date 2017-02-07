@@ -1305,7 +1305,6 @@ window.DataManagerForIviz = (function($, _) {
               _map[_panelMeta.stableId] = {};
               _map[_panelMeta.stableId]["samples"] = (_panelMeta.samples);
               _map[_panelMeta.stableId]["sel_samples"] = (_panelMeta.samples);
-              
             });
             fetch_promise.resolve(_map);
           }).fail(function(){
