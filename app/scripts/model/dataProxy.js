@@ -1291,7 +1291,7 @@ window.DataManagerForIviz = (function($, _) {
               $.ajax({
                 url: window.cbioURL + 'api-legacy/genepanel/data',
                 contentType: "application/json",
-                data: ["profile_id=genie_public_mutations", "genes="].join("&"),
+                data: ["profile_id=" + _studyId + "_mutations", "genes="].join("&"),
                 type: 'GET',
                 success: function(_res) {
                   responses.push(_res);
