@@ -1302,7 +1302,9 @@ window.DataManagerForIviz = (function($, _) {
           $.when.apply($, asyncAjaxCalls).done(function(){
             var _panelMetaArr = _.flatten(responses);
             _.each(_panelMetaArr, function(_panelMeta) {
-              _map[_panelMeta.stableId] = (_panelMeta.samples);
+              _map[_panelMeta.stableId] = {};
+              _map[_panelMeta.stableId]["samples"] = (_panelMeta.samples);
+              _map[_panelMeta.stableId]["sel_samples"] = (_panelMeta.samples);
             });
             fetch_promise.resolve(_map);
           }).fail(function(){
@@ -1340,7 +1342,7 @@ window.DataManagerForIviz = (function($, _) {
                     _map[_gene.hugoGeneSymbol]["sample_num"] = 0;
                   }
                   _map[_gene.hugoGeneSymbol]["panel_id"].push(_panelMeta.stableId);
-                  _map[_gene.hugoGeneSymbol]["sample_num"] += _panelSampleMap[_panelMeta.stableId].length;
+                  _map[_gene.hugoGeneSymbol]["sample_num"] += _panelSampleMap[_panelMeta.stableId]["samples"].length;
                 });
               });
               fetch_promise.resolve(_map);
@@ -1355,12 +1357,12 @@ window.DataManagerForIviz = (function($, _) {
         if (typeof _selectedSampleIds !== 'undefined') {
           //update panel sample count map
           _.each(Object.keys(_self.panelSampleMap), function(_panelId) {
-            _self.panelSampleMap[_panelId] = _.intersection(_self.panelSampleMap[_panelId], _selectedSampleIds);
+            _self.panelSampleMap[_panelId]["sel_samples"] = _.intersection(_self.panelSampleMap[_panelId]["samples"], _selectedSampleIds);
           });
           _.each(Object.keys(_map), function(_gene) {
             var _sampleNumPerGene = 0;
             _.each(_map[_gene]["panel_id"], function(_panelId) {
-              _sampleNumPerGene += _self.panelSampleMap[_panelId].length;
+              _sampleNumPerGene += _self.panelSampleMap[_panelId]["sel_samples"].length;
             });
             _map[_gene]["sample_num"] = _sampleNumPerGene;
           });         
