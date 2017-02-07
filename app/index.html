@@ -3,11 +3,14 @@
 <head>
   <meta charset="utf-8">
 
+  <!-- This file shouldn't be included in cBioPortal -->
+  <!-- build:js(.) scripts/iviz-vendor-cbio.js -->
+  <script src="/bower_components/jquery/jquery.min.js"></script>
+  <script src="/bower_components/jquery-ui/ui/jquery-ui.js"></script>
+  <!-- endbuild -->
 
   <!-- build:js(.) scripts/iviz-vendor.js -->
-  <!-- bower:js -->
   <script src="/bower_components/modernizr/modernizr.js"></script>
-  <script src="/bower_components/jquery/dist/jquery.min.js"></script>
   <script src="/bower_components/chosen/chosen.jquery.min.js"></script>
   <script src="/bower_components/datatables/media/js/jquery.dataTables.js"></script>
   <script src="/bower_components/d3/d3.min.js"></script>
@@ -40,9 +43,7 @@
   <script src="/bower_components/fixed-data-table/dist/fixed-data-table.min.js"></script>
   <script src="/bower_components/jstat/dist/jstat.min.js"></script>
   <script src="/bower_components/backbone/backbone.js"></script>
-  <script src="/bower_components/jquery-ui/jquery-ui.js"></script>
   <script src="/bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
-  <!-- endbower -->
   <!-- endbuild -->
 
   <!-- build:css(.) styles/iviz-vendor.css -->
@@ -58,27 +59,29 @@
   <!-- build:css(.tmp) styles/vc-session.css -->
   <link rel="stylesheet" href="styles/vendor/vc-session.css"/>
   <!-- endbuild -->
-  
+
   <!-- build:css(.tmp) styles/iviz.css -->
   <link rel="stylesheet" href="styles/main.css"/>
   <!-- endbuild -->
-  
+
   <!-- build:js scripts/cbio-vendor.js -->
   <script src="_components/FileSaver.min.js"></script>
   <script src="_components/cbio-util.js"></script>
   <script src="_components/download-util.js"></script>
+  <script src="_components/MutatedGeneCNATable.js"></script>
+  <script src="scripts/model/dataProxy.js"></script>
+  <script src="_components/cbioportal-client.js"></script>
+  <!-- endbuild -->
+
+  <!-- build:js scripts/vc-session.js -->
+  <script src="_components/vc-session.js"></script>
+  <!-- endbuild -->
+
+  <!-- build:js scripts/iviz.js -->
   <script src="_components/Notification.js"></script>
   <script src="_components/GeneValidator.js"></script>
   <script src="_components/QueryByGeneUtil.js"></script>
   <script src="_components/QueryByGeneTextArea.js"></script>
-  <script src="_components/MutatedGeneCNATable.js"></script>
-  <!-- endbuild -->
-  
-  <!-- build:js scripts/vc-session.js -->
-  <script src="_components/vc-session.js"></script>
-  <!-- endbuild -->
-  
-  <!-- build:js scripts/iviz.js -->
   <script src="scripts/main.js"></script>
   <script src="scripts/vueCore.js"></script>
   <script src="scripts/controller/util.js"></script>
@@ -105,133 +108,125 @@
   <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <!-- endbuild -->
-  
-  <script src="scripts/model/dataProxy.js"></script>
-  <script src="_components/cbioportal-client.js"></script>
-  
 </head>
 <body>
 
 <div class="container-fluid" id="complete-screen">
-  <div id="complete-screen-loader" 
-       :class="{'show-loading': showScreenLoad}" 
-       class="chart-loader" style="top: 30%; left: 30%; display: none;"><img
-    src="images/ajax-loader.gif" alt="loading"></div>
   <nav class="navbar navbar-default navbar-fixed-top">
-    <div id="main-header">
+    <div id="main-header" style="display: none" :class="{show:!isloading}">
       <div id="iviz-header-left">
-        <div style="float: left; margin-right: 10px;">
+        <div class="iviz-cohort-component" style="float: left; margin-right: 10px;">
           <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
                              :selected-patients-num="selectedPatientsNum" :selected-samples-num="selectedSamplesNum"
                              :userid="userid" :stats="stats" :update-stats.sync="updateStats"></session-component>
         </div>
 
-        <span class="iviz-header-left-case-name" style="display: block;">Samples selected: </span>
-        <span id="iviz-header-left-sample-select" @click="openCases()" class="iviz-header-left-case-number iviz-header-button" 
-              :class="{'iviz-button-hover':highlightAllButtons||highlightCaseButtons}" 
-              role="button" tabindex="0" style="display: block;">{{ selectedSamplesNum }}</span>
-        <span class="iviz-header-left-case-name" style="display: block;">Patients selected: </span>
-        <span id="iviz-header-left-patient-select" @click="openCases()" class="iviz-header-left-case-number iviz-header-button" 
-              :class="{'iviz-button-hover':highlightAllButtons||highlightCaseButtons}" 
-              role="button" tabindex="0" style="display: block;">{{ selectedPatientsNum }}</span>
-        
-        <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()" 
-              @mouseenter="highlightCaseButtons=true" @mouseleave="highlightCaseButtons=false" role="button" 
-              tabindex="0" data-hasqtip="9" aria-describedby="qtip-9"><i class="fa fa-download" alt="download"></i></span>
-      
-      <span id="query-by-gene-span">
-          <span id="queryByGeneTextSpan"></span>
-          <textarea id="query-by-gene-textarea" class="expand expandFocusOut" 
-                    :class="{'iviz-button-hover':highlightAllButtons}" rows="1" cols="10"></textarea>
+        <div class="iviz-header-left-case">
+          <span class="name" style="display: block;">Selected:</span>
+          <span class="content">
+            <span>{{ selectedSamplesNum }} samples / {{ selectedPatientsNum }} patients</span>
+          </span>
+        </div>
+        <span id="iviz-header-left-patient-select" class="iviz-header-button"
+              @click="openCases('patient')" class="number"
+              role="button" tabindex="0" style="display: block;"><i class="fa fa-user" aria-hidden="true"></i></span>
+        <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()"
+              role="button"
+              tabindex="0"><i class="fa fa-download" alt="download"></i></span>
+
+        <span id="query-by-gene-span">
+          <textarea id="query-by-gene-textarea" class="expand expandFocusOut" rows="1" cols="10"></textarea>
       </span>
-        <i id="arrow_studyview" class="fa fa-arrow-right fa-lg" aria-hidden="true"></i>
-        <form id="iviz-form"  v-on:submit.prevent="submitForm" method="post" target="_blank" style="float: left;">
-          <input type="submit" @mouseenter="highlightAllButtons=true" @mouseleave="highlightAllButtons=false" 
-                 id="iviz-header-left-1" value="Query" class="iviz-header-button" style="display: block;">
-        </form>
-      
+        <span class="iviz-header-arrow">
+          <i class="fa fa-arrow-right fa-lg" aria-hidden="true"></i>
+        </span>
+        <input type="button" id="iviz-header-left-1" value="Query" class="iviz-header-button" style="display: block;"
+               v-on:click="submitForm">
       </div>
-      
+
       <div id="iviz-header-right">
-        <custom-case-input></custom-case-input>
-        
+        <div style="display: inline-flex">
+          <custom-case-input></custom-case-input>
+        </div>
         <select id="iviz-add-chart" class="chosen-select"
                 v-select :charts="charts" v-if="showDropDown">
           <option id='' value="">Add Chart</option>
-          <option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}" v-for="(index,data) in charts">{{data.display_name}}</option>
+          <option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}" v-for="(index,data) in charts">
+            {{data.display_name}}
+          </option>
         </select>
       </div>
 
       <div id="breadcrumbs_container" v-if="hasfilters">
-        <div style="float:left;" >
+        <div style="float:left;">
           <span class="breadcrumb_container">Your selections: </span>
         </div>
 
         <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
           <span>{{customfilter.display_name}}</span>
-          <i class="fa fa-times breadcrumb_remove" @click="clearAll()"></i>
+          <i class="fa fa-times breadcrumb_remove"
+             @click="clearAllCharts(true)"></i>
         </span>
         <div style="float:left" v-for="group in groups">
           <bread-crumb :attributes.sync="item"
                        :filters.sync="item.filter" v-for="(index1, item) in group.attributes"
-                       v-if="item.filter.length>0" ></bread-crumb>
+                       v-if="item.filter.length>0"></bread-crumb>
         </div>
-        <div><button type='button' @click="clearAllCharts(true)" 
-                     class="btn btn-default btn-xs">Clear All</button></div>
+        <div style="float:left">
+          <button type='button' @click="clearAllCharts(true)"
+                  class="btn btn-default btn-xs">Clear All
+          </button>
+        </div>
       </div>
     </div>
   </nav>
   <div :class="{'start-loading': showScreenLoad}">
-  <div class="grid" id="main-grid" 
-       :class="{loading:isloading}">
-    <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
-                   :selectedpatients.sync="selectedpatients"
-                   :selectedsamples.sync="selectedsamples"
-                   :hasfilters.sync="hasfilters" 
-                   :customfilter.sync="customfilter" 
-                   :clear-all="clearAll"></main-template>
-  </div>
+    <div class="grid" id="main-grid"
+         :class="{loading:isloading}">
+      <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
+                     :selectedpatients.sync="selectedpatients"
+                     :selectedsamples.sync="selectedsamples"
+                     :hasfilters.sync="hasfilters"
+                     :customfilter.sync="customfilter"
+                     :clear-all="clearAll"></main-template>
+    </div>
   </div>
 
 </div>
 
 </body>
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
     //Include style variables
-    window.style = {
-      vars: {}
-    };
     iViz.vue.manage.init();
-    
+
     // This is used to indicate how to disable two buttons. By default, they are set to true.
     iViz.vue.manage.getInstance().showManageButton = true;
     iViz.vue.manage.getInstance().showSaveButton = true;
-    
-    $.get('resources/vars.json')
-      .then(function(data) {
-        window.style.vars = data;
-        window.style.vars.survivalWidth = 370;
-        window.style.vars.survivalHeight = 320;
-        window.style.vars.barchartWidth = 350;
-        window.style.vars.barchartHeight = 120;
-      });
-    window.cbioURL = 'http://www.cbioportal.org';
-    window.mutationProfileId ='hnsc_tcga_mutations';
+
+    window.cbioURL = 'http://www.cbioportal.org/';
+    window.cbioResourceURL = 'resources/';
+    window.mutationProfileId = 'hnsc_tcga_mutations';
     window.cnaProfileId = 'hnsc_tcga_gistic';
     window.case_set_id = '-1';
     var studyCasesMap = {};
-    studyCasesMap['hnsc_tcga']={};
+    studyCasesMap['hnsc_tcga'] = {};
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
-    $.when(window.iviz.datamanager.initialSetup()).then(function(_data){
-      iViz.init(_data);
+    $.when(
+      window.iviz.datamanager.initialSetup(),
+      window.iviz.datamanager.getStyleVars()
+    ).then(function(_data, styles) {
+      var opts = {};
+
+      if (_.isObject(styles)) {
+        opts.styles = styles;
+      }
+      iViz.init(_data, opts);
     });
-    //  iViz.data.init(window.cbioURL, ['hnsc_tcga'], iViz.init);
-   
-    
+
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
-      iViz.vue.manage.getInstance().$broadcast('gene-list-updated',genes);
+      iViz.vue.manage.getInstance().$broadcast('gene-list-updated', genes);
     });
 
   });

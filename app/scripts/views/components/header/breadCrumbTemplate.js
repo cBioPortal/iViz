@@ -9,7 +9,7 @@
     '<span>{{attributes.display_name}}</span><span ' +
     'v-if="(filtersToSkipShowing.indexOf(attributes.attr_id) === -1) && ' +
     '(specialTables.indexOf(attributes.attr_id) === -1)" class="breadcrumb_items">' +
-    '<span v-if="filters.filterType === \'RangedFilter\'">' +
+    '<span v-if="attributes.view_type===\'bar_chart\'">' +
     '<span class="breadcrumb_item">{{filters[0]}} -- {{filters[1]}}</span>' +
     '<i class="fa fa-times breadcrumb_remove" @click="removeFilter()"></i>' +
     '</span>' +

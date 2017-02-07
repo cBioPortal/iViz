@@ -34,8 +34,6 @@
             userid: 'DEFAULT',
             stats: '',
             updateStats: false,
-            highlightAllButtons: false,
-            highlightCaseButtons: false,
             clearAll: false,
             showScreenLoad: false,
             showDropDown: false
@@ -48,7 +46,11 @@
               // TODO: need to update setting timeout
               var interval = setTimeout(function() {
                 clearInterval(interval);
-                self_.$broadcast('update-special-charts');
+                var _attrs = [];
+                _.each(self_.groups, function(group) {
+                  _attrs = _attrs.concat(group.attributes);
+                });
+                self_.$broadcast('update-special-charts', self_.hasfilters);
               }, 500);
             },
             updateStats: function() {
@@ -96,8 +98,8 @@
               });
               this.showDropDown = showDropDown;
             },
-            openCases: function() {
-              iViz.openCases();
+            openCases: function(type) {
+              iViz.openCases(type);
             },
             downloadCaseData: function() {
               iViz.downloadCaseData();
@@ -108,7 +110,7 @@
             clearAllCharts: function(includeNextTickFlag) {
               var self_ = this;
               self_.clearAll = true;
-              this.hasfilters = false;
+              self_.hasfilters = false;
               if (self_.customfilter.patientIds.length > 0 ||
                 self_.customfilter.sampleIds.length > 0) {
                 self_.customfilter.sampleIds = [];
@@ -118,7 +120,7 @@
                 self_.$nextTick(function() {
                   self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
                   self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
-                  self_.$broadcast('update-special-charts');
+                  self_.$broadcast('update-special-charts', self_.hasfilters);
                   self_.clearAll = false;
                   _.each(this.groups, function(group) {
                     dc.redrawAll(group.id);
@@ -242,7 +244,9 @@
                   (radioVal === 'patient' ? 'patient' : 'sample') +
                   ' ID' + (unmappedCaseIds.length === 1 ? ' was' : 's were') +
                   ' not found in this study: ' +
-                  unmappedCaseIds.join(', '), {message_type: 'warning'});
+                  unmappedCaseIds.join(', '), {
+                    message_type: 'danger'
+                  });
               } else {
                 new Notification().createNotification(selectedCaseIds.length +
                   ' case(s) selected.', {message_type: 'info'});
@@ -277,8 +281,8 @@
                 this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
               }
             });
-            $('.iviz-header-left-5').qtip({
-              content: {text: 'Click to view the selected cases'},
+            $('#iviz-header-left-patient-select').qtip({
+              content: {text: 'View the selected patients.'},
               style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
               show: {event: 'mouseover'},
               hide: {fixed: true, delay: 100, event: 'mouseout'},
@@ -288,8 +292,19 @@
                 viewport: $(window)
               }
             });
-            $('#iviz-header-left-6').qtip({
-              content: {text: 'Click to download the selected cases'},
+            $('#iviz-header-left-case-download').qtip({
+              content: {text: 'Download clinical data for the selected cases.'},
+              style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
+              show: {event: 'mouseover'},
+              hide: {fixed: true, delay: 100, event: 'mouseout'},
+              position: {
+                my: 'bottom center',
+                at: 'top center',
+                viewport: $(window)
+              }
+            });
+            $('#iviz-form').qtip({
+              content: {text: 'Query the selected samples.'},
               style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
               show: {event: 'mouseover'},
               hide: {fixed: true, delay: 100, event: 'mouseout'},

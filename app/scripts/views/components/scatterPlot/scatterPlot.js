@@ -9,6 +9,7 @@
     var chartId_;
     var data_;
     var opts_;
+    var layout_;
     var getQtipString = function(_data) {
       var toReturn = 'Cancer Study:' + _data.study_id + '<br>Sample Id: ' +
         _data.sample_id + '<br>CNA fraction: ';
@@ -24,7 +25,9 @@
     content.init = function(_data, opts) {
       opts_ = $.extend(true, {}, opts);
       chartId_ = opts_.chartId;
-      data_ = _data;
+      data_ = _.filter(_data, function(datum) {
+        return !isNaN(datum.cna_fraction) && !isNaN(datum.mutation_count);
+      });
       var _xArr = _.pluck(data_, 'cna_fraction');
       var _yArr = _.pluck(data_, 'mutation_count');
       var _qtips = [];
@@ -49,13 +52,13 @@
       var data = [trace];
       var _marginX = (d3.max(_xArr) - d3.min(_xArr)) * 0.05;
       var _marginY = (d3.max(_yArr) - d3.min(_yArr)) * 0.05;
-      var layout = {
+      layout_ = {
         xaxis: {
           title: 'Fraction of copy number altered genome',
           range: [d3.min(_xArr) - _marginX, d3.max(_xArr) + _marginX],
-          fixedrange: true,
           zeroline: false,
-          showline: true
+          showline: true,
+          tickangle: -45
         },
         yaxis: {
           title: '# of mutations',
@@ -64,9 +67,10 @@
           showline: true
         },
         hovermode: 'closest',
+        dragmode: 'select',
         showlegend: false,
-        width: 370,
-        height: 320,
+        width: opts_.width || 370,
+        height: opts_.height || 320,
         margin: {
           l: 60,
           r: 10,
@@ -75,11 +79,11 @@
           pad: 0
         }
       };
-      Plotly.plot(document.getElementById(chartId_), data, layout, {
+      Plotly.plot(document.getElementById(chartId_), data, layout_, {
         displaylogo: false,
         modeBarButtonsToRemove: ['sendDataToCloud', 'pan2d',
           'zoomIn2d', 'zoomOut2d', 'resetScale2d',
-          'hoverClosestCartesian', 'hoverCompareCartesian']
+          'hoverClosestCartesian', 'hoverCompareCartesian', 'toImage']
       });
 
       // link to sample view
@@ -153,7 +157,9 @@
           line: {color: 'white'}
         }
       };
-      Plotly.redraw(document.getElementById(chartId_));
+
+      Plotly.newPlot(document.getElementById(chartId_), document.getElementById(chartId_).data, layout_);
+
     };
 
     content.updateDataForDownload = function(fileType) {

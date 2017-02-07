@@ -10,8 +10,9 @@
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':display-name="displayName" :chart-ctrl="chartInst"' +
-    ':has-chart-title="true" :groupid="attributes.group_id" :reset-btn-id="resetBtnId" ' +
-    ':chart-id="chartId" :attributes="attributes" :filters.sync="attributes.filter"> ' +
+    ':has-chart-title="true" :groupid="attributes.group_id" ' +
+    ':reset-btn-id="resetBtnId" :chart-id="chartId" :attributes="attributes" ' +
+    ':filters.sync="attributes.filter"> ' +
     '</chart-operations><div class="dc-chart dc-table-plot" ' +
     ':class="{\'start-loading\': showLoad}" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
@@ -37,7 +38,8 @@
         invisibleDimension: {},
         isMutatedGeneCna: false,
         classTableHeight: 'grid-item-h-2',
-        madeSelection: false
+        madeSelection: false,
+        genePanelMap: {}
       };
     },
     watch: {
@@ -151,11 +153,16 @@
       },
       processTableData: function(_data) {
         var data = iViz.getGroupNdx(this.attributes.group_id);
-        this.chartInst.init(this.attributes, this.$root.selectedsamples,
-          this.$root.selectedgenes, data, this.chartId, {
+        var opts = {
+          width: window.iViz.styles.vars.specialTables.width,
+          height: window.iViz.styles.vars.specialTables.height,
+          chartId: this.chartId
+        };
+        this.chartInst.init(this.attributes, opts, this.$root.selectedsamples,
+          this.$root.selectedgenes, data, {
             addGeneClick: this.addGeneClick,
             submitClick: this.submitClick
-          }, this.isMutatedGeneCna ? _data.geneMeta : null, this.invisibleDimension);
+          }, this.isMutatedGeneCna ? _data.geneMeta : null, this.invisibleDimension, this.genePanelMap);
         this.setDisplayTitle(this.chartInst.getCases().length);
         if (!this.isMutatedGeneCna &&
           Object.keys(this.attributes.keys).length <= 3) {
@@ -180,7 +187,8 @@
       }
 
       this.invisibleDimension = this.ndx.dimension(function(d) {
-        if (typeof d[attrId] === 'undefined') {
+        if (typeof d[attrId] === 'undefined' ||
+          ['na', 'n/a', 'N/A'].indexOf(d[attrId]) !== -1) {
           d[attrId] = 'NA';
         }
         return d[attrId];
@@ -189,11 +197,16 @@
       callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.TableView();
       _self.chartInst.setDownloadDataTypes(['tsv']);
-      if (this.isMutatedGeneCna) {
-        $.when(iViz.getTableData(_self.attributes.attr_id))
-          .then(this.processTableData);
+      if (_self.isMutatedGeneCna) {
+        $.when(iViz.getTableData(_self.attributes.attr_id)).then(function(_tableData) {
+          $.when(window.iviz.datamanager.getGenePanelMap()).then(function (_genePanelMap) {
+            //create gene panel map
+            _self.genePanelMap = _genePanelMap;
+            _self.processTableData(_tableData);
+          });
+        });
       } else {
-        this.processTableData();
+        _self.processTableData();
       }
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }

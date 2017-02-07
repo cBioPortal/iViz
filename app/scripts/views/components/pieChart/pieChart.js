@@ -1,35 +1,3 @@
-/*
- * Copyright (c) 2015 Memorial Sloan-Kettering Cancer Center.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY, WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS
- * FOR A PARTICULAR PURPOSE. The software and documentation provided hereunder
- * is on an 'as is' basis, and Memorial Sloan-Kettering Cancer Center has no
- * obligations to provide maintenance, support, updates, enhancements or
- * modifications. In no event shall Memorial Sloan-Kettering Cancer Center be
- * liable to any party for direct, indirect, special, incidental or
- * consequential damages, including lost profits, arising out of the use of this
- * software and its documentation, even if Memorial Sloan-Kettering Cancer
- * Center has been advised of the possibility of such damage.
- */
-
-/*
- * This file is part of cBioPortal.
- *
- * cBioPortal is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * @author Hongxin Zhang on 3/10/16.
  */
@@ -55,17 +23,13 @@
     v.data = $.extend(true, v.data, attributes);
     v.data.ndx = ndx;
 
-    v.opts.chartId = iViz.util.escape(v.opts.chartId);
-    v.opts.chartDivId = iViz.util.escape(v.opts.chartDivId);
-    v.opts.chartTableId = iViz.util.escape(v.opts.chartTableId);
-    
-    var labels = [];
+    var labels = {};
     var reactTableData = {};
     reactTableData.attributes = [{
       attr_id: 'name',
       display_name: v.data.display_name,
       datatype: 'STRING',
-      column_width: 213
+      column_width: 235
     }, {
       attr_id: 'color',
       display_name: 'Color',
@@ -121,7 +85,11 @@
       chartDivDom.qtip('destroy', true);
 
       if (currentView === 'table') {
-        updateReactTable();
+        if (qtipRendered) {
+          updateReactTable();
+        } else {
+          updatePieLabels();
+        }
         animateTable('#' + v.opts.chartDivId, 'table', function() {
           vm.$dispatch('update-grid');
           $('#' + v.opts.chartDivId).css('z-index', '');
@@ -141,7 +109,7 @@
         style: {
           classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width iviz-pie-qtip iviz-pie-label-qtip'
         },
-        show: {event: 'mouseover', solo: true, delay: 0, ready: true},
+        show: {event: 'mouseover', delay: 300, ready: true},
         hide: {fixed: true, delay: 300, event: 'mouseleave'},
         // hide: false,
         position: {my: 'left center', at: 'center right', viewport: $(window)},
@@ -190,13 +158,12 @@
         var radius = (width - 20) / 2;
         var color = $.extend(true, [], v.data.color);
 
-
         v.chart = dc.pieChart('#' + v.opts.chartId, v.opts.groupid);
 
         v.data.attrKeys = cluster.group().all().map(function(d) {
           return d.key;
         });
-        
+
         v.data.category = iViz.util.pieChart.getCategory(v.data.attr_id,
           v.data.attrKeys);
 
@@ -261,18 +228,15 @@
     }
 
     function initTsvDownloadData() {
-      var data = v.data.display_name + '\tCount';
+      var data = [v.data.display_name + '\tCount'];
 
-      var meta = labels || [];
+      _.each(labels, function(label, key) {
+        data.push(label.name + '\t' + label.cases);
+      });
 
-      for (var i = 0; i < meta.length; i++) {
-        data += '\r\n';
-        data += meta[i].name + '\t';
-        data += meta[i].cases;
-      }
       content.setDownloadData('tsv', {
         fileName: v.data.display_name || 'Pie Chart',
-        data: data
+        data: data.join('\n')
       });
     }
 
@@ -294,12 +258,15 @@
     }
 
     function animateTable(target, view, callback) {
-      var width = window.style['grid-w-1'] || '180px';
-      var height = window.style['grid-h-1'] || '165px';
+      var width = window.iViz.styles.vars.width.one;
+      var height = window.iViz.styles.vars.height.one;
 
       if (view === 'table') {
-        width = window.style['grid-w-2'] || '375px';
-        height = window.style['grid-h-2'] || '340px';
+        width = window.iViz.styles.vars.width.two;
+        height = window.iViz.styles.vars.height.two;
+        if (Object.keys(labels).length <= 3) {
+          height = window.iViz.styles.vars.height.one;
+        }
       }
 
       $(target).animate({
@@ -331,7 +298,9 @@
 
     function updateReactTable() {
       var data = $.extend(true, {}, reactTableData);
-      initReactTable(v.opts.chartTableId, data);
+      initReactTable(v.opts.chartTableId, data, {
+        tableWidth: window.iViz.styles.vars.specialTables.width
+      });
     }
 
     function updateQtipReactTable() {

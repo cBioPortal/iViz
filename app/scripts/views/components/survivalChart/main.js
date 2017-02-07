@@ -49,8 +49,8 @@
         new iViz.data.SurvivalChartProxy(_unselectedData, _attrId);
 
       // add curves
-      if (_unselectedDataProxy.get().length === 0) {
-        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, '#2986e2');
+      if (_selectedDataProxy.get().length === 0) {
+        this.chartInst_.addCurve(_unselectedDataProxy.get(), 0, '#2986e2');
         this.chartInst_.removePval();
       } else {
         this.chartInst_.addCurve(_selectedDataProxy.get(), 0, 'red');

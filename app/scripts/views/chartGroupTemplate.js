@@ -7,7 +7,7 @@
     template: ' <div is="individual-chart" ' +
     ':clear-chart="clearGroup" :ndx="ndx"   :attributes.sync="attribute"   v-for="attribute in attributes"></div>',
     props: [
-      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup'
+      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup', 'hasfilters'
     ], created: function() {
       // TODO: update this.data
       var _self = this;
@@ -95,10 +95,19 @@
             this.type + '_id').sort();
           // Hacked way to check if filter selected filter cases is same
           // as original case list
-          if (filteredCases.length === this.ndx.size()) {
-            iViz.deleteGroupFilteredCases(this.id);
-          } else {
+
+          var _hasFilter = false;
+          _.every(this.attributes, function(attribute) {
+            if (attribute.filter.length > 0) {
+              _hasFilter = true;
+              return false;
+            }
+            return true;
+          });
+          if (_hasFilter) {
             iViz.setGroupFilteredCases(this.id, this.type, filteredCases);
+          } else {
+            iViz.deleteGroupFilteredCases(this.id);
           }
 
           if (this.invisibleChartFilters.length > 0) {
@@ -130,7 +139,7 @@
         });
         this.invisibleChartFilters = [];
         this.invisibleBridgeDimension.filterAll();
-        if (_selectedCases.length > 0) {
+        if (this.hasfilters) {
           this.invisibleChartFilters = _selectedCases;
           var filtersMap = {};
           _.each(_selectedCases, function(filter) {

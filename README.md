@@ -1,4 +1,7 @@
 # iViz
+<a href="https://codeclimate.com/github/cBioPortal/iViz"><img src="https://codeclimate.com/github/cBioPortal/iViz/badges/gpa.svg" /></a>
+[![API Doc](https://doclets.io/cBioPortal/iViz/master.svg)](https://doclets.io/cBioPortal/iViz/master)
+
 Stand-alone library to analysis cohorts. It's seperated from cBioPortal Study View.
 
 
@@ -6,7 +9,7 @@ Stand-alone library to analysis cohorts. It's seperated from cBioPortal Study Vi
 
 - Run: `npm install`
 - Run: `bower install`
-- Run `grunt` for building and `grunt serve` for preview.
+- Run `grunt build` for building and `grunt serve` for preview.
 
 ## Feature highlights from generator-webapp
 

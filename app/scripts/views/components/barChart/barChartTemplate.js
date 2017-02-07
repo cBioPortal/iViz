@@ -12,10 +12,12 @@
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
+    ':attributes="attributes"' +
     ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
-    '<span class="text-center chart-title-span">{{displayName}}</span>' +
+    '<span class="text-center chart-title-span" ' +
+    'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
     props: [
       'ndx', 'attributes'
@@ -63,8 +65,11 @@
       },
       changeLogScale: function(logScaleChecked) {
         $('#' + this.chartId).find('svg').remove();
+        this.chartInst.filterAll();
+        this.$dispatch('update-filters', true);
         dc.deregisterChart(this.chartInst, this.attributes.group_id);
         this.initChart(logScaleChecked);
+        this.chartInst.render();
       },
       addingChart: function(groupId, val) {
         if (this.attributes.group_id === groupId) {
@@ -104,7 +109,7 @@
               self_.chartInst.select('.brush').on('mouseup', function() {
                 self_.filtersUpdated = true;
                 if (typeof _filter !== 'undefined' && _filter !== null &&
-                  _filter.length > 1) {
+                  _filter.length > 1 && self_.chartInst.hasFilter()) {
                   var tempFilters_ = [];
                   tempFilters_[0] = _filter[0].toFixed(2);
                   tempFilters_[1] = _filter[1].toFixed(2);
@@ -123,8 +128,8 @@
     ready: function() {
       this.barChart = new iViz.view.component.BarChart();
       this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
-      this.settings.width = window.style.vars.barchartWidth || 150;
-      this.settings.height = window.style.vars.barchartHeight || 150;
+      this.settings.width = window.iViz.styles.vars.barchart.width;
+      this.settings.height = window.iViz.styles.vars.barchart.height;
 
       this.opts = _.extend(this.opts, {
         groupType: this.attributes.group_type,

@@ -21,7 +21,9 @@
 
     // init axis
     _self.elem_.xScale = d3.scale.linear()
-      .domain([0, d3.max(_.pluck(_self.data_, 'time'))])
+      .domain([0,
+        d3.max(_.pluck(_self.data_, 'time')) +
+        d3.max(_.pluck(_self.data_, 'time')) / 15])
       .range([leftMargin_, _opts.width - rightMargin_]);
     _self.elem_.yScale = d3.scale.linear()
       .domain([-0.03, 1.05]) // fixed to be 0-1
@@ -195,8 +197,9 @@
                   (_.isUndefined(_time) ? '' :
                     ('Months: <strong>' + _time + '</strong><br>')) +
                   (d.patient_id ?
-                    ('Patient ID: <strong><a href="' + window.cbioURL + '/' +
-                    window.cbio.util.getLinkToPatientView(d.study_id, d.patient_id) +
+                    ('Patient ID: <strong><a href="' + window.cbioURL +
+                    window.cbio.util
+                      .getLinkToPatientView(d.study_id, d.patient_id) +
                     '" target="_blank">' + d.patient_id + '</a></strong><br>') :
                     '') +
                   (d.study_id ?
