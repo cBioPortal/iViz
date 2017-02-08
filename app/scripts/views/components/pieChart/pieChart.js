@@ -233,7 +233,7 @@
       _.each(labels, function(label, key) {
         data.push(label.name + '\t' + label.cases);
       });
-      
+
       content.setDownloadData('tsv', {
         fileName: v.data.display_name || 'Pie Chart',
         data: data.join('\n')
