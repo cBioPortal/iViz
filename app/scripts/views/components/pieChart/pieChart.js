@@ -116,10 +116,7 @@
         content: '<div id="qtip-' + v.opts.chartDivId + '-content-react">Loading....</div>',
         events: {
           show: function() {
-            if (qtipRendered) {
-              qtipRendered = false;
-              updateQtip = false;
-            } else if (updateQtip) {
+            if (updateQtip) {
               updateQtip = false;
               updatePieLabels();
             }
