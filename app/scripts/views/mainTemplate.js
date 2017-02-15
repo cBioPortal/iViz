@@ -165,12 +165,14 @@
                   iViz.util.intersection(_selectedCasesByFilters,
                     _groupFilteredCases);
               }
-            } else {
-              _selectedCasesByFilters = (updateType_ === 'patient') ?
-                self_.completePatientsList : self_.completeSamplesList;
             }
           }
         });
+
+        if (_selectedCasesByFilters.length === 0) {
+          _selectedCasesByFilters = (updateType_ === 'patient') ?
+            self_.completePatientsList : self_.completeSamplesList;
+        }
         self_.hasfilters = _hasFilters;
         if (updateType_ === 'patient') {
           self_.selectedPatientsByFilters = _selectedCasesByFilters.sort();
@@ -207,7 +209,7 @@
           self_.samplesync = _counterCasesSync;
           if (self_.hasfilters) {
             self_.selectedsamples = _resultCounterSelectedCases;
-            self_.selectedpatients = _resultSelectedCases;
+            self_.selectedpatients = _selectedCasesByFilters;
           } else {
             self_.selectedsamples = self_.completeSamplesList;
             self_.selectedpatients = self_.completePatientsList;
@@ -216,7 +218,7 @@
           self_.samplesync = _casesSync;
           self_.patientsync = _counterCasesSync;
           if (self_.hasfilters) {
-            self_.selectedsamples = _resultSelectedCases;
+            self_.selectedsamples = _selectedCasesByFilters;
             self_.selectedpatients = _resultCounterSelectedCases;
           } else {
             self_.selectedsamples = self_.completeSamplesList;

@@ -139,7 +139,7 @@
               self_.checkForDropDownCharts();
               _.every(self_.groups, function(group) {
                 if (group.type === attrData.group_type) {
-                  if (group.attributes.length < 31) {
+                  if (group.attributes.length < 30) {
                     attrData.group_id = group.id;
                     _groupIdToPush = group.id;
                     _attrAdded = true;
