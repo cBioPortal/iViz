@@ -197,9 +197,6 @@
         var _resultCounterSelectedCases =
           iViz.util.intersection(_mappedCounterSelectedCases,
             _counterSelectedCasesByFilters);
-        var _resultSelectedCases =
-          iViz.util.idMapping(iViz.getCasesMap(_counterCaseType),
-            _resultCounterSelectedCases);
         var _casesSync = iViz.util.idMapping(iViz.getCasesMap(_counterCaseType),
           _counterSelectedCasesByFilters);
         var _counterCasesSync = _mappedCounterSelectedCases;
