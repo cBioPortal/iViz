@@ -46,15 +46,37 @@
         this.showLoad = true;
       },
       'update-special-charts': function(hasFilters) {
-        var attrId =
-          this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+        var _type = this.attributes.group_type;
+        var attrId = _type === 'patient' ? 'patient_id' : 'sample_id';
         var _selectedCases = [];
+        var _allCases = Object.keys(iViz.getCaseIndices(_type));
+        var groups = [];
+
         if (hasFilters) {
           _selectedCases =
             _.pluck(this.invisibleDimension.top(Infinity), attrId);
         }
+
+        if (_selectedCases.length === 0) {
+          groups.push({
+            caseIds: _allCases,
+            curveHex: '#2986e2'
+          });
+        } else {
+          groups = [{
+            caseIds: _selectedCases,
+            curveHex: 'red'
+          }, {
+            caseIds: _.difference(
+              _allCases, _selectedCases),
+            curveHex: '#2986e2'
+          }];
+        }
+
+        groups = this.calcCurvesData(groups);
+
         this.chartInst.update(
-          _selectedCases, this.chartId, this.attributes.attr_id);
+          groups, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
       },
       'closeChart': function() {
@@ -79,6 +101,11 @@
             }
           }
         }
+      },
+      'create-rainbow-survival': function(groups) {
+        groups = this.calcCurvesData(groups);
+        this.chartInst.update(
+          groups, this.chartId, this.attributes.attr_id);
       }
     },
     methods: {
@@ -86,6 +113,18 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
+      },
+      calcCurvesData: function(groups) {
+        var groupType = this.attributes.group_type;
+        var data_ = iViz.getGroupNdx(this.attributes.group_id);
+        _.each(groups, function(group) {
+          group.data = [];
+          _.each(group.caseIds, function(id) {
+            var _index = iViz.getCaseIndices(groupType)[id];
+            group.data.push(data_[_index]);
+          });
+        });
+        return groups;
       }
     },
     ready: function() {

@@ -6,57 +6,42 @@
 (function(iViz, _) {
   iViz.view.component.Survival = function() {
     var content_ = this;
-    var data_ = {};
     var opts_ = {};
 
     content_.init = function(_data, _opts) {
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
-      data_ = _data;
       var _dataProxy = new iViz.data.SurvivalChartProxy(_data, opts_.attrId);
       this.chartInst_ =
         new iViz.view.component
           .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
-      this.chartInst_.addCurve(_dataProxy.get(), 0, '#2986e2');
+      this.chartInst_.addCurve(_dataProxy.get(), 0, opts_.curveHex || '#2986e2');
     };
 
     // _attrId here indicates chart type (OS or DFS)
-    content_.update = function(_selectedPatients, _chartId, _attrId) {
+    content_.update = function(groups, _chartId, _attrId) {
       // remove previous curves
-      this.chartInst_.removeCurves();
+      var _chartInst_ = this.chartInst_;
+      _chartInst_.removeCurves();
 
-      // separate selected and unselected data
-      var _selectedData = [];
-      var _unselectedData = [];
-      var _tmpSelectedPatientIdMap = {};
-      _.each(_selectedPatients, function(_patientId) {
-        _tmpSelectedPatientIdMap[_patientId] = '';
+      // Calculate proxy data for each group
+      _.each(groups, function(group) {
+        group.proxyData =
+          new iViz.data.SurvivalChartProxy(group.data, _attrId).get();
       });
-      _.each(Object.keys(iViz.getCaseIndices(opts_.type)),
-        function(_patientId) {
-          var _index = iViz.getCaseIndices(opts_.type)[_patientId];
-          if (_tmpSelectedPatientIdMap.hasOwnProperty(_patientId)) {
-            _selectedData.push(data_[_index]);
-          } else {
-            _unselectedData.push(data_[_index]);
-          }
-        });
 
-      // settings for different curves
-      var _selectedDataProxy =
-        new iViz.data.SurvivalChartProxy(_selectedData, _attrId);
-      var _unselectedDataProxy =
-        new iViz.data.SurvivalChartProxy(_unselectedData, _attrId);
-
-      // add curves
-      if (_selectedDataProxy.get().length === 0) {
-        this.chartInst_.addCurve(_unselectedDataProxy.get(), 0, '#2986e2');
-        this.chartInst_.removePval();
+      if (groups.length === 1) {
+        _chartInst_.addCurve(
+          groups[0].proxyData, 0, groups[0].curveHex || '#2986e2');
       } else {
-        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, 'red');
-        this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, '#2986e2');
-        this.chartInst_.addPval(
-          _selectedDataProxy.get(), _unselectedDataProxy.get());
+        _.each(groups, function(group, index) {
+          _chartInst_.addCurve(group.proxyData, index, group.curveHex);
+        });
+      }
+      if (groups.length === 2) {
+        _chartInst_.addPval(groups[0].proxyData, groups[1].proxyData);
+      } else {
+        _chartInst_.removePval();
       }
     };
 
