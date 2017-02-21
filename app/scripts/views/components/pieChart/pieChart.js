@@ -143,6 +143,51 @@
       updateQtip = false;
     };
 
+    content.getCurrentCategories = function() {
+      var categories = [];
+      _.each(dcGroup_.top(Infinity), function(label) {
+        var _labelDatum = {};
+        var _labelValue = Number(label.value);
+        if (_labelValue > 0) {
+          _labelDatum.id = labelInitData[label.key].id;
+          _labelDatum.index = labelInitData[label.key].index;
+          _labelDatum.name = label.key;
+          _labelDatum.color = labelInitData[label.key].color;
+          _labelDatum.cases = _labelValue;
+          categories.push(_labelDatum);
+        }
+      });
+      return categories;
+    };
+
+    content.getCaseIdsGroupByCurrentCategories = function() {
+      var _cases = dcDimension_.top(Infinity);
+      var _caseIds = {};
+      var groupType = v.data.group_type;
+
+      for (var i = 0; i < _cases.length; i++) {
+        var _key = _cases[i][v.data.attr_id];
+
+        if (!_caseIds.hasOwnProperty(_key)) {
+          _caseIds[_key] = [];
+        }
+        var _groupKey = groupType === 'patient' ? 'patient_id' : 'sample_id';
+        _caseIds[_key].push(_cases[i][_groupKey]);
+      }
+
+      return _caseIds;
+    };
+
+    function getCurrentSampleSizeFromCategories(categories) {
+      var currentSampleSize = 0;
+      for (var key in categories) {
+        if (categories.hasOwnProperty(key)) {
+          currentSampleSize += categories[key].cases;
+        }
+      }
+      return currentSampleSize;
+    }
+
     /**
      * This is the function to initialize dc pie chart instance.
      */
@@ -311,21 +356,8 @@
     }
 
     function updateCurrentLabels() {
-      var _labels = {};
-      var _currentSampleSize = 0;
-      _.each(dcGroup_.top(Infinity), function(label) {
-        var _labelDatum = {};
-        var _labelValue = Number(label.value);
-        if (_labelValue > 0) {
-          _labelDatum.id = labelInitData[label.key].id;
-          _labelDatum.index = labelInitData[label.key].index;
-          _labelDatum.name = label.key;
-          _labelDatum.color = labelInitData[label.key].color;
-          _labelDatum.cases = _labelValue;
-          _currentSampleSize += _labelValue;
-          _labels[_labelDatum.id] = _labelDatum;
-        }
-      });
+      var _labels = content.getCurrentCategories();
+      var _currentSampleSize = getCurrentSampleSizeFromCategories(_labels);
 
       _.each(_labels, function(label) {
         label.sampleRate = (_currentSampleSize <= 0 ? 0 : (Number(label.cases) * 100 / _currentSampleSize).toFixed(1).toString()) + '%';

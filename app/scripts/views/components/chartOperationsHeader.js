@@ -28,7 +28,7 @@
     '<i v-if="showPieIcon" class="fa fa-pie-chart icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
     '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" ' +
-    'class="icon hover"/>' +
+    'class="icon hover" @click="getRainbowSurvival" />' +
     '<div id="{{chartId}}-download-icon-wrapper" class="download">' +
     '<i class="fa fa-download icon hover" alt="download" ' +
     'id="{{chartId}}-download"></i>' +
@@ -85,6 +85,9 @@
         this.showTableIcon = !this.showTableIcon;
         this.showPieIcon = !this.showPieIcon;
         this.$dispatch('toTableView');
+      },
+      getRainbowSurvival: function() {
+        this.$dispatch('getRainbowSurvival');
       },
       hasTitleTooltip: function() {
         return _.isObject(this.attributes) ?

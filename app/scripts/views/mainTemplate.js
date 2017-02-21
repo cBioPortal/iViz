@@ -244,6 +244,9 @@
 
         this.selectedsamples = this.samplesync;
         this.selectedpatients = this.patientsync;
+      },
+      'create-rainbow-survival': function(opts) {
+        this.$broadcast('create-rainbow-survival', opts);
       }
     }
   });

@@ -75,6 +75,9 @@
 
         groups = this.calcCurvesData(groups);
 
+        // Display name may be changed due to the rainbow survival
+        this.displayName = this.attributes.display_name;
+
         this.chartInst.update(
           groups, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
@@ -102,10 +105,15 @@
           }
         }
       },
-      'create-rainbow-survival': function(groups) {
-        groups = this.calcCurvesData(groups);
+      'create-rainbow-survival': function(opts) {
+        opts.groups = this.calcCurvesData(
+          opts.groups, opts.groupType);
+
+        if (opts.subtitle) {
+          this.displayName = this.attributes.display_name + opts.subtitle;
+        }
         this.chartInst.update(
-          groups, this.chartId, this.attributes.attr_id);
+          opts.groups, this.chartId, this.attributes.attr_id);
       }
     },
     methods: {
@@ -114,13 +122,19 @@
       }, mouseLeave: function() {
         this.showOperations = false;
       },
-      calcCurvesData: function(groups) {
-        var groupType = this.attributes.group_type;
+      calcCurvesData: function(groups, groupType) {
         var data_ = iViz.getGroupNdx(this.attributes.group_id);
+        var survivalType = this.attributes.group_type;
         _.each(groups, function(group) {
           group.data = [];
+
+          // If group type is sample, need to convert sample ID to patient ID.
+          if (groupType === 'sample') {
+            group.caseIds = iViz.util.idMapping(iViz.getCasesMap('sample'),
+              group.caseIds);
+          }
           _.each(group.caseIds, function(id) {
-            var _index = iViz.getCaseIndices(groupType)[id];
+            var _index = iViz.getCaseIndices(survivalType)[id];
             group.data.push(data_[_index]);
           });
         });

@@ -12,6 +12,7 @@
     ':display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
     ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" ' +
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
+    ':show-survival-icon.sync="showSurvivalIcon"' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" ' +
     ' :filters.sync="attributes.filter" ' +
     ':attributes="attributes"></chart-operations>' +
@@ -42,7 +43,8 @@
         showTableIcon: true,
         showPieIcon: false,
         filtersUpdated: false,
-        addingChart: false
+        addingChart: false,
+        showSurvivalIcon: true
       };
     },
     watch: {
@@ -82,6 +84,26 @@
             }
           }
         }
+      },
+      getRainbowSurvival: function() {
+        var groups = [];
+        var categories = this.piechart.getCurrentCategories();
+        var dataForCategories = this.piechart.getCaseIdsGroupByCurrentCategories();
+        _.each(categories, function(category) {
+          if (dataForCategories.hasOwnProperty(category.name) &&
+              // Remove pie chart NA group by default
+            category.name !== 'NA') {
+            groups.push({
+              caseIds: dataForCategories[category.name],
+              curveHex: category.color
+            });
+          }
+        });
+        this.$dispatch('create-rainbow-survival', {
+          subtitle: ' (' + this.attributes.display_name + ')',
+          groups: groups,
+          groupType: this.attributes.group_type
+        });
       }
     },
     methods: {
