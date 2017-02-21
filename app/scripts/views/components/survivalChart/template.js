@@ -81,6 +81,7 @@
         this.chartInst.update(
           groups, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
+        this.$dispatch('remove-rainbow-survival');
       },
       'closeChart': function() {
         this.invisibleDimension.dispose();

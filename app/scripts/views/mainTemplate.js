@@ -247,6 +247,10 @@
       },
       'create-rainbow-survival': function(opts) {
         this.$broadcast('create-rainbow-survival', opts);
+        this.$broadcast('resetBarColor', [opts.attrId]);
+      },
+      'remove-rainbow-survival': function() {
+        this.$broadcast('resetBarColor', []);
       }
     }
   });

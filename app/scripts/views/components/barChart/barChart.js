@@ -9,18 +9,17 @@
     var data_ = {};// Chart related data. Such as attr_id.
     var colors_;
     var ndx_;
-    var hasEmptyValue_ = false;
+    var dcDimension;
+    var mapTickToCaseIds = {}; // Save the related caseIds under tick value.
 
     var initDc_ = function(logScale) {
       var tickVal = [];
-      var barColor = {};
       var i = 0;
 
-      var cluster = ndx_.dimension(function(d) {
+      dcDimension = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
         if (typeof val === 'undefined' || val === 'NA' || val === '' ||
           val === 'NaN') {
-          hasEmptyValue_ = true;
           val = opts_.xDomain[opts_.xDomain.length - 1];
         } else if (logScale) {
           for (i = 1; i < opts_.xDomain.length; i++) {
@@ -46,6 +45,11 @@
           tickVal.push(Number(val));
         }
 
+        if (!mapTickToCaseIds.hasOwnProperty(val)) {
+          mapTickToCaseIds[val] = [];
+        }
+        mapTickToCaseIds[val].push(
+          data_.groupType === 'patient' ? d.patient_id : d.sample_id);
         return val;
       });
 
@@ -53,24 +57,12 @@
         return a < b ? -1 : 1;
       });
 
-      var tickL = tickVal.length - 1;
-
-      for (i = 0; i < tickL; i++) {
-        barColor[tickVal[i]] = colors_[i];
-      }
-
-      if (hasEmptyValue_) {
-        barColor.NA = '#CCCCCC';
-      } else {
-        barColor[tickVal[tickL]] = colors_[tickL];
-      }
-
       chartInst_
         .width(opts_.width)
         .height(opts_.height)
         .margins({top: 10, right: 20, bottom: 30, left: 40})
-        .dimension(cluster)
-        .group(cluster.group())
+        .dimension(dcDimension)
+        .group(dcDimension.group())
         .centerBar(true)
         .elasticY(true)
         .elasticX(false)
@@ -217,7 +209,6 @@
         max: data_.max
       }, opts.logScaleChecked));
       ndx_ = ndx;
-      hasEmptyValue_ = false;
 
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
@@ -245,6 +236,64 @@
       }
     };
     // return content;
+
+    /**
+     * @return {Array} the list of current bar categories.
+     */
+    content.getCurrentCategories = function() {
+      var groups = dcDimension.group().top(Infinity);
+      var groupTypeId =
+        data_.groupType === 'patient' ? 'patient_id' : 'sample_id';
+      var selectedCases = _.pluck(dcDimension.top(Infinity), groupTypeId);
+      var categories = [];
+      var colorCounter = 0;
+      _.each(groups, function(group) {
+        if (group.value > 0 && mapTickToCaseIds.hasOwnProperty(group.key)) {
+          var color;
+          if (group.key === 'NA') {
+            color = '#ccc';
+          } else {
+            color = colors_[colorCounter];
+            colorCounter++;
+          }
+          categories.push({
+            name: group.key,
+            color: color,
+            caseIds: _.intersection(selectedCases, mapTickToCaseIds[group.key])
+          });
+        }
+      });
+      return categories;
+    };
+
+    /**
+     * Color bar based on categories info.
+     * @param {Array} categories The current bar categories, can be calculated by
+     * using getCurrentCategories method.
+     */
+    content.colorBars = function(categories) {
+      if (!_.isArray(categories)) {
+        categories = this.getCurrentCategories();
+      }
+      chartInst_.selectAll('g rect').style('fill', function(d) {
+        var color = 'grey';
+        for (var i = 0; i < categories.length; i++) {
+          var category = categories[i];
+          if (_.isObject(d.data) && category.name === d.data.key) {
+            color = category.color;
+            break;
+          }
+        }
+        return color;
+      });
+    };
+
+    /**
+     * Reset bar color by removing fill attribute.
+     */
+    content.resetBarColor = function() {
+      chartInst_.selectAll('g rect').style('fill', '');
+    };
   };
 
   iViz.view.component.BarChart.prototype =

@@ -100,6 +100,7 @@
           }
         });
         this.$dispatch('create-rainbow-survival', {
+          attrId: this.attributes.attr_id,
           subtitle: ' (' + this.attributes.display_name + ')',
           groups: groups,
           groupType: this.attributes.group_type
