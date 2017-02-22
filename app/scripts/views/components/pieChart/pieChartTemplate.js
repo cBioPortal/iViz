@@ -87,13 +87,14 @@
       },
       getRainbowSurvival: function() {
         var groups = [];
-        var categories = this.piechart.getCurrentCategories();
+        var categories = this.piechart.getCurrentCategories('key');
         var dataForCategories = this.piechart.getCaseIdsGroupByCurrentCategories();
         _.each(categories, function(category) {
           if (dataForCategories.hasOwnProperty(category.name) &&
-              // Remove pie chart NA group by default
+            // Remove pie chart NA group by default
             category.name !== 'NA') {
             groups.push({
+              name: category.name,
               caseIds: dataForCategories[category.name],
               curveHex: category.color
             });
@@ -169,6 +170,11 @@
           _self.piechart.filtered();
         }
       });
+
+      // Disable rainbow survival if only one group present
+      if (_self.piechart.getCurrentCategories().length < 2) {
+        this.showSurvivalIcon = false;
+      }
       _self.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

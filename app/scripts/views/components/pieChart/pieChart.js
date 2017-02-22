@@ -143,9 +143,11 @@
       updateQtip = false;
     };
 
-    content.getCurrentCategories = function() {
+    content.getCurrentCategories = function(sortBy) {
       var categories = [];
-      _.each(dcGroup_.top(Infinity), function(label) {
+
+      sortBy = sortBy || 'value';
+      _.each(_.sortBy(dcGroup_.top(Infinity), sortBy), function(label) {
         var _labelDatum = {};
         var _labelValue = Number(label.value);
         if (_labelValue > 0) {

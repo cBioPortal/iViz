@@ -7,6 +7,7 @@
   iViz.view.component.Survival = function() {
     var content_ = this;
     var opts_ = {};
+    var groups_ = [];
 
     content_.init = function(_data, _opts) {
       opts_ = $.extend(true, {}, _opts);
@@ -16,6 +17,10 @@
         new iViz.view.component
           .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
       this.chartInst_.addCurve(_dataProxy.get(), 0, opts_.curveHex || '#2986e2');
+      groups_ = [{
+        name: 'All Cases',
+        curveHex: opts_.curveHex || '#2986e2'
+      }];
     };
 
     // _attrId here indicates chart type (OS or DFS)
@@ -43,12 +48,17 @@
       } else {
         _chartInst_.removePval();
       }
+      groups_ = groups;
     };
 
     content_.updateDataForDownload = function(fileType) {
       if (['pdf', 'svg'].indexOf(fileType) !== -1) {
         initCanvasDownloadData();
       }
+    };
+
+    content_.getGroups = function() {
+      return groups_;
     };
 
     function initCanvasDownloadData() {

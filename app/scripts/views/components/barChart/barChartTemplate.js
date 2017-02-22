@@ -89,7 +89,7 @@
       },
       getRainbowSurvival: function() {
         var groups = [];
-        var categories = this.barChart.getCurrentCategories();
+        var categories = this.barChart.getCurrentCategories('key');
         _.each(categories, function(category) {
           if (category.name !== 'NA') {
             groups.push({
@@ -99,7 +99,7 @@
             });
           }
         });
-        this.barChart.colorBars();
+        this.barChart.colorBars(categories);
         this.$dispatch('create-rainbow-survival', {
           attrId: this.attributes.attr_id,
           subtitle: ' (' + this.attributes.display_name + ')',
@@ -185,6 +185,12 @@
         this.settings.showLogScale = true;
       }
       this.initChart(this.settings.showLogScale);
+
+      // Disable rainbow survival if only one group present
+      if (this.barChart.getCurrentCategories().length < 2) {
+        this.showSurvivalIcon = false;
+      }
+
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

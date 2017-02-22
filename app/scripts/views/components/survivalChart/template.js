@@ -38,7 +38,8 @@
         fromFilter: false,
         hasChartTitle: true,
         showLoad: true,
-        invisibleDimension: {}
+        invisibleDimension: {},
+        mainDivQtip: ''
       };
     },
     events: {
@@ -81,6 +82,7 @@
         this.chartInst.update(
           groups, this.chartId, this.attributes.attr_id);
         this.showLoad = false;
+        this.updateQtipContent();
         this.$dispatch('remove-rainbow-survival');
       },
       'closeChart': function() {
@@ -115,11 +117,30 @@
         }
         this.chartInst.update(
           opts.groups, this.chartId, this.attributes.attr_id);
+
+        this.updateQtipContent();
       }
     },
     methods: {
+      updateQtipContent: function() {
+        if (this.mainDivQtip) {
+          var qtipContent = ['<div>'];
+          var groups = this.chartInst.getGroups();
+          _.each(groups, function(group) {
+            qtipContent.push(
+              '<div class="category-item">' +
+              '<svg width="12" height="12">' +
+              '<rect height="12" width="12" fill="' +
+              group.curveHex + '"></rect>' +
+              '</svg><span>' + group.name + '</span></div>');
+          });
+          qtipContent.push('</div>');
+          this.mainDivQtip.qtip('api').set('content.text', qtipContent.join(''));
+        }
+      },
       mouseEnter: function() {
         this.showOperations = true;
+        this.$emit('initMainDivQtip');
       }, mouseLeave: function() {
         this.showOperations = false;
       },
@@ -140,6 +161,26 @@
           });
         });
         return groups;
+      },
+      initMainDivQtip: function() {
+        var self_ = this;
+        var chartDivId = self_.chartDivId;
+        self_.mainDivQtip = $('#' + chartDivId).qtip({
+          id: chartDivId + '-qtip',
+          style: {
+            classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width dc-survival-chart-qtip'
+          },
+          show: {event: 'mouseover', delay: 300, ready: true},
+          hide: {fixed: true, delay: 300, event: 'mouseleave'},
+          // hide: false,
+          position: {
+            my: 'left center',
+            at: 'center right',
+            viewport: $(window)
+          },
+          content: '<div>Loading...</div>'
+        });
+        self_.updateQtipContent();
       }
     },
     ready: function() {
@@ -164,6 +205,8 @@
       var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst.init(data, _opts);
       _self.showLoad = false;
+
+      _self.$once('initMainDivQtip', _self.initMainDivQtip);
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

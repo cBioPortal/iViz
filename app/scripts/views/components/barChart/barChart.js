@@ -18,6 +18,8 @@
 
       dcDimension = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
+        var _min;
+        var _max;
         if (typeof val === 'undefined' || val === 'NA' || val === '' ||
           val === 'NaN') {
           val = opts_.xDomain[opts_.xDomain.length - 1];
@@ -26,6 +28,8 @@
             if (d[data_.attrId] < opts_.xDomain[i] &&
               d[data_.attrId] >= opts_.xDomain[i - 1]) {
               val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
+              _min = opts_.xDomain[i - 1];
+              _max = opts_.xDomain[i];
               break;
             }
           }
@@ -34,11 +38,13 @@
         } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
           val = opts_.xDomain[opts_.xDomain.length - 2];
         } else {
-          // minus half of seperateDistance to make the margin values
+          // minus half of separateDistance to make the margin values
           // always map to the left side. Thus for any value x, it is in the
           // range of (a, b] which means a < x <= b
           val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
             opts_.gutter + opts_.startPoint - opts_.gutter / 2;
+          _min = val - opts_.gutter / 2;
+          _max = val + opts_.gutter / 2;
         }
 
         if (tickVal.indexOf(val) === -1) {
@@ -46,9 +52,15 @@
         }
 
         if (!mapTickToCaseIds.hasOwnProperty(val)) {
-          mapTickToCaseIds[val] = [];
+          mapTickToCaseIds[val] = {
+            caseIds: [],
+            tick: getTickFormat(val, logScale)
+          };
+          if (!_.isUndefined(_min) && !_.isUndefined(_max)) {
+            mapTickToCaseIds[val].range = _min + '< ~ <=' + _max;
+          }
         }
-        mapTickToCaseIds[val].push(
+        mapTickToCaseIds[val].caseIds.push(
           data_.groupType === 'patient' ? d.patient_id : d.sample_id);
         return val;
       });
@@ -238,28 +250,35 @@
     // return content;
 
     /**
+     * sortBy {String} sort category by 'key' (key, value are supported)
      * @return {Array} the list of current bar categories.
      */
-    content.getCurrentCategories = function() {
+    content.getCurrentCategories = function(sortBy) {
       var groups = dcDimension.group().top(Infinity);
       var groupTypeId =
         data_.groupType === 'patient' ? 'patient_id' : 'sample_id';
       var selectedCases = _.pluck(dcDimension.top(Infinity), groupTypeId);
       var categories = [];
       var colorCounter = 0;
+
+      sortBy = sortBy || 'value';
+
+      groups = _.sortBy(groups, sortBy);
       _.each(groups, function(group) {
         if (group.value > 0 && mapTickToCaseIds.hasOwnProperty(group.key)) {
           var color;
-          if (group.key === 'NA') {
+          var name = mapTickToCaseIds[group.key].range || mapTickToCaseIds[group.key].tick;
+          if (name === 'NA') {
             color = '#ccc';
           } else {
             color = colors_[colorCounter];
             colorCounter++;
           }
           categories.push({
-            name: group.key,
+            key: group.key,
+            name: mapTickToCaseIds[group.key].range || mapTickToCaseIds[group.key].tick,
             color: color,
-            caseIds: _.intersection(selectedCases, mapTickToCaseIds[group.key])
+            caseIds: _.intersection(selectedCases, mapTickToCaseIds[group.key].caseIds)
           });
         }
       });
@@ -279,7 +298,7 @@
         var color = 'grey';
         for (var i = 0; i < categories.length; i++) {
           var category = categories[i];
-          if (_.isObject(d.data) && category.name === d.data.key) {
+          if (_.isObject(d.data) && category.key === d.data.key) {
             color = category.color;
             break;
           }
