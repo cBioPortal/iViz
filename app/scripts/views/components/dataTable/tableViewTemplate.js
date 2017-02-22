@@ -109,14 +109,14 @@
       },
       submitClick: function(_selectedRowData) {
         var selectedSamplesUnion = [];
-        var selectedRowsUids = _.pluck(_selectedRowData, 'uniqueId');
+        var selectedRowsUids = _.pluck(_selectedRowData, 'uniqueid');
 
         this.madeSelection = true;
 
         if (this.isMutatedGeneCna) {
           this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
           _.each(_selectedRowData, function(item) {
-            var casesIds = item.caseIds.split(',');
+            var casesIds = item.caseids.split(',');
             selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
           });
           if (this.attributes.filter.length === 0) {

@@ -468,15 +468,22 @@
         rowClickFunc: pieLabelClick
       }, opts);
 
+      // Check whether the react table has been initialized
+      if (v.renderedReactTable) {
+        // Get sort settings from the initialized react table
+        var sort_ = v.renderedReactTable.getCurrentSort();
+        opts_ = $.extend(opts_, sort_);
+      }
+
       var testElement = React.createElement(EnhancedFixedDataTableSpecial, opts_);
 
-      ReactDOM.render(testElement, document.getElementById(targetId));
+      v.renderedReactTable = ReactDOM.render(testElement, document.getElementById(targetId));
     }
 
     function pieLabelClick(selectedData) {
       v.chart.onClick({
-        key: labels[selectedData.id].name,
-        value: labels[selectedData.id].value
+        key: labels[selectedData.uniqueid].name,
+        value: labels[selectedData.uniqueid].value
       });
     }
   };
