@@ -26,5 +26,5 @@ Stand-alone library to analysis cohorts. It's seperated from cBioPortal Study Vi
 For more information, please see https://github.com/yeoman/generator-webapp
 
 ### Branches
-master => rc branch in cbio
-cbio-iviz-master => iviz branch in cbio
+- master => rc branch in cbio
+- cbio-iviz-master => iviz branch in cbio
