@@ -29,9 +29,9 @@
             charts: {},
             groupCount: 0,
             updateSpecialCharts: false,
-            showSaveButton: true,
-            showManageButton: true,
-            userid: 'DEFAULT',
+            showSaveButton: false,
+            showManageButton: false,
+            loadUserSpecificCohorts: false,
             stats: '',
             updateStats: false,
             clearAll: false,
@@ -53,8 +53,11 @@
                 self_.$broadcast('update-special-charts', self_.hasfilters);
               }, 500);
             },
-            updateStats: function() {
-              this.stats = iViz.stat();
+            updateStats: function(newVal) {
+              if (newVal) {
+                this.stats = iViz.stat();
+                this.updateStats = false;
+              }
             },
             redrawgroups: function(newVal) {
               if (newVal.length > 0) {
@@ -252,7 +255,7 @@
                   ' case(s) selected.', {message_type: 'info'});
               }
 
-              $('#iviz-header-right-1').qtip('toggle');
+              $('#custom-case-input-button').qtip('toggle');
               if (selectedCaseIds.length > 0) {
                 this.clearAllCharts(false);
                 var self_ = this;

@@ -7,6 +7,7 @@
   <!-- build:js(.) scripts/iviz-vendor-cbio.js -->
   <script src="/bower_components/jquery/jquery.min.js"></script>
   <script src="/bower_components/jquery-ui/ui/jquery-ui.js"></script>
+  <script src="/bower_components/vue/dist/vue.js"></script>
   <!-- endbuild -->
 
   <!-- build:js(.) scripts/iviz-vendor.js -->
@@ -35,7 +36,6 @@
   <script src="/bower_components/imagesloaded/imagesloaded.js"></script>
   <script src="/bower_components/qtip2/jquery.qtip.js"></script>
   <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
-  <script src="/bower_components/vue/dist/vue.js"></script>
   <script src="/bower_components/clipboard/dist/clipboard.js"></script>
   <script src="/bower_components/plotly.js/dist/plotly.min.js"></script>
   <script src="/bower_components/react/react.js"></script>
@@ -117,8 +117,9 @@
       <div id="iviz-header-left">
         <div class="iviz-cohort-component" style="float: left; margin-right: 10px;">
           <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
-                             :selected-patients-num="selectedPatientsNum" :selected-samples-num="selectedSamplesNum"
-                             :userid="userid" :stats="stats" :update-stats.sync="updateStats"></session-component>
+                             :load-user-specific-cohorts="loadUserSpecificCohorts" :stats="stats"
+                             :update-stats.sync="updateStats"
+                             :show-share-button="false"></session-component>
         </div>
 
         <div class="iviz-header-left-case">
@@ -200,9 +201,15 @@
     //Include style variables
     iViz.vue.manage.init();
 
-    // This is used to indicate how to disable two buttons. By default, they are set to true.
+    vcSession.URL =
+            'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
+
+    // This is used to indicate how to disable two buttons. By default, they are set to false.
     iViz.vue.manage.getInstance().showManageButton = true;
     iViz.vue.manage.getInstance().showSaveButton = true;
+
+    //Set this to true if want to load user specific cohorts(this is for cbioportal)
+    iViz.vue.manage.getInstance().loadUserSpecificCohorts = false;
 
     window.cbioURL = 'http://www.cbioportal.org/';
     window.cbioResourceURL = 'resources/';
