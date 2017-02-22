@@ -18,7 +18,7 @@
           .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
       this.chartInst_.addCurve(_dataProxy.get(), 0, opts_.curveHex || '#2986e2');
       groups_ = [{
-        name: 'All Cases',
+        name: 'All Patients',
         curveHex: opts_.curveHex || '#2986e2'
       }];
     };
