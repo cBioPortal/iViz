@@ -10,8 +10,8 @@
     ' :name.sync="data.studyName" :edit="edit" type="text"/></td><td' +
     ' class="text center" ><editable-field :name.sync="data.description"' +
     ' :edit="edit" type="textarea"/></td><td class="text center"' +
-    ' ><span>{{data.patientsLength}}</span></td><td class="text center"' +
-    ' ><span>{{data.samplesLength}}</span></td><td><div class="buttons"' +
+    ' ><span>{{selectedSamplesNum}}</span></td><td class="text center"' +
+    ' ><span>{{selectedPatientsNum}}</span></td><td><div class="buttons"' +
     ' :class="{view: !edit}"><button class="btn btn-info"' +
     ' @click="clickSave(data)"><em class="fa' +
     ' fa-save"></em></button><button class="btn btn-default"' +
@@ -29,13 +29,24 @@
     ' @click="clickEdit(data)"><em class="fa' +
     ' fa-pencil"></em></button><button class="btn btn-danger"' +
     ' @click="clickDelete(data)"><em class="fa' +
-    ' fa-trash"></em></button><button class="btn btn-success"' +
+    ' fa-trash"></em></button><button v-show="showShareButton" class="btn btn-success"' +
     ' @click="clickShare(data)"><em class="fa' +
     ' fa-share-alt"></em></button><button class="btn btn-default"' +
     ' @click="clickImport(data)">Visualize</button></div></td></tr>',
     props: [
-      'data', 'showmodal'
+      'data', 'showmodal', 'showShareButton'
     ], created: function() {
+      var _selectedSamplesNum = 0;
+      var _selectedPatientsNum = 0;
+      console.log(this.data);
+      if (_.isObject(this.data.selectedCases)) {
+        _.each(this.data.selectedCases, function(studyCasesMap) {
+          _selectedSamplesNum += studyCasesMap.samples.length;
+          _selectedPatientsNum += studyCasesMap.patients.length;
+        });
+        this.selectedSamplesNum = _selectedSamplesNum;
+        this.selectedPatientsNum = _selectedPatientsNum;
+      }
       this.edit = false;
       this.share = false;
       this.shortenedLink = '---';
@@ -44,7 +55,9 @@
       return {
         edit: false,
         share: false,
-        shortenedLink: '---'
+        shortenedLink: '---',
+        selectedSamplesNum: 0,
+        selectedPatientsNum: 0
       };
     },
     methods: {
@@ -79,6 +92,13 @@
       },
       clickImport: function(_virtualStudy) {
         this.showmodal = false;
+        // TODO: from my test cases, I have some visual cohorts stored in my
+        // localstorage without virtualCohortID. Should we hide Visualize AND share
+        // buttons if the id is not available or virtual study will always have
+        // a virtualCohortID? What if the session service is not available?
+        // This back to my previous question, if the virtual cohort is not
+        // available in database and API returnS 404, should we insert to
+        // databAse, or delete from localstorage?
         window.open(window.cbioURL + 'study?cohorts=' + _virtualStudy.virtualCohortID);
       },
       clickShare: function(_virtualStudy) {

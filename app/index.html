@@ -46,10 +46,10 @@
 <div id="cohort-component">
   <session-component :show-save-button="showSaveButton"
                      :show-manage-button="showManageButton"
-                     :selected-patients-num="selectedPatientsNum"
-                     :selected-samples-num="selectedSamplesNum"
-                     :userid="userid" :stats="stats"
-                     :update-stats.sync="updateStats"></session-component>
+                     :load-user-specific-cohorts="loadUserSpecificCohorts"
+                     :stats="stats"
+                     :update-stats.sync="updateStats"
+                     :show-share-button="showShareButton"></session-component>
 </div>
 
 
@@ -57,14 +57,12 @@
 </body>
 <script>
   $(document).ready(function () {
-    vcSession.URL = "http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/";
+    vcSession.URL = "http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort";
     window.cbioURL = 'http://localhost:8080/cbioportal/';
     var obj_ = vcSessionsManagement.getInstance();
 
     $.getJSON('/data/sample.json', function(_data) {
       obj_.stats = _data;
-      obj_.selectedSamplesNum=_data.samplesLength;
-      obj_.selectedPatientsNum=_data.patientsLength;
     });
 
   });

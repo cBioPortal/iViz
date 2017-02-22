@@ -1,4 +1,6 @@
 'use strict';
+// Move vcSession initialization to here since the sessionEvent.js
+// is the first one to be called in the dependency list.
 window.vcSession = window.vcSession ? window.vcSession : {};
 
 (function(vcSession, _) {
@@ -7,11 +9,8 @@ window.vcSession = window.vcSession ? window.vcSession : {};
   }
   vcSession.events = (function() {
     return {
-      saveCohort: function(stats, selectedPatientsNum, selectedSamplesNum,
-                           userID, name, description) {
-        var _virtualCohort = vcSession.utils.buildVCObject(stats.filters,
-          selectedPatientsNum, selectedSamplesNum, stats.selected_cases,
-          userID,
+      saveCohort: function(stats, name, description) {
+        var _virtualCohort = vcSession.utils.buildVCObject(stats.filters, stats.selectedCases,
           name, description);
         vcSession.model.saveSession(_virtualCohort);
       },
@@ -41,13 +40,14 @@ window.vcSession = window.vcSession ? window.vcSession : {};
             var _selectedCases = vcSession.utils.buildCaseListObject(
               _studyMatch.selectedCases, cancerStudyID, sampleID);
             _studyMatch.selectedCases = _selectedCases;
-            _studyMatch.samplesLength += 1;
+            // TODO: this is the question I have for a while, should we have
+            // individual length property? I understand it's convenient
+            // but also easy to get out of sync with the samples array.
             _returnString = 'success';
           } else if (_.contains(_match.samples, sampleID)) {
             _returnString = 'warn';
           } else {
             _match.samples.push(sampleID);
-            _studyMatch.samplesLength += 1;
             _returnString = 'success';
           }
           this.editVirtualCohort(_studyMatch);

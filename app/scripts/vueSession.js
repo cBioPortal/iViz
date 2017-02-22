@@ -7,14 +7,13 @@ var vcSessionsManagement = (function(Vue) {
       vmInstance_ = new Vue({
         el: '#cohort-component',
         data: {
-          selectedPatientsNum: 0,
-          selectedSamplesNum: 0,
-          userid: 'DEFAULT',
+          loadUserSpecificCohorts: false,
           showSaveButton: true,
           showManageButton: true,
           cohortData: {},
           stats: {},
-          updateStats: false
+          updateStats: false,
+          showShareButton: true
         },
         watch: {
           updateStats: function(newVal) {
@@ -25,9 +24,7 @@ var vcSessionsManagement = (function(Vue) {
                 dataType: 'json',
                 async: false,
                 success: function(_data) {
-                  self_.stats = {};
-                  self_.selectedSamplesNum = _data.samplesLength;
-                  self_.selectedPatientsNum = _data.patientsLength;
+                  self_.stats = _data;
                   self_.updateStats = false;
                 }
               });
