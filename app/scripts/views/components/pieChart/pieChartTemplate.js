@@ -88,7 +88,11 @@
       getRainbowSurvival: function() {
         var groups = [];
         var categories = this.piechart.getCurrentCategories('key');
-        var dataForCategories = this.piechart.getCaseIdsGroupByCurrentCategories();
+        var dataForCategories = iViz.util.getCaseIdsGroupByCategories(
+          this.attributes.group_type,
+          this.chartInst.dimension(),
+          this.attributes.attr_id
+        );
         _.each(categories, function(category) {
           if (dataForCategories.hasOwnProperty(category.name) &&
             // Remove pie chart NA group by default
@@ -172,7 +176,7 @@
       });
 
       // Disable rainbow survival if only one group present
-      if (_self.piechart.getCurrentCategories().length < 2) {
+      if (_self.piechart.getCurrentCategories().length < 2 || _self.piechart.getCurrentCategories().length > 20) {
         this.showSurvivalIcon = false;
       }
       _self.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);

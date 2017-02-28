@@ -162,24 +162,6 @@
       return categories;
     };
 
-    content.getCaseIdsGroupByCurrentCategories = function() {
-      var _cases = dcDimension_.top(Infinity);
-      var _caseIds = {};
-      var groupType = v.data.group_type;
-
-      for (var i = 0; i < _cases.length; i++) {
-        var _key = _cases[i][v.data.attr_id];
-
-        if (!_caseIds.hasOwnProperty(_key)) {
-          _caseIds[_key] = [];
-        }
-        var _groupKey = groupType === 'patient' ? 'patient_id' : 'sample_id';
-        _caseIds[_key].push(_cases[i][_groupKey]);
-      }
-
-      return _caseIds;
-    };
-
     function getCurrentSampleSizeFromCategories(categories) {
       var currentSampleSize = 0;
       for (var key in categories) {
@@ -361,10 +343,11 @@
       var _labels = content.getCurrentCategories();
       var _currentSampleSize = getCurrentSampleSizeFromCategories(_labels);
 
+      labels = {};
       _.each(_labels, function(label) {
         label.sampleRate = (_currentSampleSize <= 0 ? 0 : (Number(label.cases) * 100 / _currentSampleSize).toFixed(1).toString()) + '%';
+        labels[label.id] = label;
       });
-      labels = _labels;
     }
 
     function initReactData() {

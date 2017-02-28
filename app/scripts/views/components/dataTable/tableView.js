@@ -157,6 +157,10 @@
       }
     };
 
+    content.getCurrentCategories = function() {
+      return _.values(categories_);
+    };
+
     function initReactTable(_reloadData, _selectedMap, _selectedSampleIds) {
       if (_reloadData) {
         reactTableData = initReactData(_selectedMap, _selectedSampleIds);
