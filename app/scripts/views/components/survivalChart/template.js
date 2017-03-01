@@ -60,17 +60,23 @@
 
         if (_selectedCases.length === 0) {
           groups.push({
+            id: 0,
             caseIds: _allCases,
-            curveHex: '#2986e2'
+            curveHex: '#2986e2',
+            name: 'All Patients'
           });
         } else {
           groups = [{
+            id: 0,
             caseIds: _selectedCases,
-            curveHex: 'red'
+            curveHex: 'red',
+            name: 'Selected Patients'
           }, {
+            id: 1,
             caseIds: _.difference(
               _allCases, _selectedCases),
-            curveHex: '#2986e2'
+            curveHex: '#2986e2',
+            name: 'Unselected Patients'
           }];
         }
 
@@ -109,14 +115,15 @@
         }
       },
       'create-rainbow-survival': function(opts) {
-        opts.groups = this.calcCurvesData(
-          opts.groups, opts.groupType);
+        var _opts = $.extend(true, {}, opts);
+        _opts.groups = this.calcCurvesData(
+          _opts.groups, _opts.groupType);
 
-        if (opts.subtitle) {
-          this.displayName = this.attributes.display_name + opts.subtitle;
+        if (_opts.subtitle) {
+          this.displayName = this.attributes.display_name + _opts.subtitle;
         }
         this.chartInst.update(
-          opts.groups, this.chartId, this.attributes.attr_id);
+          _opts.groups, this.chartId, this.attributes.attr_id);
 
         this.updateQtipContent();
       }
@@ -128,7 +135,7 @@
           var groups = this.chartInst.getGroups();
           _.each(groups, function(group) {
             qtipContent.push(
-              '<div class="category-item">' +
+              '<div class="category-item" curve-id="' + group.id + '">' +
               '<svg width="12" height="12">' +
               '<rect height="12" width="12" fill="' +
               group.curveHex + '"></rect>' +
@@ -147,7 +154,8 @@
       calcCurvesData: function(groups, groupType) {
         var data_ = iViz.getGroupNdx(this.attributes.group_id);
         var survivalType = this.attributes.group_type;
-        _.each(groups, function(group) {
+        _.each(groups, function(group, index) {
+          group.id = index;
           group.data = [];
 
           // If group type is sample, need to convert sample ID to patient ID.
@@ -178,7 +186,17 @@
             at: 'center right',
             viewport: $(window)
           },
-          content: '<div>Loading...</div>'
+          content: '<div>Loading...</div>',
+          events: {
+            show: function(event, api) {
+              var tooltip = api.elements.tooltip;
+              tooltip.find('.category-item').unbind('click');
+              tooltip.find('.category-item').click(function() {
+                var curveId = $(this).attr('curve-id');
+                self_.chartInst.highlightCurve(curveId);
+              });
+            }
+          }
         });
         self_.updateQtipContent();
       }
@@ -203,7 +221,12 @@
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
       var data = iViz.getGroupNdx(this.attributes.group_id);
-      _self.chartInst.init(data, _opts);
+      var groups = [{
+        id: 0,
+        name: 'All Patients',
+        curveHex: '#2986e2'
+      }];
+      _self.chartInst.init(groups, data, _opts);
       _self.showLoad = false;
 
       _self.$once('initMainDivQtip', _self.initMainDivQtip);

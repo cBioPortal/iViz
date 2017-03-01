@@ -6,7 +6,10 @@
     _self.elem_ = '';
     _self.divId_ = _divId;
     _self.data_ = _data;
-    _self.opts_ = _opts;
+    _self.opts_ = {
+      curves: {}
+    };
+    _self.opts_ = $.extend(true, _self.opts_, _opts);
     var formatAsPercentage_ = d3.format('%');
 
     var leftMargin_ = 60;
@@ -138,6 +141,9 @@
         .y(function(d) {
           return _self.elem_.yScale(d.survival_rate);
         });
+
+      // Init opts for the curve
+      _self.opts_.curves[_curveIndex] = {};
     }
 
     // draw line
@@ -275,6 +281,23 @@
     var _self = this;
     _self.elem_.svg.selectAll('.pval').remove();
   };
+
+  iViz.view.component.SurvivalCurve.prototype.highlightCurve =
+    function(curveIndex) {
+      var _self = this;
+      if (_self.elem_.curves.hasOwnProperty(curveIndex)) {
+        var opacity = '0.5';
+        if (_self.opts_.curves[curveIndex].highlighted) {
+          opacity = '0';
+          _self.opts_.curves[curveIndex].highlighted = false;
+        } else {
+          _self.opts_.curves[curveIndex].highlighted = true;
+        }
+        _self.elem_.curves[curveIndex].invisibleDots
+          .selectAll('path')
+          .style('opacity', opacity);
+      }
+    };
 })(
   window.iViz,
   window.dc,

@@ -9,7 +9,7 @@
     var opts_ = {};
     var groups_ = [];
 
-    content_.init = function(_data, _opts) {
+    content_.init = function(groups, _data, _opts) {
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
       var _dataProxy = new iViz.data.SurvivalChartProxy(_data, opts_.attrId);
@@ -17,10 +17,7 @@
         new iViz.view.component
           .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
       this.chartInst_.addCurve(_dataProxy.get(), 0, opts_.curveHex || '#2986e2');
-      groups_ = [{
-        name: 'All Patients',
-        curveHex: opts_.curveHex || '#2986e2'
-      }];
+      groups_ = groups;
     };
 
     // _attrId here indicates chart type (OS or DFS)
@@ -59,6 +56,10 @@
 
     content_.getGroups = function() {
       return groups_;
+    };
+
+    content_.highlightCurve = function(curveId) {
+      this.chartInst_.highlightCurve(curveId);
     };
 
     function initCanvasDownloadData() {
