@@ -221,7 +221,7 @@
           self_.samplesync = _casesSync;
           self_.patientsync = _counterCasesSync;
           if (self_.hasfilters) {
-            self_.selectedsamples = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);;
+            self_.selectedsamples = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);
             self_.selectedpatients = _resultCounterSelectedCases;
           } else {
             self_.selectedsamples = self_.completeSamplesList;
