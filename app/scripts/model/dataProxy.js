@@ -1,5 +1,5 @@
 'use strict';
-window.DataManagerForIviz = (function($, _) {
+window.DataManagerForIviz = (function($, _, iViz) {
   var content = {};
 
   // Clinical attributes will be transfered into table.
@@ -1393,8 +1393,8 @@ window.DataManagerForIviz = (function($, _) {
             asyncAjaxCalls.push(
               $.ajax({
                 url: window.cbioURL + 'api-legacy/genepanel/data',
-                contentType: "application/json",
-                data: ["profile_id=" + _studyId + "_mutations", "genes="].join("&"),
+                contentType: 'application/json',
+                data: ['profile_id=' + _studyId + '_mutations', 'genes='].join('&'),
                 type: 'GET',
                 success: function(_res) {
                   responses.push(_res);
@@ -1406,8 +1406,9 @@ window.DataManagerForIviz = (function($, _) {
             var _panelMetaArr = _.flatten(responses);
             _.each(_panelMetaArr, function(_panelMeta) {
               _map[_panelMeta.stableId] = {};
-              _map[_panelMeta.stableId]["samples"] = (_panelMeta.samples);
-              _map[_panelMeta.stableId]["sel_samples"] = (_panelMeta.samples);
+              var _sorted = (_panelMeta.samples).sort();
+              _map[_panelMeta.stableId].samples = (_sorted);
+              _map[_panelMeta.stableId].sel_samples = (_sorted);
             });
             fetch_promise.resolve(_map);
           }).fail(function() {
@@ -1425,7 +1426,7 @@ window.DataManagerForIviz = (function($, _) {
               asyncAjaxCalls.push(
                 $.ajax({
                   url: window.cbioURL + 'api-legacy/genepanel',
-                  contentType: "application/json",
+                  contentType: 'application/json',
                   data: {panel_id: _panelId},
                   type: 'GET',
                   success: function(_res) {
@@ -1436,18 +1437,18 @@ window.DataManagerForIviz = (function($, _) {
             });
             $.when.apply($, asyncAjaxCalls).done(function() {
               var _panelMetaArr = _.map(responses, function(responseArr) {
-                return responseArr[0]
+                return responseArr[0];
               });
               var _map = {};
               _.each(_panelMetaArr, function(_panelMeta) {
-                _.each(_panelMeta["genes"], function(_gene) {
+                _.each(_panelMeta.genes, function(_gene) {
                   if (!_map.hasOwnProperty(_gene.hugoGeneSymbol)) {
                     _map[_gene.hugoGeneSymbol] = {};
-                    _map[_gene.hugoGeneSymbol]["panel_id"] = [];
-                    _map[_gene.hugoGeneSymbol]["sample_num"] = 0;
+                    _map[_gene.hugoGeneSymbol].panel_id = [];
+                    _map[_gene.hugoGeneSymbol].sample_num = 0;
                   }
-                  _map[_gene.hugoGeneSymbol]["panel_id"].push(_panelMeta.stableId);
-                  _map[_gene.hugoGeneSymbol]["sample_num"] += _panelSampleMap[_panelMeta.stableId]["samples"].length;
+                  _map[_gene.hugoGeneSymbol].panel_id.push(_panelMeta.stableId);
+                  _map[_gene.hugoGeneSymbol].sample_num += _panelSampleMap[_panelMeta.stableId].samples.length;
                 });
               });
               fetch_promise.resolve(_map);
@@ -1459,25 +1460,26 @@ window.DataManagerForIviz = (function($, _) {
       ),
       updateGenePanelMap: function(_map, _selectedSampleIds) {
         var _self = this;
-        if (typeof _selectedSampleIds !== 'undefined') {
-          //update panel sample count map
-          _.each(Object.keys(_self.panelSampleMap), function(_panelId) {
-            _self.panelSampleMap[_panelId]["sel_samples"] = _.intersection(_self.panelSampleMap[_panelId]["samples"], _selectedSampleIds);
-          });
-          _.each(Object.keys(_map), function(_gene) {
-            var _sampleNumPerGene = 0;
-            _.each(_map[_gene]["panel_id"], function(_panelId) {
-              _sampleNumPerGene += _self.panelSampleMap[_panelId]["sel_samples"].length;
-            });
-            _map[_gene]["sample_num"] = _sampleNumPerGene;
-          });
+        if (typeof _selectedSampleIds === 'undefined') {
           return _map;
-        } else {
-          return _map
         }
+        // update panel sample count map
+        _selectedSampleIds = _selectedSampleIds.sort();
+        _.each(Object.keys(_self.panelSampleMap), function(_panelId) {
+          _self.panelSampleMap[_panelId].sel_samples =
+            iViz.util.intersection(_self.panelSampleMap[_panelId].samples, _selectedSampleIds);
+        });
+        _.each(Object.keys(_map), function(_gene) {
+          var _sampleNumPerGene = 0;
+          _.each(_map[_gene].panel_id, function(_panelId) {
+            _sampleNumPerGene += _self.panelSampleMap[_panelId].sel_samples.length;
+          });
+          _map[_gene].sample_num = _sampleNumPerGene;
+        });
+        return _map;
       }
     };
   };
 
   return content;
-})(window.$, window._);
+})(window.$, window._, window.iViz);
