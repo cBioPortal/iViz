@@ -1121,16 +1121,16 @@ window.DataManagerForIviz = (function($, _) {
               sample_ids: self.studyCasesMap[cancerStudyId].samples
             }).then(function(data) {
               var sample_to_patient = {};
-              var patientList = [];
+              var patientList = {};
               for (var i = 0; i < data.length; i++) {
                 sample_to_patient[data[i].id] = data[i].patient_id;
-                patientList.push(data[i].patient_id);
+                patientList[data[i].patient_id] = '';
               }
               // set patient list in studyCasesMap if sample list is
               // passed in the input
               if (_.isArray(self.studyCasesMap[cancerStudyId].samples) &&
                 self.studyCasesMap[cancerStudyId].samples.length > 0) {
-                self.studyCasesMap[cancerStudyId].patients = _.unique(patientList);
+                self.studyCasesMap[cancerStudyId].patients = Object.keys(patientList);
               }
               study_to_sample_to_patient[cancerStudyId] = sample_to_patient;
               def.resolve();
