@@ -6,7 +6,7 @@
     template: '<div v-if="edit"><div v-if="type==\'text\'"><input' +
     ' type="text" v-model="name" placeholder="My Virtual' +
     ' Study"/></div><div v-if="type==\'textarea\'"><textarea rows="4"' +
-    ' cols="50" v-model="name"></textarea></div></div><div' +
+    ' cols="50" v-model="name"></textarea></div></div><div style="white-space:normal !important;"' +
     ' v-else="edit"><span>{{ name }}</span></div>'
   });
 })(window.Vue);
