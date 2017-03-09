@@ -41,7 +41,8 @@
         classTableHeight: 'grid-item-h-2',
         madeSelection: false,
         showSurvivalIcon: true,
-        genePanelMap: {}
+        genePanelMap: {},
+        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20
       };
     },
     watch: {
@@ -205,7 +206,9 @@
         }
 
         var categories = this.chartInst.getCurrentCategories();
-        if (_.isArray(categories) && (categories.length > 1 && categories.length <= 20)) {
+        if (_.isArray(categories) &&
+          (categories.length > 1 &&
+          categories.length <= this.numOfSurvivalCurveLimit)) {
           return true;
         }
         return false;

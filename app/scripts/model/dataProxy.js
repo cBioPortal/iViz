@@ -943,54 +943,57 @@ window.DataManagerForIviz = (function($, _, iViz) {
       },
       // The reason to separate style variable into individual json is
       // that the scss file can also rely on this file.
-      getStyleVars: window.cbio.util.makeCachedPromiseFunction(
+      getConfigs: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
-          $.getJSON(window.cbioResourceURL + 'vars.json')
+          $.getJSON(window.cbioResourceURL + 'configs.json')
             .then(function(data) {
-              var styles = {
-                vars: {}
+              var configs = {
+                styles: {
+                  vars: {}
+                }
               };
-              styles.vars.width = {
+              configs = $.extend(true, configs, data);
+              configs.styles.vars.width = {
                 one: content.util.pxStringToNumber(data['grid-w-1']) || 195,
                 two: content.util.pxStringToNumber(data['grid-w-2']) || 400
               };
-              styles.vars.height = {
+              configs.styles.vars.height = {
                 one: content.util.pxStringToNumber(data['grid-h-1']) || 170,
                 two: content.util.pxStringToNumber(data['grid-h-2']) || 350
               };
-              styles.vars.chartHeader = 17;
-              styles.vars.borderWidth = 2;
-              styles.vars.scatter = {
+              configs.styles.vars.chartHeader = 17;
+              configs.styles.vars.borderWidth = 2;
+              configs.styles.vars.scatter = {
                 width: (
-                styles.vars.width.two -
-                styles.vars.borderWidth) || 400,
+                configs.styles.vars.width.two -
+                configs.styles.vars.borderWidth) || 400,
                 height: (
-                styles.vars.height.two -
-                styles.vars.chartHeader -
-                styles.vars.borderWidth) || 350
+                configs.styles.vars.height.two -
+                configs.styles.vars.chartHeader -
+                configs.styles.vars.borderWidth) || 350
               };
-              styles.vars.survival = {
-                width: styles.vars.scatter.width,
-                height: styles.vars.scatter.height
+              configs.styles.vars.survival = {
+                width: configs.styles.vars.scatter.width,
+                height: configs.styles.vars.scatter.height
               };
-              styles.vars.specialTables = {
-                width: styles.vars.scatter.width,
-                height: styles.vars.scatter.height - 25
+              configs.styles.vars.specialTables = {
+                width: configs.styles.vars.scatter.width,
+                height: configs.styles.vars.scatter.height - 25
               };
-              styles.vars.piechart = {
+              configs.styles.vars.piechart = {
                 width: 140,
                 height: 140
               };
-              styles.vars.barchart = {
+              configs.styles.vars.barchart = {
                 width: (
-                styles.vars.width.two -
-                styles.vars.borderWidth) || 400,
+                configs.styles.vars.width.two -
+                configs.styles.vars.borderWidth) || 400,
                 height: (
-                styles.vars.height.one -
-                styles.vars.chartHeader * 2 -
-                styles.vars.borderWidth) || 130
+                configs.styles.vars.height.one -
+                configs.styles.vars.chartHeader * 2 -
+                configs.styles.vars.borderWidth) || 130
               };
-              fetch_promise.resolve(styles);
+              fetch_promise.resolve(configs);
             })
             .fail(function() {
               fetch_promise.resolve();

@@ -44,6 +44,7 @@
           transitionDuration: iViz.opts.dc.transitionDuration
         },
         opts: {},
+        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
         addingChart: false
       };
     }, watch: {
@@ -190,7 +191,12 @@
       if (this.barChart.getCurrentCategories().length < 2) {
         this.showSurvivalIcon = false;
       }
-
+      // Disable rainbow survival if only one group present
+      if (this.barChart.getCurrentCategories().length < 2 ||
+        this.barChart.getCurrentCategories().length > this.numOfSurvivalCurveLimit) {
+        this.showSurvivalIcon = false;
+      }
+      
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

@@ -44,6 +44,7 @@
         showPieIcon: false,
         filtersUpdated: false,
         addingChart: false,
+        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
         showSurvivalIcon: true
       };
     },
@@ -176,7 +177,8 @@
       });
 
       // Disable rainbow survival if only one group present
-      if (_self.piechart.getCurrentCategories().length < 2 || _self.piechart.getCurrentCategories().length > 20) {
+      if (_self.piechart.getCurrentCategories().length < 2 ||
+        _self.piechart.getCurrentCategories().length > this.numOfSurvivalCurveLimit) {
         this.showSurvivalIcon = false;
       }
       _self.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);

@@ -425,7 +425,7 @@ module.exports = function(grunt) {
         files: [
           {
             src: [
-              '<%= config.app %>/resources/vars.json'
+              '<%= config.app %>/resources/configs.json'
             ],
             dest: '<%= config.app %>/styles/partials/_jsonVars.scss'
           }
@@ -488,6 +488,7 @@ module.exports = function(grunt) {
     'clean:dist',
     'wiredep',
     'useminPrepare',
+    'json_to_sass:vars',
     'dynamicVars:dev',
     'concurrent:dist',
     'postcss',
