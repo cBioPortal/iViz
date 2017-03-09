@@ -683,7 +683,7 @@ window.DataManagerForIviz = (function($, _, iViz) {
                   _MutationCountMeta.priority = 5;
                   _MutationCountMeta.show = true;
                   _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
-                  _sampleAttributes[_MutationCountMeta.attr_id] = (_MutationCountMeta);
+                  _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
                 }
 
                 // add CNA Table
@@ -1407,8 +1407,8 @@ window.DataManagerForIviz = (function($, _, iViz) {
             _.each(_panelMetaArr, function(_panelMeta) {
               _map[_panelMeta.stableId] = {};
               var _sorted = (_panelMeta.samples).sort();
-              _map[_panelMeta.stableId].samples = (_sorted);
-              _map[_panelMeta.stableId].sel_samples = (_sorted);
+              _map[_panelMeta.stableId].samples = _sorted;
+              _map[_panelMeta.stableId].sel_samples = _sorted;
             });
             fetch_promise.resolve(_map);
           }).fail(function() {
