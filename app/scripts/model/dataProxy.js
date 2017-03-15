@@ -614,8 +614,8 @@ window.DataManagerForIviz = (function($, _) {
 
             $.when(self.getCnaFractionData(),
               self.getMutationCount(),
-            self.getSampleClinicalData(_.keys(_sampleAttributes)),
-            self.getPatientClinicalData(_.keys(_patientAttributes)))
+              self.getSampleClinicalData(_.keys(_sampleAttributes)),
+              self.getPatientClinicalData(_.keys(_patientAttributes)))
               .then(function(_cnaFractionData, _mutationCountData, sampleInitData, patientInitData) {
                 var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
                 var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
@@ -796,8 +796,8 @@ window.DataManagerForIviz = (function($, _) {
             // time. This is temporary solution, should be replaced with
             // better solution.
             var uniqueId = _studyId + studyAttributesMap[_studyId].sort().join('') + studyCasesMap[_studyId].patients.sort().join('');
-            if (self.clinicalData.patient.hasOwnProperty(uniqueId)) {
-              var data = self.clinicalData.patient[uniqueId];
+            if (self.data.clinical.patient.hasOwnProperty(uniqueId)) {
+              var data = self.data.clinical.patient[uniqueId];
               for (var i = 0; i < data.length; i++) {
                 data[i].attr_id = data[i].attr_id.toUpperCase();
                 var attr_id = data[i].attr_id;
@@ -811,7 +811,7 @@ window.DataManagerForIviz = (function($, _) {
                 attribute_ids: studyAttributesMap[_studyId],
                 patient_ids: studyCasesMap[_studyId].patients
               }).then(function(data) {
-                self.clinicalData.patient[uniqueId] = data;
+                self.data.clinical.patient[uniqueId] = data;
                 for (var i = 0; i < data.length; i++) {
                   data[i].attr_id = data[i].attr_id.toUpperCase();
                   var attr_id = data[i].attr_id;
@@ -869,8 +869,8 @@ window.DataManagerForIviz = (function($, _) {
               // time. This is temporary solution, should be replaced with
               // better solution.
               var uniqueId = _studyId + studyAttributesMap[_studyId].sort().join('') + studyCasesMap[_studyId].samples.sort().join('');
-              if (self.clinicalData.sample.hasOwnProperty(uniqueId)) {
-                var data = self.clinicalData.sample[uniqueId];
+              if (self.data.clinical.sample.hasOwnProperty(uniqueId)) {
+                var data = self.data.clinical.sample[uniqueId];
                 for (var i = 0; i < data.length; i++) {
                   data[i].attr_id = data[i].attr_id.toUpperCase();
                   var attr_id = data[i].attr_id;
@@ -884,7 +884,7 @@ window.DataManagerForIviz = (function($, _) {
                   attribute_ids: studyAttributesMap[_studyId],
                   sample_ids: studyCasesMap[_studyId].samples
                 }).then(function(data) {
-                  self.clinicalData.sample[uniqueId] = data;
+                  self.data.clinical.sample[uniqueId] = data;
                   for (var i = 0; i < data.length; i++) {
                     data[i].attr_id = data[i].attr_id.toUpperCase();
                     var attr_id = data[i].attr_id;
@@ -930,9 +930,16 @@ window.DataManagerForIviz = (function($, _) {
       getStudyCasesMap: function() {
         return window.cbio.util.deepCopyObject(this.studyCasesMap);
       },
-      clinicalData: {
-        sample: {},
-        patient: {}
+      data: {
+        clinical: {
+          sample: {},
+          patient: {}
+        },
+        sampleLists: {
+          all: {},
+          sequenced: {},
+          cna: {}
+        }
       },
       // The reason to separate style variable into individual json is
       // that the scss file can also rely on this file.
@@ -1046,23 +1053,22 @@ window.DataManagerForIviz = (function($, _) {
           var requests = self.getCancerStudyIds().map(
             function(cancer_study_id) {
               var def = new $.Deferred();
-              window.cbioportal_client
-                .getSampleLists({study_id: [cancer_study_id]})
-                .then(function(_sampleLists) {
-                  _.each(_sampleLists, function(_sampleList) {
-                    if (_sampleList.id === cancer_study_id + '_sequenced') {
-                      _sequencedSampleIds = _sequencedSampleIds.concat(_sampleList.sample_ids);
-                    } else if (_sampleList.id === cancer_study_id + '_cna') {
-                      _cnaSampleIds = _cnaSampleIds.concat(_sampleList.sample_ids);
-                    } else if (_sampleList.id === cancer_study_id + '_all') {
-                      _allSampleIds = _allSampleIds.concat(_sampleList.sample_ids);
-                    }
-                  });
+              var sampleListCalls = [];
+              self.getSampleListsData(['all', 'sequenced', 'cna'], cancer_study_id)
+                .done(function() {
+                  if (_.isArray(self.data.sampleLists.sequenced[cancer_study_id])) {
+                    _sequencedSampleIds = _sequencedSampleIds.concat(self.data.sampleLists.sequenced[cancer_study_id]);
+                  }
+                  if (_.isArray(self.data.sampleLists.cna[cancer_study_id])) {
+                    _cnaSampleIds = _cnaSampleIds.concat(self.data.sampleLists.cna[cancer_study_id]);
+                  }
+                  if (_.isArray(self.data.sampleLists.all[cancer_study_id])) {
+                    _allSampleIds = _allSampleIds.concat(self.data.sampleLists.all[cancer_study_id]);
+                  }
                   def.resolve();
-                }).fail(
-                function() {
-                  fetch_promise.reject();
-                });
+                }).fail(function() {
+                fetch_promise.reject();
+              });
               return def.promise();
             });
           $.when.apply($, requests).then(function() {
@@ -1155,15 +1161,12 @@ window.DataManagerForIviz = (function($, _) {
                     fetch_promise.reject();
                   });
               } else {
-                window.cbioportal_client
-                  .getSampleLists({study_id: [cancer_study_id]})
-                  .then(function(_sampleLists) {
-                    _.each(_sampleLists, function(_sampleList) {
-                      if (_sampleList.id === cancer_study_id + '_all') {
-                        self.studyCasesMap[cancer_study_id].samples =
-                          _sampleList.sample_ids;
-                      }
-                    });
+                self.getSampleListsData(['all'], cancer_study_id)
+                  .done(function() {
+                    if (_.isArray(self.data.sampleLists.all[cancer_study_id])) {
+                      self.studyCasesMap[cancer_study_id].samples =
+                        self.data.sampleLists.all[cancer_study_id];
+                    }
                     getSamplesCall(cancer_study_id)
                       .then(function() {
                         def.resolve();
@@ -1171,10 +1174,9 @@ window.DataManagerForIviz = (function($, _) {
                       .fail(function() {
                         fetch_promise.reject();
                       });
-                  })
-                  .fail(function() {
-                    fetch_promise.reject();
-                  });
+                  }).fail(function() {
+                  fetch_promise.reject();
+                });
               }
               return def.promise();
             });
@@ -1182,6 +1184,46 @@ window.DataManagerForIviz = (function($, _) {
             fetch_promise.resolve(study_to_sample_to_patient);
           });
         }),
+      getSampleListsData: function(lists, studyId) {
+        var def = new $.Deferred();
+        var self = this;
+        var promises = [];
+        if (_.isArray(lists)) {
+          _.each(lists, function(list) {
+            var _def = new $.Deferred();
+            if (!self.data.sampleLists.hasOwnProperty(list)) {
+              self.data.samplesLists[list] = {};
+            }
+            if (self.data.sampleLists[list].hasOwnProperty(studyId)) {
+              _def.resolve(self.data.sampleLists[list][studyId]);
+            } else {
+              $.ajax({
+                url: window.cbioURL + 'api/sample-lists/' +
+                studyId + '_' + list + '/sample-ids',
+                contentType: "application/json",
+                type: 'GET'
+              }).done(function(data) {
+                self.data.sampleLists[list][studyId] = data;
+                _def.resolve(data);
+              }).fail(function() {
+                _def.reject();
+              });
+            }
+
+            promises.push(_def.promise());
+          });
+          $.when.apply($, promises)
+            .then(function() {
+              def.resolve();
+            })
+            .fail(function() {
+              def.reject();
+            });
+        } else {
+          def.reject();
+        }
+        return def.promise();
+      },
       getCnaFractionData: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           var _ajaxCnaFractionData = {};
@@ -1343,7 +1385,7 @@ window.DataManagerForIviz = (function($, _) {
           this.getSampleClinicalData(attribute_ids);
       },
       getAllGenePanelSampleIds: window.cbio.util.makeCachedPromiseFunction(
-        function (self, fetch_promise) {
+        function(self, fetch_promise) {
           var _map = {};
           var asyncAjaxCalls = [];
           var responses = [];
@@ -1360,7 +1402,7 @@ window.DataManagerForIviz = (function($, _) {
               })
             );
           });
-          $.when.apply($, asyncAjaxCalls).done(function(){
+          $.when.apply($, asyncAjaxCalls).done(function() {
             var _panelMetaArr = _.flatten(responses);
             _.each(_panelMetaArr, function(_panelMeta) {
               _map[_panelMeta.stableId] = {};
@@ -1368,18 +1410,18 @@ window.DataManagerForIviz = (function($, _) {
               _map[_panelMeta.stableId]["sel_samples"] = (_panelMeta.samples);
             });
             fetch_promise.resolve(_map);
-          }).fail(function(){
+          }).fail(function() {
             fetch_promise.reject();
           });
         }
       ),
       getGenePanelMap: window.cbio.util.makeCachedPromiseFunction(
-        function (self, fetch_promise) {
+        function(self, fetch_promise) {
           self.getAllGenePanelSampleIds().then(function(_panelSampleMap) {
             self.panelSampleMap = _panelSampleMap;
             var asyncAjaxCalls = [];
             var responses = [];
-            _.each(Object.keys(_panelSampleMap), function(_panelId){
+            _.each(Object.keys(_panelSampleMap), function(_panelId) {
               asyncAjaxCalls.push(
                 $.ajax({
                   url: window.cbioURL + 'api-legacy/genepanel',
@@ -1392,8 +1434,10 @@ window.DataManagerForIviz = (function($, _) {
                 })
               );
             });
-            $.when.apply($, asyncAjaxCalls).done(function(){
-              var _panelMetaArr = _.map(responses, function(responseArr) { return responseArr[0] });
+            $.when.apply($, asyncAjaxCalls).done(function() {
+              var _panelMetaArr = _.map(responses, function(responseArr) {
+                return responseArr[0]
+              });
               var _map = {};
               _.each(_panelMetaArr, function(_panelMeta) {
                 _.each(_panelMeta["genes"], function(_gene) {
@@ -1407,7 +1451,7 @@ window.DataManagerForIviz = (function($, _) {
                 });
               });
               fetch_promise.resolve(_map);
-            }).fail(function(){
+            }).fail(function() {
               fetch_promise.reject();
             });
           });
@@ -1426,7 +1470,7 @@ window.DataManagerForIviz = (function($, _) {
               _sampleNumPerGene += _self.panelSampleMap[_panelId]["sel_samples"].length;
             });
             _map[_gene]["sample_num"] = _sampleNumPerGene;
-          });         
+          });
           return _map;
         } else {
           return _map
