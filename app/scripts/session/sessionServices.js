@@ -30,6 +30,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
 
     return {
       saveSession: function(virtualCohort) {
+        var def = new $.Deferred();
         var data = {
           virtualCohort: virtualCohort
         };
@@ -39,13 +40,17 @@ window.vcSession = window.vcSession ? window.vcSession : {};
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(data)
         }).done(function(response) {
-          if (virtualCohort.userID === 'DEFAULT')
+          if (virtualCohort.userID === 'DEFAULT') {
             localStorageAdd_(response.id,
               virtualCohort);
+          }
+          def.resolve();
         }).fail(function() {
           localStorageAdd_(vcSession.utils.generateUUID(),
             virtualCohort);
+          def.reject();
         });
+        return def.promise();
       },
       removeSession: function(_virtualCohort) {
         $.ajax({
@@ -53,8 +58,9 @@ window.vcSession = window.vcSession ? window.vcSession : {};
           url: vcSession.URL + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8'
         }).done(function() {
-          if (_virtualCohort.userID === 'DEFAULT')
+          if (_virtualCohort.userID === 'DEFAULT') {
             localStorageDelete_(_virtualCohort);
+          }
         }).fail(function() {
           localStorageDelete_(_virtualCohort);
         });
@@ -69,8 +75,9 @@ window.vcSession = window.vcSession ? window.vcSession : {};
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(data)
         }).done(function(response) {
-          if (_virtualCohort.userID === 'DEFAULT')
+          if (_virtualCohort.userID === 'DEFAULT') {
             localStorageEdit_(data.virtualCohort);
+          }
         }).fail(function(jqXHR) {
           if (jqXHR.status === 404) {
             localStorageDelete_(_virtualCohort);

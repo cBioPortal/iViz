@@ -6,11 +6,24 @@ body {
   font-family: sans-serif;
 }
 
-#complete-screen {
+#cohort-component {
+  @import "components/vc";
   @import "partials/global";
 }
 
-#cohort-component{
-  @import "components/vc";
-  @import "partials/global";
+.iviz-save-cohort-btn-qtip {
+  .qtip-content {
+    input {
+      line-height: 20px;
+      border-radius: 5px;
+      border: 1px solid lightgrey;
+      padding: 2px 5px;
+      width: 100%;
+      font-size: 14px;
+      margin: 2px 0;
+    }
+    textarea.form-control {
+      padding: 6px 5px;
+    }
+  }
 }

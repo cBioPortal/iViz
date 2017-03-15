@@ -9,11 +9,19 @@ window.vcSession = window.vcSession ? window.vcSession : {};
     return {
       saveCohort: function(stats, selectedPatientsNum, selectedSamplesNum,
                            userID, name, description) {
+        var def = new $.Deferred();
         var _virtualCohort = vcSession.utils.buildVCObject(stats.filters,
           selectedPatientsNum, selectedSamplesNum, stats.selected_cases,
           userID,
           name, description);
-        vcSession.model.saveSession(_virtualCohort);
+        vcSession.model.saveSession(_virtualCohort)
+          .done(function() {
+            def.resolve();
+          })
+          .fail(function() {
+            def.reject();
+          });
+        return def.promise();
       },
       removeVirtualCohort: function(virtualCohort) {
         vcSession.model.removeSession(virtualCohort);
