@@ -7,23 +7,59 @@ body {
 }
 
 #cohort-component {
+  margin: 200px;
   @import "components/vc";
   @import "partials/global";
 }
 
 .iviz-save-cohort-btn-qtip {
   .qtip-content {
-    input {
-      line-height: 20px;
-      border-radius: 5px;
-      border: 1px solid lightgrey;
-      padding: 2px 5px;
+    padding: 9px;
+    .close-dialog {
       width: 100%;
-      font-size: 14px;
-      margin: 2px 0;
+      display: inline-block;
+      i {
+        float: right;
+        font-size: 15px;
+        color: grey;
+        margin-top: -5px;
+        margin-bottom: 5px;
+      }
+      i:hover {
+        cursor: pointer;
+      }
     }
-    textarea.form-control {
-      padding: 6px 5px;
+    .dialog {
+      input {
+        line-height: 20px;
+        padding: 2px 5px;
+        width: 100%;
+        font-size: 14px;
+        margin: 2px 0;
+      }
+      textarea.form-control {
+        padding: 6px 5px;
+      }
+    }
+    .saved, .saving {
+      font-size: 15px;
+      line-height: 16px;
+    }
+    .saved > span {
+      float: left;
+    }
+    .saved > button {
+      float: right;
+    }
+    .saved {
+      .savedMessage {
+        .fa-exclamation-triangle {
+          color: orange;
+        }
+      }
+    }
+    .saving {
+      text-align: center;
     }
   }
 }
