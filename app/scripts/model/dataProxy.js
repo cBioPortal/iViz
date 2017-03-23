@@ -266,14 +266,10 @@ window.DataManagerForIviz = (function($, _) {
                 var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
                 var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
                 var _result = {};
-                var _patientData = [];
+                var _patientUIDData = [];
                 var _sampleAttributes = {};
                 var _patientAttributes = {};
-                var _sampleData = [];
-                var _indexSample = 0;
-                var _sampleDataIndicesObj = {};
-                var _indexPatient = 0;
-                var _patientDataIndicesObj = {};
+                var _sampleUIDData = [];
                 var _hasDFS = false;
                 var _hasOS = false;
                 var _hasPatientAttrData = {};
@@ -282,15 +278,35 @@ window.DataManagerForIviz = (function($, _) {
                 var _hasDfsMonths = false;
                 var _hasOsStatus = false;
                 var _hasOsMonths = false;
-                var _cnaCasesMap = {};
-                var _sequencedCasesMap = {};
-                var _cnaCases = _caseLists.cnaSampleIds.length > 0 ? _caseLists.cnaSampleIds : _caseLists.allSampleIds;
-                var _sequencedCases = _caseLists.sequencedSampleIds.length > 0 ? _caseLists.sequencedSampleIds : _caseLists.allSampleIds;
-                _.each(_cnaCases, function(_sampleId) {
-                  _cnaCasesMap[_sampleId] = _sampleId;
+                var _cnaCaseUIdsMap = {};
+                var _sequencedCaseUIdsMap = {};
+                var _cnaCaseUIDs = [];
+                var _sequencedCaseUIDs = [];
+                var _allCaseUIDs = [];
+                $.each(_caseLists, function(studyId, caseList) {
+                  if (caseList.cnaSampleIds.length > 0) {
+                    $.each(caseList.cnaSampleIds, function(index, sampleId) {
+                      _cnaCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
+                    });
+                  }
+                  if (caseList.sequencedSampleIds.length > 0) {
+                    $.each(caseList.sequencedSampleIds, function(index, sampleId) {
+                      _sequencedCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
+                    });
+                  }
+                  if (caseList.allSampleIds.length > 0) {
+                    $.each(caseList.allSampleIds, function(index, sampleId) {
+                      _allCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
+                    });
+                  }
                 });
-                _.each(_sequencedCases, function(_sampleId) {
-                  _sequencedCasesMap[_sampleId] = _sampleId;
+                _cnaCaseUIDs = _cnaCaseUIDs.length > 0 ? _cnaCaseUIDs : _allCaseUIDs;
+                _sequencedCaseUIDs = _sequencedCaseUIDs.length > 0 ? _sequencedCaseUIDs : _allCaseUIDs;
+                _.each(_cnaCaseUIDs, function(_sampleId) {
+                  _cnaCaseUIdsMap[_sampleId] = _sampleId;
+                });
+                _.each(_sequencedCaseUIDs, function(_sampleId) {
+                  _sequencedCaseUIdsMap[_sampleId] = _sampleId;
                 });
 
                 _.each(_clinicalAttributes, function(attr) {
@@ -359,8 +375,8 @@ window.DataManagerForIviz = (function($, _) {
                     _metaObj.view_type = 'table';
                     _metaObj.type = 'pieLabel';
                     _metaObj.options = {
-                      allCases: _caseLists.allSampleIds,
-                      sequencedCases: _caseLists.allSampleIds
+                      allCases: _allCaseUIDs,
+                      sequencedCases: _allCaseUIDs
                     };
                   }
                   if (['CANCER_TYPE', 'CANCER_TYPE_DETAILED']
@@ -407,8 +423,8 @@ window.DataManagerForIviz = (function($, _) {
                     _metaObj.view_type = 'table';
                     _metaObj.type = 'pieLabel';
                     _metaObj.options = {
-                      allCases: _caseLists.allSampleIds,
-                      sequencedCases: _caseLists.allSampleIds
+                      allCases:_allCaseUIDs,
+                      sequencedCases: _allCaseUIDs
                     };
                   }
                 });
@@ -422,46 +438,58 @@ window.DataManagerForIviz = (function($, _) {
 
                 var _samplesToPatientMap = {};
                 var _patientToSampleMap = {};
-
-                _hasSampleAttrData.sample_id = '';
+                var _patientToUIDs = {};
+                var _sampleToUIDs = {};
+                _hasSampleAttrData.sample_id_uid = '';
+                _hasSampleAttrData.sample_id_id = '';
                 _hasSampleAttrData.study_id = '';
                 _hasSampleAttrData.sequenced = '';
                 _hasSampleAttrData.has_cna_data = '';
                 _.each(_studyToSampleToPatientMap, function(_sampleToPatientMap, _studyId) {
-                  _.each(_sampleToPatientMap, function(_patientId, _sampleId) {
-                    if (_samplesToPatientMap[_sampleId] === undefined) {
-                      _samplesToPatientMap[_sampleId] = [_patientId];
+                  _.each(_sampleToPatientMap.sample_to_patient_uid, function(_patientUID, _sampleUID) {
+                    var _sampleId = _sampleToPatientMap.uid_to_sample[_sampleUID];
+                    if (_samplesToPatientMap[_sampleUID] === undefined) {
+                      _samplesToPatientMap[_sampleUID] = [_patientUID];
                     }
-                    if (_patientToSampleMap[_patientId] === undefined) {
-                      _patientToSampleMap[_patientId] = [_sampleId];
+                    if (_patientToSampleMap[_patientUID] === undefined) {
+                      _patientToSampleMap[_patientUID] = [_sampleUID];
                     } else {
-                      _patientToSampleMap[_patientId].push(_sampleId);
+                      _patientToSampleMap[_patientUID].push(_sampleUID);
                     }
 
-                    if (_patientDataIndicesObj[_patientId] === undefined) {
+                    if (_patientUIDData[_patientUID] === undefined) {
                       // create datum for each patient
                       var _patientDatum = {};
-                      _patientDatum.patient_id = _patientId;
+                      _patientDatum.patient_uid = _patientUID;
+                      _patientDatum.patient_id = _sampleToPatientMap.uid_to_patient[_patientUID];
                       _patientDatum.study_id = _studyId;
-                      _hasPatientAttrData.patient_id = '';
+                      _hasPatientAttrData.patient_uid = '';
                       _hasPatientAttrData.study_id = '';
-                      _patientData.push(_patientDatum);
-                      _patientDataIndicesObj[_patientId] = _indexPatient;
-                      _indexPatient += 1;
+                      _hasPatientAttrData.patient_id = '';
+                      _patientUIDData[_patientUID] = _patientDatum;
+                      if (!_patientToUIDs[_patientDatum.patient_id]) {
+                        _patientToUIDs[_patientDatum.patient_id] = [];
+                      }
+                      _patientToUIDs[_patientDatum.patient_id].push(_patientDatum.patient_uid);
                     }
 
                     // create datum for each sample
                     var _sampleDatum = {};
+                    _sampleDatum.sample_uid = _sampleUID;
                     _sampleDatum.sample_id = _sampleId;
                     _sampleDatum.study_id = _studyId;
                     _sampleDatum.has_cna_data = 'NO';
                     _sampleDatum.sequenced = 'NO';
+                    if (!_sampleToUIDs[_sampleDatum.sample_id]) {
+                      _sampleToUIDs[_sampleDatum.sample_id] = [];
+                    }
+                    _sampleToUIDs[_sampleDatum.sample_id].push( _sampleDatum.sample_uid);
                     // mutation count
                     if (_hasMutationCountData) {
                       _hasSampleAttrData.mutation_count = '';
                       if (_mutationCountData[_sampleId] === undefined ||
                         _mutationCountData[_sampleId] === null) {
-                        if (_sequencedCasesMap[_sampleDatum.sample_id] === undefined) {
+                        if (_sequencedCaseUIdsMap[_sampleUID] === undefined) {
                           _sampleDatum.mutation_count = 'NA';
                         } else {
                           _sampleDatum.mutation_count = 0;
@@ -484,29 +512,26 @@ window.DataManagerForIviz = (function($, _) {
                       }
                     }
                     if (self.hasMutationData()) {
-                      if (_sequencedCasesMap[_sampleDatum.sample_id] !== undefined) {
+                      if (_sequencedCaseUIdsMap[_sampleDatum.sample_uid] !== undefined) {
                         _sampleDatum.sequenced = 'YES';
                       }
                       _sampleDatum.mutated_genes = [];
                     }
                     if (self.hasCnaSegmentData()) {
-                      if (_cnaCasesMap[_sampleDatum.sample_id] !== undefined) {
+                      if (_cnaCaseUIdsMap[_sampleId] !== undefined) {
                         _sampleDatum.has_cna_data = 'YES';
                       }
                       _sampleDatum.cna_details = [];
                     }
-                    _sampleData.push(_sampleDatum);
-                    // indices
-                    _sampleDataIndicesObj[_sampleId] = _indexSample;
-                    _indexSample += 1;
+                    _sampleUIDData[_sampleUID] = _sampleDatum;
                   });
                 });
 
                 // Add sample_count_patient data
-                _.each(_patientData, function(datum) {
+                _.each(_patientUIDData, function(datum, patientUID) {
                   _hasPatientAttrData.sample_count_patient = '';
-                  if (_patientToSampleMap.hasOwnProperty(datum.patient_id)) {
-                    datum.sample_count_patient = _patientToSampleMap[datum.patient_id].length.toString();
+                  if (_patientToSampleMap.hasOwnProperty(patientUID)) {
+                    datum.sample_count_patient = _patientToSampleMap[patientUID].length.toString();
                   }
                 });
 
@@ -544,8 +569,8 @@ window.DataManagerForIviz = (function($, _) {
                   _cnaAttrMeta.priority = 4;
                   _cnaAttrMeta.attrList = [_cnaAttrMeta.attr_id];
                   _cnaAttrMeta.options = {
-                    allCases: _caseLists.allSampleIds,
-                    sequencedCases: _cnaCases
+                    allCases: _allCaseUIDs,
+                    sequencedCases: _cnaCaseUIDs
                   };
                   _sampleAttributes[_cnaAttrMeta.attr_id] = _cnaAttrMeta;
                 }
@@ -568,8 +593,8 @@ window.DataManagerForIviz = (function($, _) {
                   _mutDataAttrMeta.priority = 3;
                   _mutDataAttrMeta.attrList = [_mutDataAttrMeta.attr_id];
                   _mutDataAttrMeta.options = {
-                    allCases: _caseLists.allSampleIds,
-                    sequencedCases: _sequencedCases
+                    allCases: _allCaseUIDs,
+                    sequencedCases: _sequencedCaseUIDs
                   };
                   _sampleAttributes[_mutDataAttrMeta.attr_id] = _mutDataAttrMeta;
                 }
@@ -678,32 +703,27 @@ window.DataManagerForIviz = (function($, _) {
                   }
                 });
 
-                _result.groups = {};
-                _result.groups.patient = {};
-                _result.groups.sample = {};
-                _result.groups.group_mapping = {};
-                _result.groups.patient.attr_meta =
-                  content.util
-                    .sortByClinicalPriority(_.values(_patientAttributes));
-                _result.groups.sample.attr_meta =
-                  content.util
-                    .sortByClinicalPriority(_.values(_sampleAttributes));
-                _result.groups.patient.data = _patientData;
-                _result.groups.patient.hasAttrData = _hasPatientAttrData;
-                _result.groups.sample.data = _sampleData;
-                _result.groups.sample.hasAttrData = _hasSampleAttrData;
-                _result.groups.patient.data_indices = {};
-                _result.groups.sample.data_indices = {};
-                _result.groups.patient.data_indices.patient_id =
-                  _patientDataIndicesObj;
-                _result.groups.sample.data_indices.sample_id =
-                  _sampleDataIndicesObj;
-                _result.groups.group_mapping.sample = {};
-                _result.groups.group_mapping.patient = {};
-                _result.groups.group_mapping.sample.patient =
-                  _samplesToPatientMap;
-                _result.groups.group_mapping.patient.sample =
-                  _patientToSampleMap;
+                _result.groups = {
+                  group_mapping: {
+                    patient_to_sample: _patientToSampleMap,
+                    sample_to_patient: _samplesToPatientMap,
+                    patient_to_uid: _patientToUIDs,
+                    sample_to_uid: _sampleToUIDs,
+                    studyMap: _studyToSampleToPatientMap
+                  },
+                  patient: {
+                    attr_meta: content.util
+                      .sortByClinicalPriority(_.values(_patientAttributes)),
+                    data: _patientUIDData,
+                    has_attr_data: _hasPatientAttrData
+                  },
+                  sample: {
+                    attr_meta: content.util
+                      .sortByClinicalPriority(_.values(_sampleAttributes)),
+                    data: _sampleUIDData,
+                    has_attr_data: _hasSampleAttrData
+                  }
+                };
 
                 self.initialSetupResult = _result;
                 _def.resolve(_result);
@@ -979,24 +999,27 @@ window.DataManagerForIviz = (function($, _) {
         }),
       getCaseLists: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
-          var _allSampleIds = [];
-          var _sequencedSampleIds = [];
-          var _cnaSampleIds = [];
+          var _responseStudyCaseList = {};
           var requests = self.getCancerStudyIds().map(
             function(cancer_study_id) {
               var def = new $.Deferred();
               window.cbioportal_client
                 .getSampleLists({study_id: [cancer_study_id]})
                 .then(function(_sampleLists) {
+                  var studyCaseList = {sequencedSampleIds:[],
+                    cnaSampleIds: [],
+                    allSampleIds: []
+                  };
                   _.each(_sampleLists, function(_sampleList) {
                     if (_sampleList.id === cancer_study_id + '_sequenced') {
-                      _sequencedSampleIds = _sequencedSampleIds.concat(_sampleList.sample_ids);
+                      studyCaseList.sequencedSampleIds = _sampleList.sample_ids;
                     } else if (_sampleList.id === cancer_study_id + '_cna') {
-                      _cnaSampleIds = _cnaSampleIds.concat(_sampleList.sample_ids);
+                      studyCaseList.cnaSampleIds = _sampleList.sample_ids;
                     } else if (_sampleList.id === cancer_study_id + '_all') {
-                      _allSampleIds = _allSampleIds.concat(_sampleList.sample_ids);
+                      studyCaseList.allSampleIds = _sampleList.sample_ids;
                     }
                   });
+                  _responseStudyCaseList[cancer_study_id] = studyCaseList;
                   def.resolve();
                 }).fail(
                 function() {
@@ -1005,12 +1028,7 @@ window.DataManagerForIviz = (function($, _) {
               return def.promise();
             });
           $.when.apply($, requests).then(function() {
-            var _completeSampleLists = {};
-            _completeSampleLists.allSampleIds = _allSampleIds.sort();
-            _completeSampleLists.sequencedSampleIds =
-              _sequencedSampleIds.sort();
-            _completeSampleLists.cnaSampleIds = _cnaSampleIds.sort();
-            fetch_promise.resolve(_completeSampleLists);
+            fetch_promise.resolve(_responseStudyCaseList);
           }).fail(function() {
             fetch_promise.reject();
           });
@@ -1053,6 +1071,8 @@ window.DataManagerForIviz = (function($, _) {
       getStudyToSampleToPatientdMap: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           var study_to_sample_to_patient = {};
+          var _sampleUID = 0;
+          var _patientUID = 0;
           var getSamplesCall = function(cancerStudyId) {
             var def = new $.Deferred();
             window.cbioportal_client.getSamples({
@@ -1060,10 +1080,25 @@ window.DataManagerForIviz = (function($, _) {
               sample_ids: self.studyCasesMap[cancerStudyId].samples
             }).then(function(data) {
               var sample_to_patient = {};
+              var sample_to_patient_uid = {};
+              var uid_to_sample = {};
+              var sample_to_uid = {};
+              var patient_to_uid = {};
+              var uid_to_patient = {};
+              var resultMap = {};
               var patientList = [];
               for (var i = 0; i < data.length; i++) {
+                uid_to_sample[_sampleUID] = data[i].id;
+                sample_to_uid[data[i].id] = _sampleUID;
+                if (patient_to_uid[data[i].patient_id] === undefined) {
+                  uid_to_patient[_patientUID] = data[i].patient_id;
+                  patient_to_uid[data[i].patient_id] = _patientUID;
+                  _patientUID++;
+                }
                 sample_to_patient[data[i].id] = data[i].patient_id;
+                sample_to_patient_uid[_sampleUID] = patient_to_uid[data[i].patient_id];
                 patientList.push(data[i].patient_id);
+                _sampleUID++;
               }
               // set patient list in studyCasesMap if sample list is
               // passed in the input
@@ -1071,7 +1106,13 @@ window.DataManagerForIviz = (function($, _) {
                 self.studyCasesMap[cancerStudyId].samples.length > 0) {
                 self.studyCasesMap[cancerStudyId].patients = _.unique(patientList);
               }
-              study_to_sample_to_patient[cancerStudyId] = sample_to_patient;
+              resultMap.uid_to_sample = uid_to_sample;
+              resultMap.uid_to_patient = uid_to_patient;
+              resultMap.sample_to_uid = sample_to_uid;
+              resultMap.patient_to_uid = patient_to_uid;
+              resultMap.sample_to_patient = sample_to_patient;
+              resultMap.sample_to_patient_uid = sample_to_patient_uid;
+              study_to_sample_to_patient[cancerStudyId] = resultMap;
               def.resolve();
             }).fail(function() {
               def.reject();
@@ -1157,11 +1198,6 @@ window.DataManagerForIviz = (function($, _) {
           var _ajaxCnaData = {};
           var fetch_promises = [];
           var _cnaProfiles = self.cnaProfileIdsMap;
-          _ajaxCnaData.gene = [];
-          _ajaxCnaData.gistic = [];
-          _ajaxCnaData.cytoband = [];
-          _ajaxCnaData.alter = [];
-          _ajaxCnaData.caseIds = [];
           var _studyCasesMap = self.getStudyCasesMap();
 
           fetch_promises = fetch_promises.concat(_.map(_cnaProfiles,
@@ -1180,11 +1216,7 @@ window.DataManagerForIviz = (function($, _) {
                 url: self.portalUrl + 'cna.json?',
                 data: _data,
                 success: function(response) {
-                  _ajaxCnaData.gene = _ajaxCnaData.gene.concat(response.gene);
-                  _ajaxCnaData.gistic = _ajaxCnaData.gistic.concat(response.gistic);
-                  _ajaxCnaData.cytoband = _ajaxCnaData.cytoband.concat(response.cytoband);
-                  _ajaxCnaData.alter = _ajaxCnaData.alter.concat(response.alter);
-                  _ajaxCnaData.caseIds = _ajaxCnaData.caseIds.concat(response.caseIds);
+                  _ajaxCnaData[_studyId] = response;
                   _def.resolve();
                 },
                 error: function() {
@@ -1239,7 +1271,7 @@ window.DataManagerForIviz = (function($, _) {
       getMutData: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           var fetch_promises = [];
-          var _mutDataStudyIdArr = {};
+          var _mutDataStudyIdArr = [];
           var _mutationProfiles = self.mutationProfileIdsMap;
           var _studyCasesMap = self.getStudyCasesMap();
           fetch_promises = fetch_promises.concat(_.map(_mutationProfiles,
@@ -1258,7 +1290,10 @@ window.DataManagerForIviz = (function($, _) {
                 url: self.portalUrl + 'mutations.json?',
                 data: _data,
                 success: function(response) {
-                  _mutDataStudyIdArr = $.extend({}, response, _mutDataStudyIdArr);
+                  _.each(response, function(element) {
+                    _.extend(element, {study_id: _studyId});
+                  });
+                  _mutDataStudyIdArr = _mutDataStudyIdArr.concat(response);
                   _def.resolve();
                 },
                 error: function() {
@@ -1282,7 +1317,7 @@ window.DataManagerForIviz = (function($, _) {
           this.getSampleClinicalData(attribute_ids);
       },
       getAllGenePanelSampleIds: window.cbio.util.makeCachedPromiseFunction(
-        function (self, fetch_promise) {
+        function(self, fetch_promise) {
           var _map = {};
           var asyncAjaxCalls = [];
           var responses = [];

@@ -32,13 +32,12 @@
       _.each(_selectedPatients, function(_patientId) {
         _tmpSelectedPatientIdMap[_patientId] = '';
       });
-      _.each(Object.keys(iViz.getCaseIndices(opts_.type)),
-        function(_patientId) {
-          var _index = iViz.getCaseIndices(opts_.type)[_patientId];
-          if (_tmpSelectedPatientIdMap.hasOwnProperty(_patientId)) {
-            _selectedData.push(data_[_index]);
+      _.each(Object.keys(iViz.getCasesMap(opts_.type)),
+        function(_caseUID) {
+          if (_tmpSelectedPatientIdMap.hasOwnProperty(_caseUID)) {
+            _selectedData.push(data_[_caseUID]);
           } else {
-            _unselectedData.push(data_[_index]);
+            _unselectedData.push(data_[_caseUID]);
           }
         });
 
