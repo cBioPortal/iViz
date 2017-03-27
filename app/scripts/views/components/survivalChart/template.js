@@ -80,7 +80,7 @@
           }];
         }
 
-        groups = this.calcCurvesData(groups);
+        groups = this.calcCurvesData(groups, _type);
 
         // Display name may be changed due to the rainbow survival
         this.displayName = this.attributes.display_name;
@@ -143,6 +143,11 @@
           });
           qtipContent.push('</div>');
           this.mainDivQtip.qtip('api').set('content.text', qtipContent.join(''));
+          if (_.isArray(groups) && groups.length > 0) {
+            this.mainDivQtip.qtip('api').disable(false);
+          } else {
+            this.mainDivQtip.qtip('api').disable(true);
+          }
         }
       },
       mouseEnter: function() {
@@ -217,6 +222,8 @@
         title: this.attributes.display_name,
         type: this.attributes.group_type
       };
+      var _type = this.attributes.group_type;
+      
       _self.chartInst = new iViz.view.component.Survival();
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
@@ -224,8 +231,11 @@
       var groups = [{
         id: 0,
         name: 'All Patients',
-        curveHex: '#2986e2'
+        curveHex: '#2986e2',
+        caseIds: Object.keys(iViz.getCaseIndices(_type))
       }];
+      groups = this.calcCurvesData(groups, _type);
+
       _self.chartInst.init(groups, data, _opts);
       _self.showLoad = false;
 

@@ -16,36 +16,41 @@
       this.chartInst_ =
         new iViz.view.component
           .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
-      this.chartInst_.addCurve(_dataProxy.get(), 0, opts_.curveHex || '#2986e2');
-      groups_ = groups;
+      this.update(groups, _opts.chartId, _opts.attrId);
     };
 
     // _attrId here indicates chart type (OS or DFS)
     content_.update = function(groups, _chartId, _attrId) {
       // remove previous curves
       var _chartInst_ = this.chartInst_;
+      var _newGroups = [];
       _chartInst_.removeCurves();
+      _chartInst_.removePval();
+      _chartInst_.removeNoInfo();
 
-      // Calculate proxy data for each group
-      _.each(groups, function(group) {
-        group.proxyData =
-          new iViz.data.SurvivalChartProxy(group.data, _attrId).get();
-      });
+      if (_.isArray(groups)) {
 
-      if (groups.length === 1) {
-        _chartInst_.addCurve(
-          groups[0].proxyData, 0, groups[0].curveHex || '#2986e2');
-      } else {
-        _.each(groups, function(group, index) {
-          _chartInst_.addCurve(group.proxyData, index, group.curveHex);
+        // Calculate proxy data for each group
+        _.each(groups, function(group) {
+          group.proxyData =
+            new iViz.data.SurvivalChartProxy(group.data, _attrId).get();
+          if(_.isArray(group.proxyData) && group.proxyData.length > 0) {
+            _newGroups.push(group);
+          }
         });
+
+        if (_newGroups.length > 0) {
+          if (_newGroups.length === 2) {
+            _chartInst_.addPval(_newGroups[0].proxyData, _newGroups[1].proxyData);
+          }
+          _.each(_newGroups, function(group, index) {
+            _chartInst_.addCurve(group.proxyData, index, group.curveHex);
+          });
+        } else {
+          _chartInst_.addNoInfo();
+        }
       }
-      if (groups.length === 2) {
-        _chartInst_.addPval(groups[0].proxyData, groups[1].proxyData);
-      } else {
-        _chartInst_.removePval();
-      }
-      groups_ = groups;
+      groups_ = _newGroups;
     };
 
     content_.updateDataForDownload = function(fileType) {

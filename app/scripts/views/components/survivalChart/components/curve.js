@@ -103,8 +103,8 @@
   };
 
   iViz.view.component.SurvivalCurve.prototype.addCurve = function(_data,
-                                                                  _curveIndex,
-                                                                  _lineColor) {
+    _curveIndex,
+    _lineColor) {
     var _self = this;
 
     // add an empty/zero point so the curve starts from zero time point
@@ -276,6 +276,26 @@
         .style('text-anchor', 'end')
         .text('p = ' + _pVal.toPrecision(2));
     };
+
+  iViz.view.component.SurvivalCurve.prototype.addNoInfo =
+    function() {
+      var _self = this;
+      _self.elem_.svg.selectAll('.noInfo').remove();
+
+      _self.elem_.svg.append('text')
+        .attr('class', 'noInfo')
+        .attr('x', _self.opts_.width / 2 + 25)
+        .attr('y', _self.opts_.height / 2)
+        .attr('font-size', 15)
+        .style('font-style', 'bold')
+        .style('text-anchor', 'middle')
+        .text('No data available');
+    };
+
+  iViz.view.component.SurvivalCurve.prototype.removeNoInfo = function() {
+    var _self = this;
+    _self.elem_.svg.selectAll('.noInfo').remove();
+  };
 
   iViz.view.component.SurvivalCurve.prototype.removePval = function() {
     var _self = this;
