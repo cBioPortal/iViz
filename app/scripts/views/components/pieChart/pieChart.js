@@ -371,9 +371,8 @@
       $('#' + v.opts.chartId).find('svg g .mark').remove();
     }
 
-    function drawMarker(_childID, _fatherID) {
-      var _path = $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + _childID + ')')
-        .find('path');
+    function drawMarker(_slice) {
+      var _path = $(_slice).find('path');
       var _pointsInfo = _path
         .attr('d')
         .split(/[\s,MLHVCSQTAZ]/);
@@ -419,7 +418,6 @@
             ' than start angle.', 'color: red');
         }
 
-        var _arcID = 'arc-' + _fatherID + '-' + (Number(_childID) - 1);
         var _arc = d3.svg.arc()
           .innerRadius(_r + 3)
           .outerRadius(_r + 5)
@@ -429,32 +427,47 @@
         d3.select('#' + v.opts.chartId + ' svg g').append('path')
           .attr('d', _arc)
           .attr('fill', _fill)
-          .attr('id', _arcID)
           .attr('class', 'mark');
       }
     }
 
     function pieLabelMouseEnter(data) {
-      var childID = Number(data.index) + 1;
-      var fatherID = v.opts.chartId;
-
-      $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + childID + ')').css({
+      var _slice = getPieSlice(data);
+      
+      $(_slice).css({
         'fill-opacity': '.5',
         'stroke-width': '3'
       });
 
-      drawMarker(childID, fatherID);
+      drawMarker(_slice);
     }
 
     function pieLabelMouseLeave(data) {
-      var childID = Number(data.index) + 1;
+      var _slice = getPieSlice(data);
 
-      $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + childID + ')').css({
+      $(_slice).css({
         'fill-opacity': '1',
         'stroke-width': '1px'
       });
-
+      
       removeMarker();
+    }
+
+    function getPieSlice(data) {
+      var _color = data.color;
+      var _slice;
+
+      $('#' + v.opts.chartId + ' svg g.pie-slice').each(function(index, item) {
+        var _sliceColor = $(item).find('path').attr('fill');
+        if (_sliceColor === _color) {
+          _slice = item;
+          $(item).css({
+            'fill-opacity': '1',
+            'stroke-width': '1px'
+          });
+        }
+      });
+      return _slice;
     }
 
     function initReactTable(targetId, inputData, opts) {
