@@ -21,7 +21,7 @@
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
     '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
-      'ndx', 'attributes', 'options'
+      'ndx', 'attributes', 'options', 'showedSurvivalPlot'
     ],
     data: function() {
       return {
@@ -40,7 +40,7 @@
         isMutatedGeneCna: false,
         classTableHeight: 'grid-item-h-2',
         madeSelection: false,
-        showSurvivalIcon: true,
+        showSurvivalIcon: false,
         genePanelMap: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20
       };
@@ -52,6 +52,9 @@
           this.selectedRows = [];
         }
         this.$dispatch('update-filters', true);
+      },
+      'showedSurvivalPlot': function() {
+        this.showRainbowSurvival();
       }
     },
     events: {
@@ -77,7 +80,7 @@
           this.chartInst.update(_selectedCases, this.selectedRows);
           this.setDisplayTitle(this.chartInst.getCases().length);
           this.showLoad = false;
-          this.showSurvivalIcon = this.showRainbowSurvival();
+          this.showRainbowSurvival();
         }
       },
       'closeChart': function() {
@@ -201,17 +204,14 @@
         this.showLoad = false;
       },
       showRainbowSurvival: function() {
-        if (this.isMutatedGeneCna) {
-          return false;
-        }
-
         var categories = this.chartInst.getCurrentCategories();
-        if (_.isArray(categories) &&
-          (categories.length > 1 &&
-          categories.length <= this.numOfSurvivalCurveLimit)) {
-          return true;
+        if (this.showedSurvivalPlot && !this.isMutatedGeneCna && _.isArray(categories) &&
+          categories.length > 1 &&
+          categories.length <= this.numOfSurvivalCurveLimit) {
+          this.showSurvivalIcon = true;
+        } else {
+          this.showSurvivalIcon = false;
         }
-        return false;
       }
     },
     ready: function() {
@@ -251,7 +251,7 @@
       } else {
         _self.processTableData();
       }
-      this.showSurvivalIcon = this.showRainbowSurvival();
+      this.showRainbowSurvival();
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

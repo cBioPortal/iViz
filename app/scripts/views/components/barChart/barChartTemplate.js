@@ -21,7 +21,7 @@
     'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
     props: [
-      'ndx', 'attributes'
+      'ndx', 'attributes', 'showedSurvivalPlot'
     ],
     data: function() {
       return {
@@ -35,7 +35,7 @@
         barChart: '',
         showOperations: false,
         filtersUpdated: false,
-        showSurvivalIcon: true,
+        showSurvivalIcon: false,
         data: {},
         settings: {
           width: 400,
@@ -59,6 +59,9 @@
           }
         }
         this.barChart.resetBarColor();
+      },
+      'showedSurvivalPlot': function() {
+        this.updateShowSurvivalIcon();
       }
     }, events: {
       closeChart: function() {
@@ -115,6 +118,19 @@
       }
     },
     methods: {
+      updateShowSurvivalIcon: function() {
+        if (this.showedSurvivalPlot) {
+          // Disable rainbow survival if only one group present
+          if (this.barChart.getCurrentCategories().length < 2 ||
+            this.barChart.getCurrentCategories().length > this.numOfSurvivalCurveLimit) {
+            this.showSurvivalIcon = false;
+          } else {
+            this.showSurvivalIcon = true
+          }
+        } else {
+          this.showSurvivalIcon = false;
+        }
+      },
       mouseEnter: function() {
         this.showOperations = true;
       }, mouseLeave: function() {
@@ -186,17 +202,7 @@
         this.settings.showLogScale = true;
       }
       this.initChart(this.settings.showLogScale);
-
-      // Disable rainbow survival if only one group present
-      if (this.barChart.getCurrentCategories().length < 2) {
-        this.showSurvivalIcon = false;
-      }
-      // Disable rainbow survival if only one group present
-      if (this.barChart.getCurrentCategories().length < 2 ||
-        this.barChart.getCurrentCategories().length > this.numOfSurvivalCurveLimit) {
-        this.showSurvivalIcon = false;
-      }
-      
+      this.updateShowSurvivalIcon();
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

@@ -8,10 +8,10 @@
     ':hasfilters="hasfilters" :id="group.id" :type="group.type" ' +
     ':mappedcases="group.type==\'patient\'?patientsync:samplesync" ' +
     ' :attributes.sync="group.attributes" :clear-group="clearAll"' +
-    ' v-for="group in groups"></chart-group> ',
+    ' v-for="group in groups" :showed-survival-plot="showedSurvivalPlot"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'hasfilters',
-      'redrawgroups', 'customfilter', 'clearAll'
+      'redrawgroups', 'customfilter', 'clearAll', 'showedSurvivalPlot'
     ], data: function() {
       return {
         patientsync: [],

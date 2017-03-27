@@ -48,7 +48,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     numOfSurvivalCurveLimit: 20,
     dc: {
       transitionDuration: 400
-    }
+    },
+    showSurvival: false
   };
 
   function getAttrVal(attrs, arr) {
@@ -110,6 +111,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           attrData.show = false;
         }
         charts[attrData.attr_id] = attrData;
+        if (attrData.view_type === 'survival' && attrData.show) {
+          vm_.numOfSurvivalPlots++;
+        }
       });
       group.attributes = groupAttrs;
       groups.push(group);

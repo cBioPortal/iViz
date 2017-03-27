@@ -22,7 +22,7 @@
     '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>' +
     '</div>',
     props: [
-      'ndx', 'attributes'
+      'ndx', 'attributes', 'showedSurvivalPlot'
     ],
     data: function() {
       return {
@@ -45,7 +45,7 @@
         filtersUpdated: false,
         addingChart: false,
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
-        showSurvivalIcon: true
+        showSurvivalIcon: false
       };
     },
     watch: {
@@ -61,6 +61,9 @@
           }
           this.$dispatch('update-filters', true);
         }
+      },
+      'showedSurvivalPlot': function() {
+        this.updateShowSurvivalIcon();
       }
     },
     events: {
@@ -114,6 +117,15 @@
       }
     },
     methods: {
+      updateShowSurvivalIcon: function() {
+        if (this.showedSurvivalPlot &&
+          this.piechart.getCurrentCategories().length >= 2 &&
+          this.piechart.getCurrentCategories().length <= this.numOfSurvivalCurveLimit) {
+          this.showSurvivalIcon = true;
+        } else {
+          this.showSurvivalIcon = false;
+        }
+      },
       mouseEnter: function() {
         this.showOperations = true;
         this.$emit('initMainDivQtip');
@@ -176,11 +188,7 @@
         }
       });
 
-      // Disable rainbow survival if only one group present
-      if (_self.piechart.getCurrentCategories().length < 2 ||
-        _self.piechart.getCurrentCategories().length > this.numOfSurvivalCurveLimit) {
-        this.showSurvivalIcon = false;
-      }
+      _self.updateShowSurvivalIcon();
       _self.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

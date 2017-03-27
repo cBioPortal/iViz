@@ -36,7 +36,9 @@
             updateStats: false,
             clearAll: false,
             showScreenLoad: false,
-            showDropDown: false
+            showDropDown: false,
+            numOfSurvivalPlots: 0,
+            showedSurvivalPlot: false
           }, watch: {
             charts: function() {
               this.checkForDropDownCharts();
@@ -78,6 +80,13 @@
               if (newVal.length !== oldVal.length) {
                 this.selectedPatientsNum = newVal.length;
               }
+            },
+            numOfSurvivalPlots: function(newVal) {
+              if (!newVal || newVal <= 0) {
+                this.showedSurvivalPlot = false;
+              } else {
+                this.showedSurvivalPlot = true;
+              }
             }
           }, events: {
             'manage-genes': function(geneList) {
@@ -88,6 +97,12 @@
               this.removeChart(attrId, groupId);
             }
           }, methods: {
+            addSurvival: function() {
+              this.numOfSurvivalPlots++;
+            },
+            removeSurvival: function() {
+              this.numOfSurvivalPlots--;
+            },
             checkForDropDownCharts: function() {
               var showDropDown = false;
               _.each(this.charts, function(_chart) {
@@ -158,6 +173,9 @@
                     if (isGroupNdxDataUpdated) {
                       self_.$broadcast('add-chart-to-group', attrData.group_id);
                     }
+                    if (attrData.view_type === 'survival') {
+                      self_.addSurvival();
+                    }
                     self_.$nextTick(function() {
                       $('#iviz-add-chart').trigger('chosen:updated');
                       self_.showScreenLoad = false;
@@ -192,6 +210,10 @@
 
               self.$broadcast('remove-grid-item',
                 $('#chart-' + attrId + '-div'));
+
+              if (attrData.view_type === 'survival') {
+                this.removeSurvival();
+              }
 
               self.$nextTick(function() {
                 $('#iviz-add-chart').trigger('chosen:updated');
@@ -245,8 +267,8 @@
                   ' ID' + (unmappedCaseIds.length === 1 ? ' was' : 's were') +
                   ' not found in this study: ' +
                   unmappedCaseIds.join(', '), {
-                    message_type: 'danger'
-                  });
+                  message_type: 'danger'
+                });
               } else {
                 new Notification().createNotification(selectedCaseIds.length +
                   ' case(s) selected.', {message_type: 'info'});
