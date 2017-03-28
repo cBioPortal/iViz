@@ -97,12 +97,6 @@
               this.removeChart(attrId, groupId);
             }
           }, methods: {
-            addSurvival: function() {
-              this.numOfSurvivalPlots++;
-            },
-            removeSurvival: function() {
-              this.numOfSurvivalPlots--;
-            },
             checkForDropDownCharts: function() {
               var showDropDown = false;
               _.each(this.charts, function(_chart) {
@@ -174,7 +168,7 @@
                       self_.$broadcast('add-chart-to-group', attrData.group_id);
                     }
                     if (attrData.view_type === 'survival') {
-                      self_.addSurvival();
+                      self_.numOfSurvivalPlots++;
                     }
                     self_.$nextTick(function() {
                       $('#iviz-add-chart').trigger('chosen:updated');
@@ -212,7 +206,7 @@
                 $('#chart-' + attrId + '-div'));
 
               if (attrData.view_type === 'survival') {
-                this.removeSurvival();
+                this.numOfSurvivalPlots--;
               }
 
               self.$nextTick(function() {

@@ -48,8 +48,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     numOfSurvivalCurveLimit: 20,
     dc: {
       transitionDuration: 400
-    },
-    showSurvival: false
+    }
   };
 
   function getAttrVal(attrs, arr) {
