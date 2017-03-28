@@ -55,7 +55,8 @@
         titleTooltip: {
           content: _.isObject(this.attributes) ?
             iViz.util.getClinicalAttrTooltipContent(this.attributes) : ''
-        }
+        },
+        numOfIcons: 4
       };
     },
     watch: {
@@ -64,6 +65,17 @@
         this.$dispatch('changeLogScale', newVal);
       }, filters: function(newVal) {
         this.hasFilters = newVal.length > 0;
+      },
+      // Only set up the watcher for survival icon for now. This is the only icon known maybe changed so far.
+      showSurvivalIcon: function(newVal) {
+        if(newVal) {
+          this.numOfIcons++;
+        }else {
+          this.numOfIcons--;
+        }
+      },
+      numOfIcons: function(newVal) {
+        this.chartTitleActive = 'chart-title-active chart-title-active-' + newVal;
       }
     },
     methods: {
@@ -161,6 +173,29 @@
           }
         }
       });
+
+      var _numOfIcons = this.numOfIcons;
+
+      if (self.showPieIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.showTableIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.showSurvivalIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.hasTitleTooltip()) {
+        _numOfIcons++;
+      }
+
+      if (self.showLogScale) {
+        _numOfIcons++;
+      }
+      this.numOfIcons = _numOfIcons;
     }
   });
 })(window.Vue,
