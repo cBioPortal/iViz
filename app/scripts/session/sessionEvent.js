@@ -38,7 +38,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
         });
         if (typeof _studyMatch === 'undefined') {
           /*
-           TODO : if virtual study is not present in local storage
+           TODO : if virtual cohort is not present in local storage
            */
           console.log('virtual cohort not found');
         } else {

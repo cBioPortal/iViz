@@ -7,8 +7,8 @@ window.vcSession = window.vcSession ? window.vcSession : {};
   }
   vcSession.utils = (function() {
     var virtualCohort_ = {
-      studyName: 'My virtual study',
-      description: 'My virtual study - Description',
+      studyName: 'My virtual cohort',
+      description: 'My virtual cohort - Description',
       userID: 'DEFAULT',
       created: '',
       filters: '',

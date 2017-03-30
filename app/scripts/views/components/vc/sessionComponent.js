@@ -112,7 +112,7 @@
                       self_.userid, cohortName, cohortDescription || '')
                       .done(function() {
                         tooltip.find('.savedMessage').text(
-                          'Added to new Virtual Study');
+                          'Added to new Virtual Cohort');
                       })
                       .fail(function() {
                         tooltip.find('.savedMessage').html(
@@ -173,7 +173,7 @@
           '<div class="saved" style="display: none;">' +
           '<span class="savedMessage"></span>' +
           '<button class="btn btn-default btn-sm query"' +
-          '>Query Virtual Study</button></div>' +
+          '>Query Virtual Cohort</button></div>' +
           '</div>'
         });
       }
