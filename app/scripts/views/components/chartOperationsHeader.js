@@ -28,7 +28,7 @@
     '<i v-if="showPieIcon" class="fa fa-pie-chart icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
     '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" ' +
-    'class="icon hover" @click="getRainbowSurvival" />' +
+    'class="icon hover" @click="getRainbowSurvival" alt="Survival Analysis"/>' +
     '<div id="{{chartId}}-download-icon-wrapper" class="download">' +
     '<i class="fa fa-download icon hover" alt="download" ' +
     'id="{{chartId}}-download"></i>' +
