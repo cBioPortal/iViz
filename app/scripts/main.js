@@ -45,7 +45,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
     init: function(_rawDataJSON, opts) {
       vm_ = iViz.vue.manage.getInstance();
-      console.log(data_);
 
       data_ = _rawDataJSON;
 
@@ -383,10 +382,10 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       return data_.groups.group_mapping.studyMap[study_id].patient_to_uid[case_id];
     },
     getCaseUIDs: function(type, case_id) {
-      if (type === 'sample') {
-        return data_.groups.group_mapping.sample_to_uid[case_id];
-      }
-      return data_.groups.group_mapping.patient_to_uid[case_id];
+      return Object.keys(data_.groups.group_mapping.studyMap).reduce(function(a, b) {
+        var _uid = data_.groups.group_mapping.studyMap[b][type + '_to_uid'][case_id];
+        return (_uid === undefined) ? a : a.concat(_uid);
+      }, []);
     },
     getCaseIdUsingUID: function(type, study_id, case_uid) {
       if (type === 'sample') {

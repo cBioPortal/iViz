@@ -438,8 +438,6 @@ window.DataManagerForIviz = (function($, _) {
 
                 var _samplesToPatientMap = {};
                 var _patientToSampleMap = {};
-                var _patientToUIDs = {};
-                var _sampleToUIDs = {};
                 _hasSampleAttrData.sample_id_uid = '';
                 _hasSampleAttrData.sample_id_id = '';
                 _hasSampleAttrData.study_id = '';
@@ -467,10 +465,6 @@ window.DataManagerForIviz = (function($, _) {
                       _hasPatientAttrData.study_id = '';
                       _hasPatientAttrData.patient_id = '';
                       _patientUIDData[_patientUID] = _patientDatum;
-                      if (!_patientToUIDs[_patientDatum.patient_id]) {
-                        _patientToUIDs[_patientDatum.patient_id] = [];
-                      }
-                      _patientToUIDs[_patientDatum.patient_id].push(_patientDatum.patient_uid);
                     }
 
                     // create datum for each sample
@@ -480,10 +474,6 @@ window.DataManagerForIviz = (function($, _) {
                     _sampleDatum.study_id = _studyId;
                     _sampleDatum.has_cna_data = 'NO';
                     _sampleDatum.sequenced = 'NO';
-                    if (!_sampleToUIDs[_sampleDatum.sample_id]) {
-                      _sampleToUIDs[_sampleDatum.sample_id] = [];
-                    }
-                    _sampleToUIDs[_sampleDatum.sample_id].push( _sampleDatum.sample_uid);
                     // mutation count
                     if (_hasMutationCountData) {
                       _hasSampleAttrData.mutation_count = '';
@@ -707,8 +697,6 @@ window.DataManagerForIviz = (function($, _) {
                   group_mapping: {
                     patient_to_sample: _patientToSampleMap,
                     sample_to_patient: _samplesToPatientMap,
-                    patient_to_uid: _patientToUIDs,
-                    sample_to_uid: _sampleToUIDs,
                     studyMap: _studyToSampleToPatientMap
                   },
                   patient: {
