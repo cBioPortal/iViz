@@ -7,6 +7,9 @@
     'use strict';
     this.chartType = chartType || 'generalChart';
     this.dataForDownload = {};
+    this.getCurrentCategories = function() {
+      return [];
+    };
     this.getChartType = function() {
       return this.chartType;
     };

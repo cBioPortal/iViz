@@ -10,38 +10,44 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
   var patientData_;
   var sampleData_;
   var charts = {};
-  var styles_ = {
-    vars: {
-      width: {
-        one: 195,
-        two: 400
-      },
-      height: {
-        one: 170,
-        two: 350
-      },
-      chartHeader: 17,
-      borderWidth: 2,
-      scatter: {
-        width: 398,
-        height: 331
-      },
-      survival: {
-        width: 398,
-        height: 331
-      },
-      specialTables: {
-        width: 398,
-        height: 306
-      },
-      piechart: {
-        width: 140,
-        height: 140
-      },
-      barchart: {
-        width: 398,
-        height: 134
+  var configs_ = {
+    styles: {
+      vars: {
+        width: {
+          one: 195,
+          two: 400
+        },
+        height: {
+          one: 170,
+          two: 350
+        },
+        chartHeader: 17,
+        borderWidth: 2,
+        scatter: {
+          width: 398,
+          height: 331
+        },
+        survival: {
+          width: 398,
+          height: 331
+        },
+        specialTables: {
+          width: 398,
+          height: 306
+        },
+        piechart: {
+          width: 140,
+          height: 140
+        },
+        barchart: {
+          width: 398,
+          height: 134
+        }
       }
+    },
+    numOfSurvivalCurveLimit: 20,
+    dc: {
+      transitionDuration: 400
     }
   };
 
@@ -63,15 +69,13 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
   return {
 
-    init: function(_rawDataJSON, opts) {
+    init: function(_rawDataJSON, configs) {
       vm_ = iViz.vue.manage.getInstance();
 
       data_ = _rawDataJSON;
 
-      if (_.isObject(opts)) {
-        if (_.isObject(opts.styles)) {
-          styles_ = _.extend(styles_, opts.styles);
-        }
+      if (_.isObject(configs)) {
+        configs_ = $.extend(true, configs_, configs);
       }
 
       hasPatientAttrDataMap_ = data_.groups.patient.hasAttrData;
@@ -106,6 +110,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           attrData.show = false;
         }
         charts[attrData.attr_id] = attrData;
+        if (attrData.view_type === 'survival' && attrData.show) {
+          vm_.numOfSurvivalPlots++;
+        }
       });
       group.attributes = groupAttrs;
       groups.push(group);
@@ -667,13 +674,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       component: {}
     },
     util: {},
-    opts: {
-      dc: {
-        transitionDuration: 400
-      }
-    },
+    opts: configs_,
     data: {},
-    styles: styles_,
+    styles: configs_.styles,
     applyVC: function(_vc) {
       var _selectedSamples = [];
       var _selectedPatients = [];

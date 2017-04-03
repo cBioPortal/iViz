@@ -8,10 +8,10 @@
     ':hasfilters="hasfilters" :id="group.id" :type="group.type" ' +
     ':mappedcases="group.type==\'patient\'?patientsync:samplesync" ' +
     ' :attributes.sync="group.attributes" :clear-group="clearAll"' +
-    ' v-for="group in groups"></chart-group> ',
+    ' v-for="group in groups" :showed-survival-plot="showedSurvivalPlot"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'hasfilters',
-      'redrawgroups', 'customfilter', 'clearAll'
+      'redrawgroups', 'customfilter', 'clearAll', 'showedSurvivalPlot'
     ], data: function() {
       return {
         patientsync: [],
@@ -221,7 +221,7 @@
           self_.samplesync = _casesSync;
           self_.patientsync = _counterCasesSync;
           if (self_.hasfilters) {
-            self_.selectedsamples = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);;
+            self_.selectedsamples = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);
             self_.selectedpatients = _resultCounterSelectedCases;
           } else {
             self_.selectedsamples = self_.completeSamplesList;
@@ -244,6 +244,13 @@
 
         this.selectedsamples = this.samplesync;
         this.selectedpatients = this.patientsync;
+      },
+      'create-rainbow-survival': function(opts) {
+        this.$broadcast('create-rainbow-survival', opts);
+        this.$broadcast('resetBarColor', [opts.attrId]);
+      },
+      'remove-rainbow-survival': function() {
+        this.$broadcast('resetBarColor', []);
       }
     }
   });
