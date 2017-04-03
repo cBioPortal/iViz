@@ -44,9 +44,9 @@
             this.cancerStudyId, this.sample);
           var msgToShow = 'Error while adding sample';
           if (_message === 'success') {
-            msgToShow = 'Added sample Virtual Study';
+            msgToShow = 'Added sample Virtual Cohort';
           } else if (_message === 'warn') {
-            msgToShow = 'Sample already present is Virtual Study';
+            msgToShow = 'Sample already present is Virtual Cohort';
           }
           jQuery.notify(msgToShow, _message);
           this.close();

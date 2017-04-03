@@ -1,25 +1,31 @@
 .view {
   display: none;
 }
+
 //not used
 .hide-content {
   display: none;
 }
+
 .show {
   display: block;
 }
 
-#cohort-component {
-  height: inherit !important;
-}
+.input-group {
+  float: left;
+  width: 140px;
+  .btn {
+    padding: 4px 12px;
+  }
 
-.cohort-save-button {
-  height: inherit !important;
-  width: inherit !important;
-}
-
-.cohort-manage-button {
-  height: inherit !important;
-  width: inherit !important;
-  padding: 0 0 !important;
+  // In order to attach the second qtip without changing the bootstrap style,
+  // Expand the icon to whole button
+  .save-cohort-btn {
+    padding: 0;
+    i {
+      height: 28px;
+      line-height: 28px;
+      padding: 0 12px;
+    }
+  }
 }

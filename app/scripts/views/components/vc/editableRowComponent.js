@@ -61,9 +61,9 @@
       };
     },
     methods: {
-      clickEdit: function(_virtualStudy) {
-        this.backupName = _virtualStudy.studyName;
-        this.backupDesc = _virtualStudy.description;
+      clickEdit: function(_virtualCohort) {
+        this.backupName = _virtualCohort.studyName;
+        this.backupDesc = _virtualCohort.description;
         this.edit = true;
       },
       clickCancel: function() {
@@ -75,22 +75,22 @@
           this.share = false;
         }
       },
-      clickDelete: function(_virtualStudy) {
+      clickDelete: function(_virtualCohort) {
         if (_.isObject(vcSession)) {
-          this.$dispatch('remove-cohort', _virtualStudy);
-          vcSession.events.removeVirtualCohort(_virtualStudy);
+          this.$dispatch('remove-cohort', _virtualCohort);
+          vcSession.events.removeVirtualCohort(_virtualCohort);
         }
       },
-      clickSave: function(_virtualStudy) {
+      clickSave: function(_virtualCohort) {
         this.edit = false;
-        if (_virtualStudy.studyName === '') {
-          _virtualStudy.studyName = 'My virtual study';
+        if (_virtualCohort.studyName === '') {
+          _virtualCohort.studyName = 'My virtual cohort';
         }
         if (_.isObject(vcSession)) {
-          vcSession.events.editVirtualCohort(_virtualStudy);
+          vcSession.events.editVirtualCohort(_virtualCohort);
         }
       },
-      clickImport: function(_virtualStudy) {
+      clickImport: function(_virtualCohort) {
         this.showmodal = false;
         // TODO: from my test cases, I have some visual cohorts stored in my
         // localstorage without virtualCohortID. Should we hide Visualize AND share
@@ -99,12 +99,12 @@
         // This back to my previous question, if the virtual cohort is not
         // available in database and API returnS 404, should we insert to
         // databAse, or delete from localstorage?
-        window.open(window.cbioURL + 'study?cohorts=' + _virtualStudy.virtualCohortID);
+        window.open(window.cbioURL + 'study?cohorts=' + _virtualCohort.virtualCohortID);
       },
-      clickShare: function(_virtualStudy) {
+      clickShare: function(_virtualCohort) {
         // TODO: Create Bitly URL
         this.shortenedLink = window.cbioURL + 'study?cohorts=' +
-          _virtualStudy.virtualCohortID;
+          _virtualCohort.virtualCohortID;
         this.share = true;
         // Check if ClipBoard instance is present, If yes re-initialize the
         // instance.

@@ -28,6 +28,7 @@
 
     return {
       saveSession: function(virtualCohort) {
+        var def = new $.Deferred();
         $.ajax({
           type: 'POST',
           url: vcSession.URL,
@@ -38,10 +39,13 @@
             virtualCohort.virtualCohortID = response.id;
             localStorageAdd_(virtualCohort);
           }
+          def.resolve();
         }).fail(function() {
           virtualCohort.virtualCohortID = vcSession.utils.generateUUID();
           localStorageAdd_(virtualCohort);
+          def.reject();
         });
+        return def.promise();
       },
       removeSession: function(_virtualCohort) {
         $.ajax({
