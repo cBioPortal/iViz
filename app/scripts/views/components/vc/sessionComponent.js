@@ -112,6 +112,17 @@
                 if (_.isObject(vcSession)) {
                   self_.updateStats = true;
                   self_.$nextTick(function() {
+                    var _selectedSamplesNum = 0;
+                    var _selectedPatientsNum = 0;
+                    if (_.isObject(self_.stats.selectedCases)) {
+                      _.each(self_.stats.selectedCases, function(studyCasesMap) {
+                        _selectedSamplesNum += studyCasesMap.samples.length;
+                        _selectedPatientsNum += studyCasesMap.patients.length;
+                      });
+                      self_.selectedSamplesNum = _selectedSamplesNum;
+                      self_.selectedPatientsNum = _selectedPatientsNum;
+                    }
+                    
                     vcSession.events.saveCohort(self_.stats,
                       cohortName, cohortDescription || '')
                       .done(function() {
