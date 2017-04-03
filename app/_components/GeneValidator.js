@@ -35,6 +35,7 @@ function GeneValidator(geneAreaId, geneModel){
                 if(symbolResults.length > 100) {
                     addNotification("<b>You have entered more than 100 genes.</b><br>Please enter fewer genes for better performance", "danger");
                     allValid=false;
+                    $("#iviz-header-left-1").attr("disabled", true);
                 }
 
                 // handle each symbol found
@@ -42,8 +43,10 @@ function GeneValidator(geneAreaId, geneModel){
                     var valid = handleSymbol(symbolResults[j])
                     if(!valid) {
                         allValid = false;
+                        $("#iviz-header-left-1").attr("disabled", true);
                     }
                 }
+                if (allValid) $("#iviz-header-left-1").attr("disabled", false);
             })
             .fail(function(xhr,  textStatus, errorThrown){
                 addNotification("There was a problem: "+errorThrown, "danger");
@@ -51,7 +54,10 @@ function GeneValidator(geneAreaId, geneModel){
             })
             .always(function(){
                 // if not all valid, focus on the gene array for focusin trigger
-                if(!allValid) $(geneAreaId).focus();
+                if(!allValid) {
+                    $(geneAreaId).focus();
+                    $("#iviz-header-left-1").attr("disabled", true);
+                }
                 // in case a submit was pressed, use the callback
                 if($.isFunction(callback)) callback(allValid);
             });

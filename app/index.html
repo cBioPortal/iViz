@@ -204,13 +204,14 @@
     iViz.vue.manage.getInstance().showManageButton = true;
     iViz.vue.manage.getInstance().showSaveButton = true;
 
-    window.cbioURL = 'http://www.cbioportal.org/';
+    window.cbioURL = 'http://localhost:8080/cbioportal/';
     window.cbioResourceURL = 'resources/';
-    window.mutationProfileId = 'hnsc_tcga_mutations';
-    window.cnaProfileId = 'hnsc_tcga_gistic';
+    window.mutationProfileId = ['brca_tcga_mutations', 'blca_tcga_mutations'];
+    window.cnaProfileId = ['brca_tcga_gistic', 'blca_tcga_gistic'];
     window.case_set_id = '-1';
     var studyCasesMap = {};
-    studyCasesMap['hnsc_tcga'] = {};
+    studyCasesMap['brca_tcga'] = {};
+    studyCasesMap['blca_tcga'] = {};
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
     $.when(

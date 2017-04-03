@@ -87,6 +87,7 @@ var QueryByGeneTextArea  = (function() {
             geneList.push(gene);
             geneModel.set("geneString", geneModel.getCleanGeneString()+" "+gene);
             new Notification().createNotification(gene+" added to your query");
+            $('#iviz-header-left-1').attr("disabled", false);
         }
         // if the gene is in the list, remove it and create a notification
         else{
