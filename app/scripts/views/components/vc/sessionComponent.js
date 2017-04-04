@@ -30,7 +30,8 @@
     data: function() {
       return {
         showVCList: false,
-        virtualCohorts: []
+        virtualCohorts: [],
+        savedVC: null
       };
     }, events: {
       'remove-cohort': function(cohort) {
@@ -107,10 +108,22 @@
                 if (_.isObject(vcSession)) {
                   self_.updateStats = true;
                   self_.$nextTick(function() {
+                    var _selectedSamplesNum = 0;
+                    var _selectedPatientsNum = 0;
+                    if (_.isObject(self_.stats.selectedCases)) {
+                      _.each(self_.stats.selectedCases, function(studyCasesMap) {
+                        _selectedSamplesNum += studyCasesMap.samples.length;
+                        _selectedPatientsNum += studyCasesMap.patients.length;
+                      });
+                      self_.selectedSamplesNum = _selectedSamplesNum;
+                      self_.selectedPatientsNum = _selectedPatientsNum;
+                    }
+                    
                     vcSession.events.saveCohort(self_.stats,
                       self_.selectedPatientsNum, self_.selectedSamplesNum,
                       self_.userid, cohortName, cohortDescription || '')
-                      .done(function() {
+                      .done(function(response) {
+                        self_.savedVC = response;
                         tooltip.find('.savedMessage').text(
                           'Added to new Virtual Cohort');
                       })
@@ -133,6 +146,11 @@
                         api.reposition();
                       });
                   });
+                }
+              });
+              tooltip.find('.query').click(function() {
+                if(_.isObject(self_.savedVC) && self_.savedVC.id) {
+                  window.open(window.cbioURL + 'study?cohorts=' + self_.savedVC.id);
                 }
               });
               tooltip.find('.close-dialog i').click(function() {
