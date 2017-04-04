@@ -14,8 +14,8 @@ window.vcSession = window.vcSession ? window.vcSession : {};
         var _virtualCohort = vcSession.utils.buildVCObject(stats.filters, stats.selectedCases,
           name, description);
         vcSession.model.saveSession(_virtualCohort)
-          .done(function() {
-            def.resolve();
+          .done(function(response) {
+            def.resolve(response);
           })
           .fail(function() {
             def.reject();

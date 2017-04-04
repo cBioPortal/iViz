@@ -30,7 +30,8 @@
     data: function() {
       return {
         showVCList: false,
-        virtualCohorts: []
+        virtualCohorts: [],
+        savedVC: null
       };
     }, events: {
       'remove-cohort': function(cohort) {
@@ -125,7 +126,8 @@
                     
                     vcSession.events.saveCohort(self_.stats,
                       cohortName, cohortDescription || '')
-                      .done(function() {
+                      .done(function(response) {
+                        self_.savedVC = response;
                         tooltip.find('.savedMessage').text(
                           'Added to new Virtual Cohort');
                       })
@@ -148,6 +150,11 @@
                         api.reposition();
                       });
                   });
+                }
+              });
+              tooltip.find('.query').click(function() {
+                if(_.isObject(self_.savedVC) && self_.savedVC.id) {
+                  window.open(window.cbioURL + 'study?cohorts=' + self_.savedVC.id);
                 }
               });
               tooltip.find('.close-dialog i').click(function() {

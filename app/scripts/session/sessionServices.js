@@ -39,7 +39,7 @@
             virtualCohort.virtualCohortID = response.id;
             localStorageAdd_(virtualCohort);
           }
-          def.resolve();
+          def.resolve(response);
         }).fail(function() {
           virtualCohort.virtualCohortID = vcSession.utils.generateUUID();
           localStorageAdd_(virtualCohort);
