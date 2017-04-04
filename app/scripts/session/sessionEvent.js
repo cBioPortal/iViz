@@ -15,8 +15,8 @@ window.vcSession = window.vcSession ? window.vcSession : {};
           userID,
           name, description);
         vcSession.model.saveSession(_virtualCohort)
-          .done(function() {
-            def.resolve();
+          .done(function(response) {
+            def.resolve(response);
           })
           .fail(function() {
             def.reject();

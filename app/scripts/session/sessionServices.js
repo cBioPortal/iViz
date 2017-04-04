@@ -44,7 +44,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
             localStorageAdd_(response.id,
               virtualCohort);
           }
-          def.resolve();
+          def.resolve(response);
         }).fail(function() {
           localStorageAdd_(vcSession.utils.generateUUID(),
             virtualCohort);
