@@ -80,7 +80,7 @@
         chartOperationsActive: 'chart-operations-active',
         chartOperations: 'chart-operations',
         chartTitle: 'chart-title',
-        chartTitleActive: 'chart-title-active',
+        chartTitleActive: 'chart-title-active chart-title-active-' + 3,
         logChecked: true,
         hasFilters: false,
         titleTooltip: {
@@ -97,8 +97,14 @@
       }, filters: function(newVal) {
         this.hasFilters = newVal.length > 0;
       },
-      // Only set up the watcher for survival icon for now. This is the only icon known maybe changed so far.
       showSurvivalIcon: function(newVal) {
+        if (newVal) {
+          this.numOfIcons++;
+        } else {
+          this.numOfIcons--;
+        }
+      },
+      showDownloadIcon: function(newVal) {
         if (newVal) {
           this.numOfIcons++;
         } else {

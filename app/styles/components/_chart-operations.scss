@@ -49,6 +49,12 @@
     float: left;
     width: 100%;
   }
+  .chart-title-active-0 {
+    width: 100%; // 2 icons on chart header
+  }
+  .chart-title-active-1 {
+    width: calc(100% - 15px); // 2 icons on chart header
+  }
   .chart-title-active-2 {
     width: calc(100% - 30px); // 2 icons on chart header
   }
