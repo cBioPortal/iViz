@@ -38,7 +38,7 @@
         component: '',
         showOperations: false,
         cluster: '',
-        piechart: '',
+        piechart: {},
         hasChartTitle: true,
         showTableIcon: true,
         showPieIcon: false,

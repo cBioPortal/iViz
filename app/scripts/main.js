@@ -422,13 +422,19 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var self = this;
       if (tableData_[attrId] === undefined) {
         if (attrId === 'mutated_genes') {
-          $.when(window.iviz.datamanager.getMutData()).then(function(_data) {
-            def.resolve(self.extractMutationData(_data));
-          });
+          $.when(window.iviz.datamanager.getMutData())
+            .then(function(_data) {
+              def.resolve(self.extractMutationData(_data));
+            }, function() {
+              def.reject();
+            });
         } else if (attrId === 'cna_details') {
-          $.when(window.iviz.datamanager.getCnaData()).then(function(_data) {
-            def.resolve(self.extractCnaData(_data));
-          });
+          $.when(window.iviz.datamanager.getCnaData())
+            .then(function(_data) {
+              def.resolve(self.extractCnaData(_data));
+            }, function() {
+              def.reject();
+            });
         }
       } else {
         def.resolve(tableData_[attrId]);

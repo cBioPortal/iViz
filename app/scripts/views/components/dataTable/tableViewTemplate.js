@@ -5,7 +5,7 @@
 (function(Vue, dc, iViz, $, QueryByGeneTextArea, _) {
   Vue.component('tableView', {
     template: '<div id={{chartDivId}} ' +
-    ':class="[\'grid-item\', classTableHeight, \'grid-item-w-2\']" ' +
+    ':class="[\'grid-item\', classTableHeight, \'grid-item-w-2\', \'react-table\']" ' +
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
@@ -13,13 +13,17 @@
     ':has-chart-title="true" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-id="chartId" :attributes="attributes" ' +
     ':show-survival-icon.sync="showSurvivalIcon"' +
+    ':show-download-icon="!failedToInit"' +
     ':filters.sync="attributes.filter"> ' +
     '</chart-operations><div class="dc-chart dc-table-plot" ' +
     ':class="{\'start-loading\': showLoad}" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
     '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
-    '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
+    '<img src="images/ajax-loader.gif" alt="loading"></div>' +
+    '<div :class="{\'error-init\': failedToInit}" ' +
+    'style="display: none;">' +
+    '<span class="content">Failed to load data, refresh the page may help</span></div></div>',
     props: [
       'ndx', 'attributes', 'options', 'showedSurvivalPlot'
     ],
@@ -34,6 +38,7 @@
         displayName: '',
         showOperations: false,
         chartInst: {},
+        failedToInit: false,
         showLoad: true,
         selectedRows: [],
         invisibleDimension: {},
@@ -180,9 +185,14 @@
         QueryByGeneTextArea.addRemoveGene(clickedRowData.gene);
       },
       setDisplayTitle: function(numOfCases) {
-        this.displayName = this.isMutatedGeneCna ?
-          (this.attributes.display_name +
-          ' (' + numOfCases + ' profiled samples)') : '';
+        var arr = [];
+        if (this.isMutatedGeneCna) {
+          arr.push(this.attributes.display_name);
+          if (!isNaN(numOfCases)) {
+            arr.push(' (' + numOfCases + ' profiled samples)');
+          }
+        }
+        this.displayName = arr.join('');
       },
       processTableData: function(_data) {
         var data = iViz.getGroupNdx(this.attributes.group_id);
@@ -241,13 +251,22 @@
       _self.chartInst = new iViz.view.component.TableView();
       _self.chartInst.setDownloadDataTypes(['tsv']);
       if (_self.isMutatedGeneCna) {
-        $.when(iViz.getTableData(_self.attributes.attr_id)).then(function(_tableData) {
-          $.when(window.iviz.datamanager.getGenePanelMap()).then(function(_genePanelMap) {
-            // create gene panel map
-            _self.genePanelMap = _genePanelMap;
-            _self.processTableData(_tableData);
+        $.when(iViz.getTableData(_self.attributes.attr_id))
+          .then(function(_tableData) {
+            $.when(window.iviz.datamanager.getGenePanelMap()).then(function(_genePanelMap) {
+              // create gene panel map
+              _self.genePanelMap = _genePanelMap;
+              _self.processTableData(_tableData);
+            });
+          }, function() {
+            _self.setDisplayTitle();
+            if (!_self.isMutatedGeneCna &&
+              Object.keys(_self.attributes.keys).length <= 3) {
+              _self.classTableHeight = 'grid-item-h-1';
+            }
+            _self.failedToInit = true;
+            _self.showLoad = false;
           });
-        });
       } else {
         _self.processTableData();
       }

@@ -32,7 +32,7 @@
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ''),
         displayName: this.attributes.display_name,
-        chartInst: '',
+        chartInst: {},
         showOperations: false,
         fromWatch: false,
         fromFilter: false,
