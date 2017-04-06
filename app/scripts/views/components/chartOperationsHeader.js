@@ -28,7 +28,7 @@
     '<i v-if="showPieIcon" class="fa fa-pie-chart icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
     '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" ' +
-    'class="icon hover"/>' +
+    'class="icon hover" @click="getRainbowSurvival" alt="Survival Analysis"/>' +
     '<div id="{{chartId}}-download-icon-wrapper" class="download">' +
     '<i class="fa fa-download icon hover" alt="download" ' +
     'id="{{chartId}}-download"></i>' +
@@ -55,7 +55,8 @@
         titleTooltip: {
           content: _.isObject(this.attributes) ?
             iViz.util.getClinicalAttrTooltipContent(this.attributes) : ''
-        }
+        },
+        numOfIcons: 4
       };
     },
     watch: {
@@ -64,6 +65,17 @@
         this.$dispatch('changeLogScale', newVal);
       }, filters: function(newVal) {
         this.hasFilters = newVal.length > 0;
+      },
+      // Only set up the watcher for survival icon for now. This is the only icon known maybe changed so far.
+      showSurvivalIcon: function(newVal) {
+        if(newVal) {
+          this.numOfIcons++;
+        }else {
+          this.numOfIcons--;
+        }
+      },
+      numOfIcons: function(newVal) {
+        this.chartTitleActive = 'chart-title-active chart-title-active-' + newVal;
       }
     },
     methods: {
@@ -85,6 +97,9 @@
         this.showTableIcon = !this.showTableIcon;
         this.showPieIcon = !this.showPieIcon;
         this.$dispatch('toTableView');
+      },
+      getRainbowSurvival: function() {
+        this.$dispatch('getRainbowSurvival');
       },
       hasTitleTooltip: function() {
         return _.isObject(this.attributes) ?
@@ -158,6 +173,29 @@
           }
         }
       });
+
+      var _numOfIcons = this.numOfIcons;
+
+      if (self.showPieIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.showTableIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.showSurvivalIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.hasTitleTooltip()) {
+        _numOfIcons++;
+      }
+
+      if (self.showLogScale) {
+        _numOfIcons++;
+      }
+      this.numOfIcons = _numOfIcons;
     }
   });
 })(window.Vue,

@@ -12,6 +12,7 @@
     ':display-name="displayName" :chart-ctrl="chartInst"' +
     ':has-chart-title="true" :groupid="attributes.group_id" ' +
     ':reset-btn-id="resetBtnId" :chart-id="chartId" :attributes="attributes" ' +
+    ':show-survival-icon.sync="showSurvivalIcon"' +
     ':filters.sync="attributes.filter"> ' +
     '</chart-operations><div class="dc-chart dc-table-plot" ' +
     ':class="{\'start-loading\': showLoad}" align="center" ' +
@@ -20,7 +21,7 @@
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
     '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
-      'ndx', 'attributes', 'options'
+      'ndx', 'attributes', 'options', 'showedSurvivalPlot'
     ],
     data: function() {
       return {
@@ -39,7 +40,9 @@
         isMutatedGeneCna: false,
         classTableHeight: 'grid-item-h-2',
         madeSelection: false,
-        genePanelMap: {}
+        showSurvivalIcon: false,
+        genePanelMap: {},
+        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20
       };
     },
     watch: {
@@ -49,6 +52,9 @@
           this.selectedRows = [];
         }
         this.$dispatch('update-filters', true);
+      },
+      'showedSurvivalPlot': function() {
+        this.showRainbowSurvival();
       }
     },
     events: {
@@ -74,6 +80,7 @@
           this.chartInst.update(_selectedCases, this.selectedRows);
           this.setDisplayTitle(this.chartInst.getCases().length);
           this.showLoad = false;
+          this.showRainbowSurvival();
         }
       },
       'closeChart': function() {
@@ -98,6 +105,32 @@
             }
           }
         }
+      },
+      getRainbowSurvival: function() {
+        var groups = [];
+        var categories = this.chartInst.getCurrentCategories();
+        var dataForCategories = iViz.util.getCaseIdsGroupByCategories(
+          this.attributes.group_type,
+          this.invisibleDimension,
+          this.attributes.attr_id
+        );
+        _.each(categories, function(category) {
+          if (dataForCategories.hasOwnProperty(category.name) &&
+            // Remove pie chart NA group by default
+            category.name !== 'NA') {
+            groups.push({
+              name: category.name,
+              caseIds: dataForCategories[category.name],
+              curveHex: category.color
+            });
+          }
+        });
+        this.$dispatch('create-rainbow-survival', {
+          attrId: this.attributes.attr_id,
+          subtitle: ' (' + this.attributes.display_name + ')',
+          groups: groups,
+          groupType: this.attributes.group_type
+        });
       }
     },
     methods: {
@@ -109,14 +142,14 @@
       },
       submitClick: function(_selectedRowData) {
         var selectedSamplesUnion = [];
-        var selectedRowsUids = _.pluck(_selectedRowData, 'uniqueId');
+        var selectedRowsUids = _.pluck(_selectedRowData, 'uniqueid');
 
         this.madeSelection = true;
 
         if (this.isMutatedGeneCna) {
           this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
           _.each(_selectedRowData, function(item) {
-            var casesIds = item.caseIds.split(',');
+            var casesIds = item.caseids.split(',');
             selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
           });
           if (this.attributes.filter.length === 0) {
@@ -169,6 +202,16 @@
           this.classTableHeight = 'grid-item-h-1';
         }
         this.showLoad = false;
+      },
+      showRainbowSurvival: function() {
+        var categories = this.chartInst.getCurrentCategories();
+        if (this.showedSurvivalPlot && !this.isMutatedGeneCna && _.isArray(categories) &&
+          categories.length > 1 &&
+          categories.length <= this.numOfSurvivalCurveLimit) {
+          this.showSurvivalIcon = true;
+        } else {
+          this.showSurvivalIcon = false;
+        }
       }
     },
     ready: function() {
@@ -199,8 +242,8 @@
       _self.chartInst.setDownloadDataTypes(['tsv']);
       if (_self.isMutatedGeneCna) {
         $.when(iViz.getTableData(_self.attributes.attr_id)).then(function(_tableData) {
-          $.when(window.iviz.datamanager.getGenePanelMap()).then(function (_genePanelMap) {
-            //create gene panel map
+          $.when(window.iviz.datamanager.getGenePanelMap()).then(function(_genePanelMap) {
+            // create gene panel map
             _self.genePanelMap = _genePanelMap;
             _self.processTableData(_tableData);
           });
@@ -208,6 +251,7 @@
       } else {
         _self.processTableData();
       }
+      this.showRainbowSurvival();
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

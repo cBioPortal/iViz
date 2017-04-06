@@ -8,10 +8,10 @@
     ':hasfilters="hasfilters" :id="group.id" :type="group.type" ' +
     ':mappedcases="group.type==\'patient\'?patientsync:samplesync" ' +
     ' :attributes.sync="group.attributes" :clear-group="clearAll"' +
-    ' v-for="group in groups"></chart-group> ',
+    ' v-for="group in groups" :showed-survival-plot="showedSurvivalPlot"></chart-group> ',
     props: [
       'groups', 'selectedsamples', 'selectedpatients', 'hasfilters',
-      'redrawgroups', 'customfilter', 'clearAll'
+      'redrawgroups', 'customfilter', 'clearAll', 'showedSurvivalPlot'
     ], data: function() {
       return {
         patientsync: [],
@@ -165,22 +165,27 @@
                   iViz.util.intersection(_selectedCasesByFilters,
                     _groupFilteredCases);
               }
-            } else {
-              _selectedCasesByFilters = (updateType_ === 'patient') ?
-                self_.completePatientsList : self_.completeSamplesList;
             }
           }
         });
+
+        if (_selectedCasesByFilters.length === 0) {
+          _selectedCasesByFilters = (updateType_ === 'patient') ?
+            self_.completePatientsList : self_.completeSamplesList;
+        }
         self_.hasfilters = _hasFilters;
+
+        _selectedCasesByFilters = _selectedCasesByFilters.sort()
+
         if (updateType_ === 'patient') {
-          self_.selectedPatientsByFilters = _selectedCasesByFilters.sort();
+          self_.selectedPatientsByFilters = _selectedCasesByFilters;
           // _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
           //   self_.completePatientsList : _selectedCasesByFilters;
           _counterSelectedCasesByFilters =
             this.selectedSamplesByFilters.length === 0 ?
               self_.completeSamplesList : this.selectedSamplesByFilters;
         } else {
-          self_.selectedSamplesByFilters = _selectedCasesByFilters.sort();
+          self_.selectedSamplesByFilters = _selectedCasesByFilters;
           // _selectedCasesByFilters = _selectedCasesByFilters.length === 0 ?
           //   self_.completeSamplesList : _selectedCasesByFilters;
           _counterSelectedCasesByFilters =
@@ -197,7 +202,7 @@
             _counterSelectedCasesByFilters);
         var _resultSelectedCases =
           iViz.util.idMapping(iViz.getCasesMap(_counterCaseType),
-            _resultCounterSelectedCases);
+            _resultCounterSelectedCases).sort();
         var _casesSync = iViz.util.idMapping(iViz.getCasesMap(_counterCaseType),
           _counterSelectedCasesByFilters);
         var _counterCasesSync = _mappedCounterSelectedCases;
@@ -207,7 +212,7 @@
           self_.samplesync = _counterCasesSync;
           if (self_.hasfilters) {
             self_.selectedsamples = _resultCounterSelectedCases;
-            self_.selectedpatients = _resultSelectedCases;
+            self_.selectedpatients = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);
           } else {
             self_.selectedsamples = self_.completeSamplesList;
             self_.selectedpatients = self_.completePatientsList;
@@ -216,7 +221,7 @@
           self_.samplesync = _casesSync;
           self_.patientsync = _counterCasesSync;
           if (self_.hasfilters) {
-            self_.selectedsamples = _resultSelectedCases;
+            self_.selectedsamples = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);
             self_.selectedpatients = _resultCounterSelectedCases;
           } else {
             self_.selectedsamples = self_.completeSamplesList;
@@ -239,6 +244,13 @@
 
         this.selectedsamples = this.samplesync;
         this.selectedpatients = this.patientsync;
+      },
+      'create-rainbow-survival': function(opts) {
+        this.$broadcast('create-rainbow-survival', opts);
+        this.$broadcast('resetBarColor', [opts.attrId]);
+      },
+      'remove-rainbow-survival': function() {
+        this.$broadcast('resetBarColor', []);
       }
     }
   });
