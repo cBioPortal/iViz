@@ -253,11 +253,15 @@
       if (_self.isMutatedGeneCna) {
         $.when(iViz.getTableData(_self.attributes.attr_id))
           .then(function(_tableData) {
-            $.when(window.iviz.datamanager.getGenePanelMap()).then(function(_genePanelMap) {
-              // create gene panel map
-              _self.genePanelMap = _genePanelMap;
-              _self.processTableData(_tableData);
-            });
+            $.when(window.iviz.datamanager.getGenePanelMap())
+              .then(function(_genePanelMap) {
+                // create gene panel map
+                _self.genePanelMap = _genePanelMap;
+                _self.processTableData(_tableData);
+              }, function() {
+                _self.genePanelMap = {};
+                _self.processTableData(_tableData);
+              });
           }, function() {
             _self.setDisplayTitle();
             if (!_self.isMutatedGeneCna &&
