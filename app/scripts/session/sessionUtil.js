@@ -52,9 +52,19 @@
       _virtualCohort.created = new Date().getTime();
       if (name) {
         _virtualCohort.studyName = name;
+      } else {
+        _virtualCohort.studyName = "Custom Cohort (" + new Date().toISOString().replace(/T/, ' ') + ")";
       }
       if (description) {
         _virtualCohort.description = description;
+      } else {
+        $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(cases, "studyID"))).then(function(_studyIdNameMap) {
+          var _desp = "";
+          _.each(cases, function(_i) {
+            _desp += _studyIdNameMap[_i.studyID] + ": " + _i.samples.length + " samples / " + _i.patients.length + " patients\n";
+          });
+          _virtualCohort.description = _desp;
+        });
       }
       return _virtualCohort;
     };
