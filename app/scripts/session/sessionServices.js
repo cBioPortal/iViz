@@ -1,13 +1,11 @@
 'use strict';
-window.vcSession = window.vcSession ? window.vcSession : {};
 
 (function(vcSession, _, $) {
   if (!_.isObject(vcSession)) {
     vcSession = {};
   }
   vcSession.model = (function() {
-    var localStorageAdd_ = function(id, virtualCohort) {
-      virtualCohort.virtualCohortID = id;
+    var localStorageAdd_ = function(virtualCohort) {
       var _virtualCohorts = vcSession.utils.getVirtualCohorts();
       _virtualCohorts.push(virtualCohort);
       vcSession.utils.setVirtualCohorts(_virtualCohorts);
@@ -31,31 +29,44 @@ window.vcSession = window.vcSession ? window.vcSession : {};
     return {
       saveSession: function(virtualCohort) {
         var def = new $.Deferred();
-        var data = {
-          virtualCohort: virtualCohort
-        };
         $.ajax({
           type: 'POST',
           url: vcSession.URL,
           contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify(data)
+          data: JSON.stringify(virtualCohort)
         }).done(function(response) {
           if (virtualCohort.userID === 'DEFAULT') {
-            localStorageAdd_(response.id,
-              virtualCohort);
+            virtualCohort.virtualCohortID = response.id;
+            localStorageAdd_(virtualCohort);
           }
           def.resolve(response);
         }).fail(function() {
-          localStorageAdd_(vcSession.utils.generateUUID(),
-            virtualCohort);
+          virtualCohort.virtualCohortID = vcSession.utils.generateUUID();
+          localStorageAdd_(virtualCohort);
           def.reject();
         });
         return def.promise();
       },
+      saveSessionWithoutWritingLocalStorage: function(_virtualCohort, _callbackFunc) {
+        $.ajax({
+          type: 'POST',
+          url: vcSession.URL,
+          contentType: 'application/json;charset=UTF-8',
+          data: JSON.stringify(_virtualCohort)
+        }).done(function(response) {
+          if(_virtualCohort.userID === 'DEFAULT') {
+            _virtualCohort.virtualCohortID = response.id;
+            _callbackFunc(response.id);
+          }          
+        }).fail(function() {
+          _virtualCohort.virtualCohortID = vcSession.utils.generateUUID();
+          _callbackFunc(response.id);
+        });
+      },
       removeSession: function(_virtualCohort) {
         $.ajax({
           type: 'DELETE',
-          url: vcSession.URL + _virtualCohort.virtualCohortID,
+          url: vcSession.URL + '/' + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8'
         }).done(function() {
           if (_virtualCohort.userID === 'DEFAULT') {
@@ -66,19 +77,18 @@ window.vcSession = window.vcSession ? window.vcSession : {};
         });
       },
       editSession: function(_virtualCohort) {
-        var data = {
-          virtualCohort: _virtualCohort
-        };
         $.ajax({
           type: 'PUT',
-          url: vcSession.URL + _virtualCohort.virtualCohortID,
+          url: vcSession.URL + '/' + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify(data)
-        }).done(function(response) {
+          data: JSON.stringify(_virtualCohort)
+        }).done(function() {
           if (_virtualCohort.userID === 'DEFAULT') {
-            localStorageEdit_(data.virtualCohort);
+            localStorageEdit_(_virtualCohort);
           }
         }).fail(function(jqXHR) {
+          // TODO: should we delete the virtual cohort if no record found
+          // in the database? Should we add it into database?
           if (jqXHR.status === 404) {
             localStorageDelete_(_virtualCohort);
             vcSession.model.saveSession(_virtualCohort);
@@ -87,28 +97,26 @@ window.vcSession = window.vcSession ? window.vcSession : {};
           }
         });
       },
-      loadUserVirtualCohorts: function(userID) {
+      /*
+      This method would be used in cbio to get user specific cohorts
+       // TODO: should we send request without validating userID?
+       */
+      loadUserVirtualCohorts: function() {
         var def = new $.Deferred();
         $.ajax({
           type: 'GET',
-          url: vcSession.URL + 'query/',
-          contentType: 'application/json;charset=UTF-8',
-          data: {
-            field: 'data.virtualCohort.userID',
-            value: userID
-          }
+          url: vcSession.URL + '/get-user-cohorts',
+          contentType: 'application/json;charset=UTF-8'
         }).done(function(response) {
           var _virtualCohorts = [];
           $.each(response, function(key, val) {
-            var _virtualCohort = val.data.virtualCohort;
+            var _virtualCohort = val.data;
             _virtualCohort.virtualCohortID = val.id;
             _virtualCohorts.push(_virtualCohort);
           });
           def.resolve(_virtualCohorts);
-          //vcSession.utils.setVirtualCohorts(_virtualCohorts);
         }).fail(function() {
-          console.log('unable to get user virtual cohorts');
-          def.reject();
+          def.resolve([]);
         });
         return def.promise();
       }

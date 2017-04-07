@@ -1,5 +1,4 @@
 'use strict';
-window.vcSession = window.vcSession ? window.vcSession : {};
 
 (function(vcSession, _, $) {
   if (!_.isObject(vcSession)) {
@@ -7,13 +6,11 @@ window.vcSession = window.vcSession ? window.vcSession : {};
   }
   vcSession.utils = (function() {
     var virtualCohort_ = {
-      studyName: 'My virtual cohort',
-      description: 'My virtual cohort - Description',
+      studyName: '',
+      description: '',
       userID: 'DEFAULT',
       created: '',
       filters: '',
-      samplesLength: '',
-      patientsLength: '',
       selectedCases: ''
     };
 
@@ -47,23 +44,27 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       localStorage.setItem('virtual-cohorts', JSON.stringify(virtualCohorts));
     };
 
-    var buildVCObject_ = function(filters, patientsLength,
-                                  samplesLength, cases, userID, name,
+    var buildVCObject_ = function(filters, cases, name,
                                   description) {
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
       _virtualCohort.filters = filters;
       _virtualCohort.selectedCases = cases;
-      _virtualCohort.samplesLength = samplesLength;
-      _virtualCohort.patientsLength = patientsLength;
       _virtualCohort.created = new Date().getTime();
       if (name) {
         _virtualCohort.studyName = name;
+      } else {
+        _virtualCohort.studyName = "Custom Cohort (" + new Date().toISOString().replace(/T/, ' ') + ")";
       }
       if (description) {
         _virtualCohort.description = description;
-      }
-      if (userID) {
-        _virtualCohort.userID = userID;
+      } else {
+        $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(cases, "studyID"))).then(function(_studyIdNameMap) {
+          var _desp = "";
+          _.each(cases, function(_i) {
+            _desp += _studyIdNameMap[_i.studyID] + ": " + _i.samples.length + " samples / " + _i.patients.length + " patients\n";
+          });
+          _virtualCohort.description = _desp;
+        });
       }
       return _virtualCohort;
     };

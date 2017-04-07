@@ -6,7 +6,7 @@
     "jquery": "2.0.3",
     "modernizr": "~2.8.2",
     "underscore": "~1.8.3",
-    "vue": "~1.0.15",
+    "vue": "1.0.26",
     "components-font-awesome": "^4.5.0",
     "bootstrap-sass": "^3.3.6",
     "clipboard": "^1.5.9",
