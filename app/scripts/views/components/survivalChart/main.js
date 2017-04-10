@@ -6,7 +6,9 @@
 (function(iViz, _) {
   iViz.view.component.Survival = function() {
     var content_ = this;
-    var opts_ = {};
+    var opts_ = {
+      downloadIsEnabled: true
+    };
     var groups_ = [];
 
     content_.init = function(groups, _data, _opts) {
@@ -46,15 +48,17 @@
           _.each(_newGroups, function(group, index) {
             _chartInst_.addCurve(group.proxyData, index, group.curveHex);
           });
+          opts_.downloadIsEnabled = true;
         } else {
           _chartInst_.addNoInfo();
+          opts_.downloadIsEnabled = false;
         }
       }
       groups_ = _newGroups;
     };
 
     content_.updateDataForDownload = function(fileType) {
-      if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+      if (opts_.downloadIsEnabled && ['pdf', 'svg'].indexOf(fileType) !== -1) {
         initCanvasDownloadData();
       }
     };
@@ -65,6 +69,10 @@
 
     content_.highlightCurve = function(curveId) {
       this.chartInst_.highlightCurve(curveId);
+    };
+    
+    content_.downloadIsEnabled = function() {
+      return opts_.downloadIsEnabled;
     };
 
     function initCanvasDownloadData() {

@@ -9,6 +9,7 @@
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
+    ':show-download-icon.sync="showDownloadIcon" ' +
     ':has-chart-title="hasChartTitle" :display-name="displayName" ' +
     ':groupid="attributes.group_id" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" ' +
     ' :chart-id="chartId" ' +
@@ -32,12 +33,13 @@
         this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ''),
         displayName: this.attributes.display_name,
-        chartInst: '',
+        chartInst: {},
         showOperations: false,
         fromWatch: false,
         fromFilter: false,
         hasChartTitle: true,
         showLoad: true,
+        showDownloadIcon: false,
         invisibleDimension: {},
         mainDivQtip: ''
       };
@@ -87,6 +89,7 @@
 
         this.chartInst.update(
           groups, this.chartId, this.attributes.attr_id);
+        this.checkDownloadableStatus();
         this.showLoad = false;
         this.updateQtipContent();
         this.$dispatch('remove-rainbow-survival');
@@ -124,7 +127,7 @@
         }
         this.chartInst.update(
           _opts.groups, this.chartId, this.attributes.attr_id);
-
+        this.checkDownloadableStatus();
         this.updateQtipContent();
       }
     },
@@ -204,6 +207,13 @@
           }
         });
         self_.updateQtipContent();
+      },
+      checkDownloadableStatus: function() {
+        if (this.chartInst.downloadIsEnabled()) {
+          this.showDownloadIcon = true;
+        } else {
+          this.showDownloadIcon = false;
+        }
       }
     },
     ready: function() {
@@ -223,7 +233,7 @@
         type: this.attributes.group_type
       };
       var _type = this.attributes.group_type;
-      
+
       _self.chartInst = new iViz.view.component.Survival();
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
@@ -237,8 +247,8 @@
       groups = this.calcCurvesData(groups, _type);
 
       _self.chartInst.init(groups, data, _opts);
+      _self.checkDownloadableStatus();
       _self.showLoad = false;
-
       _self.$once('initMainDivQtip', _self.initMainDivQtip);
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }

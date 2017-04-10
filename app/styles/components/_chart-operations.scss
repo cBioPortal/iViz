@@ -1,7 +1,7 @@
 
 .chart-header {
   margin-top: 2px;
-  height: 15px;
+  height: $chart-header-height;
   .chart-title {
     width: 100%;
     float: none;
@@ -25,10 +25,18 @@
   .download {
     float: left;
   }
-  .bar-x-log {
+  .log-scale {
+    height: 12px;
+    line-height: 12px;
+    font-size: 10px;
     float: left;
-    margin-right: 2px;
-    margin-top: 3px !important;
+    color: grey;
+    margin-right: 10px;
+    .checkbox {
+      margin-right: 2px;
+      margin-top: 1px !important;
+      float: left;
+    }
   }
   .chart-title-span {
     @extend .chart-title-span;
@@ -39,6 +47,16 @@
   }
   .chart-title-active {
     float: left;
+    width: 100%;
+  }
+  .chart-title-active-0 {
+    width: 100%; // 2 icons on chart header
+  }
+  .chart-title-active-1 {
+    width: calc(100% - 15px); // 2 icons on chart header
+  }
+  .chart-title-active-2 {
+    width: calc(100% - 30px); // 2 icons on chart header
   }
   .chart-title-active-3 {
     width: calc(100% - 45px); // 3 icons on chart header, each occupies 15px
@@ -58,7 +76,7 @@
   .chart-title-active-8 {
     width: calc(100% - 120px); // 6 icons on chart header
   }
-  
+
   .iviz-chart-header {
     height: 16px;
     width: 100%;
