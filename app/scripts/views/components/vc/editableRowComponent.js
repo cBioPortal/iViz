@@ -38,7 +38,6 @@
     ], created: function() {
       var _selectedSamplesNum = 0;
       var _selectedPatientsNum = 0;
-      console.log(this.data);
       if (_.isObject(this.data.selectedCases)) {
         _.each(this.data.selectedCases, function(studyCasesMap) {
           _selectedSamplesNum += studyCasesMap.samples.length;

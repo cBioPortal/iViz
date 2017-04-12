@@ -11,15 +11,16 @@ window.vcSession = window.vcSession ? window.vcSession : {};
     return {
       saveCohort: function(stats, name, description) {
         var def = new $.Deferred();
-        var _virtualCohort = vcSession.utils.buildVCObject(stats.filters, stats.selectedCases,
-          name, description);
-        vcSession.model.saveSession(_virtualCohort)
-          .done(function(response) {
-            def.resolve(response);
-          })
-          .fail(function() {
-            def.reject();
-          });
+        $.when(vcSession.utils.buildVCObject(stats.filters, stats.selectedCases,
+          name, description)).done(function(_virtualCohort) {
+          vcSession.model.saveSession(_virtualCohort)
+            .done(function(response) {
+              def.resolve(response);
+            })
+            .fail(function() {
+              def.reject();
+            });
+        });
         return def.promise();
       },
       removeVirtualCohort: function(virtualCohort) {
