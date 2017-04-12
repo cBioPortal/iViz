@@ -173,6 +173,19 @@
             },
             show: function() {
               var tooltip = $('.iviz-save-cohort-btn-qtip .qtip-content');
+              self_.updateStats = true;
+              self_.$nextTick(function() {
+                // If user hasn't specific description only.
+                if (!tooltip.find('.cohort-description').val()) {
+                  $.when(vcSession.utils.generateCohortDescription(self_.stats.selectedCases))
+                    .then(function(_desp) {
+                      // If user hasn't specific description only.
+                      if (!tooltip.find('.cohort-description').val()) {
+                        tooltip.find('.cohort-description').val(_desp);
+                      }
+                    });
+                }
+              });
               tooltip.find('.close-dialog').css('display', 'inline-block');
               tooltip.find('.dialog').css('display', 'block');
               tooltip.find('.saving').css('display', 'none');
