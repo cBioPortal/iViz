@@ -1,5 +1,5 @@
 'use strict';
-window.DataManagerForIviz = (function($, _, iViz) {
+window.DataManagerForIviz = (function($, _) {
   var content = {};
 
   // Clinical attributes will be transfered into table.
@@ -250,6 +250,35 @@ window.DataManagerForIviz = (function($, _, iViz) {
     return hiddenAttrs;
   };
 
+  /**
+   * Finds the intersection elements between two arrays in a simple fashion.
+   * Should have O(n) operations, where n is n = MIN(a.length, b.length)
+   *
+   * @param {array} a First array, must already be sorted
+   * @param {array} b Second array, must already be sorted
+   * @return {array} The interaction elements between a and b
+   */
+  content.util.intersection = function(a, b) {
+    var result = [];
+    var i = 0;
+    var j = 0;
+    var aL = a.length;
+    var bL = b.length;
+    while (i < aL && j < bL) {
+      if (a[i] < b[j]) {
+        ++i;
+      } else if (a[i] > b[j]) {
+        ++j;
+      } else {
+        result.push(a[i]);
+        ++i;
+        ++j;
+      }
+    }
+
+    return result;
+  };
+
   content.init = function(_portalUrl, _study_cases_map) {
     var initialSetup = function() {
       var _def = new $.Deferred();
@@ -487,7 +516,7 @@ window.DataManagerForIviz = (function($, _, iViz) {
                 _cnaAttrMeta.view_type = 'table';
                 _cnaAttrMeta.display_name = 'CNA Genes';
                 _cnaAttrMeta.description = 'This table only shows ' +
-                  'cbio cancer genes in the cohort.';
+                  '<a href="cancer_gene_list.jsp" target="_blank">cbio cancer genes</a> in the cohort.';
                 _cnaAttrMeta.attr_id = 'cna_details';
                 _cnaAttrMeta.filter = [];
                 _cnaAttrMeta.show = true;
@@ -509,8 +538,8 @@ window.DataManagerForIviz = (function($, _, iViz) {
                 _mutDataAttrMeta.type = 'mutatedGene';
                 _mutDataAttrMeta.view_type = 'table';
                 _mutDataAttrMeta.display_name = 'Mutated Genes';
-                _mutDataAttrMeta.description = 'This table shows cbio ' +
-                  'cancer genes with 1 or more mutations, as well as any ' +
+                _mutDataAttrMeta.description = 'This table shows ' +
+                  '<a href="cancer_gene_list.jsp" target="_blank" target="_blank">cbio cancer genes</a> with 1 or more mutations, as well as any ' +
                   'gene with 2 or more mutations';
                 _mutDataAttrMeta.attr_id = 'mutated_genes';
                 _mutDataAttrMeta.filter = [];
@@ -695,7 +724,7 @@ window.DataManagerForIviz = (function($, _, iViz) {
                     _cnaAttrMeta.view_type = 'table';
                     _cnaAttrMeta.display_name = 'CNA Genes';
                     _cnaAttrMeta.description = 'This table only shows ' +
-                      'cbio cancer genes in the cohort.';
+                      '<a href="cancer_gene_list.jsp" target="_blank">cbio cancer genes</a> in the cohort.';
                     _cnaAttrMeta.attr_id = 'cna_details';
                     _cnaAttrMeta.filter = [];
                     _cnaAttrMeta.show = true;
@@ -1513,7 +1542,7 @@ window.DataManagerForIviz = (function($, _, iViz) {
         _selectedSampleIds = _selectedSampleIds.sort();
         _.each(Object.keys(_self.panelSampleMap), function(_panelId) {
           _self.panelSampleMap[_panelId].sel_samples =
-            iViz.util.intersection(_self.panelSampleMap[_panelId].samples, _selectedSampleIds);
+            content.util.intersection(_self.panelSampleMap[_panelId].samples, _selectedSampleIds);
         });
         _.each(Object.keys(_map), function(_gene) {
           var _sampleNumPerGene = 0;
@@ -1528,4 +1557,4 @@ window.DataManagerForIviz = (function($, _, iViz) {
   };
 
   return content;
-})(window.$, window._, window.iViz);
+})(window.$, window._);

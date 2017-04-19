@@ -64,7 +64,7 @@
     },
     events: {
       'show-loader': function() {
-        if (!this.madeSelection || this.isMutatedGeneCna) {
+        if (!this.failedToInit && (!this.madeSelection || this.isMutatedGeneCna)) {
           this.showLoad = true;
         }
       },
@@ -74,18 +74,20 @@
       },
       'update-special-charts': function() {
         // Do not update chart if the selection is made on itself
-        if (this.madeSelection && !this.isMutatedGeneCna) {
-          this.madeSelection = false;
-        } else {
-          var attrId =
-            this.attributes.group_type === 'patient' ?
-              'patient_id' : 'sample_id';
-          var _selectedCases =
-            _.pluck(this.invisibleDimension.top(Infinity), attrId);
-          this.chartInst.update(_selectedCases, this.selectedRows);
-          this.setDisplayTitle(this.chartInst.getCases().length);
-          this.showLoad = false;
-          this.showRainbowSurvival();
+        if(!this.failedToInit) {
+          if (this.madeSelection && !this.isMutatedGeneCna) {
+            this.madeSelection = false;
+          } else {
+            var attrId =
+              this.attributes.group_type === 'patient' ?
+                'patient_id' : 'sample_id';
+            var _selectedCases =
+              _.pluck(this.invisibleDimension.top(Infinity), attrId);
+            this.chartInst.update(_selectedCases, this.selectedRows);
+            this.setDisplayTitle(this.chartInst.getCases().length);
+            this.showLoad = false;
+            this.showRainbowSurvival();
+          }
         }
       },
       'closeChart': function() {
