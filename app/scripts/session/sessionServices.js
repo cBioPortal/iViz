@@ -64,7 +64,8 @@
         });
       },
       removeSession: function(_virtualCohort) {
-        $.ajax({
+        // Delete cohort just from browser localstorage
+       /* $.ajax({
           type: 'DELETE',
           url: vcSession.URL + '/' + _virtualCohort.virtualCohortID,
           contentType: 'application/json;charset=UTF-8'
@@ -74,7 +75,8 @@
           }
         }).fail(function() {
           localStorageDelete_(_virtualCohort);
-        });
+        });*/
+        localStorageDelete_(_virtualCohort);
       },
       editSession: function(_virtualCohort) {
         $.ajax({
