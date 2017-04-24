@@ -25,7 +25,7 @@
       'filters', 'attributes'
     ], data: function() {
       return {
-        filtersToSkipShowing: ['MUT_CNT_VS_CNA', 'sample_id', 'patient_id'],
+        filtersToSkipShowing: ['MUT_CNT_VS_CNA', 'sample_uid', 'patient_uid'],
         specialTables: ['mutated_genes', 'cna_details']
       };
     },

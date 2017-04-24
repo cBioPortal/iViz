@@ -26,7 +26,7 @@
     style: 'qtip-light qtip-rounded qtip-wide'
   };
   Vue.component('customCaseInput', {
-    template: '<input type="button" id="iviz-header-right-1" ' +
+    template: '<input type="button" id="custom-case-input-button" ' +
     'class="iviz-header-button" value="Select cases by IDs"/>' +
     '<div class="iviz-hidden" id="iviz-case-select-custom-dialog">' +
     '<b>Please input IDs (one per line)</b><textarea rows="20" cols="50" ' +
@@ -55,7 +55,7 @@
         $.extend(true, {}, headerCaseSelectCustomDialog);
       _customDialogQtip.position.target = $(window);
       _customDialogQtip.content.text = $('#iviz-case-select-custom-dialog');
-      $('#iviz-header-right-1').qtip(_customDialogQtip);
+      $('#custom-case-input-button').qtip(_customDialogQtip);
     }
   });
 })(

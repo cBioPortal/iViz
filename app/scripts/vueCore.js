@@ -11,8 +11,8 @@
           el: '#complete-screen',
           data: {
             groups: [],
-            selectedsamples: [],
-            selectedpatients: [],
+            selectedsampleUIDs: [],
+            selectedpatientUIDs: [],
             selectedgenes: [],
             addNewVC: false,
             selectedPatientsNum: 0,
@@ -29,16 +29,14 @@
             charts: {},
             groupCount: 0,
             updateSpecialCharts: false,
-            showSaveButton: true,
-            showManageButton: true,
-            userid: 'DEFAULT',
+            showSaveButton: false,
+            showManageButton: false,
+            loadUserSpecificCohorts: false,
             stats: '',
             updateStats: false,
             clearAll: false,
             showScreenLoad: false,
-            showDropDown: false,
-            numOfSurvivalPlots: 0,
-            showedSurvivalPlot: false
+            showDropDown: false
           }, watch: {
             charts: function() {
               this.checkForDropDownCharts();
@@ -55,8 +53,11 @@
                 self_.$broadcast('update-special-charts', self_.hasfilters);
               }, 500);
             },
-            updateStats: function() {
-              this.stats = iViz.stat();
+            updateStats: function(newVal) {
+              if (newVal) {
+                this.stats = iViz.stat();
+                this.updateStats = false;
+              }
             },
             redrawgroups: function(newVal) {
               if (newVal.length > 0) {
@@ -71,21 +72,14 @@
                 });
               }
             },
-            selectedsamples: function(newVal, oldVal) {
+            selectedsampleUIDs: function(newVal, oldVal) {
               if (newVal.length !== oldVal.length) {
                 this.selectedSamplesNum = newVal.length;
               }
             },
-            selectedpatients: function(newVal, oldVal) {
+            selectedpatientUIDs: function(newVal, oldVal) {
               if (newVal.length !== oldVal.length) {
                 this.selectedPatientsNum = newVal.length;
-              }
-            },
-            numOfSurvivalPlots: function(newVal) {
-              if (!newVal || newVal <= 0) {
-                this.showedSurvivalPlot = false;
-              } else {
-                this.showedSurvivalPlot = true;
               }
             }
           }, events: {
@@ -127,8 +121,8 @@
               }
               if (includeNextTickFlag) {
                 self_.$nextTick(function() {
-                  self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
-                  self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+                  self_.selectedsampleUIDs = _.keys(iViz.getCasesMap('sample'));
+                  self_.selectedpatientUIDs = _.keys(iViz.getCasesMap('patient'));
                   self_.$broadcast('update-special-charts', self_.hasfilters);
                   self_.clearAll = false;
                   _.each(this.groups, function(group) {
@@ -167,9 +161,6 @@
                     if (isGroupNdxDataUpdated) {
                       self_.$broadcast('add-chart-to-group', attrData.group_id);
                     }
-                    if (attrData.view_type === 'survival') {
-                      self_.numOfSurvivalPlots++;
-                    }
                     self_.$nextTick(function() {
                       $('#iviz-add-chart').trigger('chosen:updated');
                       self_.showScreenLoad = false;
@@ -205,10 +196,6 @@
               self.$broadcast('remove-grid-item',
                 $('#chart-' + attrId + '-div'));
 
-              if (attrData.view_type === 'survival') {
-                this.numOfSurvivalPlots--;
-              }
-
               self.$nextTick(function() {
                 $('#iviz-add-chart').trigger('chosen:updated');
               });
@@ -231,45 +218,33 @@
             },
             setSelectedCases: function(selectionType, selectedCases) {
               var radioVal = selectionType;
-              var selectedCaseIds = [];
-              var unmappedCaseIds = [];
+              var selectedCaseUIDs = [];
+              var unmappedCaseIDs = [];
+              _.each(selectedCases, function(id) {
+                var caseUIDs = iViz.getCaseUIDs(selectionType, id);
+                if (caseUIDs.length === 0) {
+                  unmappedCaseIDs.push(id);
+                } else {
+                  selectedCaseUIDs = selectedCaseUIDs.concat(caseUIDs);
+                }
+              });
 
-              if (radioVal === 'patient') {
-                var patientIdsList = Object.keys(iViz.getCasesMap('patient'));
-                _.each(selectedCases, function(id) {
-                  if (patientIdsList.indexOf(id) === -1) {
-                    unmappedCaseIds.push(id);
-                  } else {
-                    selectedCaseIds.push(id);
-                  }
-                });
-              } else {
-                var sampleIdsList = Object.keys(iViz.getCasesMap('sample'));
-                _.each(selectedCases, function(id) {
-                  if (sampleIdsList.indexOf(id) === -1) {
-                    unmappedCaseIds.push(id);
-                  } else {
-                    selectedCaseIds.push(id);
-                  }
-                });
-              }
-
-              if (unmappedCaseIds.length > 0) {
-                new Notification().createNotification(selectedCaseIds.length +
+              if (unmappedCaseIDs.length > 0) {
+                new Notification().createNotification(selectedCaseUIDs.length +
                   ' cases selected. The following ' +
                   (radioVal === 'patient' ? 'patient' : 'sample') +
-                  ' ID' + (unmappedCaseIds.length === 1 ? ' was' : 's were') +
+                  ' ID' + (unmappedCaseIDs.length === 1 ? ' was' : 's were') +
                   ' not found in this study: ' +
-                  unmappedCaseIds.join(', '), {
+                  unmappedCaseIDs.join(', '), {
                   message_type: 'danger'
                 });
               } else {
-                new Notification().createNotification(selectedCaseIds.length +
+                new Notification().createNotification(selectedCaseUIDs.length +
                   ' case(s) selected.', {message_type: 'info'});
               }
 
-              $('#iviz-header-right-1').qtip('toggle');
-              if (selectedCaseIds.length > 0) {
+              $('#custom-case-input-button').qtip('toggle');
+              if (selectedCaseUIDs.length > 0) {
                 this.clearAllCharts(false);
                 var self_ = this;
                 Vue.nextTick(function() {
@@ -278,10 +253,10 @@
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;
                       if (radioVal === 'sample') {
-                        self_.customfilter.sampleIds = selectedCaseIds;
+                        self_.customfilter.sampleIds = selectedCaseUIDs;
                         self_.customfilter.patientIds = [];
                       } else {
-                        self_.customfilter.patientIds = selectedCaseIds;
+                        self_.customfilter.patientIds = selectedCaseUIDs;
                         self_.customfilter.sampleIds = [];
                       }
                       self_.$broadcast('update-custom-filters');
@@ -362,8 +337,8 @@
     bind: function() {
       var self = this;
       $(this.el).chosen({
-        width: '30%'
-      })
+          width: '30%'
+        })
         .change(
           function() {
             var value = self.el.value;

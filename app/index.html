@@ -7,6 +7,7 @@
   <!-- build:js(.) scripts/iviz-vendor-cbio.js -->
   <script src="/bower_components/jquery/jquery.min.js"></script>
   <script src="/bower_components/jquery-ui/ui/jquery-ui.js"></script>
+  <script src="/bower_components/vue/dist/vue.js"></script>
   <!-- endbuild -->
 
   <!-- build:js(.) scripts/iviz-vendor.js -->
@@ -35,7 +36,6 @@
   <script src="/bower_components/imagesloaded/imagesloaded.js"></script>
   <script src="/bower_components/qtip2/jquery.qtip.js"></script>
   <script src="/bower_components/qtip2/basic/jquery.qtip.js"></script>
-  <script src="/bower_components/vue/dist/vue.js"></script>
   <script src="/bower_components/clipboard/dist/clipboard.js"></script>
   <script src="/bower_components/plotly.js/dist/plotly.min.js"></script>
   <script src="/bower_components/react/react.js"></script>
@@ -117,8 +117,9 @@
       <div id="iviz-header-left">
         <div class="iviz-cohort-component" style="float: left; margin-right: 10px;">
           <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
-                             :selected-patients-num="selectedPatientsNum" :selected-samples-num="selectedSamplesNum"
-                             :userid="userid" :stats="stats" :update-stats.sync="updateStats"></session-component>
+                             :load-user-specific-cohorts="loadUserSpecificCohorts" :stats="stats"
+                             :update-stats.sync="updateStats"
+                             :show-share-button="false"></session-component>
         </div>
 
         <div class="iviz-header-left-case">
@@ -128,7 +129,7 @@
           </span>
         </div>
         <span id="iviz-header-left-patient-select" class="iviz-header-button"
-              @click="openCases('patient')" class="number"
+              @click="openCases" class="number"
               role="button" tabindex="0" style="display: block;"><i class="fa fa-user" aria-hidden="true"></i></span>
         <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()"
               role="button"
@@ -184,11 +185,10 @@
     <div class="grid" id="main-grid"
          :class="{loading:isloading}">
       <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
-                     :selectedpatients.sync="selectedpatients"
-                     :selectedsamples.sync="selectedsamples"
+                     :selectedpatient-uIDs.sync="selectedpatientUIDs"
+                     :selectedsample-uIDs.sync="selectedsampleUIDs"
                      :hasfilters.sync="hasfilters"
                      :customfilter.sync="customfilter"
-                     :showed-survival-plot="showedSurvivalPlot"
                      :clear-all="clearAll"></main-template>
     </div>
   </div>
@@ -201,28 +201,33 @@
     //Include style variables
     iViz.vue.manage.init();
 
-    // This is used to indicate how to disable two buttons. By default, they are set to true.
+    vcSession.URL =
+      'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
+
+    // This is used to indicate how to disable two buttons. By default, they are set to false.
     iViz.vue.manage.getInstance().showManageButton = true;
     iViz.vue.manage.getInstance().showSaveButton = true;
 
-    window.cbioURL = 'http://localhost:8080/cbioportal/';
+    //Set this to true if want to load user specific cohorts(this is for cbioportal)
+    iViz.vue.manage.getInstance().loadUserSpecificCohorts = false;
+
+    window.cbioURL = 'http://www.cbioportal.org/';
     window.cbioResourceURL = 'resources/';
-    window.mutationProfileId = ['brca_tcga_mutations', 'blca_tcga_mutations'];
-    window.cnaProfileId = ['brca_tcga_gistic', 'blca_tcga_gistic'];
+    window.mutationProfileId = 'hnsc_tcga_mutations';
+    window.cnaProfileId = 'hnsc_tcga_gistic';
     window.case_set_id = '-1';
     var studyCasesMap = {};
-    studyCasesMap['brca_tcga'] = {};
-    studyCasesMap['blca_tcga'] = {};
+    studyCasesMap['hnsc_tcga'] = {};
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
     $.when(
       window.iviz.datamanager.initialSetup(),
-      window.iviz.datamanager.getConfigs()
-    ).then(function(_data, configs) {
+      window.iviz.datamanager.getStyleVars()
+    ).then(function(_data, styles) {
       var opts = {};
 
-      if (_.isObject(configs)) {
-        opts = configs;
+      if (_.isObject(styles)) {
+        opts.styles = styles;
       }
       iViz.init(_data, opts);
     });
