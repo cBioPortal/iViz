@@ -8,13 +8,10 @@ window.vcSession = window.vcSession ? window.vcSession : {};
   }
   vcSession.events = (function() {
     return {
-      saveCohort: function(stats, selectedPatientsNum, selectedSamplesNum,
-                           userID, name, description) {
-        var _virtualCohort = vcSession.utils.buildVCObject(stats.filters,
-          selectedPatientsNum, selectedSamplesNum, stats.selected_cases,
-          userID,
-          name, description);
-        vcSession.model.saveSession(_virtualCohort);
+      saveCohort: function(stats, name, description) {
+        $.when(vcSession.utils.buildVCObject(stats.filters, stats.selectedCases, name, description)).done(function(_vc) {
+          vcSession.model.saveSession(_vc);
+        });
       },
       removeVirtualCohort: function(virtualCohort) {
         vcSession.model.removeSession(virtualCohort);
@@ -116,6 +113,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
     var buildVCObject_ = function(filters, patientsLength,
                                   samplesLength, cases, userID, name,
                                   description) {
+      var _def = new $.Deferred();
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
       _virtualCohort.filters = filters;
       _virtualCohort.selectedCases = cases;
@@ -124,9 +122,23 @@ window.vcSession = window.vcSession ? window.vcSession : {};
       _virtualCohort.created = new Date().getTime();
       if (name) {
         _virtualCohort.studyName = name;
+      } else {
+        _virtualCohort.studyName = "Custom Cohort (" + new Date().toISOString().replace(/T/, ' ') + ")";
       }
       if (description) {
         _virtualCohort.description = description;
+        _def.resolve(_virtualCohort);
+      } else {
+        $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(cases, "studyID"))).then(function(_studyIdNameMap) {
+          var _desp = "";
+          _.each(cases, function(_i) {
+            _desp += _studyIdNameMap[_i.studyID] + ": " + _i.samples.length + " samples / " + _i.patients.length + " patients;";
+            _desp += "\n";
+          });
+          _virtualCohort.description = _desp;
+          _def.resolve(_virtualCohort);
+        });
+        return _def.promise();
       }
       if (userID) {
         _virtualCohort.userID = userID;
@@ -191,21 +203,35 @@ window.vcSession = window.vcSession ? window.vcSession : {};
 
     return {
       saveSession: function(virtualCohort) {
-        var data = {
-          virtualCohort: virtualCohort
-        };
         $.ajax({
           type: 'POST',
-          url:  vcSession.URL,
+          url: vcSession.URL,
           contentType: 'application/json;charset=UTF-8',
-          data: JSON.stringify(data)
+          data: JSON.stringify(virtualCohort)
         }).done(function(response) {
-          if(virtualCohort.userID === 'DEFAULT')
-          localStorageAdd_(response.id,
-            virtualCohort);
+          if (virtualCohort.userID === 'DEFAULT') {
+            virtualCohort.virtualCohortID = response.id;
+            localStorageAdd_(virtualCohort);
+          }
         }).fail(function() {
-          localStorageAdd_(vcSession.utils.generateUUID(),
-            virtualCohort);
+          virtualCohort.virtualCohortID = vcSession.utils.generateUUID();
+          localStorageAdd_(virtualCohort);
+        });
+      },
+      saveSessionWithoutWritingLocalStorage: function(_virtualCohort, _callbackFunc) {
+        $.ajax({
+          type: 'POST',
+          url: vcSession.URL,
+          contentType: 'application/json;charset=UTF-8',
+          data: JSON.stringify(_virtualCohort)
+        }).done(function(response) {
+          if (_virtualCohort.userID === 'DEFAULT') {
+            _virtualCohort.virtualCohortID = response.id;
+            _callbackFunc(response.id);
+          }
+        }).fail(function() {
+          _virtualCohort.virtualCohortID = vcSession.utils.generateUUID();
+          _callbackFunc(response.id);
         });
       },
       removeSession: function(_virtualCohort) {
@@ -486,9 +512,10 @@ window.vcSession = window.vcSession ? window.vcSession : {};
     ' class="form-group"><label>Number of Patients' +
     ' :&nbsp;</label><span>{{selectedPatientsNum}}</span></div><br><div' +
     ' class="form-group"><label for="name">Name:</label><input type="text"' +
-    ' class="form-control" v-model="name"  placeholder="My Virtual Cohort"' +
-    ' value="My Virtual Cohort"></div><br><div class="form-group"><label' +
-    ' for="description">Decription:</label><textarea class="form-control"' +
+    ' class="form-control" v-model="name"  placeholder="Name cohort..."></div><br><div' +
+    ' class="form-group"><label' +
+    ' for="description">Decription:</label><textarea placeholder="Add description ..."' +
+    ' class="form-control popup-textarea"' +
     ' rows="4" cols="50" v-model="description"></textarea></div></div><div' +
     ' slot="footer"><button type="button" class="btn btn-default"' +
     ' @click="addNewVc = false">Cancel</button><button type="button"' +
@@ -516,9 +543,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
           var self_ = this;
           self_.updateStats = true;
           self_.$nextTick(function(){
-            vcSession.events.saveCohort(self_.stats,
-              self_.selectedPatientsNum, self_.selectedSamplesNum, self_.userid, self_.name,
-              self_.description || '');
+            vcSession.events.saveCohort(self_.stats, self_.name || '', self_.description || '');
             self_.addNewVc = false;
             jQuery.notify('Added to new Virtual Study', 'success');
           })

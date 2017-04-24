@@ -401,20 +401,20 @@ window.DataManagerForIviz = (function($, _) {
               });
               _.each(_patientAttributes, function(_metaObj) {
                 switch (_metaObj.attr_id) {
-                case 'DFS_STATUS':
-                  _hasDfsStatus = true;
-                  break;
-                case 'DFS_MONTHS':
-                  _hasDfsMonths = true;
-                  break;
-                case 'OS_STATUS':
-                  _hasOsStatus = true;
-                  break;
-                case 'OS_MONTHS':
-                  _hasOsMonths = true;
-                  break;
-                default :
-                  break;
+                  case 'DFS_STATUS':
+                    _hasDfsStatus = true;
+                    break;
+                  case 'DFS_MONTHS':
+                    _hasDfsMonths = true;
+                    break;
+                  case 'OS_STATUS':
+                    _hasOsStatus = true;
+                    break;
+                  case 'OS_MONTHS':
+                    _hasOsMonths = true;
+                    break;
+                  default :
+                    break;
                 }
                 _metaObj.filter = [];
                 _metaObj.keys = {};
