@@ -9,14 +9,16 @@
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
-    ':show-operations="showOperations" :groupid="attributes.group_id" ' +
+    ':show-operations="showOperations && !failedToInit" :groupid="attributes.group_id" ' +
     ':show-survival-icon.sync="showSurvivalIcon"' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
     ':attributes="attributes"' +
     ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
-    'style="float:none !important;" id={{chartId}} ></div>' +
+    'style="float:none !important;" id={{chartId}} >' +
+    '<error-handle v-if="failedToInit"></error-handle>' +
+    '</div>' +
     '<span class="text-center chart-title-span" ' +
     'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
@@ -43,6 +45,7 @@
           showLogScale: false,
           transitionDuration: iViz.opts.dc.transitionDuration
         },
+        failedToInit: false,
         opts: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
         addingChart: false
@@ -170,8 +173,6 @@
       }
     },
     ready: function() {
-      this.barChart = new iViz.view.component.BarChart();
-      this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
       this.settings.width = window.iViz.styles.vars.barchart.width;
       this.settings.height = window.iViz.styles.vars.barchart.height;
 
@@ -201,9 +202,15 @@
       if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
         this.settings.showLogScale = true;
       }
-      this.initChart(this.settings.showLogScale);
-      this.updateShowSurvivalIcon();
-      this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
+      
+      if (isNaN(this.data.min) || isNaN(this.data.max)) {
+        this.failedToInit = true;
+      }else{
+        this.barChart = new iViz.view.component.BarChart();
+        this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
+        this.initChart(this.settings.showLogScale);
+        this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
+      }
     }
   });
 })(
