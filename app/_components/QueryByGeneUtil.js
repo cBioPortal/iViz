@@ -25,21 +25,35 @@ window.QueryByGeneUtil = (function() {
 
   return {
     toMainPage: function(studyId, selectedCases) {
+      var _arr = [];
+      _.each(selectedCases, function(_obj) {
+        var _studyId = _obj.studyID;
+        _.each(_obj.samples, function(_sampleId) {
+          _arr.push(_studyId + "|" + _sampleId);
+        });
+      });
       submitForm(window.cbioURL + 'index.do', {
         'cancer_study_id': studyId,
-        'case_ids': selectedCases.join(' '),
+        'case_ids': _arr.join('+'),
         'case_set_id': -1
       });
     },
-    toQueryPage: function(studyId, selectedCases,
-                          selectedGenes, mutationProfileId, cnaProfileId) {
+    toQueryPageSingleCohort: function(studyId, selectedCases,
+                                      selectedGenes, mutationProfileId, cnaProfileId) {
+      var _arr = [];
+      _.each(selectedCases, function(_obj) {
+        var _studyId = _obj.studyID;
+        _.each(_obj.samples, function(_sampleId) {
+          _arr.push(_studyId + "|" + _sampleId);
+        });
+      });
       submitForm(window.cbioURL + 'index.do', {
         cancer_study_id: studyId,
-        case_ids: selectedCases.join(' '),
+        cancer_study_list: null,
+        case_ids: _arr.join('+'),
         case_set_id: -1,
         gene_set_choice: 'user-defined-list',
         gene_list: selectedGenes,
-        cancer_study_list: studyId,
         Z_SCORE_THRESHOLD: 2.0,
         genetic_profile_ids_PROFILE_MUTATION_EXTENDED: mutationProfileId,
         genetic_profile_ids_PROFILE_COPY_NUMBER_ALTERATION: cnaProfileId,
@@ -48,6 +62,25 @@ window.QueryByGeneUtil = (function() {
         tab_index: 'tab_visualize',
         Action: 'Submit'
       });
+    },
+    toMultiStudiesQueryPage: function(_vcId, _selectedCases, _selectedGenes) {
+      var _arr = [];
+      _.each(_selectedCases, function(_obj) {
+        var _studyId = _obj.studyID;
+        _.each(_obj.samples, function(_sampleId) {
+          _arr.push(_studyId + "|" + _sampleId);
+        });
+      });
+      submitForm(window.cbioURL + 'index.do', {
+        cancer_study_list: null,
+        cancer_study_id: _vcId,
+        gene_list: _selectedGenes,
+        case_set_id: '-1',
+        case_ids: _arr.join('+'),
+        tab_index: 'tab_visualize',
+        Action: 'Submit'
+      });
     }
   }
 })();
+

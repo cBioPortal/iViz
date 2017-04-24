@@ -12,6 +12,7 @@
     ':display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
     ' :show-pie-icon.sync="showPieIcon" :chart-id="chartId" ' +
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
+    ':show-survival-icon.sync="showSurvivalIcon"' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="piechart" ' +
     ' :filters.sync="attributes.filter" ' +
     ':attributes="attributes"></chart-operations>' +
@@ -21,7 +22,7 @@
     '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>' +
     '</div>',
     props: [
-      'ndx', 'attributes'
+      'ndx', 'attributes', 'showedSurvivalPlot'
     ],
     data: function() {
       return {
@@ -37,12 +38,14 @@
         component: '',
         showOperations: false,
         cluster: '',
-        piechart: '',
+        piechart: {},
         hasChartTitle: true,
         showTableIcon: true,
         showPieIcon: false,
         filtersUpdated: false,
-        addingChart: false
+        addingChart: false,
+        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
+        showSurvivalIcon: false
       };
     },
     watch: {
@@ -58,6 +61,9 @@
           }
           this.$dispatch('update-filters', true);
         }
+      },
+      'showedSurvivalPlot': function() {
+        this.updateShowSurvivalIcon();
       }
     },
     events: {
@@ -82,9 +88,44 @@
             }
           }
         }
+      },
+      getRainbowSurvival: function() {
+        var groups = [];
+        var categories = this.piechart.getCurrentCategories('key');
+        var dataForCategories = iViz.util.getCaseIdsGroupByCategories(
+          this.attributes.group_type,
+          this.chartInst.dimension(),
+          this.attributes.attr_id
+        );
+        _.each(categories, function(category) {
+          if (dataForCategories.hasOwnProperty(category.name) &&
+            // Remove pie chart NA group by default
+            category.name !== 'NA') {
+            groups.push({
+              name: category.name,
+              caseIds: dataForCategories[category.name],
+              curveHex: category.color
+            });
+          }
+        });
+        this.$dispatch('create-rainbow-survival', {
+          attrId: this.attributes.attr_id,
+          subtitle: ' (' + this.attributes.display_name + ')',
+          groups: groups,
+          groupType: this.attributes.group_type
+        });
       }
     },
     methods: {
+      updateShowSurvivalIcon: function() {
+        if (this.showedSurvivalPlot &&
+          this.piechart.getCurrentCategories().length >= 2 &&
+          this.piechart.getCurrentCategories().length <= this.numOfSurvivalCurveLimit) {
+          this.showSurvivalIcon = true;
+        } else {
+          this.showSurvivalIcon = false;
+        }
+      },
       mouseEnter: function() {
         this.showOperations = true;
         this.$emit('initMainDivQtip');
@@ -146,6 +187,8 @@
           _self.piechart.filtered();
         }
       });
+
+      _self.updateShowSurvivalIcon();
       _self.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

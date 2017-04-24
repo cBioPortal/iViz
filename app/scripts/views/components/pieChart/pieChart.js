@@ -143,6 +143,35 @@
       updateQtip = false;
     };
 
+    content.getCurrentCategories = function(sortBy) {
+      var categories = [];
+
+      sortBy = sortBy || 'value';
+      _.each(_.sortBy(dcGroup_.top(Infinity), sortBy), function(label) {
+        var _labelDatum = {};
+        var _labelValue = Number(label.value);
+        if (_labelValue > 0) {
+          _labelDatum.id = labelInitData[label.key].id;
+          _labelDatum.index = labelInitData[label.key].index;
+          _labelDatum.name = label.key;
+          _labelDatum.color = labelInitData[label.key].color;
+          _labelDatum.cases = _labelValue;
+          categories.push(_labelDatum);
+        }
+      });
+      return categories;
+    };
+
+    function getCurrentSampleSizeFromCategories(categories) {
+      var currentSampleSize = 0;
+      for (var key in categories) {
+        if (categories.hasOwnProperty(key)) {
+          currentSampleSize += categories[key].cases;
+        }
+      }
+      return currentSampleSize;
+    }
+
     /**
      * This is the function to initialize dc pie chart instance.
      */
@@ -311,26 +340,14 @@
     }
 
     function updateCurrentLabels() {
-      var _labels = {};
-      var _currentSampleSize = 0;
-      _.each(dcGroup_.top(Infinity), function(label) {
-        var _labelDatum = {};
-        var _labelValue = Number(label.value);
-        if (_labelValue > 0) {
-          _labelDatum.id = labelInitData[label.key].id;
-          _labelDatum.index = labelInitData[label.key].index;
-          _labelDatum.name = label.key;
-          _labelDatum.color = labelInitData[label.key].color;
-          _labelDatum.cases = _labelValue;
-          _currentSampleSize += _labelValue;
-          _labels[_labelDatum.id] = _labelDatum;
-        }
-      });
+      var _labels = content.getCurrentCategories();
+      var _currentSampleSize = getCurrentSampleSizeFromCategories(_labels);
 
+      labels = {};
       _.each(_labels, function(label) {
         label.sampleRate = (_currentSampleSize <= 0 ? 0 : (Number(label.cases) * 100 / _currentSampleSize).toFixed(1).toString()) + '%';
+        labels[label.id] = label;
       });
-      labels = _labels;
     }
 
     function initReactData() {
@@ -354,9 +371,8 @@
       $('#' + v.opts.chartId).find('svg g .mark').remove();
     }
 
-    function drawMarker(_childID, _fatherID) {
-      var _path = $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + _childID + ')')
-        .find('path');
+    function drawMarker(_slice) {
+      var _path = $(_slice).find('path');
       var _pointsInfo = _path
         .attr('d')
         .split(/[\s,MLHVCSQTAZ]/);
@@ -402,7 +418,6 @@
             ' than start angle.', 'color: red');
         }
 
-        var _arcID = 'arc-' + _fatherID + '-' + (Number(_childID) - 1);
         var _arc = d3.svg.arc()
           .innerRadius(_r + 3)
           .outerRadius(_r + 5)
@@ -412,32 +427,47 @@
         d3.select('#' + v.opts.chartId + ' svg g').append('path')
           .attr('d', _arc)
           .attr('fill', _fill)
-          .attr('id', _arcID)
           .attr('class', 'mark');
       }
     }
 
     function pieLabelMouseEnter(data) {
-      var childID = Number(data.index) + 1;
-      var fatherID = v.opts.chartId;
-
-      $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + childID + ')').css({
+      var _slice = getPieSlice(data);
+      
+      $(_slice).css({
         'fill-opacity': '.5',
         'stroke-width': '3'
       });
 
-      drawMarker(childID, fatherID);
+      drawMarker(_slice);
     }
 
     function pieLabelMouseLeave(data) {
-      var childID = Number(data.index) + 1;
+      var _slice = getPieSlice(data);
 
-      $('#' + v.opts.chartId + ' svg>g>g:nth-child(' + childID + ')').css({
+      $(_slice).css({
         'fill-opacity': '1',
         'stroke-width': '1px'
       });
-
+      
       removeMarker();
+    }
+
+    function getPieSlice(data) {
+      var _color = data.color;
+      var _slice;
+
+      $('#' + v.opts.chartId + ' svg g.pie-slice').each(function(index, item) {
+        var _sliceColor = $(item).find('path').attr('fill');
+        if (_sliceColor === _color) {
+          _slice = item;
+          $(item).css({
+            'fill-opacity': '1',
+            'stroke-width': '1px'
+          });
+        }
+      });
+      return _slice;
     }
 
     function initReactTable(targetId, inputData, opts) {
@@ -468,15 +498,22 @@
         rowClickFunc: pieLabelClick
       }, opts);
 
+      // Check whether the react table has been initialized
+      if (v.renderedReactTable) {
+        // Get sort settings from the initialized react table
+        var sort_ = v.renderedReactTable.getCurrentSort();
+        opts_ = $.extend(opts_, sort_);
+      }
+
       var testElement = React.createElement(EnhancedFixedDataTableSpecial, opts_);
 
-      ReactDOM.render(testElement, document.getElementById(targetId));
+      v.renderedReactTable = ReactDOM.render(testElement, document.getElementById(targetId));
     }
 
     function pieLabelClick(selectedData) {
       v.chart.onClick({
-        key: labels[selectedData.id].name,
-        value: labels[selectedData.id].value
+        key: labels[selectedData.uniqueid].name,
+        value: labels[selectedData.uniqueid].value
       });
     }
   };

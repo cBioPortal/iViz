@@ -221,7 +221,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
         });
       },
       /*
-      This method would be used in cbio to get user specific cohorts
+       This method would be used in cbio to get user specific cohorts
        // TODO: should we send request without validating userID?
        */
       loadUserVirtualCohorts: function() {
@@ -502,25 +502,25 @@ window.vcSession = window.vcSession ? window.vcSession : {};
 (function(Vue, $, vcSession) {
   Vue.component('sessionComponent', {
     template: '<div id="cohort-component"><button  class="cohort-save-button"' +
-      ' v-if="showSaveButton" type="button" class="btn btn-default"' +
-      ' @click="saveCohort()" id="save_cohort_btn">Save Cohort </button>' +
-      ' <button class="cohort-manage-button"' +
-      ' v-if="showManageButton" type="button" class="btn btn-default"' +
-      ' @click="manageCohorts()"> Manage Cohorts</i> </button>' +
-      ' <add-vc :add-new-vc.sync="addNewVC"' +
-      ' :stats="stats"></add-vc>' +
-      ' <modaltemplate :show.sync="showVCList" size="modal-xlg"> <div' +
-      ' slot="header"> <h4 class="modal-title">Virtual Cohorts</h4> </div>' +
-      ' <div slot="body"> <table class="table table-bordered table-hover' +
-      ' table-condensed"> <thead> <tr style="font-weight: bold"> <td' +
-      ' style="width:20%">Name</td> <td style="width:40%">Description</td>' +
-      ' <td style="width:10%">Patients</td> <td' +
-      ' style="width:10%">Samples</td> <td' +
-      ' style="width:20%">Operations</td> </tr> </thead> <tr' +
-      ' is="editable-row" :data="virtualCohort"' +
-      ' :showmodal.sync="showVCList" :show-share-button="showShareButton" v-for="virtualCohort in' +
-      ' virtualCohorts"> </tr> </table> </div> <div slot="footer"> </div>' +
-      ' </modaltemplate> </div> </nav> </div>',
+    ' v-if="showSaveButton" type="button" class="btn btn-default"' +
+    ' @click="saveCohort()" id="save_cohort_btn">Save Cohort </button>' +
+    ' <button class="cohort-manage-button"' +
+    ' v-if="showManageButton" type="button" class="btn btn-default"' +
+    ' @click="manageCohorts()"> Manage Cohorts</i> </button>' +
+    ' <add-vc :add-new-vc.sync="addNewVC"' +
+    ' :stats="stats"></add-vc>' +
+    ' <modaltemplate :show.sync="showVCList" size="modal-xlg"> <div' +
+    ' slot="header"> <h4 class="modal-title">Virtual Cohorts</h4> </div>' +
+    ' <div slot="body"> <table class="table table-bordered table-hover' +
+    ' table-condensed"> <thead> <tr style="font-weight: bold"> <td' +
+    ' style="width:20%">Name</td> <td style="width:40%">Description</td>' +
+    ' <td style="width:10%">Patients</td> <td' +
+    ' style="width:10%">Samples</td> <td' +
+    ' style="width:20%">Operations</td> </tr> </thead> <tr' +
+    ' is="editable-row" :data="virtualCohort"' +
+    ' :showmodal.sync="showVCList" :show-share-button="showShareButton" v-for="virtualCohort in' +
+    ' virtualCohorts"> </tr> </table> </div> <div slot="footer"> </div>' +
+    ' </modaltemplate> </div> </nav> </div>',
     props: [
       'loadUserSpecificCohorts', 'showSaveButton', 'showManageButton', 'stats', 'updateStats', 'showShareButton'
     ],

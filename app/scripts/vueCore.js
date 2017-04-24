@@ -236,8 +236,8 @@
                   ' ID' + (unmappedCaseIDs.length === 1 ? ' was' : 's were') +
                   ' not found in this study: ' +
                   unmappedCaseIDs.join(', '), {
-                    message_type: 'danger'
-                  });
+                  message_type: 'danger'
+                });
               } else {
                 new Notification().createNotification(selectedCaseUIDs.length +
                   ' case(s) selected.', {message_type: 'info'});
@@ -337,8 +337,8 @@
     bind: function() {
       var self = this;
       $(this.el).chosen({
-        width: '30%'
-      })
+          width: '30%'
+        })
         .change(
           function() {
             var value = self.el.value;

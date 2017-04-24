@@ -1,0 +1,13 @@
+.react-table {
+  .error-init {
+    display: block !important;
+    font-size: 15px;
+    width: 100%;
+    text-align: center;
+    height: calc(100% - #{$chart-header-height});
+    .content {
+      position: relative;
+      top: calc(50% - #{$chart-header-height});
+    }
+  }
+}

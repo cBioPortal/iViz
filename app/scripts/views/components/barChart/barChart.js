@@ -9,24 +9,27 @@
     var data_ = {};// Chart related data. Such as attr_id.
     var colors_;
     var ndx_;
-    var hasEmptyValue_ = false;
+    var dcDimension;
+    var mapTickToCaseIds = {}; // Save the related caseIds under tick value.
 
     var initDc_ = function(logScale) {
       var tickVal = [];
-      var barColor = {};
       var i = 0;
 
-      var cluster = ndx_.dimension(function(d) {
+      dcDimension = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
+        var _min;
+        var _max;
         if (typeof val === 'undefined' || val === 'NA' || val === '' ||
           val === 'NaN') {
-          hasEmptyValue_ = true;
           val = opts_.xDomain[opts_.xDomain.length - 1];
         } else if (logScale) {
           for (i = 1; i < opts_.xDomain.length; i++) {
             if (d[data_.attrId] < opts_.xDomain[i] &&
               d[data_.attrId] >= opts_.xDomain[i - 1]) {
               val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
+              _min = opts_.xDomain[i - 1];
+              _max = opts_.xDomain[i];
               break;
             }
           }
@@ -35,17 +38,30 @@
         } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
           val = opts_.xDomain[opts_.xDomain.length - 2];
         } else {
-          // minus half of seperateDistance to make the margin values
+          // minus half of separateDistance to make the margin values
           // always map to the left side. Thus for any value x, it is in the
           // range of (a, b] which means a < x <= b
           val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
             opts_.gutter + opts_.startPoint - opts_.gutter / 2;
+          _min = val - opts_.gutter / 2;
+          _max = val + opts_.gutter / 2;
         }
 
         if (tickVal.indexOf(val) === -1) {
           tickVal.push(Number(val));
         }
 
+        if (!mapTickToCaseIds.hasOwnProperty(val)) {
+          mapTickToCaseIds[val] = {
+            caseIds: [],
+            tick: getTickFormat(val, logScale)
+          };
+          if (!_.isUndefined(_min) && !_.isUndefined(_max)) {
+            mapTickToCaseIds[val].range = _min + '< ~ <=' + _max;
+          }
+        }
+        mapTickToCaseIds[val].caseIds.push(
+          data_.groupType === 'patient' ? d.patient_id : d.sample_id);
         return val;
       });
 
@@ -53,24 +69,12 @@
         return a < b ? -1 : 1;
       });
 
-      var tickL = tickVal.length - 1;
-
-      for (i = 0; i < tickL; i++) {
-        barColor[tickVal[i]] = colors_[i];
-      }
-
-      if (hasEmptyValue_) {
-        barColor.NA = '#CCCCCC';
-      } else {
-        barColor[tickVal[tickL]] = colors_[tickL];
-      }
-
       chartInst_
         .width(opts_.width)
         .height(opts_.height)
         .margins({top: 10, right: 20, bottom: 30, left: 40})
-        .dimension(cluster)
-        .group(cluster.group())
+        .dimension(dcDimension)
+        .group(dcDimension.group())
         .centerBar(true)
         .elasticY(true)
         .elasticX(false)
@@ -217,7 +221,6 @@
         max: data_.max
       }, opts.logScaleChecked));
       ndx_ = ndx;
-      hasEmptyValue_ = false;
 
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
@@ -245,6 +248,71 @@
       }
     };
     // return content;
+
+    /**
+     * sortBy {String} sort category by 'key' (key, value are supported)
+     * @return {Array} the list of current bar categories.
+     */
+    content.getCurrentCategories = function(sortBy) {
+      var groups = dcDimension.group().top(Infinity);
+      var groupTypeId =
+        data_.groupType === 'patient' ? 'patient_id' : 'sample_id';
+      var selectedCases = _.pluck(dcDimension.top(Infinity), groupTypeId);
+      var categories = [];
+      var colorCounter = 0;
+
+      sortBy = sortBy || 'value';
+
+      groups = _.sortBy(groups, sortBy);
+      _.each(groups, function(group) {
+        if (group.value > 0 && mapTickToCaseIds.hasOwnProperty(group.key)) {
+          var color;
+          var name = mapTickToCaseIds[group.key].range || mapTickToCaseIds[group.key].tick;
+          if (name === 'NA') {
+            color = '#ccc';
+          } else {
+            color = colors_[colorCounter];
+            colorCounter++;
+          }
+          categories.push({
+            key: group.key,
+            name: mapTickToCaseIds[group.key].range || mapTickToCaseIds[group.key].tick,
+            color: color,
+            caseIds: _.intersection(selectedCases, mapTickToCaseIds[group.key].caseIds)
+          });
+        }
+      });
+      return categories;
+    };
+
+    /**
+     * Color bar based on categories info.
+     * @param {Array} categories The current bar categories, can be calculated by
+     * using getCurrentCategories method.
+     */
+    content.colorBars = function(categories) {
+      if (!_.isArray(categories)) {
+        categories = this.getCurrentCategories();
+      }
+      chartInst_.selectAll('g rect').style('fill', function(d) {
+        var color = 'grey';
+        for (var i = 0; i < categories.length; i++) {
+          var category = categories[i];
+          if (_.isObject(d.data) && category.key === d.data.key) {
+            color = category.color;
+            break;
+          }
+        }
+        return color;
+      });
+    };
+
+    /**
+     * Reset bar color by removing fill attribute.
+     */
+    content.resetBarColor = function() {
+      chartInst_.selectAll('g rect').style('fill', '');
+    };
   };
 
   iViz.view.component.BarChart.prototype =

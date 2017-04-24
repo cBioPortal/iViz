@@ -52,7 +52,7 @@
 
     content.init =
       function(_attributes, _opts, _selectedSamples, _selectedGenes,
-        _data, _callbacks, _geneData, _dimension, _genePanelMap) {
+               _data, _callbacks, _geneData, _dimension, _genePanelMap) {
         initialized = false;
         allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
@@ -266,7 +266,7 @@
     function mutatedGenesData(_selectedGenesMap, _selectedSampleIds) {
 
       genePanelMap = window.iviz.datamanager.updateGenePanelMap(genePanelMap, _selectedSampleIds);
-      
+
       selectedGeneData.length = 0;
       var numOfCases_ = content.getCases().length;
 

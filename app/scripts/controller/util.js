@@ -527,23 +527,23 @@
 
     function barChartDownload(fileType, content) {
       switch (fileType) {
-        case 'tsv':
-          csvDownload(content.fileName || 'data', content.data);
-          break;
-        case 'svg':
-          barChartCanvasDownload(content, {
-            filename: content.fileName + '.svg'
-          });
-          break;
-        case 'pdf':
-          barChartCanvasDownload(content, {
-            filename: content.fileName + '.pdf',
-            contentType: 'application/pdf',
-            servletName: window.cbioURL + 'svgtopdf.do'
-          });
-          break;
-        default:
-          break;
+      case 'tsv':
+        csvDownload(content.fileName || 'data', content.data);
+        break;
+      case 'svg':
+        barChartCanvasDownload(content, {
+          filename: content.fileName + '.svg'
+        });
+        break;
+      case 'pdf':
+        barChartCanvasDownload(content, {
+          filename: content.fileName + '.pdf',
+          contentType: 'application/pdf',
+          servletName: window.cbioURL + 'svgtopdf.do'
+        });
+        break;
+      default:
+        break;
       }
     }
 
@@ -607,6 +607,28 @@
       return string.join('<br/>');
     };
 
+    content.getCaseIdsGroupByCategories = function(groupType, dcDimension, attrId) {
+      var _cases = [];
+      var _caseIds = {};
+
+      if (!groupType || !dcDimension) {
+        return _caseIds;
+      }
+
+      _cases = dcDimension.top(Infinity);
+
+      for (var i = 0; i < _cases.length; i++) {
+        var _key = _cases[i][attrId];
+
+        if (!_caseIds.hasOwnProperty(_key)) {
+          _caseIds[_key] = [];
+        }
+        var _groupKey = groupType === 'patient' ? 'patient_id' : 'sample_id';
+        _caseIds[_key].push(_cases[i][_groupKey]);
+      }
+
+      return _caseIds;
+    };
     return content;
   })();
 })(window.iViz,

@@ -1388,11 +1388,34 @@ window.DataManagerForIviz = (function($, _) {
               _sampleNumPerGene += _self.panelSampleMap[_panelId]["sel_samples"].length;
             });
             _map[_gene]["sample_num"] = _sampleNumPerGene;
-          });         
+          });
           return _map;
         } else {
           return _map
         }
+      },
+      getCancerStudyDisplayName: function(_cancerStudyStableIds) {
+        var _def = new $.Deferred();
+        var _asyncAjaxCalls = [];
+        var _responses = [];
+        _.each(_cancerStudyStableIds, function(_csId) {
+          _asyncAjaxCalls.push(
+            $.ajax({
+              url: window.cbioURL + 'api/studies/' + _csId ,
+              contentType: "application/json",
+              type: 'GET',
+              success: function(_res) { _responses.push(_res); }
+            })
+          );
+        });
+        var _map = {};
+        $.when.apply($, _asyncAjaxCalls).done(function() {
+          _.each(_responses, function(_res) {
+            _map[_res.studyId] = _res.shortName;
+          });
+          _def.resolve(_map);
+        });
+        return _def.promise();
       }
     };
   };

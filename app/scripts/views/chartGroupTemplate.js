@@ -5,9 +5,10 @@
 (function(Vue, dc, iViz, crossfilter, _) {
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart" ' +
-    ':clear-chart="clearGroup" :ndx="ndx"   :attributes.sync="attribute"   v-for="attribute in attributes"></div>',
+    ':clear-chart="clearGroup" :ndx="ndx"   :attributes.sync="attribute" ' +
+    ':showed-survival-plot="showedSurvivalPlot"  v-for="attribute in attributes"></div>',
     props: [
-      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup', 'hasfilters'
+      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup', 'hasfilters', 'showedSurvivalPlot'
     ], created: function() {
       // TODO: update this.data
       var _self = this;
