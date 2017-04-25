@@ -68,7 +68,7 @@
         } else {
           var attrId =
             this.attributes.group_type === 'patient' ?
-              'patient_uid' : 'sample_uid';
+              'patient_id' : 'sample_id';
           var _selectedCases =
             _.pluck(this.invisibleDimension.top(Infinity), attrId);
           this.chartInst.update(_selectedCases, this.selectedRows);
@@ -116,7 +116,7 @@
         if (this.isMutatedGeneCna) {
           this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
           _.each(_selectedRowData, function(item) {
-            var casesIds = item.case_uids.split(',');
+            var casesIds = item.caseIds.split(',');
             selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
           });
           if (this.attributes.filter.length === 0) {
@@ -158,7 +158,7 @@
           height: window.iViz.styles.vars.specialTables.height,
           chartId: this.chartId
         };
-        this.chartInst.init(this.attributes, opts, this.$root.selectedsampleUIDs,
+        this.chartInst.init(this.attributes, opts, this.$root.selectedsamples,
           this.$root.selectedgenes, data, {
             addGeneClick: this.addGeneClick,
             submitClick: this.submitClick
@@ -183,7 +183,7 @@
 
       if (this.isMutatedGeneCna) {
         attrId = this.attributes.group_type === 'patient' ?
-          'patient_uid' : 'sample_uid';
+          'patient_id' : 'sample_id';
       }
 
       this.invisibleDimension = this.ndx.dimension(function(d) {

@@ -47,7 +47,7 @@
       },
       'update-special-charts': function(hasFilters) {
         var attrId =
-          this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
+          this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
         var _selectedCases = [];
         if (hasFilters) {
           _selectedCases =
@@ -92,7 +92,7 @@
       var _self = this;
       _self.showLoad = true;
       var attrId =
-        this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
+        this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
       this.invisibleDimension = this.ndx.dimension(function(d) {
         return d[attrId];
       });

@@ -10,7 +10,7 @@
     ' :attributes.sync="group.attributes" :clear-group="clearAll"' +
     ' v-for="group in groups"></chart-group> ',
     props: [
-      'groups', 'selectedsampleUIDs', 'selectedpatientUIDs', 'hasfilters',
+      'groups', 'selectedsamples', 'selectedpatients', 'hasfilters',
       'redrawgroups', 'customfilter', 'clearAll'
     ], data: function() {
       return {
@@ -205,21 +205,21 @@
           self_.patientsync = _casesSync;
           self_.samplesync = _counterCasesSync;
           if (self_.hasfilters) {
-            self_.selectedsampleUIDs = _resultCounterSelectedCases;
-            self_.selectedpatientUIDs = _selectedCasesByFilters;
+            self_.selectedsamples = _resultCounterSelectedCases;
+            self_.selectedpatients = _selectedCasesByFilters;
           } else {
-            self_.selectedsampleUIDs = self_.completeSamplesList;
-            self_.selectedpatientUIDs = self_.completePatientsList;
+            self_.selectedsamples = self_.completeSamplesList;
+            self_.selectedpatients = self_.completePatientsList;
           }
         } else {
           self_.samplesync = _casesSync;
           self_.patientsync = _counterCasesSync;
           if (self_.hasfilters) {
-            self_.selectedsampleUIDs = _selectedCasesByFilters;
-            self_.selectedpatientUIDs = _resultCounterSelectedCases;
+            self_.selectedsamples = _selectedCasesByFilters;
+            self_.selectedpatients = _resultCounterSelectedCases;
           } else {
-            self_.selectedsampleUIDs = self_.completeSamplesList;
-            self_.selectedpatientUIDs = self_.completePatientsList;
+            self_.selectedsamples = self_.completeSamplesList;
+            self_.selectedpatients = self_.completePatientsList;
           }
         }
       },
@@ -236,8 +236,8 @@
           this.customfilter.patientIds = this.patientsync;
         }
 
-        this.selectedsampleUIDs = this.samplesync;
-        this.selectedpatientUIDs = this.patientsync;
+        this.selectedsamples = this.samplesync;
+        this.selectedpatients = this.patientsync;
       }
     }
   });

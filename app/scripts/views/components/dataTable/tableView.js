@@ -20,6 +20,7 @@
     var allSamplesIds = [];
     var reactTableData = {};
     var initialized = false;
+    var caseIndices = {};
     var selectedRowData = [];
     var selectedGeneData = [];
     var displayName = '';
@@ -63,6 +64,7 @@
         chartId_ = _opts.chartId;
         opts = _opts;
         genePanelMap = _genePanelMap;
+        caseIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
         geneData_ = _geneData;
         type_ = _attributes.type;
@@ -78,7 +80,7 @@
         initReactTable(true);
       };
 
-    content.update = function(_selectedSampleUIDs, _selectedRows) {
+    content.update = function(_selectedSamples, _selectedRows) {
       var selectedMap_ = {};
       var includeMutationCount = false;
       if (_selectedRows !== undefined) {
@@ -87,16 +89,17 @@
       if (selectedRows.length === 0) {
         selectedRowData = [];
       }
-      _selectedSampleUIDs.sort();
+      _selectedSamples.sort();
       if ((!initialized) ||
-        (!iViz.util.compare(selectedSamples, _selectedSampleUIDs))) {
+        (!iViz.util.compare(selectedSamples, _selectedSamples))) {
         initialized = true;
-        selectedSamples = _selectedSampleUIDs;
+        selectedSamples = _selectedSamples;
         if (iViz.util.compare(allSamplesIds, selectedSamples)) {
           initReactTable(true);
         } else {
-          _.each(_selectedSampleUIDs, function(caseId) {
-            var caseData_ = data_[caseId];
+          _.each(_selectedSamples, function(caseId) {
+            var caseIndex_ = caseIndices[caseId];
+            var caseData_ = data_[caseIndex_];
             var tempData_ = '';
             switch (type_) {
               case 'mutatedGene':
@@ -125,12 +128,12 @@
                   if (includeMutationCount) {
                     selectedMap_[geneIndex].num_muts = 1;
                   }
-                  selectedMap_[geneIndex].case_uids = [caseId];
+                  selectedMap_[geneIndex].caseIds = [caseId];
                 } else {
                   if (includeMutationCount) {
                     selectedMap_[geneIndex].num_muts += 1;
                   }
-                  selectedMap_[geneIndex].case_uids.push(caseId);
+                  selectedMap_[geneIndex].caseIds.push(caseId);
                 }
               });
             }
@@ -209,7 +212,7 @@
             var datum = {
               attr_id: key,
               uniqueId: name,
-              attr_val: key === 'case_uids' ? category.case_uids.join(',') : category[key]
+              attr_val: key === 'caseIds' ? category.caseIds.join(',') : category[key]
             };
             data.push(datum);
           }
@@ -276,10 +279,10 @@
           var freq = 0;
           datum.gene = item.gene;
           if (_selectedGenesMap === undefined) {
-            datum.case_uids = iViz.util.unique(item.case_uids);
-            datum.cases = datum.case_uids.length;
+            datum.caseIds = iViz.util.unique(item.caseIds);
+            datum.cases = datum.caseIds.length;
             datum.uniqueId = index;
-            if(typeof genePanelMap[item.gene] !== 'undefined') {
+            if (typeof genePanelMap[item.gene] !== 'undefined') {
               freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
             } else {
               freq = iViz.util.calcFreq(datum.cases, numOfCases_);
@@ -301,9 +304,9 @@
             if (_selectedGenesMap[item.index] === undefined) {
               return;
             }
-            datum.case_uids =
-              iViz.util.unique(_selectedGenesMap[item.index].case_uids);
-            datum.cases = datum.case_uids.length;
+            datum.caseIds =
+              iViz.util.unique(_selectedGenesMap[item.index].caseIds);
+            datum.cases = datum.caseIds.length;
             if (typeof genePanelMap[item.gene] !== 'undefined') {
               freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
             } else {
@@ -357,7 +360,7 @@
               var datum = {
                 attr_id: key,
                 uniqueId: item.uniqueId,
-                attr_val: key === 'case_uids' ? item.case_uids.join(',') : item[key]
+                attr_val: key === 'caseIds' ? item.caseIds.join(',') : item[key]
               };
               result.data.push(datum);
             }
@@ -480,7 +483,7 @@
               column_width: 93
             },
             {
-              attr_id: 'case_uids',
+              attr_id: 'caseIds',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false
@@ -532,7 +535,7 @@
               column_width: 78
             },
             {
-              attr_id: 'case_uids',
+              attr_id: 'caseIds',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false
@@ -574,7 +577,7 @@
               datatype: 'PERCENTAGE',
               column_width: 90
             }, {
-              attr_id: 'case_uids',
+              attr_id: 'caseIds',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false

@@ -162,8 +162,8 @@
       data.push(header.join('\t'));
 
       for (var i = 0; i < _cases.length; i++) {
-        var sampleId = _cases[i].sample_uid;
-        var patientId = _cases[i].patient_uid;
+        var sampleId = _cases[i].sample_id;
+        var patientId = _cases[i].patient_id;
         var row = [];
         if (opts_.groupType === 'patient') {
           sampleId = iViz.getSampleIds(patientId);

@@ -129,7 +129,7 @@
           </span>
         </div>
         <span id="iviz-header-left-patient-select" class="iviz-header-button"
-              @click="openCases" class="number"
+              @click="openCases('patient')" class="number"
               role="button" tabindex="0" style="display: block;"><i class="fa fa-user" aria-hidden="true"></i></span>
         <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()"
               role="button"
@@ -185,8 +185,8 @@
     <div class="grid" id="main-grid"
          :class="{loading:isloading}">
       <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
-                     :selectedpatient-uIDs.sync="selectedpatientUIDs"
-                     :selectedsample-uIDs.sync="selectedsampleUIDs"
+                     :selectedpatients.sync="selectedpatients"
+                     :selectedsamples.sync="selectedsamples"
                      :hasfilters.sync="hasfilters"
                      :customfilter.sync="customfilter"
                      :clear-all="clearAll"></main-template>

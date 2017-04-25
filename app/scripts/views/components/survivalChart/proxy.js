@@ -10,7 +10,6 @@
   iViz.data.SurvivalChartProxy = function(_data, _attrId) {
     var datum_ = {
       study_id: '',
-      patient_uid: '',
       patient_id: '',
       time: '', // num of months
       status: '',
@@ -35,9 +34,8 @@
         _status !== 'NaN' && _status !== 'NA' &&
         typeof _status !== 'undefined' && typeof _time !== 'undefined') {
         var _datum = jQuery.extend(true, {}, datum_);
-        _datum.patient_uid = _dataObj.patient_uid;
+        _datum.patient_id = _dataObj.patient_id;
         _datum.study_id = _dataObj.study_id;
-        _datum.patient_id = iViz.getCaseIdUsingUID('patient', _dataObj.study_id, _dataObj.patient_uid);
         _datum.time = parseFloat(_time);
         _datum.status = _status;
         datumArr_.push(_datum);

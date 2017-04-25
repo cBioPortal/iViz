@@ -11,8 +11,8 @@
           el: '#complete-screen',
           data: {
             groups: [],
-            selectedsampleUIDs: [],
-            selectedpatientUIDs: [],
+            selectedsamples: [],
+            selectedpatients: [],
             selectedgenes: [],
             addNewVC: false,
             selectedPatientsNum: 0,
@@ -72,12 +72,12 @@
                 });
               }
             },
-            selectedsampleUIDs: function(newVal, oldVal) {
+            selectedsamples: function(newVal, oldVal) {
               if (newVal.length !== oldVal.length) {
                 this.selectedSamplesNum = newVal.length;
               }
             },
-            selectedpatientUIDs: function(newVal, oldVal) {
+            selectedpatients: function(newVal, oldVal) {
               if (newVal.length !== oldVal.length) {
                 this.selectedPatientsNum = newVal.length;
               }
@@ -121,8 +121,8 @@
               }
               if (includeNextTickFlag) {
                 self_.$nextTick(function() {
-                  self_.selectedsampleUIDs = _.keys(iViz.getCasesMap('sample'));
-                  self_.selectedpatientUIDs = _.keys(iViz.getCasesMap('patient'));
+                  self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
+                  self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
                   self_.$broadcast('update-special-charts', self_.hasfilters);
                   self_.clearAll = false;
                   _.each(this.groups, function(group) {
@@ -218,33 +218,45 @@
             },
             setSelectedCases: function(selectionType, selectedCases) {
               var radioVal = selectionType;
-              var selectedCaseUIDs = [];
-              var unmappedCaseIDs = [];
-              _.each(selectedCases, function(id) {
-                var caseUIDs = iViz.getCaseUIDs(selectionType, id);
-                if (caseUIDs.length === 0) {
-                  unmappedCaseIDs.push(id);
-                } else {
-                  selectedCaseUIDs = selectedCaseUIDs.concat(caseUIDs);
-                }
-              });
+              var selectedCaseIds = [];
+              var unmappedCaseIds = [];
 
-              if (unmappedCaseIDs.length > 0) {
-                new Notification().createNotification(selectedCaseUIDs.length +
+              if (radioVal === 'patient') {
+                var patientIdsList = Object.keys(iViz.getCasesMap('patient'));
+                _.each(selectedCases, function(id) {
+                  if (patientIdsList.indexOf(id) === -1) {
+                    unmappedCaseIds.push(id);
+                  } else {
+                    selectedCaseIds.push(id);
+                  }
+                });
+              } else {
+                var sampleIdsList = Object.keys(iViz.getCasesMap('sample'));
+                _.each(selectedCases, function(id) {
+                  if (sampleIdsList.indexOf(id) === -1) {
+                    unmappedCaseIds.push(id);
+                  } else {
+                    selectedCaseIds.push(id);
+                  }
+                });
+              }
+
+              if (unmappedCaseIds.length > 0) {
+                new Notification().createNotification(selectedCaseIds.length +
                   ' cases selected. The following ' +
                   (radioVal === 'patient' ? 'patient' : 'sample') +
-                  ' ID' + (unmappedCaseIDs.length === 1 ? ' was' : 's were') +
+                  ' ID' + (unmappedCaseIds.length === 1 ? ' was' : 's were') +
                   ' not found in this study: ' +
-                  unmappedCaseIDs.join(', '), {
+                  unmappedCaseIds.join(', '), {
                     message_type: 'danger'
                   });
               } else {
-                new Notification().createNotification(selectedCaseUIDs.length +
+                new Notification().createNotification(selectedCaseIds.length +
                   ' case(s) selected.', {message_type: 'info'});
               }
 
               $('#custom-case-input-button').qtip('toggle');
-              if (selectedCaseUIDs.length > 0) {
+              if (selectedCaseIds.length > 0) {
                 this.clearAllCharts(false);
                 var self_ = this;
                 Vue.nextTick(function() {
@@ -253,10 +265,10 @@
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;
                       if (radioVal === 'sample') {
-                        self_.customfilter.sampleIds = selectedCaseUIDs;
+                        self_.customfilter.sampleIds = selectedCaseIds;
                         self_.customfilter.patientIds = [];
                       } else {
-                        self_.customfilter.patientIds = selectedCaseUIDs;
+                        self_.customfilter.patientIds = selectedCaseIds;
                         self_.customfilter.sampleIds = [];
                       }
                       self_.$broadcast('update-custom-filters');
