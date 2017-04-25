@@ -10,38 +10,44 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
   var patientData_;
   var sampleData_;
   var charts = {};
-  var styles_ = {
-    vars: {
-      width: {
-        one: 195,
-        two: 400
-      },
-      height: {
-        one: 170,
-        two: 350
-      },
-      chartHeader: 17,
-      borderWidth: 2,
-      scatter: {
-        width: 398,
-        height: 331
-      },
-      survival: {
-        width: 398,
-        height: 331
-      },
-      specialTables: {
-        width: 398,
-        height: 306
-      },
-      piechart: {
-        width: 140,
-        height: 140
-      },
-      barchart: {
-        width: 398,
-        height: 134
+  var configs_ = {
+    styles: {
+      vars: {
+        width: {
+          one: 195,
+          two: 400
+        },
+        height: {
+          one: 170,
+          two: 350
+        },
+        chartHeader: 17,
+        borderWidth: 2,
+        scatter: {
+          width: 398,
+          height: 331
+        },
+        survival: {
+          width: 398,
+          height: 331
+        },
+        specialTables: {
+          width: 398,
+          height: 306
+        },
+        piechart: {
+          width: 140,
+          height: 140
+        },
+        barchart: {
+          width: 398,
+          height: 134
+        }
       }
+    },
+    numOfSurvivalCurveLimit: 20,
+    dc: {
+      transitionDuration: 400
     }
   };
 
@@ -63,15 +69,13 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
   return {
 
-    init: function(_rawDataJSON, opts) {
+    init: function(_rawDataJSON, configs) {
       vm_ = iViz.vue.manage.getInstance();
 
       data_ = _rawDataJSON;
 
-      if (_.isObject(opts)) {
-        if (_.isObject(opts.styles)) {
-          styles_ = _.extend(styles_, opts.styles);
-        }
+      if (_.isObject(configs)) {
+        configs_ = $.extend(true, configs_, configs);
       }
 
       hasPatientAttrDataMap_ = data_.groups.patient.hasAttrData;
@@ -106,6 +110,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           attrData.show = false;
         }
         charts[attrData.attr_id] = attrData;
+        if (attrData.view_type === 'survival' && attrData.show) {
+          vm_.numOfSurvivalPlots++;
+        }
       });
       group.attributes = groupAttrs;
       groups.push(group);
@@ -233,9 +240,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         def.resolve(toReturn);
       });
       if (attrDataToGet.length > 0) {
-        $.when(this.updateDataObject(type, attrDataToGet)).then(function() {
-          _def.resolve();
-        });
+        $.when(this.updateDataObject(type, attrDataToGet))
+          .then(function() {
+            _def.resolve();
+          }, function() {
+            _def.reject();
+          });
       } else {
         _def.resolve();
       }
@@ -247,13 +257,19 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         return _chart.group_type === _type;
       }), 'attr_id');
       if (_processData) {
-        $.when(iViz.getDataWithAttrs(_type, _attrIds)).then(function() {
-          _def.resolve();
-        });
+        $.when(iViz.getDataWithAttrs(_type, _attrIds))
+          .then(function() {
+            _def.resolve();
+          }, function() {
+            _def.reject();
+          });
       } else {
-        $.when(window.iviz.datamanager.getClinicalData(_attrIds, (_type === 'patient'))).then(function() {
-          _def.resolve();
-        });
+        $.when(window.iviz.datamanager.getClinicalData(_attrIds, (_type === 'patient')))
+          .then(function() {
+            _def.resolve();
+          }, function() {
+            _def.reject();
+          });
       }
       return _def.promise();
     },
@@ -314,6 +330,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           });
 
           def.resolve();
+        }, function() {
+          def.reject();
         });
       return def.promise();
     },
@@ -415,13 +433,19 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var self = this;
       if (tableData_[attrId] === undefined) {
         if (attrId === 'mutated_genes') {
-          $.when(window.iviz.datamanager.getMutData()).then(function(_data) {
-            def.resolve(self.extractMutationData(_data));
-          });
+          $.when(window.iviz.datamanager.getMutData())
+            .then(function(_data) {
+              def.resolve(self.extractMutationData(_data));
+            }, function() {
+              def.reject();
+            });
         } else if (attrId === 'cna_details') {
-          $.when(window.iviz.datamanager.getCnaData()).then(function(_data) {
-            def.resolve(self.extractCnaData(_data));
-          });
+          $.when(window.iviz.datamanager.getCnaData())
+            .then(function(_data) {
+              def.resolve(self.extractCnaData(_data));
+            }, function() {
+              def.reject();
+            });
         }
       } else {
         def.resolve(tableData_[attrId]);
@@ -552,6 +576,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         };
 
         cbio.download.initDownload(content, downloadOpts);
+      }, function() {
+        // TODO: give warning/error message to user if the download is failed
       });
     },
     submitForm: function() {
@@ -667,13 +693,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       component: {}
     },
     util: {},
-    opts: {
-      dc: {
-        transitionDuration: 400
-      }
-    },
+    opts: configs_,
     data: {},
-    styles: styles_,
+    styles: configs_.styles,
     applyVC: function(_vc) {
       var _selectedSamples = [];
       var _selectedPatients = [];

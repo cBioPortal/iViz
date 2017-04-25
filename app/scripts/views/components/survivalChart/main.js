@@ -6,64 +6,73 @@
 (function(iViz, _) {
   iViz.view.component.Survival = function() {
     var content_ = this;
-    var data_ = {};
-    var opts_ = {};
+    var opts_ = {
+      downloadIsEnabled: true
+    };
+    var groups_ = [];
 
-    content_.init = function(_data, _opts) {
+    content_.init = function(groups, _data, _opts) {
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
-      data_ = _data;
       var _dataProxy = new iViz.data.SurvivalChartProxy(_data, opts_.attrId);
       this.chartInst_ =
         new iViz.view.component
           .SurvivalCurve(opts_.chartId, _dataProxy.get(), opts_);
-      this.chartInst_.addCurve(_dataProxy.get(), 0, '#2986e2');
+      this.update(groups, _opts.chartId, _opts.attrId);
     };
 
     // _attrId here indicates chart type (OS or DFS)
-    content_.update = function(_selectedPatients, _chartId, _attrId) {
+    content_.update = function(groups, _chartId, _attrId) {
       // remove previous curves
-      this.chartInst_.removeCurves();
+      var _chartInst_ = this.chartInst_;
+      var _newGroups = [];
+      _chartInst_.removeCurves();
+      _chartInst_.removePval();
+      _chartInst_.removeNoInfo();
 
-      // separate selected and unselected data
-      var _selectedData = [];
-      var _unselectedData = [];
-      var _tmpSelectedPatientIdMap = {};
-      _.each(_selectedPatients, function(_patientId) {
-        _tmpSelectedPatientIdMap[_patientId] = '';
-      });
-      _.each(Object.keys(iViz.getCaseIndices(opts_.type)),
-        function(_patientId) {
-          var _index = iViz.getCaseIndices(opts_.type)[_patientId];
-          if (_tmpSelectedPatientIdMap.hasOwnProperty(_patientId)) {
-            _selectedData.push(data_[_index]);
-          } else {
-            _unselectedData.push(data_[_index]);
+      if (_.isArray(groups)) {
+
+        // Calculate proxy data for each group
+        _.each(groups, function(group) {
+          group.proxyData =
+            new iViz.data.SurvivalChartProxy(group.data, _attrId).get();
+          if(_.isArray(group.proxyData) && group.proxyData.length > 0) {
+            _newGroups.push(group);
           }
         });
 
-      // settings for different curves
-      var _selectedDataProxy =
-        new iViz.data.SurvivalChartProxy(_selectedData, _attrId);
-      var _unselectedDataProxy =
-        new iViz.data.SurvivalChartProxy(_unselectedData, _attrId);
-
-      // add curves
-      if (_selectedDataProxy.get().length === 0) {
-        this.chartInst_.addCurve(_unselectedDataProxy.get(), 0, '#2986e2');
-        this.chartInst_.removePval();
-      } else {
-        this.chartInst_.addCurve(_selectedDataProxy.get(), 0, 'red');
-        this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, '#2986e2');
-        this.chartInst_.addPval(
-          _selectedDataProxy.get(), _unselectedDataProxy.get());
+        if (_newGroups.length > 0) {
+          if (_newGroups.length === 2) {
+            _chartInst_.addPval(_newGroups[0].proxyData, _newGroups[1].proxyData);
+          }
+          _.each(_newGroups, function(group, index) {
+            _chartInst_.addCurve(group.proxyData, index, group.curveHex);
+          });
+          opts_.downloadIsEnabled = true;
+        } else {
+          _chartInst_.addNoInfo();
+          opts_.downloadIsEnabled = false;
+        }
       }
+      groups_ = _newGroups;
     };
 
     content_.updateDataForDownload = function(fileType) {
-      if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+      if (opts_.downloadIsEnabled && ['pdf', 'svg'].indexOf(fileType) !== -1) {
         initCanvasDownloadData();
       }
+    };
+
+    content_.getGroups = function() {
+      return groups_;
+    };
+
+    content_.highlightCurve = function(curveId) {
+      this.chartInst_.highlightCurve(curveId);
+    };
+    
+    content_.downloadIsEnabled = function() {
+      return opts_.downloadIsEnabled;
     };
 
     function initCanvasDownloadData() {
