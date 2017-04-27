@@ -1,3 +1,4 @@
+
 'use strict';
 (function(Vue, iViz, dc, _) {
   iViz.vue = {};
@@ -29,8 +30,8 @@
             charts: {},
             groupCount: 0,
             updateSpecialCharts: false,
-            showSaveButton: false,
-            showManageButton: false,
+            showSaveButton: true,
+            showManageButton: true,
             loadUserSpecificCohorts: false,
             stats: '',
             updateStats: false,
@@ -365,8 +366,8 @@
     bind: function() {
       var self = this;
       $(this.el).chosen({
-        width: '30%'
-      })
+          width: '30%'
+        })
         .change(
           function() {
             var value = self.el.value;
@@ -377,35 +378,4 @@
     }
   });
 
-  // This is an example to add sample to a virtual cohort from scatter plot
-  /*  iViz.vue.vmScatter = (function() {
-   var vmInstance_;
-
-   return {
-   init: function() {
-   vmInstance_ = new Vue({
-   el: '#scatter-container',
-   data: {
-   showList: false,
-   virtualCohorts: null,
-   sampleID: null,
-   cancerStudyID: null,
-   addNewVC: false
-   }, ready: function() {
-   this.$watch('showList', function() {
-   if (_.isObject(iViz.session)) {
-   this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
-   }
-   });
-   }
-   });
-   },
-   getInstance: function() {
-   if (typeof vmInstance_ === 'undefined') {
-   this.init();
-   }
-   return vmInstance_;
-   }
-   };
-   })();*/
 })(window.Vue, window.iViz, window.dc, window._);
