@@ -581,44 +581,43 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       });
     },
     submitForm: function() {
-      var selectedCases_ = vm_.selectedsamples;
-      var studyId_ = '';
-      var possibleTOQuery = true;
+
+      var _self = this;
+      _self.selectedsamples = _.keys(iViz.getCasesMap('sample'));
+      _self.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+      _self.cohorts_ = window.cohortIdsList; // queried cohorts (vc or regular study)
 
       // Remove all hidden inputs
       $('#iviz-form input:not(:first)').remove();
 
-      _.each(selectedCases_, function(_caseId, key) {
-        var index_ = data_.groups.sample.data_indices.sample_id[_caseId];
-        if (key === 0) {
-          studyId_ = data_.groups.sample.data[index_].study_id;
-        } else if (studyId_ !== data_.groups.sample.data[index_].study_id) {
-          possibleTOQuery = false;
-          return false;
-        }
-      });
-      if (possibleTOQuery) {
-        window.studyId = studyId_;
+      if (_self.cohorts_.length === 1) { // to query single study
         if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(studyId_, selectedCases_);
+          QueryByGeneUtil.toMainPage(_self.cohorts_[0], _self.stat().selectedCases);
         } else {
-          QueryByGeneTextArea.validateGenes(this.decideSubmit, false);
+          QueryByGeneTextArea.validateGenes(this.decideSubmitSingleCohort, false);
         }
-      } else {
-        new Notification().createNotification(
-          'Querying multiple studies features is not yet ready!',
-          {message_type: 'info'});
+      } else { // to query multiple studies, always generate a tmp VC and save to session service only. 
+        $.when(vcSession.utils.buildVCObject(_self.stat().filters, _self.stat().selectedCases, "Selected patients / samples", "")).done(function (_vc) {
+          vcSession.model.saveSessionWithoutWritingLocalStorage(_vc, function (_vcId) {
+            if (QueryByGeneTextArea.isEmpty()) {
+              QueryByGeneUtil.toMainPage(_vcId, _self.stat().selectedCases);
+            } else {
+              QueryByGeneUtil.toMultiStudiesQueryPage(_vcId, _self.stat().selectedCases, QueryByGeneTextArea.getGenes());
+            }
+          });
+        });
       }
     },
-    decideSubmit: function(allValid) {
+    decideSubmitSingleCohort: function(allValid) {
       // if all genes are valid, submit, otherwise show a notification
       if (allValid) {
-        QueryByGeneUtil.toQueryPage(window.studyId, vm_.selectedsamples,
+        var _self = this;
+        QueryByGeneUtil.toQueryPageSingleCohort(window.cohortIdsList[0], iViz.stat().selectedCases,
           QueryByGeneTextArea.getGenes(), window.mutationProfileId,
           window.cnaProfileId);
       } else {
         new Notification().createNotification(
-          'There were problems with the selected genes. Please fix.',
+          'Invalid gene symbols.',
           {message_type: 'danger'});
         $('#query-by-gene-textarea').focus();
       }
