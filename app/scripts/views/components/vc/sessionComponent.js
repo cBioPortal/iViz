@@ -123,7 +123,7 @@
                       self_.selectedSamplesNum = _selectedSamplesNum;
                       self_.selectedPatientsNum = _selectedPatientsNum;
                     }
-                    
+
                     vcSession.events.saveCohort(self_.stats,
                       cohortName, cohortDescription || '')
                       .done(function(response) {
