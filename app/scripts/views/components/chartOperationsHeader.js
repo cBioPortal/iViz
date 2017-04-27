@@ -7,18 +7,17 @@
     template: '<div class="chart-header">' +
     '<div class="chart-title" ' +
     ':class="[showOperations?chartTitleActive:chartTitle]" ' +
-    'v-if="hasChartTitle&&((showTableIcon===undefined)||showTableIcon)">' +
+    'v-if="hasChartTitle">' +
     '<span class="chart-title-span" id="{{chartId}}-title">{{displayName}}' +
     '</span></div>' +
     '<div :class="[showOperations?chartOperationsActive:chartOperations]">' +
+    '<div class="log-scale" v-if="showLogScale">' +
+    '<input type="checkbox" value="" id="" ' +
+    'class="checkbox" v-model="logChecked">' +
+    '<span id="scale-span-{{chartId}}">' +
+    'Log Scale X</span></div>' +
     '<i v-show="hasFilters" class="fa fa-undo icon hover" ' +
     'aria-hidden="true" @click="reset()"></i>' +
-    '<div style="float:left" v-if="showLogScale"></input style="float:left">' +
-    '<input type="checkbox" value="" id="" ' +
-    'class="bar-x-log" v-model="logChecked">' +
-    '<span id="scale-span-{{chartId}}" ' +
-    'style="float:left; font-size:10px; margin-right: 15px; color: grey">' +
-    'Log Scale X</span></div>' +
     '<i v-if="hasTitleTooltip()" ' +
     'class="fa fa-info-circle icon hover" ' +
     'id="{{chartId}}-description-icon"' +
@@ -28,8 +27,8 @@
     '<i v-if="showPieIcon" class="fa fa-pie-chart icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
     '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" ' +
-    'class="icon hover"/>' +
-    '<div id="{{chartId}}-download-icon-wrapper" class="download">' +
+    'class="icon hover" @click="getRainbowSurvival" alt="Survival Analysis"/>' +
+    '<div v-if="showDownloadIcon" id="{{chartId}}-download-icon-wrapper" class="download">' +
     '<i class="fa fa-download icon hover" alt="download" ' +
     'id="{{chartId}}-download"></i>' +
     '</div>' +
@@ -38,24 +37,57 @@
     '@click="close()"></i></div>' +
     '</div>' +
     '</div>',
-    props: [
-      'showOperations', 'resetBtnId', 'chartCtrl', 'groupid',
-      'hasChartTitle', 'showTable', 'displayName', 'chartId', 'showPieIcon',
-      'showTableIcon', 'showLogScale', 'showSurvivalIcon', 'filters',
-      'attributes'
-    ],
+    props: {
+      showOperations: {
+        type: Boolean,
+        default: true
+      }, resetBtnId: {
+        type: String
+      }, chartCtrl: {
+        type: Object
+      }, groupid: {
+        type: Number
+      }, hasChartTitle: {
+        type: Boolean,
+        default: false
+      }, showTable: {
+        type: Boolean
+      }, displayName: {
+        type: String
+      }, chartId: {
+        type: String
+      }, showPieIcon: {
+        type: Boolean
+      }, showTableIcon: {
+        type: Boolean
+      }, showLogScale: {
+        type: Boolean,
+        default: false
+      }, showSurvivalIcon: {
+        type: Boolean,
+        default: false
+      }, filters: {
+        type: Array
+      }, attributes: {
+        type: Object
+      }, showDownloadIcon: {
+        type: Boolean,
+        default: true
+      }
+    },
     data: function() {
       return {
         chartOperationsActive: 'chart-operations-active',
         chartOperations: 'chart-operations',
         chartTitle: 'chart-title',
-        chartTitleActive: 'chart-title-active',
+        chartTitleActive: 'chart-title-active chart-title-active-' + 3,
         logChecked: true,
         hasFilters: false,
         titleTooltip: {
           content: _.isObject(this.attributes) ?
             iViz.util.getClinicalAttrTooltipContent(this.attributes) : ''
-        }
+        },
+        numOfIcons: 3
       };
     },
     watch: {
@@ -64,6 +96,23 @@
         this.$dispatch('changeLogScale', newVal);
       }, filters: function(newVal) {
         this.hasFilters = newVal.length > 0;
+      },
+      showSurvivalIcon: function(newVal) {
+        if (newVal) {
+          this.numOfIcons++;
+        } else {
+          this.numOfIcons--;
+        }
+      },
+      showDownloadIcon: function(newVal) {
+        if (newVal) {
+          this.numOfIcons++;
+        } else {
+          this.numOfIcons--;
+        }
+      },
+      numOfIcons: function(newVal) {
+        this.chartTitleActive = 'chart-title-active chart-title-active-' + newVal;
       }
     },
     methods: {
@@ -85,6 +134,9 @@
         this.showTableIcon = !this.showTableIcon;
         this.showPieIcon = !this.showPieIcon;
         this.$dispatch('toTableView');
+      },
+      getRainbowSurvival: function() {
+        this.$dispatch('getRainbowSurvival');
       },
       hasTitleTooltip: function() {
         return _.isObject(this.attributes) ?
@@ -158,6 +210,33 @@
           }
         }
       });
+
+      var _numOfIcons = this.numOfIcons;
+
+      if (self.showPieIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.showTableIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.showSurvivalIcon) {
+        _numOfIcons++;
+      }
+
+      if (self.hasTitleTooltip()) {
+        _numOfIcons++;
+      }
+
+      if (self.showLogScale) {
+        _numOfIcons++;
+      }
+      
+      if(self.showDownloadIcon) {
+        _numOfIcons++;
+      }
+      this.numOfIcons = _numOfIcons;
     }
   });
 })(window.Vue,

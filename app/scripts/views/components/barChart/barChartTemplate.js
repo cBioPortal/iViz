@@ -10,6 +10,7 @@
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
+    ':show-survival-icon.sync="showSurvivalIcon"' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
     ':attributes="attributes"' +
@@ -20,7 +21,7 @@
     'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
     props: [
-      'ndx', 'attributes'
+      'ndx', 'attributes', 'showedSurvivalPlot'
     ],
     data: function() {
       return {
@@ -30,11 +31,11 @@
         '-reset',
         chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ''),
         displayName: this.attributes.display_name,
-        chartInst: '',
-        barChart: '',
+        chartInst: {},
+        barChart: {},
         showOperations: false,
         filtersUpdated: false,
-        showSurvivalIcon: true,
+        showSurvivalIcon: false,
         data: {},
         settings: {
           width: 400,
@@ -43,6 +44,7 @@
           transitionDuration: iViz.opts.dc.transitionDuration
         },
         opts: {},
+        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
         addingChart: false
       };
     }, watch: {
@@ -56,6 +58,10 @@
             this.$dispatch('update-filters', true);
           }
         }
+        this.barChart.resetBarColor();
+      },
+      'showedSurvivalPlot': function() {
+        this.updateShowSurvivalIcon();
       }
     }, events: {
       closeChart: function() {
@@ -84,9 +90,47 @@
             }
           }
         }
+      },
+      getRainbowSurvival: function() {
+        var groups = [];
+        var categories = this.barChart.getCurrentCategories('key');
+        _.each(categories, function(category) {
+          if (category.name !== 'NA') {
+            groups.push({
+              name: category.name,
+              caseIds: category.caseIds,
+              curveHex: category.color
+            });
+          }
+        });
+        this.barChart.colorBars(categories);
+        this.$dispatch('create-rainbow-survival', {
+          attrId: this.attributes.attr_id,
+          subtitle: ' (' + this.attributes.display_name + ')',
+          groups: groups,
+          groupType: this.attributes.group_type
+        });
+      },
+      resetBarColor: function(exceptionAttrIds) {
+        if (_.isArray(exceptionAttrIds) && exceptionAttrIds.indexOf(this.attributes.attr_id) === -1) {
+          this.barChart.resetBarColor();
+        }
       }
     },
     methods: {
+      updateShowSurvivalIcon: function() {
+        if (this.showedSurvivalPlot) {
+          // Disable rainbow survival if only one group present
+          if (this.barChart.getCurrentCategories().length < 2 ||
+            this.barChart.getCurrentCategories().length > this.numOfSurvivalCurveLimit) {
+            this.showSurvivalIcon = false;
+          } else {
+            this.showSurvivalIcon = true
+          }
+        } else {
+          this.showSurvivalIcon = false;
+        }
+      },
       mouseEnter: function() {
         this.showOperations = true;
       }, mouseLeave: function() {
@@ -152,11 +196,13 @@
       this.data.min = findExtremeResult[0];
       this.data.max = findExtremeResult[1];
       this.data.attrId = this.attributes.attr_id;
+      this.data.groupType = this.attributes.group_type;
 
       if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
         this.settings.showLogScale = true;
       }
       this.initChart(this.settings.showLogScale);
+      this.updateShowSurvivalIcon();
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });

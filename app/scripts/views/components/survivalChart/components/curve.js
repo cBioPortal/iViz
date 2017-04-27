@@ -6,7 +6,10 @@
     _self.elem_ = '';
     _self.divId_ = _divId;
     _self.data_ = _data;
-    _self.opts_ = _opts;
+    _self.opts_ = {
+      curves: {}
+    };
+    _self.opts_ = $.extend(true, _self.opts_, _opts);
     var formatAsPercentage_ = d3.format('%');
 
     var leftMargin_ = 60;
@@ -100,8 +103,8 @@
   };
 
   iViz.view.component.SurvivalCurve.prototype.addCurve = function(_data,
-                                                                  _curveIndex,
-                                                                  _lineColor) {
+    _curveIndex,
+    _lineColor) {
     var _self = this;
 
     // add an empty/zero point so the curve starts from zero time point
@@ -138,6 +141,9 @@
         .y(function(d) {
           return _self.elem_.yScale(d.survival_rate);
         });
+
+      // Init opts for the curve
+      _self.opts_.curves[_curveIndex] = {};
     }
 
     // draw line
@@ -271,10 +277,47 @@
         .text('p = ' + _pVal.toPrecision(2));
     };
 
+  iViz.view.component.SurvivalCurve.prototype.addNoInfo =
+    function() {
+      var _self = this;
+      _self.elem_.svg.selectAll('.noInfo').remove();
+
+      _self.elem_.svg.append('text')
+        .attr('class', 'noInfo')
+        .attr('x', _self.opts_.width / 2 + 25)
+        .attr('y', _self.opts_.height / 2)
+        .attr('font-size', 15)
+        .style('font-style', 'bold')
+        .style('text-anchor', 'middle')
+        .text('No data available');
+    };
+
+  iViz.view.component.SurvivalCurve.prototype.removeNoInfo = function() {
+    var _self = this;
+    _self.elem_.svg.selectAll('.noInfo').remove();
+  };
+
   iViz.view.component.SurvivalCurve.prototype.removePval = function() {
     var _self = this;
     _self.elem_.svg.selectAll('.pval').remove();
   };
+
+  iViz.view.component.SurvivalCurve.prototype.highlightCurve =
+    function(curveIndex) {
+      var _self = this;
+      if (_self.elem_.curves.hasOwnProperty(curveIndex)) {
+        var opacity = '0.5';
+        if (_self.opts_.curves[curveIndex].highlighted) {
+          opacity = '0';
+          _self.opts_.curves[curveIndex].highlighted = false;
+        } else {
+          _self.opts_.curves[curveIndex].highlighted = true;
+        }
+        _self.elem_.curves[curveIndex].invisibleDots
+          .selectAll('path')
+          .style('opacity', opacity);
+      }
+    };
 })(
   window.iViz,
   window.dc,

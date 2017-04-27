@@ -5,15 +5,16 @@
 (function(Vue, dc, iViz, crossfilter, _) {
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart" ' +
-    ':clear-chart="clearGroup" :ndx="ndx"   :attributes.sync="attribute"   v-for="attribute in attributes"></div>',
+    ':clear-chart="clearGroup" :ndx="ndx"   :attributes.sync="attribute" ' +
+    ':showed-survival-plot="showedSurvivalPlot"  v-for="attribute in attributes"></div>',
     props: [
-      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup', 'hasfilters'
+      'attributes', 'type', 'id', 'redrawgroups', 'mappedcases', 'clearGroup', 'hasfilters', 'showedSurvivalPlot'
     ], created: function() {
       // TODO: update this.data
       var _self = this;
       var ndx_ = crossfilter(iViz.getGroupNdx(this.id));
       this.invisibleBridgeDimension = ndx_.dimension(function(d) {
-        return d[_self.type + '_uid'];
+        return d[_self.type + '_id'];
       });
       this.ndx = ndx_;
       this.invisibleChartFilters = [];
@@ -92,7 +93,7 @@
           }
           var filteredCases = _.pluck(
             this.invisibleBridgeDimension.top(Infinity),
-            this.type + '_uid').sort();
+            this.type + '_id').sort();
           // Hacked way to check if filter selected filter cases is same
           // as original case list
 

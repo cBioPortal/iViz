@@ -12,7 +12,7 @@
     var layout_;
     var getQtipString = function(_data) {
       var toReturn = 'Cancer Study:' + _data.study_id + '<br>Sample Id: ' +
-        iViz.getCaseIdUsingUID('patient', _data.study_id, _data.sample_uid) + '<br>CNA fraction: ';
+        _data.sample_id + '<br>CNA fraction: ';
       if (isNaN(_data.cna_fraction)) {
         toReturn += _data.cna_fraction;
       } else {
@@ -42,7 +42,7 @@
         type: 'scatter',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
-        sample_uid: _.pluck(data_, 'sample_uid'),
+        sample_id: _.pluck(data_, 'sample_id'),
         marker: {
           size: 7,
           color: '#2986e2',
@@ -91,10 +91,10 @@
       _plotsElem.on('plotly_click', function(data) {
         var _pts_study_id =
           data.points[0].data.study_id[data.points[0].pointNumber];
-        var _pts_sample_uid =
-          data.points[0].data.sample_uid[data.points[0].pointNumber];
+        var _pts_sample_id =
+          data.points[0].data.sample_id[data.points[0].pointNumber];
         window.open(
-          cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_uid));
+          cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_id));
       });
 
       initCanvasDownloadData();
@@ -110,7 +110,7 @@
         _tmpSelectedSampleIdMap[_sampleId] = '';
       });
       _.each(data_, function(_dataObj) {
-        if (_tmpSelectedSampleIdMap.hasOwnProperty(_dataObj.sample_uid)) {
+        if (_tmpSelectedSampleIdMap.hasOwnProperty(_dataObj.sample_id)) {
           _selectedData.push(_dataObj);
         } else {
           _unselectedData.push(_dataObj);
@@ -135,7 +135,7 @@
         type: 'scatter',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
-        sample_uid: _.pluck(data_, 'sample_uid'),
+        sample_id: _.pluck(data_, 'sample_id'),
         marker: {
           size: 6,
           color: '#2986e2',
@@ -150,7 +150,7 @@
         type: 'scatter',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
-        sample_uid: _.pluck(data_, 'sample_uid'),
+        sample_id: _.pluck(data_, 'sample_id'),
         marker: {
           size: 6,
           color: 'red',

@@ -7,7 +7,7 @@
   iViz.view.component.TableView = function() {
     var content = this;
     var chartId_;
-    var data_;
+    var data_ = [];
     var type_ = '';
     var attr_ = [];
     var attributes_ = [];
@@ -20,6 +20,7 @@
     var allSamplesIds = [];
     var reactTableData = {};
     var initialized = false;
+    var caseIndices = {};
     var selectedRowData = [];
     var selectedGeneData = [];
     var displayName = '';
@@ -31,6 +32,7 @@
     var labelInitData = {};
     var opts = {};
     var genePanelMap = {};
+    var renderedReactTable;
 
     // Category based color assignment. Avoid color changing
     var assignedColors = {
@@ -52,7 +54,7 @@
 
     content.init =
       function(_attributes, _opts, _selectedSamples, _selectedGenes,
-        _data, _callbacks, _geneData, _dimension, _genePanelMap) {
+               _data, _callbacks, _geneData, _dimension, _genePanelMap) {
         initialized = false;
         allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
@@ -63,6 +65,7 @@
         chartId_ = _opts.chartId;
         opts = _opts;
         genePanelMap = _genePanelMap;
+        caseIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
         geneData_ = _geneData;
         type_ = _attributes.type;
@@ -78,7 +81,7 @@
         initReactTable(true);
       };
 
-    content.update = function(_selectedSampleUIDs, _selectedRows) {
+    content.update = function(_selectedSamples, _selectedRows) {
       var selectedMap_ = {};
       var includeMutationCount = false;
       if (_selectedRows !== undefined) {
@@ -87,52 +90,57 @@
       if (selectedRows.length === 0) {
         selectedRowData = [];
       }
-      _selectedSampleUIDs.sort();
+      _selectedSamples.sort();
       if ((!initialized) ||
-        (!iViz.util.compare(selectedSamples, _selectedSampleUIDs))) {
+        (!iViz.util.compare(selectedSamples, _selectedSamples))) {
         initialized = true;
-        selectedSamples = _selectedSampleUIDs;
+        selectedSamples = _selectedSamples;
         if (iViz.util.compare(allSamplesIds, selectedSamples)) {
           initReactTable(true);
         } else {
-          _.each(_selectedSampleUIDs, function(caseId) {
-            var caseData_ = data_[caseId];
-            var tempData_ = '';
-            switch (type_) {
-              case 'mutatedGene':
-                tempData_ = caseData_.mutated_genes;
-                includeMutationCount = true;
-                break;
-              case 'cna':
-                tempData_ = caseData_.cna_details;
-                includeMutationCount = false;
-                break;
-              default:
-                var category = caseData_[attributes_.attr_id];
-                if (!category) {
-                  category = 'NA';
-                }
-                if (!selectedMap_.hasOwnProperty(category)) {
-                  selectedMap_[category] = [];
-                }
-                selectedMap_[category].push(caseId);
-                break;
-            }
-            if (isMutatedGeneCna) {
-              _.each(tempData_, function(geneIndex) {
-                if (selectedMap_[geneIndex] === undefined) {
-                  selectedMap_[geneIndex] = {};
-                  if (includeMutationCount) {
-                    selectedMap_[geneIndex].num_muts = 1;
+          _.each(_selectedSamples, function(caseId) {
+            var caseIndex_ = caseIndices[caseId];
+            if (_.isNumber(caseIndex_)) {
+              var caseData_ = data_[caseIndex_];
+              if (_.isObject(caseData_)) {
+                var tempData_ = '';
+                switch (type_) {
+                case 'mutatedGene':
+                  tempData_ = caseData_.mutated_genes;
+                  includeMutationCount = true;
+                  break;
+                case 'cna':
+                  tempData_ = caseData_.cna_details;
+                  includeMutationCount = false;
+                  break;
+                default:
+                  var category = caseData_[attributes_.attr_id];
+                  if (!category) {
+                    category = 'NA';
                   }
-                  selectedMap_[geneIndex].case_uids = [caseId];
-                } else {
-                  if (includeMutationCount) {
-                    selectedMap_[geneIndex].num_muts += 1;
+                  if (!selectedMap_.hasOwnProperty(category)) {
+                    selectedMap_[category] = [];
                   }
-                  selectedMap_[geneIndex].case_uids.push(caseId);
+                  selectedMap_[category].push(caseId);
+                  break;
                 }
-              });
+                if (isMutatedGeneCna) {
+                  _.each(tempData_, function(geneIndex) {
+                    if (selectedMap_[geneIndex] === undefined) {
+                      selectedMap_[geneIndex] = {};
+                      if (includeMutationCount) {
+                        selectedMap_[geneIndex].num_muts = 1;
+                      }
+                      selectedMap_[geneIndex].caseIds = [caseId];
+                    } else {
+                      if (includeMutationCount) {
+                        selectedMap_[geneIndex].num_muts += 1;
+                      }
+                      selectedMap_[geneIndex].caseIds.push(caseId);
+                    }
+                  });
+                }
+              }
             }
           });
           initReactTable(true, selectedMap_, selectedSamples);
@@ -151,6 +159,10 @@
       if (fileType === 'tsv') {
         initTsvDownloadData();
       }
+    };
+
+    content.getCurrentCategories = function() {
+      return _.values(categories_);
     };
 
     function initReactTable(_reloadData, _selectedMap, _selectedSampleIds) {
@@ -195,10 +207,18 @@
           selectButtonClickCallback: reactSubmitClickCallback
         });
       }
+
+      // Check whether the react table has been initialized
+      if (renderedReactTable) {
+        // Get sort settings from the initialized react table
+        var sort_ = renderedReactTable.getCurrentSort();
+        _opts = $.extend(_opts, sort_);
+      }
+
       var testElement = React.createElement(EnhancedFixedDataTableSpecial,
         _opts);
 
-      ReactDOM.render(testElement, document.getElementById(chartId_));
+      renderedReactTable = ReactDOM.render(testElement, document.getElementById(chartId_));
     }
 
     function initRegularTableData() {
@@ -209,7 +229,7 @@
             var datum = {
               attr_id: key,
               uniqueId: name,
-              attr_val: key === 'case_uids' ? category.case_uids.join(',') : category[key]
+              attr_val: key === 'caseIds' ? category.caseIds.join(',') : category[key]
             };
             data.push(datum);
           }
@@ -266,7 +286,7 @@
     function mutatedGenesData(_selectedGenesMap, _selectedSampleIds) {
 
       genePanelMap = window.iviz.datamanager.updateGenePanelMap(genePanelMap, _selectedSampleIds);
-      
+
       selectedGeneData.length = 0;
       var numOfCases_ = content.getCases().length;
 
@@ -276,10 +296,10 @@
           var freq = 0;
           datum.gene = item.gene;
           if (_selectedGenesMap === undefined) {
-            datum.case_uids = iViz.util.unique(item.case_uids);
-            datum.cases = datum.case_uids.length;
+            datum.caseIds = iViz.util.unique(item.caseIds);
+            datum.cases = datum.caseIds.length;
             datum.uniqueId = index;
-            if(typeof genePanelMap[item.gene] !== 'undefined') {
+            if (typeof genePanelMap[item.gene] !== 'undefined') {
               freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
             } else {
               freq = iViz.util.calcFreq(datum.cases, numOfCases_);
@@ -301,9 +321,9 @@
             if (_selectedGenesMap[item.index] === undefined) {
               return;
             }
-            datum.case_uids =
-              iViz.util.unique(_selectedGenesMap[item.index].case_uids);
-            datum.cases = datum.case_uids.length;
+            datum.caseIds =
+              iViz.util.unique(_selectedGenesMap[item.index].caseIds);
+            datum.cases = datum.caseIds.length;
             if (typeof genePanelMap[item.gene] !== 'undefined') {
               freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
             } else {
@@ -357,7 +377,7 @@
               var datum = {
                 attr_id: key,
                 uniqueId: item.uniqueId,
-                attr_val: key === 'case_uids' ? item.case_uids.join(',') : item[key]
+                attr_val: key === 'caseIds' ? item.caseIds.join(',') : item[key]
               };
               result.data.push(datum);
             }
@@ -480,7 +500,7 @@
               column_width: 93
             },
             {
-              attr_id: 'case_uids',
+              attr_id: 'caseIds',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false
@@ -532,7 +552,7 @@
               column_width: 78
             },
             {
-              attr_id: 'case_uids',
+              attr_id: 'caseIds',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false
@@ -574,7 +594,7 @@
               datatype: 'PERCENTAGE',
               column_width: 90
             }, {
-              attr_id: 'case_uids',
+              attr_id: 'caseIds',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false

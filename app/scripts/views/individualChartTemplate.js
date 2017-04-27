@@ -5,9 +5,9 @@
 (function(Vue) {
   Vue.component('individualChart', {
     template: '<component :is="currentView" v-if="attributes.show" :clear-chart="clearChart" :ndx="ndx" ' +
-    ':attributes.sync="attributes" :clear-chart="clearChart"></component>',
+    ':attributes.sync="attributes" :clear-chart="clearChart" :showed-survival-plot="showedSurvivalPlot"></component>',
     props: [
-      'ndx', 'attributes', 'clearChart'
+      'ndx', 'attributes', 'clearChart', 'showedSurvivalPlot'
     ],
     data: function() {
       var currentView = '';
