@@ -19,7 +19,7 @@
     };
 
     var localStorageEdit_ = function(updateVirtualCohort) {
-      var _virtualCohorts = vcSession.utils.getVirtualCohorts();
+      var _virtualCohorts = vcSession.utils.getVirtualCohorts();3
       _.extend(_.findWhere(_virtualCohorts, {
         virtualCohortID: updateVirtualCohort.virtualCohortID
       }), updateVirtualCohort);
@@ -54,10 +54,10 @@
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(_virtualCohort)
         }).done(function(response) {
-          if(_virtualCohort.userID === 'DEFAULT') {
+          if (_virtualCohort.userID === 'DEFAULT') {
             _virtualCohort.virtualCohortID = response.id;
             _callbackFunc(response.id);
-          }          
+          }
         }).fail(function() {
           _virtualCohort.virtualCohortID = vcSession.utils.generateUUID();
           _callbackFunc(response.id);

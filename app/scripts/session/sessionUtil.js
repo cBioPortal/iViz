@@ -60,7 +60,7 @@
         _virtualCohort.description = description;
         def.resolve(_virtualCohort);
       } else {
-        $.when(generateCohortDescription_(cases)).done(function(_desp) {
+        $.when(_generateCohortDescription(cases)).done(function(_desp) {
           _virtualCohort.description = _desp;
           def.resolve(_virtualCohort);
         });
@@ -77,24 +77,23 @@
       return _selectedCases;
     };
 
-    var generateCohortDescription_ = function(_cases) {
-      var def = new $.Deferred();
-      var _desp = "";
+    var _generateCohortDescription = function(_cases) {
+      var def = new $.Deferred(), _desp = "";
       $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(_cases, "studyID"))).done(function(_studyIdNameMap) {
-        _.each(_cases, function(_i) {
+        _.each(_cases, function (_i) {
           _desp += _studyIdNameMap[_i.studyID] + ": " + _i.samples.length + " samples / " + _i.patients.length + " patients\n";
         });
         def.resolve(_desp);
       });
       return def.promise();
-    };
+    }
 
     return {
       buildVCObject: buildVCObject_,
       setVirtualCohorts: setVirtualCohorts_,
       getVirtualCohorts: getVirtualCohorts_,
       generateUUID: generateUUID_,
-      generateCohortDescription: generateCohortDescription_,
+      generateCohortDescription: _generateCohortDescription,
       buildCaseListObject: buildCaseListObject_
     };
   })();
