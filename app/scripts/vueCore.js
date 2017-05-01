@@ -23,8 +23,8 @@
             customfilter: {
               display_name: 'Custom',
               type: '',
-              sampleIds: [],
-              patientIds: []
+              sampleUids: [],
+              patientUids: []
             },
             charts: {},
             groupCount: 0,
@@ -120,10 +120,10 @@
               var self_ = this;
               self_.clearAll = true;
               self_.hasfilters = false;
-              if (self_.customfilter.patientIds.length > 0 ||
-                self_.customfilter.sampleIds.length > 0) {
-                self_.customfilter.sampleIds = [];
-                self_.customfilter.patientIds = [];
+              if (self_.customfilter.patientUids.length > 0 ||
+                self_.customfilter.sampleUids.length > 0) {
+                self_.customfilter.sampleUids = [];
+                self_.customfilter.patientUids = [];
               }
               if (includeNextTickFlag) {
                 self_.$nextTick(function() {
@@ -269,11 +269,11 @@
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;
                       if (radioVal === 'sample') {
-                        self_.customfilter.sampleIds = selectedCaseUIDs;
-                        self_.customfilter.patientIds = [];
+                        self_.customfilter.sampleUids = selectedCaseUIDs;
+                        self_.customfilter.patientUids = [];
                       } else {
-                        self_.customfilter.patientIds = selectedCaseUIDs;
-                        self_.customfilter.sampleIds = [];
+                        self_.customfilter.patientUids = selectedCaseUIDs;
+                        self_.customfilter.sampleUids = [];
                       }
                       self_.$broadcast('update-custom-filters');
                       return false;

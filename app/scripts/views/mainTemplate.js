@@ -139,11 +139,11 @@
         var _counterCaseType =
           (updateType_ === 'patient') ? 'sample' : 'patient';
 
-        if (self_.customfilter.patientIds.length > 0 ||
-          self_.customfilter.sampleIds.length > 0) {
+        if (self_.customfilter.patientUids.length > 0 ||
+          self_.customfilter.sampleUids.length > 0) {
           _hasFilters = true;
-          _selectedCasesByFilters = self_.customfilter.patientIds.length > 0 ?
-            self_.customfilter.patientIds : self_.customfilter.sampleIds;
+          _selectedCasesByFilters = (updateType_ === 'patient') ?
+            self_.customfilter.patientUids : self_.customfilter.sampleUids;
         }
         _.each(self_.groups, function(group) {
           _.each(group.attributes, function(attributes) {
@@ -175,7 +175,7 @@
         }
         self_.hasfilters = _hasFilters;
 
-        _selectedCasesByFilters = _selectedCasesByFilters.sort()
+        _selectedCasesByFilters = _selectedCasesByFilters.sort();
 
         if (updateType_ === 'patient') {
           self_.selectedPatientsByFilters = _selectedCasesByFilters;
@@ -231,15 +231,15 @@
       },
       'update-custom-filters': function() {
         if (this.customfilter.type === 'patient') {
-          this.patientsync = this.customfilter.patientIds;
+          this.patientsync = this.customfilter.patientUids;
           this.samplesync = iViz.util.idMapping(iViz.getCasesMap('patient'),
             this.patientsync);
-          this.customfilter.sampleIds = this.samplesync;
+          this.customfilter.sampleUids = this.samplesync;
         } else {
           this.patientsync = iViz.util.idMapping(iViz.getCasesMap('sample'),
-            this.customfilter.sampleIds);
-          this.samplesync = this.customfilter.sampleIds;
-          this.customfilter.patientIds = this.patientsync;
+            this.customfilter.sampleUids);
+          this.samplesync = this.customfilter.sampleUids;
+          this.customfilter.patientUids = this.patientsync;
         }
 
         this.selectedsampleUIDs = this.samplesync;

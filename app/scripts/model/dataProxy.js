@@ -290,10 +290,10 @@ window.DataManagerForIviz = (function($, _) {
             .then(function(_geneticProfiles, _caseLists,
                            _clinicalAttributes) {
               var _result = {};
-              var _patientUIDData = [];
+              var _patientData = [];
               var _sampleAttributes = {};
               var _patientAttributes = {};
-              var _sampleUIDData = [];
+              var _sampleData = [];
               var _hasDFS = false;
               var _hasOS = false;
               var _hasPatientAttrData = {};
@@ -470,7 +470,7 @@ window.DataManagerForIviz = (function($, _) {
               _hasSampleAttrData.sequenced = '';
               _hasSampleAttrData.has_cna_data = '';
               _.each(_studyToSampleToPatientMap, function(_sampleToPatientMap, _studyId) {
-                _.each(_sampleToPatientMap.sample_to_patient_uid, function(_patientUID, _sampleUID) {
+                _.each(_sampleToPatientMap.sample_uid_to_patient_uid, function(_patientUID, _sampleUID) {
                   if (_samplesToPatientMap[_sampleUID] === undefined) {
                     _samplesToPatientMap[_sampleUID] = [_patientUID];
                   }
@@ -480,7 +480,7 @@ window.DataManagerForIviz = (function($, _) {
                     _patientToSampleMap[_patientUID].push(_sampleUID);
                   }
 
-                  if (_patientUIDData[_patientUID] === undefined) {
+                  if (_patientData[_patientUID] === undefined) {
                     // create datum for each patient
                     var _patientDatum = {};
                     _patientDatum.patient_uid = _patientUID;
@@ -489,7 +489,7 @@ window.DataManagerForIviz = (function($, _) {
                     _hasPatientAttrData.patient_id = '';
                     _hasPatientAttrData.patient_uid = '';
                     _hasPatientAttrData.study_id = '';
-                    _patientUIDData[_patientUID] = _patientDatum;
+                    _patientData[_patientUID] = _patientDatum;
                   }
 
                   // create datum for each sample
@@ -512,12 +512,12 @@ window.DataManagerForIviz = (function($, _) {
                     }
                     _sampleDatum.cna_details = [];
                   }
-                  _sampleUIDData[_sampleUID] = _sampleDatum;
+                  _sampleData[_sampleUID] = _sampleDatum;
                 });
               });
 
               // Add sample_count_patient data
-              _.each(_patientUIDData, function(datum, patientUID) {
+              _.each(_patientData, function(datum, patientUID) {
                 _hasPatientAttrData.sample_count_patient = '';
                 if (_patientToSampleMap.hasOwnProperty(patientUID)) {
                   datum.sample_count_patient = _patientToSampleMap[patientUID].length.toString();
@@ -646,13 +646,13 @@ window.DataManagerForIviz = (function($, _) {
                 patient: {
                   attr_meta: content.util
                     .sortByClinicalPriority(_.values(_patientAttributes)),
-                  data: _patientUIDData,
+                  data: _patientData,
                   has_attr_data: _hasPatientAttrData
                 },
                 sample: {
                   attr_meta: content.util
                     .sortByClinicalPriority(_.values(_sampleAttributes)),
-                  data: _sampleUIDData,
+                  data: _sampleData,
                   has_attr_data: _hasSampleAttrData
                 }
               };
@@ -1106,7 +1106,7 @@ window.DataManagerForIviz = (function($, _) {
                     allSampleIds: []
                   };
                   if (_.isArray(self.data.sampleLists.sequenced[cancer_study_id])) {
-                    studyCaseList.sequencedSampleIds  = self.data.sampleLists.sequenced[cancer_study_id];
+                    studyCaseList.sequencedSampleIds = self.data.sampleLists.sequenced[cancer_study_id];
                   }
                   if (_.isArray(self.data.sampleLists.cna[cancer_study_id])) {
                     studyCaseList.cnaSampleIds = self.data.sampleLists.cna[cancer_study_id];
@@ -1174,7 +1174,7 @@ window.DataManagerForIviz = (function($, _) {
               sample_ids: self.studyCasesMap[cancerStudyId].samples
             }).then(function(data) {
               var sample_to_patient = {};
-              var sample_to_patient_uid = {};
+              var sample_uid_to_patient_uid = {};
               var uid_to_sample = {};
               var sample_to_uid = {};
               var patient_to_uid = {};
@@ -1190,7 +1190,7 @@ window.DataManagerForIviz = (function($, _) {
                   _patient_uid++;
                 }
                 sample_to_patient[data[i].id] = data[i].patient_id;
-                sample_to_patient_uid[_sample_uid] = patient_to_uid[data[i].patient_id];
+                sample_uid_to_patient_uid[_sample_uid] = patient_to_uid[data[i].patient_id];
                 patientList.push(data[i].patient_id);
                 _sample_uid++;
               }
@@ -1205,7 +1205,7 @@ window.DataManagerForIviz = (function($, _) {
               resultMap.sample_to_uid = sample_to_uid;
               resultMap.patient_to_uid = patient_to_uid;
               resultMap.sample_to_patient = sample_to_patient;
-              resultMap.sample_to_patient_uid = sample_to_patient_uid;
+              resultMap.sample_uid_to_patient_uid = sample_uid_to_patient_uid;
               study_to_sample_to_patient[cancerStudyId] = resultMap;
               def.resolve();
             }).fail(function() {

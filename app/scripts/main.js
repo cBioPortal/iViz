@@ -452,21 +452,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var sampleUIds_ = vm_.selectedsampleUIDs;
       var attr = {};
       var self = this;
-      function getAttrVal(attrs, arr) {
-        var str = [];
-        _.each(attrs, function(displayName, attrId) {
-          if (attrId === 'cna_details' || attrId === 'mutated_genes') {
-            var temp = 'No';
-            if (arr[attrId] !== undefined) {
-              temp = arr[attrId].length > 0 ? 'Yes' : 'No';
-            }
-            str.push(temp);
-          } else {
-            str.push(arr[attrId] ? arr[attrId] : 'NA');
-          }
-        });
-        return str;
-      }
+
       $.when(this.fetchCompleteData('patient', true), this.fetchCompleteData('sample', true)).then(function() {
         attr.CANCER_TYPE_DETAILED = 'Cancer Type Detailed';
         attr.CANCER_TYPE = 'Cancer Type';
@@ -510,7 +496,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
         for (var i = 0; i < arr.length; i++) {
           strA.length = 0;
-          strA = getAttrVal(attr, arr[i]);
+          strA = iViz.util.getAttrVal(attr, arr[i]);
           content += '\r\n' + strA.join('\t');
         }
 

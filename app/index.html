@@ -163,7 +163,8 @@
           <span class="breadcrumb_container">Your selections: </span>
         </div>
 
-        <span class="breadcrumb_container" v-if="customfilter.patientIds.length>0||customfilter.sampleIds.length>0">
+        <span class="breadcrumb_container"
+              v-if="customfilter.patientUids.length>0||customfilter.sampleUids.length>0">
           <span>{{customfilter.display_name}}</span>
           <i class="fa fa-times breadcrumb_remove"
              @click="clearAllCharts(true)"></i>

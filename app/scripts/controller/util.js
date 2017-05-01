@@ -665,6 +665,23 @@
 
       return _caseIds;
     };
+
+    content.getAttrVal = function(attrs, arr) {
+      var str = [];
+      _.each(attrs, function(displayName, attrId) {
+        if (attrId === 'cna_details' || attrId === 'mutated_genes') {
+          var temp = 'No';
+          if (arr[attrId] !== undefined) {
+            temp = arr[attrId].length > 0 ? 'Yes' : 'No';
+          }
+          str.push(temp);
+        } else {
+          str.push(arr[attrId] ? arr[attrId] : 'NA');
+        }
+      });
+      return str;
+    };
+
     return content;
   })();
 })(window.iViz,
