@@ -195,6 +195,50 @@
       return freq + '%';
     };
 
+    /**
+     * Remove illegal characters for DOM id
+     * @param {string} str Original DOM id string
+     * @return {string} trimmed id
+     */
+    content.trimDomId = function(str) {
+      if (str) {
+        str = str.replace(/>/g, '_greater_than_');
+        str = str.replace(/</g, '_less_than_');
+        str = str.replace(/\+/g, '_plus_');
+        str = str.replace(/-/g, '_minus_');
+        str = str.replace(/^[^a-z]+|[^\w:.-]+/gi, '');
+      }
+      return str;
+    };
+
+    /**
+     * Generate default DOM ids
+     * @param {string} type Available types are: chartDivId, resetBtnId, chartId, chartTableId
+     * @param {string} attrId
+     * @return {string} Default DOM id
+     */
+    content.getDefaultDomId = function(type, attrId) {
+      var domId = '';
+      if (type && attrId) {
+        var attrId = this.trimDomId(attrId);
+        switch (type) {
+        case 'chartDivId':
+          domId = 'chart-' + attrId + '-div';
+          break;
+        case 'resetBtnId':
+          domId = 'chart-' + attrId + '-reset';
+          break;
+        case 'chartId':
+          domId = 'chart-new-' + attrId;
+        case 'chartTableId':
+          domId = 'table-' + attrId;
+          break;
+        }
+      }
+      // TODO: DOM id pool. Ideally id shouldn't be repeated
+      return domId;
+    };
+    
     function tableDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
@@ -585,15 +629,6 @@
         }
       }
       return false;
-    };
-
-    content.escape = function(_str) {
-      _str = _str.replace(/>/g, '_greater_than_');
-      _str = _str.replace(/</g, '_less_than_');
-      _str = _str.replace(/\+/g, '_plus_');
-      _str = _str.replace(/-/g, '_minus_');
-      _str = _str.replace(/\(|\)| /g, '');
-      return _str;
     };
 
     content.getClinicalAttrTooltipContent = function(attribute) {
