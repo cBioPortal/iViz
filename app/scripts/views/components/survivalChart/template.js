@@ -27,11 +27,12 @@
     },
     data: function() {
       return {
-        chartDivId: 'chart-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, '') + '-div',
-        resetBtnId: 'chart-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
-        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ''),
+        chartDivId:
+          iViz.util.getDefaultDomId('chartDivId', this.attributes.attr_id),
+        resetBtnId:
+          iViz.util.getDefaultDomId('resetBtnId', this.attributes.attr_id),
+        chartId:
+          iViz.util.getDefaultDomId('chartId', this.attributes.attr_id),
         displayName: this.attributes.display_name,
         chartInst: {},
         showOperations: false,
