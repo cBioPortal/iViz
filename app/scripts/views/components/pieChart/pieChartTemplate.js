@@ -27,12 +27,14 @@
     data: function() {
       return {
         v: {},
-        chartDivId: 'chart-' +
-        iViz.util.escape(this.attributes.attr_id) + '-div',
-        resetBtnId: 'chart-' +
-        iViz.util.escape(this.attributes.attr_id) + '-reset',
-        chartId: 'chart-' + iViz.util.escape(this.attributes.attr_id),
-        chartTableId: 'table-' + iViz.util.escape(this.attributes.attr_id),
+        chartDivId:
+          iViz.util.getDefaultDomId('chartDivId', this.attributes.attr_id),
+        resetBtnId:
+          iViz.util.getDefaultDomId('resetBtnId', this.attributes.attr_id),
+        chartId:
+          iViz.util.getDefaultDomId('chartId', this.attributes.attr_id),
+        chartTableId:
+          iViz.util.getDefaultDomId('chartTableId', this.attributes.attr_id),
         displayName: this.attributes.display_name,
         chartInst: '',
         component: '',
