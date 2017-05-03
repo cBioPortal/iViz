@@ -115,11 +115,13 @@
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header" style="display: none" :class="{show:!isloading}">
       <div id="iviz-header-left">
-        <div class="iviz-cohort-component" style="float: left; margin-right: 10px;">
-          <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
-                             :load-user-specific-cohorts="loadUserSpecificCohorts" :stats="stats"
-                             :update-stats.sync="updateStats"
-                             :show-share-button="false"></session-component>
+        <div id="cohort-component" style="float: left">
+          <div style="float: left; margin-right: 10px;">
+            <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
+                               :load-user-specific-cohorts="loadUserSpecificCohorts" :stats="stats"
+                               :update-stats.sync="updateStats"
+                               :show-share-button="false"></session-component>
+          </div>
         </div>
 
         <div class="iviz-header-left-case">
