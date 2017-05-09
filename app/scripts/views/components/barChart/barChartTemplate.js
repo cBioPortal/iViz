@@ -6,7 +6,8 @@
   Vue.component('barChart', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" ' +
-    ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
+    ':attribute-id="attributes.attr_id" @mouseenter="mouseEnter" ' +
+    ':layout-number="attributes.layout" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +

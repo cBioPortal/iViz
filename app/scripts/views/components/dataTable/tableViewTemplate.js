@@ -6,7 +6,7 @@
   Vue.component('tableView', {
     template: '<div id={{chartDivId}} ' +
     ':class="[\'grid-item\', classTableHeight, \'grid-item-w-2\', \'react-table\']" ' +
-    ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
+    ':attribute-id="attributes.attr_id" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':display-name="displayName" :chart-ctrl="chartInst"' +
@@ -226,6 +226,8 @@
         if (!this.isMutatedGeneCna &&
           Object.keys(this.attributes.keys).length <= 3) {
           this.classTableHeight = 'grid-item-h-1';
+          this.attributes.layout[1] = 2;
+          this.attributes.layout[2] = 'h';
         }
         this.showLoad = false;
       },
