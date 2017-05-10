@@ -40,7 +40,7 @@
         fromFilter: false,
         hasChartTitle: true,
         showLoad: true,
-        showDownloadIcon: false,
+        showDownloadIcon: true,
         invisibleDimension: {},
         mainDivQtip: ''
       };
