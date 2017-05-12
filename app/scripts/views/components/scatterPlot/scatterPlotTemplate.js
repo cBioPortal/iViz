@@ -154,7 +154,7 @@
       var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(data, _opts);
-      _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
+      _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
 
       _self.attachPlotlySelectedEvent();
       _self.showLoad = false;

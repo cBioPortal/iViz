@@ -517,6 +517,9 @@
             servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
+      case 'tsv':
+        csvDownload(content.fileName, content.data);
+        break;
         default:
           break;
       }
