@@ -659,7 +659,7 @@
         if (!_caseIds.hasOwnProperty(_key)) {
           _caseIds[_key] = [];
         }
-        var _groupKey = groupType === 'patient' ? 'patient_id' : 'sample_id';
+        var _groupKey = groupType === 'patient' ? 'patient_uid' : 'sample_uid';
         _caseIds[_key].push(_cases[i][_groupKey]);
       }
 

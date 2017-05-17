@@ -10,7 +10,7 @@
     ' :attributes.sync="group.attributes" :clear-group="clearAll"' +
     ' v-for="group in groups" :showed-survival-plot="showedSurvivalPlot"></chart-group> ',
     props: [
-      'groups', 'selectedsamples', 'selectedpatients', 'hasfilters',
+      'groups', 'selectedsampleUIDs', 'selectedpatientUIDs', 'hasfilters',
       'redrawgroups', 'customfilter', 'clearAll', 'showedSurvivalPlot'
     ], data: function() {
       return {
@@ -211,21 +211,21 @@
           self_.patientsync = _casesSync;
           self_.samplesync = _counterCasesSync;
           if (self_.hasfilters) {
-            self_.selectedsamples = _resultCounterSelectedCases;
-            self_.selectedpatients = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);
+            self_.selectedsampleUIDs = _resultCounterSelectedCases;
+            self_.selectedpatientUIDs = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);
           } else {
-            self_.selectedsamples = self_.completeSamplesList;
-            self_.selectedpatients = self_.completePatientsList;
+            self_.selectedsampleUIDs = self_.completeSamplesList;
+            self_.selectedpatientUIDs = self_.completePatientsList;
           }
         } else {
           self_.samplesync = _casesSync;
           self_.patientsync = _counterCasesSync;
           if (self_.hasfilters) {
-            self_.selectedsamples = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);
-            self_.selectedpatients = _resultCounterSelectedCases;
+            self_.selectedsampleUIDs = iViz.util.intersection(_selectedCasesByFilters, _resultSelectedCases);
+            self_.selectedpatientUIDs = _resultCounterSelectedCases;
           } else {
-            self_.selectedsamples = self_.completeSamplesList;
-            self_.selectedpatients = self_.completePatientsList;
+            self_.selectedsampleUIDs = self_.completeSamplesList;
+            self_.selectedpatientUIDs = self_.completePatientsList;
           }
         }
       },
@@ -242,8 +242,8 @@
           this.customfilter.patientIds = this.patientsync;
         }
 
-        this.selectedsamples = this.samplesync;
-        this.selectedpatients = this.patientsync;
+        this.selectedsampleUIDs = this.samplesync;
+        this.selectedpatientUIDs = this.patientsync;
       },
       'create-rainbow-survival': function(opts) {
         this.$broadcast('create-rainbow-survival', opts);

@@ -14,7 +14,7 @@
       var _self = this;
       var ndx_ = crossfilter(iViz.getGroupNdx(this.id));
       this.invisibleBridgeDimension = ndx_.dimension(function(d) {
-        return d[_self.type + '_id'];
+        return d[_self.type + '_uid'];
       });
       this.ndx = ndx_;
       this.invisibleChartFilters = [];
@@ -93,7 +93,7 @@
           }
           var filteredCases = _.pluck(
             this.invisibleBridgeDimension.top(Infinity),
-            this.type + '_id').sort();
+            this.type + '_uid').sort();
           // Hacked way to check if filter selected filter cases is same
           // as original case list
 
