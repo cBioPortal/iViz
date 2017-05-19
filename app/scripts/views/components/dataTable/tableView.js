@@ -20,7 +20,6 @@
     var allSamplesIds = [];
     var reactTableData = {};
     var initialized = false;
-    var caseIndices = {};
     var selectedRowData = [];
     var selectedGeneData = [];
     var displayName = '';
@@ -59,13 +58,12 @@
         allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
         selectedSamples.sort();
-        sequencedSampleIds = _attributes.options.sequencedCases;
+        sequencedSampleIds = _attributes.options.sequencedCases === undefined ? allSamplesIds : _attributes.options.sequencedCases;
         sequencedSampleIds.sort();
         selectedGenes = _selectedGenes;
         chartId_ = _opts.chartId;
         opts = _opts;
         genePanelMap = _genePanelMap;
-        caseIndices = iViz.getCaseIndices(_attributes.group_type);
         data_ = _data;
         geneData_ = _geneData;
         type_ = _attributes.type;
@@ -81,7 +79,7 @@
         initReactTable(true);
       };
 
-    content.update = function(_selectedSamples, _selectedRows) {
+    content.update = function(_selectedSampleUIDs, _selectedRows) {
       var selectedMap_ = {};
       var includeMutationCount = false;
       if (_selectedRows !== undefined) {
@@ -90,21 +88,19 @@
       if (selectedRows.length === 0) {
         selectedRowData = [];
       }
-      _selectedSamples.sort();
+      _selectedSampleUIDs.sort();
       if ((!initialized) ||
-        (!iViz.util.compare(selectedSamples, _selectedSamples))) {
+        (!iViz.util.compare(selectedSamples, _selectedSampleUIDs))) {
         initialized = true;
-        selectedSamples = _selectedSamples;
+        selectedSamples = _selectedSampleUIDs;
         if (iViz.util.compare(allSamplesIds, selectedSamples)) {
           initReactTable(true);
         } else {
-          _.each(_selectedSamples, function(caseId) {
-            var caseIndex_ = caseIndices[caseId];
-            if (_.isNumber(caseIndex_)) {
-              var caseData_ = data_[caseIndex_];
-              if (_.isObject(caseData_)) {
-                var tempData_ = '';
-                switch (type_) {
+          _.each(_selectedSampleUIDs, function(caseId) {
+            var caseData_ = data_[caseId];
+            if (_.isObject(caseData_)) {
+              var tempData_ = '';
+              switch (type_) {
                 case 'mutatedGene':
                   tempData_ = caseData_.mutated_genes;
                   includeMutationCount = true;
@@ -123,23 +119,22 @@
                   }
                   selectedMap_[category].push(caseId);
                   break;
-                }
-                if (isMutatedGeneCna) {
-                  _.each(tempData_, function(geneIndex) {
-                    if (selectedMap_[geneIndex] === undefined) {
-                      selectedMap_[geneIndex] = {};
-                      if (includeMutationCount) {
-                        selectedMap_[geneIndex].num_muts = 1;
-                      }
-                      selectedMap_[geneIndex].caseIds = [caseId];
-                    } else {
-                      if (includeMutationCount) {
-                        selectedMap_[geneIndex].num_muts += 1;
-                      }
-                      selectedMap_[geneIndex].caseIds.push(caseId);
+              }
+              if (isMutatedGeneCna) {
+                _.each(tempData_, function(geneIndex) {
+                  if (selectedMap_[geneIndex] === undefined) {
+                    selectedMap_[geneIndex] = {};
+                    if (includeMutationCount) {
+                      selectedMap_[geneIndex].num_muts = 1;
                     }
-                  });
-                }
+                    selectedMap_[geneIndex].case_uids = [caseId];
+                  } else {
+                    if (includeMutationCount) {
+                      selectedMap_[geneIndex].num_muts += 1;
+                    }
+                    selectedMap_[geneIndex].case_uids.push(caseId);
+                  }
+                });
               }
             }
           });
@@ -229,7 +224,7 @@
             var datum = {
               attr_id: key,
               uniqueId: name,
-              attr_val: key === 'caseIds' ? category.caseIds.join(',') : category[key]
+              attr_val: key === 'case_uids' ? category.case_uids.join(',') : category[key]
             };
             data.push(datum);
           }
@@ -296,8 +291,8 @@
           var freq = 0;
           datum.gene = item.gene;
           if (_selectedGenesMap === undefined) {
-            datum.caseIds = iViz.util.unique(item.caseIds);
-            datum.cases = datum.caseIds.length;
+            datum.case_uids = iViz.util.unique(item.case_uids);
+            datum.cases = datum.case_uids.length;
             datum.uniqueId = index;
             if (typeof genePanelMap[item.gene] !== 'undefined') {
               freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
@@ -321,9 +316,9 @@
             if (_selectedGenesMap[item.index] === undefined) {
               return;
             }
-            datum.caseIds =
-              iViz.util.unique(_selectedGenesMap[item.index].caseIds);
-            datum.cases = datum.caseIds.length;
+            datum.case_uids =
+              iViz.util.unique(_selectedGenesMap[item.index].case_uids);
+            datum.cases = datum.case_uids.length;
             if (typeof genePanelMap[item.gene] !== 'undefined') {
               freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
             } else {
@@ -377,7 +372,7 @@
               var datum = {
                 attr_id: key,
                 uniqueId: item.uniqueId,
-                attr_val: key === 'caseIds' ? item.caseIds.join(',') : item[key]
+                attr_val: key === 'case_uids' ? item.case_uids.join(',') : item[key]
               };
               result.data.push(datum);
             }
@@ -500,7 +495,7 @@
               column_width: 93
             },
             {
-              attr_id: 'caseIds',
+              attr_id: 'case_uids',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false
@@ -552,7 +547,7 @@
               column_width: 78
             },
             {
-              attr_id: 'caseIds',
+              attr_id: 'case_uids',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false
@@ -594,7 +589,7 @@
               datatype: 'PERCENTAGE',
               column_width: 90
             }, {
-              attr_id: 'caseIds',
+              attr_id: 'case_uids',
               display_name: 'Cases',
               datatype: 'STRING',
               show: false

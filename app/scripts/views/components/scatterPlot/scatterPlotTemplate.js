@@ -53,7 +53,7 @@
       },
       'update-special-charts': function(hasFilters) {
         var attrId =
-          this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+          this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
         var _selectedCases =
           _.pluck(this.invisibleDimension.top(Infinity), attrId);
 
@@ -117,7 +117,7 @@
                     _CnaFracMutCntMap[_pointObj.x + '||' + _pointObj.y]);
                 }
               });
-              var _selectedCases = _.pluck(_selectedData, 'sample_id').sort();
+              var _selectedCases = _.pluck(_selectedData, 'sample_uid').sort();
               _self.selectedSamples = _selectedCases;
               _self.attributes.filter = _selectedCases;
 
@@ -146,7 +146,7 @@
         height: window.iViz.styles.vars.scatter.height
       };
       var attrId =
-        this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+        this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
       this.invisibleDimension = this.ndx.dimension(function(d) {
         return d[attrId];
       });
