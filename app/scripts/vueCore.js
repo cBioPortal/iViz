@@ -353,7 +353,8 @@
     bind: function() {
       var self = this;
       $(this.el).chosen({
-        width: '30%'
+        width: '30%',
+        search_contains: true
       })
         .change(
           function() {
