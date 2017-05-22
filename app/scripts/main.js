@@ -419,11 +419,17 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       }
       return data_.groups.group_mapping.studyMap[study_id].uid_to_patient[case_uid];
     },
-    getPatientIds: function(sampleId) {
-      return this.getCasesMap('sample')[sampleId];
+    getPatientUIDs: function(sampleUID) {
+      return this.getCasesMap('sample')[sampleUID];
     },
-    getSampleIds: function(patientId) {
-      return this.getCasesMap('patient')[patientId];
+    getSampleUIDs: function(patientUID) {
+      return this.getCasesMap('patient')[patientUID];
+    },
+    getPatientId: function(studyId, sampleId) {
+      return data_.groups.group_mapping.studyMap[studyId].sample_to_patient[sampleId];
+    },
+    getSampleIds: function(studyId, patientId) {
+      return data_.groups.group_mapping.studyMap[studyId].patient_to_sample[patientId];
     },
     openCases: function() {
       var _selectedCasesMap = {};
@@ -490,7 +496,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         _.each(sampleUIds_, function(sampleUId) {
           var temp = data_.groups.sample.data[sampleUId];
           var temp1 = $.extend({}, temp,
-            data_.groups.patient.data[self.getPatientIds(sampleUId)[0]]);
+            data_.groups.patient.data[self.getPatientUIDs(sampleUId)[0]]);
           arr.push(temp1);
         });
 
@@ -573,7 +579,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _selectedStudyCasesMap[_caseDataObj.study_id].patients = [];
         }
         _selectedStudyCasesMap[_caseDataObj.study_id].samples.push(_caseDataObj.sample_id);
-        var temp = self.getPatientIds(sampleUID);
+        var temp = self.getPatientUIDs(sampleUID);
         _selectedStudyCasesMap[_caseDataObj.study_id].patients.push(data_.groups.patient.data[temp[0]].patient_id);
       });
       $.each(_selectedStudyCasesMap, function(key, val) {
