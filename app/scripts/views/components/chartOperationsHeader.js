@@ -191,7 +191,11 @@
             $('#' + chartId + '-download-icon-wrapper').qtip('api').hide();
           },
           render: function(event, api) {
-            var downloadFileTypes = self.chartCtrl.getDownloadFileTypes();
+            var downloadFileTypes = self.chartCtrl.getDownloadFileTypes().sort(function(a, b) {
+              a = a === 'tsv' ? 'data' : a;
+              b = b === 'tsv' ? 'data' : b;
+              return a > b;
+            });
             var content = [];
             _.each(downloadFileTypes, function(item) {
               content.push('<div style="display:inline-block;"><button id="' + self.chartId + '-' + item + '" style="width:50px">' + (item === 'tsv' ? 'DATA' : item.toUpperCase()) + '</button></div>');
