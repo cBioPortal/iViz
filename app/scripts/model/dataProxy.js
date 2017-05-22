@@ -1173,6 +1173,7 @@ window.DataManagerForIviz = (function($, _) {
               study_id: [cancerStudyId],
               sample_ids: self.studyCasesMap[cancerStudyId].samples
             }).then(function(data) {
+              var patient_to_sample = {};
               var sample_to_patient = {};
               var sample_uid_to_patient_uid = {};
               var uid_to_sample = {};
@@ -1189,6 +1190,10 @@ window.DataManagerForIviz = (function($, _) {
                   patient_to_uid[data[i].patient_id] = _patient_uid.toString();
                   _patient_uid++;
                 }
+                if (!patient_to_sample.hasOwnProperty(data[i].patient_id)) {
+                  patient_to_sample[data[i].patient_id] = {};
+                }
+                patient_to_sample[data[i].patient_id][data[i].id] = 1;
                 sample_to_patient[data[i].id] = data[i].patient_id;
                 sample_uid_to_patient_uid[_sample_uid] = patient_to_uid[data[i].patient_id];
                 patientList.push(data[i].patient_id);
@@ -1205,6 +1210,9 @@ window.DataManagerForIviz = (function($, _) {
               resultMap.sample_to_uid = sample_to_uid;
               resultMap.patient_to_uid = patient_to_uid;
               resultMap.sample_to_patient = sample_to_patient;
+              resultMap.patient_to_sample = _.mapObject(patient_to_sample, function(item) {
+                return _.keys(item);
+              });
               resultMap.sample_uid_to_patient_uid = sample_uid_to_patient_uid;
               study_to_sample_to_patient[cancerStudyId] = resultMap;
               def.resolve();
