@@ -197,9 +197,10 @@
       _data = [_data.join('\t')];
       _.each(groups_, function(group) {
         _.each(group.data, function(item) {
-          var _patientIds = iViz.getPatientIds(item.sample_id);
-          var _txt = (_.isArray(_patientIds) ? _patientIds.join(', ') : 'NA') +
-            '\t' + item.sample_id + '\t' + item.mutation_count + '\t' +
+          var _sampleId = iViz.getCaseIdUsingUID('sample', item.study_id, item.sample_uid);
+          var _patientId = iViz.getPatientId(item.study_id, _sampleId);
+          var _txt = (_patientId ? _patientId : 'NA') +
+            '\t' + _sampleId + '\t' + item.mutation_count + '\t' +
             item.cna_fraction + '\t' + group.name;
           _data.push(_txt);
         });
