@@ -12,7 +12,7 @@
     var layout_;
     var getQtipString = function(_data) {
       var toReturn = 'Cancer Study:' + _data.study_id + '<br>Sample Id: ' +
-        iViz.getCaseIdUsingUID('patient', _data.study_id, _data.sample_uid) + '<br>CNA fraction: ';
+        iViz.getCaseIdUsingUID('sample', _data.study_id, _data.sample_uid) + '<br>CNA fraction: ';
       if (isNaN(_data.cna_fraction)) {
         toReturn += _data.cna_fraction;
       } else {
@@ -94,7 +94,7 @@
         var _pts_sample_uid =
           data.points[0].data.sample_uid[data.points[0].pointNumber];
         window.open(
-          cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_uid));
+          cbio.util.getLinkToSampleView(_pts_study_id, iViz.getCaseIdUsingUID('sample', _pts_study_id, _pts_sample_uid)));
       });
 
       initCanvasDownloadData();
