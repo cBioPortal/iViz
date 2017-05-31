@@ -11,7 +11,7 @@
     '<span class="chart-title-span" id="{{chartId}}-title">{{displayName}}' +
     '</span></div>' +
     '<div :class="[showOperations?chartOperationsActive:chartOperations]">' +
-    '<div class="log-scale" v-if="showLogScale">' +
+    '<div class="checkbox-div" v-if="showLogScale">' +
     '<input type="checkbox" value="" id="" ' +
     'class="checkbox" v-model="logChecked">' +
     '<span id="scale-span-{{chartId}}">' +
@@ -46,7 +46,7 @@
       }, chartCtrl: {
         type: Object
       }, groupid: {
-        type: Number
+        type: String
       }, hasChartTitle: {
         type: Boolean,
         default: false
@@ -94,7 +94,8 @@
       logChecked: function(newVal) {
         this.reset();
         this.$dispatch('changeLogScale', newVal);
-      }, filters: function(newVal) {
+      },
+      filters: function(newVal) {
         this.hasFilters = newVal.length > 0;
       },
       showSurvivalIcon: function(newVal) {
@@ -236,10 +237,16 @@
       if (self.showLogScale) {
         _numOfIcons++;
       }
-      
-      if(self.showDownloadIcon) {
+
+      if (self.showDownloadIcon) {
         _numOfIcons++;
       }
+
+      if (self.attributes.view_type
+        && self.attributes.view_type === 'survival') {
+        _numOfIcons += 5;
+      }
+
       this.numOfIcons = _numOfIcons;
     }
   });
