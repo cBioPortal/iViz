@@ -33,6 +33,22 @@
               break;
             }
           }
+        } else if (data_.smallDataFlag) {
+          if (d[data_.attrId] <= opts_.xDomain[1]) {
+            val = opts_.xDomain[0];
+          } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+            val = opts_.xDomain[opts_.xDomain.length - 2];
+          } else {
+            for (i = 2; i < opts_.xDomain.length - 2; i++) {
+              if (d[data_.attrId] <= opts_.xDomain[i] &&
+                d[data_.attrId] >= opts_.xDomain[i - 1]) {
+                _min = opts_.xDomain[i - 1];
+                _max = opts_.xDomain[i];
+                val = _min + (_max - _min)/4;
+                break;
+              }
+            }
+          }
         } else if (d[data_.attrId] <= opts_.xDomain[1]) {
           val = opts_.xDomain[0];
         } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
@@ -89,6 +105,12 @@
       if (logScale) {
         chartInst_.x(d3.scale.log().nice()
           .domain([0.7, opts_.maxDomain]));
+      } else if (data_.smallDataFlag) {
+        chartInst_.x(d3.scale.log().nice()
+          .domain([
+            opts_.xDomain[0] / 2,
+            opts_.xDomain[opts_.xDomain.length - 1] * 3]
+          ));
       } else {
         chartInst_.x(d3.scale.linear()
           .domain([
@@ -96,7 +118,6 @@
             opts_.xDomain[opts_.xDomain.length - 1] + opts_.gutter
           ]));
       }
-
       chartInst_.yAxis().ticks(6);
       chartInst_.yAxis().tickFormat(d3.format('d'));
       chartInst_.xAxis().tickFormat(function(v) {
@@ -112,6 +133,11 @@
     function getTickFormat(v, logScale) {
       var _returnValue = v;
       var index = 0;
+
+      var e = d3.format('.1e');// convert small data to scientific notation format
+      // if(data_.smallDataFlag){
+      //   v = e(v);
+      // }
       if (logScale) {
         if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
@@ -131,8 +157,14 @@
           _returnValue = 'NA';
         }
       } else if (v === opts_.xDomain[0]) {
+        if (data_.smallDataFlag) {
+          return '<=' + e(opts_.xDomain[1]);
+        }
         return '<=' + opts_.xDomain[1];
       } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
+        if (data_.smallDataFlag) {
+          return '>' + e(opts_.xDomain[opts_.xDomain.length - 3]);
+        }
         return '>' + opts_.xDomain[opts_.xDomain.length - 3];
       } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
         return 'NA';
@@ -147,6 +179,10 @@
         }
       } else {
         _returnValue = v;
+      }
+
+      if (data_.smallDataFlag) {
+        return e(_returnValue);
       }
       return _returnValue;
     }
@@ -166,25 +202,23 @@
       data.push(header.join('\t'));
 
       for (var i = 0; i < _cases.length; i++) {
-        var sampleId = _cases[i].sample_uid;
-        var patientId = _cases[i].patient_uid;
         var row = [];
         if (opts_.groupType === 'patient') {
-          sampleId = iViz.getSampleIds(patientId);
-          if (_.isArray(sampleId)) {
-            sampleId = sampleId.join(', ');
+          var patientUID = _cases[i].patient_uid;
+          var patientId = iViz.getCaseIdUsingUID('patient', _cases[i].study_id, patientUID);
+          var sampleIds = iViz.getSampleIds(_cases[i].study_id, patientId);
+          if (_.isArray(sampleIds)) {
+            sampleIds = sampleIds.join(', ');
           } else {
-            sampleId = '';
+            sampleIds = '';
           }
           row.push(patientId);
-          row.push(sampleId);
+          row.push(sampleIds);
         } else {
-          patientId = iViz.getPatientIds(sampleId);
-          if (_.isArray(patientId)) {
-            patientId = patientId.join(', ');
-          } else {
-            patientId = '';
-          }
+          var sampleUID = _cases[i].sample_uid;
+          var sampleId = iViz.getCaseIdUsingUID('sample', _cases[i].study_id, sampleUID);
+          var patientId = iViz.getPatientId(_cases[i].study_id, sampleId);
+
           row.push(sampleId);
           row.push(patientId);
         }
@@ -218,7 +252,8 @@
       data_ = data;
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
-        max: data_.max
+        max: data_.max,
+        smallDataFlag: data_.smallDataFlag
       }, opts.logScaleChecked));
       ndx_ = ndx;
 
@@ -234,7 +269,8 @@
     content.redraw = function(logScaleChecked) {
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
-        max: data_.max
+        max: data_.max,
+        smallDataFlag: data_.smallDataFlag
       }, logScaleChecked));
 
       initDc_(logScaleChecked);
@@ -404,6 +440,27 @@
               config.maxDomain = Math.pow(10, i + 1.5);
               break;
             }
+          }
+        } else if (data.smallDataFlag) {// use decimal scientific ticks for 0 < data < 0.001
+          // count how many 0 after decimal dot
+          var minZeros = 0;
+          while (min < 1) {
+            min *= 10;
+            minZeros++;
+          }
+          var maxZeros = 0;
+          while (max < 1) {
+            max *= 10;
+            maxZeros++;
+          }
+
+          // add 1 more element for showing <min
+          var minTick = 1 / (Math.pow(10, minZeros + 1));
+          // add 2 more elements for showing >max and NA
+          var maxTick = 1 / (Math.pow(10, maxZeros - 2));
+
+          for (i = minTick; i <= maxTick; i *= 10) {
+            config.xDomain.push(Number(i));
           }
         } else {
           if (!_.isNaN(range)) {

@@ -598,14 +598,18 @@ cbio.util = (function() {
     // Likewise for q3. 
     var q3 = values[(Math.ceil((values.length * (3 / 4))) > values.length - 1 ? values.length - 1 : Math.ceil((values.length * (3 / 4))))];
     var iqr = q3 - q1;
+
     if (values[Math.ceil((values.length * (1 / 2)))] < 0.001) {
       smallDataFlag = true;
     }
     // Then find min and max values
     var maxValue, minValue;
-    if (q3 < 1) {
-      maxValue = Number((q3 + iqr * 1.5).toFixed(2));
-      minValue = Number((q1 - iqr * 1.5).toFixed(2));
+    if (0.001 <= q3 && q3 < 1) {
+      maxValue = Number((q3 + iqr * 1.5).toFixed(3));
+      minValue = Number((q1 - iqr * 1.5).toFixed(3));
+    } else if(q3 < 0.001){// get IQR for very small number(<0.001)
+      maxValue = Number((q3 + iqr * 1.5));
+      minValue = Number((q1 - iqr * 1.5));
     } else {
       maxValue = Math.ceil(q3 + iqr * 1.5);
       minValue = Math.floor(q1 - iqr * 1.5);
@@ -665,6 +669,18 @@ cbio.util = (function() {
     });
     return def.promise();
   }
+
+  //Jing's function: get exponent for 0<data<1
+
+  // function getDecimalExponent(data){
+  //  
+  //   var values 
+  //   var zeros = 0;
+  //   while (number < 1) {
+  //     number *= 10;
+  //     zeros++;
+  //   }
+  // }
 
   return {
     toPrecision: toPrecision,

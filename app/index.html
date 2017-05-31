@@ -209,11 +209,11 @@
 
     window.cbioURL = 'http://www.cbioportal.org/';
     window.cbioResourceURL = 'resources/';
-    window.mutationProfileId = 'hnsc_tcga_mutations';
-    window.cnaProfileId = 'hnsc_tcga_gistic';
+    window.mutationProfileId = 'blca_dfarber_mskcc_2014_mutations';
+    window.cnaProfileId = 'blca_dfarber_mskcc_2014_gistic';
     window.case_set_id = '-1';
     var studyCasesMap = {};
-    studyCasesMap['hnsc_tcga'] = {};
+    studyCasesMap['blca_dfarber_mskcc_2014'] = {};
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
     $.when(

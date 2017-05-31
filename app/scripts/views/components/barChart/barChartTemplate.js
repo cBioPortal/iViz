@@ -203,20 +203,19 @@
         }
         return number;
       });
-      
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
         var findExtremeResult = cbio.util.findExtremes(this.data.meta);
+        console.log(findExtremeResult);
         this.data.min = findExtremeResult[0];
         this.data.max = findExtremeResult[1];
+        this.data.smallDataFlag = findExtremeResult[2];
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
-        
         if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
           this.settings.showLogScale = true;
         }
-
         this.barChart = new iViz.view.component.BarChart();
         this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
         this.initChart(this.settings.showLogScale);
