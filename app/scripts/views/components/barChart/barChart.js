@@ -44,7 +44,7 @@
                 d[data_.attrId] >= opts_.xDomain[i - 1]) {
                 _min = opts_.xDomain[i - 1];
                 _max = opts_.xDomain[i];
-                val = _min + (_max - _min)/4;
+                val = _min + (_max - _min)/3;
                 break;
               }
             }
@@ -133,11 +133,8 @@
     function getTickFormat(v, logScale) {
       var _returnValue = v;
       var index = 0;
-
       var e = d3.format('.1e');// convert small data to scientific notation format
-      // if(data_.smallDataFlag){
-      //   v = e(v);
-      // }
+      
       if (logScale) {
         if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
@@ -182,7 +179,11 @@
       }
 
       if (data_.smallDataFlag) {
-        return e(_returnValue);
+        _returnValue = e(_returnValue);
+        var _tempValue = e(v).toString();
+        if (_tempValue.charAt(0) !== '1') {// hide tick values whose format is not 1.0e-N
+          _returnValue = '';
+        }
       }
       return _returnValue;
     }
@@ -401,6 +402,12 @@
         } else if (max < 100 &&
           max > 10) {
           config.divider = 2;
+        } else if (data.smallDataFlag) {
+          if (range > 2) {
+            config.divider = 1;
+          } else {
+            config.divider = 0.5;
+          }
         }
 
         if (max <= 1 && max > 0 && min >= -1 && min < 0) {
@@ -441,27 +448,13 @@
               break;
             }
           }
-        } else if (data.smallDataFlag) {// use decimal scientific ticks for 0 < data < 0.001
-          // count how many 0 after decimal dot
-          var minZeros = 0;
-          while (min < 1) {
-            min *= 10;
-            minZeros++;
+        } else if (data.smallDataFlag) {// use decimal scientific ticks for 0 < data < 0.1
+          config.xDomain.push(Math.pow(10, min - config.divider));// add "<=" marker
+          for (i = min; i <= max; i += config.divider) {
+            config.xDomain.push(Math.pow(10, i));
           }
-          var maxZeros = 0;
-          while (max < 1) {
-            max *= 10;
-            maxZeros++;
-          }
-
-          // add 1 more element for showing <min
-          var minTick = 1 / (Math.pow(10, minZeros + 1));
-          // add 2 more elements for showing >max and NA
-          var maxTick = 1 / (Math.pow(10, maxZeros - 2));
-
-          for (i = minTick; i <= maxTick; i *= 10) {
-            config.xDomain.push(Number(i));
-          }
+          config.xDomain.push(Math.pow(10, max + config.divider));// add ">=" marker
+          config.xDomain.push(Math.pow(10, max + config.divider * 2));// add "NA" marker
         } else {
           if (!_.isNaN(range)) {
             for (i = 0; i <= config.numOfGroups; i++) {

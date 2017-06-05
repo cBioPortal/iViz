@@ -129,7 +129,7 @@
             this.barChart.getCurrentCategories().length > this.numOfSurvivalCurveLimit) {
             this.showSurvivalIcon = false;
           } else {
-            this.showSurvivalIcon = true
+            this.showSurvivalIcon = true;
           }
         } else {
           this.showSurvivalIcon = false;
@@ -206,11 +206,23 @@
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
-        var findExtremeResult = cbio.util.findExtremes(this.data.meta);
+
+        var findExtremeResult;
+        if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001) {
+          this.data.smallDataFlag = true;
+          //this.settings.showLogScale = true;
+          this.data.exponents = cbio.util.getDecimalExponents(this.data.meta);
+          findExtremeResult = cbio.util.findExtremes(this.data.exponents);
+          //findExtremeResult = cbio.util.getScientificNumber(findExtremeExponentResult);
+        } else {
+          this.data.smallDataFlag = false;
+          findExtremeResult = cbio.util.findExtremes(this.data.meta);
+        }
+
         console.log(findExtremeResult);
+        
         this.data.min = findExtremeResult[0];
         this.data.max = findExtremeResult[1];
-        this.data.smallDataFlag = findExtremeResult[2];
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
         if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {

@@ -589,6 +589,8 @@ cbio.util = (function() {
     values.sort(function(a, b) {
       return a - b;
     });
+    
+    
 
     /* Then find a generous IQR. This is generous because if (values.length / 4) 
      * is not an int, then really you should average the two elements on either 
@@ -670,17 +672,52 @@ cbio.util = (function() {
     return def.promise();
   }
 
-  //Jing's function: get exponent for 0<data<1
+  //Jing's function: get exponent for 0<data<0.001
 
-  // function getDecimalExponent(data){
-  //  
-  //   var values 
-  //   var zeros = 0;
-  //   while (number < 1) {
-  //     number *= 10;
-  //     zeros++;
-  //   }
-  // }
+  function getDecimalExponents(data){
+
+    // Copy the values, rather than operating on references to existing values
+    var values = [];
+    _.each(data, function(item) {
+      if ($.isNumeric(item)) {
+        values.push(Number(item));
+      }
+    });
+
+    // Then sort
+    values.sort(function(a, b) {
+      return a - b;
+    });
+    
+    var minZeros = 0;
+    while (values[0] < 1) {
+      values[0] *= 10;
+      minZeros++;
+    }
+
+    var maxZeros = 0;
+    while (values[values.length-1] < 1) {
+      values[values.length-1] *= 10;
+      maxZeros++;
+    }
+    
+    var expoents = [];
+    
+    for(var i = maxZeros;i <= minZeros; i++){
+      expoents.push(-i);
+    }
+    return expoents;
+  }
+  
+  
+  function getScientificNumber(data){
+
+    var maxValue = 1 / Math.pow(10, Number(data[0]));
+    var minValue = 1 / Math.pow(10, Number(data[1]));
+
+    return [minValue, maxValue];
+    
+  }
 
   return {
     toPrecision: toPrecision,
@@ -709,7 +746,9 @@ cbio.util = (function() {
     findExtremes: findExtremes,
     deepCopyObject: deepCopyObject,
     makeCachedPromiseFunction: makeCachedPromiseFunction,
-    getDatahubStudiesList: getDatahubStudiesList
+    getDatahubStudiesList: getDatahubStudiesList,
+    getDecimalExponents: getDecimalExponents,
+    getScientificNumber:getScientificNumber
   };
 
 })();
