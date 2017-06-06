@@ -24,11 +24,12 @@
     ],
     data: function() {
       return {
-        chartDivId: 'chart-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, '') + '-div',
-        resetBtnId: 'chart-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
-        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ''),
+        chartDivId:
+          iViz.util.getDefaultDomId('chartDivId', this.attributes.attr_id),
+        resetBtnId:
+          iViz.util.getDefaultDomId('resetBtnId', this.attributes.attr_id),
+        chartId:
+          iViz.util.getDefaultDomId('chartId', this.attributes.attr_id),
         displayName: this.attributes.display_name,
         showOperations: false,
         selectedSamples: [],
@@ -52,7 +53,7 @@
       },
       'update-special-charts': function(hasFilters) {
         var attrId =
-          this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+          this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
         var _selectedCases =
           _.pluck(this.invisibleDimension.top(Infinity), attrId);
 
@@ -116,7 +117,7 @@
                     _CnaFracMutCntMap[_pointObj.x + '||' + _pointObj.y]);
                 }
               });
-              var _selectedCases = _.pluck(_selectedData, 'sample_id').sort();
+              var _selectedCases = _.pluck(_selectedData, 'sample_uid').sort();
               _self.selectedSamples = _selectedCases;
               _self.attributes.filter = _selectedCases;
 
@@ -145,7 +146,7 @@
         height: window.iViz.styles.vars.scatter.height
       };
       var attrId =
-        this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+        this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
       this.invisibleDimension = this.ndx.dimension(function(d) {
         return d[attrId];
       });
@@ -153,7 +154,7 @@
       var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.init(data, _opts);
-      _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
+      _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
 
       _self.attachPlotlySelectedEvent();
       _self.showLoad = false;

@@ -29,12 +29,12 @@
     ],
     data: function() {
       return {
-        chartDivId: 'chart-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, '') + '-div',
-        resetBtnId: 'chart-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
-        chartId: 'chart-new-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, ''),
+        chartDivId: 
+          iViz.util.getDefaultDomId('chartDivId', this.attributes.attr_id),
+        resetBtnId:
+          iViz.util.getDefaultDomId('resetBtnId', this.attributes.attr_id),
+        chartId:
+          iViz.util.getDefaultDomId('chartId', this.attributes.attr_id),
         displayName: '',
         showOperations: false,
         chartInst: {},
@@ -80,7 +80,7 @@
           } else {
             var attrId =
               this.attributes.group_type === 'patient' ?
-                'patient_id' : 'sample_id';
+                'patient_uid' : 'sample_uid';
             var _selectedCases =
               _.pluck(this.invisibleDimension.top(Infinity), attrId);
             this.chartInst.update(_selectedCases, this.selectedRows);
@@ -156,7 +156,7 @@
         if (this.isMutatedGeneCna) {
           this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
           _.each(_selectedRowData, function(item) {
-            var casesIds = item.caseids.split(',');
+            var casesIds = item.case_uids.split(',');
             selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
           });
           if (this.attributes.filter.length === 0) {
@@ -203,7 +203,7 @@
           height: window.iViz.styles.vars.specialTables.height,
           chartId: this.chartId
         };
-        this.chartInst.init(this.attributes, opts, this.$root.selectedsamples,
+        this.chartInst.init(this.attributes, opts, this.$root.selectedsampleUIDs,
           this.$root.selectedgenes, data, {
             addGeneClick: this.addGeneClick,
             submitClick: this.submitClick
@@ -238,7 +238,7 @@
 
       if (this.isMutatedGeneCna) {
         attrId = this.attributes.group_type === 'patient' ?
-          'patient_id' : 'sample_id';
+          'patient_uid' : 'sample_uid';
       }
 
       this.invisibleDimension = this.ndx.dimension(function(d) {
