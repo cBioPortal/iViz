@@ -206,21 +206,15 @@
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
-
         var findExtremeResult;
         if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001) {
           this.data.smallDataFlag = true;
-          //this.settings.showLogScale = true;
           this.data.exponents = cbio.util.getDecimalExponents(this.data.meta);
           findExtremeResult = cbio.util.findExtremes(this.data.exponents);
-          //findExtremeResult = cbio.util.getScientificNumber(findExtremeExponentResult);
         } else {
           this.data.smallDataFlag = false;
           findExtremeResult = cbio.util.findExtremes(this.data.meta);
         }
-
-        console.log(findExtremeResult);
-        
         this.data.min = findExtremeResult[0];
         this.data.max = findExtremeResult[1];
         this.data.attrId = this.attributes.attr_id;

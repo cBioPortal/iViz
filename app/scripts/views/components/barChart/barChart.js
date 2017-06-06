@@ -109,7 +109,7 @@
         chartInst_.x(d3.scale.log().nice()
           .domain([
             opts_.xDomain[0] / 2,
-            opts_.xDomain[opts_.xDomain.length - 1] * 3]
+            opts_.xDomain[opts_.xDomain.length - 1] * 2]
           ));
       } else {
         chartInst_.x(d3.scale.linear()
@@ -387,7 +387,7 @@
         var rangeL = parseInt(range, 10).toString().length - 2;
         var i = 0;
         var _tmpValue;
-
+        
         // Set divider based on the number m in 10(m)
         for (i = 0; i < rangeL; i++) {
           config.divider *= 10;
@@ -403,9 +403,15 @@
           max > 10) {
           config.divider = 2;
         } else if (data.smallDataFlag) {
-          if (range > 2) {
+          if (range > 20) {
+            config.divider = 8;
+          } else if (range > 9 && range <= 20) {
+            config.divider = 4;
+          } else if (range > 4 && range <= 9) {
+            config.divider = 2;
+          } else if (range > 2 && range <= 4) {
             config.divider = 1;
-          } else {
+          } else if (range >= 0 && range <= 2) {
             config.divider = 0.5;
           }
         }

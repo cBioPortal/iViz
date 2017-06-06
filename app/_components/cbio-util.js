@@ -672,7 +672,6 @@ cbio.util = (function() {
     return def.promise();
   }
 
-  //Jing's function: get exponent for 0<data<0.001
 
   function getDecimalExponents(data){
 
@@ -708,16 +707,6 @@ cbio.util = (function() {
     }
     return expoents;
   }
-  
-  
-  function getScientificNumber(data){
-
-    var maxValue = 1 / Math.pow(10, Number(data[0]));
-    var minValue = 1 / Math.pow(10, Number(data[1]));
-
-    return [minValue, maxValue];
-    
-  }
 
   return {
     toPrecision: toPrecision,
@@ -747,8 +736,7 @@ cbio.util = (function() {
     deepCopyObject: deepCopyObject,
     makeCachedPromiseFunction: makeCachedPromiseFunction,
     getDatahubStudiesList: getDatahubStudiesList,
-    getDecimalExponents: getDecimalExponents,
-    getScientificNumber:getScientificNumber
+    getDecimalExponents: getDecimalExponents
   };
 
 })();
