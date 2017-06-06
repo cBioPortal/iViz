@@ -1606,8 +1606,8 @@ window.DataManagerForIviz = (function($, _) {
             })
           );
         });
-        var _map = {};
         $.when.apply($, _asyncAjaxCalls).done(function() {
+          var _map = {};
           _.each(_responses, function(_res) {
             _map[_res.studyId] = _res.shortName;
           });
