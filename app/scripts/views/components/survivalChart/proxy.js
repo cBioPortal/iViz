@@ -11,6 +11,7 @@
     var datum_ = {
       study_id: '',
       patient_id: '',
+      patient_uid: '',
       time: '', // num of months
       status: '',
       num_at_risk: -1,
@@ -34,7 +35,8 @@
         _status !== 'NaN' && _status !== 'NA' &&
         typeof _status !== 'undefined' && typeof _time !== 'undefined') {
         var _datum = jQuery.extend(true, {}, datum_);
-        _datum.patient_id = _dataObj.patient_id;
+        _datum.patient_uid = _dataObj.patient_uid;
+        _datum.patient_id = iViz.getCaseIdUsingUID('patient', _dataObj.study_id, _dataObj.patient_uid);
         _datum.study_id = _dataObj.study_id;
         _datum.time = parseFloat(_time);
         _datum.status = _status;

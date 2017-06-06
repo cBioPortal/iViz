@@ -61,7 +61,7 @@
           }
         }
         mapTickToCaseIds[val].caseIds.push(
-          data_.groupType === 'patient' ? d.patient_id : d.sample_id);
+          data_.groupType === 'patient' ? d.patient_uid : d.sample_uid);
         return val;
       });
 
@@ -166,25 +166,23 @@
       data.push(header.join('\t'));
 
       for (var i = 0; i < _cases.length; i++) {
-        var sampleId = _cases[i].sample_id;
-        var patientId = _cases[i].patient_id;
         var row = [];
         if (opts_.groupType === 'patient') {
-          sampleId = iViz.getSampleIds(patientId);
-          if (_.isArray(sampleId)) {
-            sampleId = sampleId.join(', ');
+          var patientUID = _cases[i].patient_uid;
+          var patientId = iViz.getCaseIdUsingUID('patient', _cases[i].study_id, patientUID);
+          var sampleIds = iViz.getSampleIds(_cases[i].study_id, patientId);
+          if (_.isArray(sampleIds)) {
+            sampleIds = sampleIds.join(', ');
           } else {
-            sampleId = '';
+            sampleIds = '';
           }
           row.push(patientId);
-          row.push(sampleId);
+          row.push(sampleIds);
         } else {
-          patientId = iViz.getPatientIds(sampleId);
-          if (_.isArray(patientId)) {
-            patientId = patientId.join(', ');
-          } else {
-            patientId = '';
-          }
+          var sampleUID = _cases[i].sample_uid;
+          var sampleId = iViz.getCaseIdUsingUID('sample', _cases[i].study_id, sampleUID);
+          var patientId = iViz.getPatientId(_cases[i].study_id, sampleId);
+          
           row.push(sampleId);
           row.push(patientId);
         }
@@ -256,7 +254,7 @@
     content.getCurrentCategories = function(sortBy) {
       var groups = dcDimension.group().top(Infinity);
       var groupTypeId =
-        data_.groupType === 'patient' ? 'patient_id' : 'sample_id';
+        data_.groupType === 'patient' ? 'patient_uid' : 'sample_uid';
       var selectedCases = _.pluck(dcDimension.top(Infinity), groupTypeId);
       var categories = [];
       var colorCounter = 0;

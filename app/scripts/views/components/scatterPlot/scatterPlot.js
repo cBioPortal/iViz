@@ -8,11 +8,12 @@
     var content = this;
     var chartId_;
     var data_;
+    var groups_ = [];
     var opts_;
     var layout_;
     var getQtipString = function(_data) {
       var toReturn = 'Cancer Study:' + _data.study_id + '<br>Sample Id: ' +
-        _data.sample_id + '<br>CNA fraction: ';
+        iViz.getCaseIdUsingUID('sample', _data.study_id, _data.sample_uid) + '<br>CNA fraction: ';
       if (isNaN(_data.cna_fraction)) {
         toReturn += _data.cna_fraction;
       } else {
@@ -42,7 +43,7 @@
         type: 'scatter',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
-        sample_id: _.pluck(data_, 'sample_id'),
+        sample_uid: _.pluck(data_, 'sample_uid'),
         marker: {
           size: 7,
           color: '#2986e2',
@@ -91,11 +92,16 @@
       _plotsElem.on('plotly_click', function(data) {
         var _pts_study_id =
           data.points[0].data.study_id[data.points[0].pointNumber];
-        var _pts_sample_id =
-          data.points[0].data.sample_id[data.points[0].pointNumber];
+        var _pts_sample_uid =
+          data.points[0].data.sample_uid[data.points[0].pointNumber];
         window.open(
-          cbio.util.getLinkToSampleView(_pts_study_id, _pts_sample_id));
+          cbio.util.getLinkToSampleView(_pts_study_id, iViz.getCaseIdUsingUID('sample', _pts_study_id, _pts_sample_uid)));
       });
+
+      groups_ = [{
+        name: 'Unselected',
+        data: _data
+      }];
 
       initCanvasDownloadData();
     };
@@ -110,7 +116,7 @@
         _tmpSelectedSampleIdMap[_sampleId] = '';
       });
       _.each(data_, function(_dataObj) {
-        if (_tmpSelectedSampleIdMap.hasOwnProperty(_dataObj.sample_id)) {
+        if (_tmpSelectedSampleIdMap.hasOwnProperty(_dataObj.sample_uid)) {
           _selectedData.push(_dataObj);
         } else {
           _unselectedData.push(_dataObj);
@@ -127,6 +133,20 @@
       _.each(_selectedData, function(_dataObj) {
         _selectedDataQtips.push(getQtipString(_dataObj));
       });
+
+      groups_ = [];
+      if (_selectedData.length > 0) {
+        groups_.push({
+          name: 'Selected',
+          data: _selectedData
+        })
+      }
+      if (_unselectedData.length > 0) {
+        groups_.push({
+          name: 'Unselected',
+          data: _unselectedData
+        })
+      }
       document.getElementById(chartId_).data[0] = {
         x: _.pluck(_unselectedData, 'cna_fraction'),
         y: _.pluck(_unselectedData, 'mutation_count'),
@@ -135,7 +155,7 @@
         type: 'scatter',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
-        sample_id: _.pluck(data_, 'sample_id'),
+        sample_uid: _.pluck(data_, 'sample_uid'),
         marker: {
           size: 6,
           color: '#2986e2',
@@ -150,7 +170,7 @@
         type: 'scatter',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
-        sample_id: _.pluck(data_, 'sample_id'),
+        sample_uid: _.pluck(data_, 'sample_uid'),
         marker: {
           size: 6,
           color: 'red',
@@ -165,8 +185,32 @@
     content.updateDataForDownload = function(fileType) {
       if (['pdf', 'svg'].indexOf(fileType) !== -1) {
         initCanvasDownloadData();
+      } else if (fileType === 'tsv') {
+        initTsvDownloadData();
       }
     };
+
+    function initTsvDownloadData() {
+      var _title = opts_.title || 'Mutation Count vs. CNA';
+      var _data = ['Patient ID', 'Sample ID', 'Mutation Count', 'CNA', 'Group'];
+
+      _data = [_data.join('\t')];
+      _.each(groups_, function(group) {
+        _.each(group.data, function(item) {
+          var _sampleId = iViz.getCaseIdUsingUID('sample', item.study_id, item.sample_uid);
+          var _patientId = iViz.getPatientId(item.study_id, _sampleId);
+          var _txt = (_patientId ? _patientId : 'NA') +
+            '\t' + _sampleId + '\t' + item.mutation_count + '\t' +
+            item.cna_fraction + '\t' + group.name;
+          _data.push(_txt);
+        });
+      });
+
+      content.setDownloadData('tsv', {
+        fileName: _title,
+        data: _data.join('\n')
+      });
+    }
 
     function initCanvasDownloadData() {
       content.setDownloadData('svg', {

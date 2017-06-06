@@ -12,8 +12,8 @@
           el: '#complete-screen',
           data: {
             groups: [],
-            selectedsamples: [],
-            selectedpatients: [],
+            selectedsampleUIDs: [],
+            selectedpatientUIDs: [],
             selectedgenes: [],
             addNewVC: false,
             selectedPatientsNum: 0,
@@ -24,8 +24,8 @@
             customfilter: {
               display_name: 'Custom',
               type: '',
-              sampleIds: [],
-              patientIds: []
+              sampleUids: [],
+              patientUids: []
             },
             charts: {},
             groupCount: 0,
@@ -75,12 +75,12 @@
                 });
               }
             },
-            selectedsamples: function(newVal, oldVal) {
+            selectedsampleUIDs: function(newVal, oldVal) {
               if (newVal.length !== oldVal.length) {
                 this.selectedSamplesNum = newVal.length;
               }
             },
-            selectedpatients: function(newVal, oldVal) {
+            selectedpatientUIDs: function(newVal, oldVal) {
               if (newVal.length !== oldVal.length) {
                 this.selectedPatientsNum = newVal.length;
               }
@@ -111,8 +111,8 @@
               });
               this.showDropDown = showDropDown;
             },
-            openCases: function(type) {
-              iViz.openCases(type);
+            openCases: function() {
+              iViz.openCases();
             },
             downloadCaseData: function() {
               iViz.downloadCaseData();
@@ -124,15 +124,15 @@
               var self_ = this;
               self_.clearAll = true;
               self_.hasfilters = false;
-              if (self_.customfilter.patientIds.length > 0 ||
-                self_.customfilter.sampleIds.length > 0) {
-                self_.customfilter.sampleIds = [];
-                self_.customfilter.patientIds = [];
+              if (self_.customfilter.patientUids.length > 0 ||
+                self_.customfilter.sampleUids.length > 0) {
+                self_.customfilter.sampleUids = [];
+                self_.customfilter.patientUids = [];
               }
               if (includeNextTickFlag) {
                 self_.$nextTick(function() {
-                  self_.selectedsamples = _.keys(iViz.getCasesMap('sample'));
-                  self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+                  self_.selectedsampleUIDs = _.keys(iViz.getCasesMap('sample'));
+                  self_.selectedpatientUIDs = _.keys(iViz.getCasesMap('patient'));
                   self_.$broadcast('update-special-charts', self_.hasfilters);
                   self_.clearAll = false;
                   _.each(this.groups, function(group) {
@@ -235,45 +235,35 @@
             },
             setSelectedCases: function(selectionType, selectedCases) {
               var radioVal = selectionType;
-              var selectedCaseIds = [];
-              var unmappedCaseIds = [];
+              var selectedCaseUIDs = [];
+              var unmappedCaseIDs = [];
 
-              if (radioVal === 'patient') {
-                var patientIdsList = Object.keys(iViz.getCasesMap('patient'));
-                _.each(selectedCases, function(id) {
-                  if (patientIdsList.indexOf(id) === -1) {
-                    unmappedCaseIds.push(id);
-                  } else {
-                    selectedCaseIds.push(id);
-                  }
-                });
-              } else {
-                var sampleIdsList = Object.keys(iViz.getCasesMap('sample'));
-                _.each(selectedCases, function(id) {
-                  if (sampleIdsList.indexOf(id) === -1) {
-                    unmappedCaseIds.push(id);
-                  } else {
-                    selectedCaseIds.push(id);
-                  }
-                });
-              }
+              _.each(selectedCases, function(id) {
+                var caseUIDs = iViz.getCaseUID(selectionType, id);
+                if (caseUIDs.length === 0) {
+                  unmappedCaseIDs.push(id);
+                } else {
+                  selectedCaseUIDs = selectedCaseUIDs.concat(caseUIDs);
+                }
+              });
 
-              if (unmappedCaseIds.length > 0) {
-                new Notification().createNotification(selectedCaseIds.length +
+
+
+              if (unmappedCaseIDs.length > 0) {
+                new Notification().createNotification(selectedCaseUIDs.length +
                   ' cases selected. The following ' +
                   (radioVal === 'patient' ? 'patient' : 'sample') +
-                  ' ID' + (unmappedCaseIds.length === 1 ? ' was' : 's were') +
+                  ' ID' + (unmappedCaseIDs.length === 1 ? ' was' : 's were') +
                   ' not found in this study: ' +
-                  unmappedCaseIds.join(', '), {
+                  unmappedCaseIDs.join(', '), {
                   message_type: 'danger'
                 });
               } else {
-                new Notification().createNotification(selectedCaseIds.length +
+                new Notification().createNotification(selectedCaseUIDs.length +
                   ' case(s) selected.', {message_type: 'info'});
               }
-
-              $('#custom-case-input-button').qtip('toggle');
-              if (selectedCaseIds.length > 0) {
+              $('#iviz-header-right-1').qtip('toggle');
+              if (selectedCaseUIDs.length > 0) {
                 this.clearAllCharts(false);
                 var self_ = this;
                 Vue.nextTick(function() {
@@ -282,11 +272,11 @@
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;
                       if (radioVal === 'sample') {
-                        self_.customfilter.sampleIds = selectedCaseIds;
-                        self_.customfilter.patientIds = [];
+                        self_.customfilter.sampleUids = selectedCaseUIDs;
+                        self_.customfilter.patientUids = [];
                       } else {
-                        self_.customfilter.patientIds = selectedCaseIds;
-                        self_.customfilter.sampleIds = [];
+                        self_.customfilter.patientUids = selectedCaseUIDs;
+                        self_.customfilter.sampleUids = [];
                       }
                       self_.$broadcast('update-custom-filters');
                       return false;
@@ -366,8 +356,9 @@
     bind: function() {
       var self = this;
       $(this.el).chosen({
-          width: '30%'
-        })
+        width: '30%',
+        search_contains: true
+      })
         .change(
           function() {
             var value = self.el.value;

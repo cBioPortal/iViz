@@ -9,14 +9,16 @@
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
-    ':show-operations="showOperations" :groupid="attributes.group_id" ' +
+    ':show-operations="showOperations && !failedToInit" :groupid="attributes.group_id" ' +
     ':show-survival-icon.sync="showSurvivalIcon"' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
     ':attributes="attributes"' +
     ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
-    'style="float:none !important;" id={{chartId}} ></div>' +
+    'style="float:none !important;" id={{chartId}} >' +
+    '<error-handle v-if="failedToInit"></error-handle>' +
+    '</div>' +
     '<span class="text-center chart-title-span" ' +
     'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
@@ -25,11 +27,12 @@
     ],
     data: function() {
       return {
-        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, '') +
-        '-div',
-        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, '') +
-        '-reset',
-        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ''),
+        chartDivId:
+          iViz.util.getDefaultDomId('chartDivId', this.attributes.attr_id),
+        resetBtnId:
+          iViz.util.getDefaultDomId('resetBtnId', this.attributes.attr_id),
+        chartId:
+          iViz.util.getDefaultDomId('chartId', this.attributes.attr_id),
         displayName: this.attributes.display_name,
         chartInst: {},
         barChart: {},
@@ -43,6 +46,7 @@
           showLogScale: false,
           transitionDuration: iViz.opts.dc.transitionDuration
         },
+        failedToInit: false,
         opts: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
         addingChart: false
@@ -170,8 +174,7 @@
       }
     },
     ready: function() {
-      this.barChart = new iViz.view.component.BarChart();
-      this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
+      var _dataIssue = false;
       this.settings.width = window.iViz.styles.vars.barchart.width;
       this.settings.height = window.iViz.styles.vars.barchart.height;
 
@@ -188,22 +191,38 @@
 
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
+        if (typeof d === 'undefined' || d === 'na' || d === '' ||
+          d === 'NaN' || d == null) {
+          d = 'NA';
+        }
         return d !== 'NA';
       }), function(d) {
-        return parseFloat(d);
+        var number = parseFloat(d);
+        if (isNaN(number)) {
+          _dataIssue = true;
+        }
+        return number;
       });
-      var findExtremeResult = cbio.util.findExtremes(this.data.meta);
-      this.data.min = findExtremeResult[0];
-      this.data.max = findExtremeResult[1];
-      this.data.attrId = this.attributes.attr_id;
-      this.data.groupType = this.attributes.group_type;
+      
+      if (_dataIssue) {
+        this.failedToInit = true;
+      } else {
+        var findExtremeResult = cbio.util.findExtremes(this.data.meta);
+        this.data.min = findExtremeResult[0];
+        this.data.max = findExtremeResult[1];
+        this.data.attrId = this.attributes.attr_id;
+        this.data.groupType = this.attributes.group_type;
+        
+        if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
+          this.settings.showLogScale = true;
+        }
 
-      if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
-        this.settings.showLogScale = true;
+        this.barChart = new iViz.view.component.BarChart();
+        this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
+        this.initChart(this.settings.showLogScale);
+        this.updateShowSurvivalIcon();
+        this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
       }
-      this.initChart(this.settings.showLogScale);
-      this.updateShowSurvivalIcon();
-      this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
 })(

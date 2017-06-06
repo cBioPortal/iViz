@@ -195,6 +195,51 @@
       return freq + '%';
     };
 
+    /**
+     * Remove illegal characters for DOM id
+     * @param {string} str Original DOM id string
+     * @return {string} trimmed id
+     */
+    content.trimDomId = function(str) {
+      if (str) {
+        str = str.replace(/>/g, '_greater_than_');
+        str = str.replace(/</g, '_less_than_');
+        str = str.replace(/\+/g, '_plus_');
+        str = str.replace(/-/g, '_minus_');
+        str = str.replace(/^[^a-z]+|[^\w:.-]+/gi, '');
+      }
+      return str;
+    };
+
+    /**
+     * Generate default DOM ids
+     * @param {string} type Available types are: chartDivId, resetBtnId, chartId, chartTableId
+     * @param {string} attrId
+     * @return {string} Default DOM id
+     */
+    content.getDefaultDomId = function(type, attrId) {
+      var domId = '';
+      if (type && attrId) {
+        var attrId = this.trimDomId(attrId);
+        switch (type) {
+        case 'chartDivId':
+          domId = 'chart-' + attrId + '-div';
+          break;
+        case 'resetBtnId':
+          domId = 'chart-' + attrId + '-reset';
+          break;
+        case 'chartId':
+          domId = 'chart-new-' + attrId;
+          break;
+        case 'chartTableId':
+          domId = 'table-' + attrId;
+          break;
+        }
+      }
+      // TODO: DOM id pool. Ideally id shouldn't be repeated
+      return domId;
+    };
+    
     function tableDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
@@ -472,6 +517,9 @@
             servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
+      case 'tsv':
+        csvDownload(content.fileName, content.data);
+        break;
         default:
           break;
       }
@@ -587,15 +635,6 @@
       return false;
     };
 
-    content.escape = function(_str) {
-      _str = _str.replace(/>/g, '_greater_than_');
-      _str = _str.replace(/</g, '_less_than_');
-      _str = _str.replace(/\+/g, '_plus_');
-      _str = _str.replace(/-/g, '_minus_');
-      _str = _str.replace(/\(|\)| /g, '');
-      return _str;
-    };
-
     content.getClinicalAttrTooltipContent = function(attribute) {
       var string = [];
       if (attribute.display_name) {
@@ -623,12 +662,29 @@
         if (!_caseIds.hasOwnProperty(_key)) {
           _caseIds[_key] = [];
         }
-        var _groupKey = groupType === 'patient' ? 'patient_id' : 'sample_id';
+        var _groupKey = groupType === 'patient' ? 'patient_uid' : 'sample_uid';
         _caseIds[_key].push(_cases[i][_groupKey]);
       }
 
       return _caseIds;
     };
+
+    content.getAttrVal = function(attrs, arr) {
+      var str = [];
+      _.each(attrs, function(displayName, attrId) {
+        if (attrId === 'cna_details' || attrId === 'mutated_genes') {
+          var temp = 'No';
+          if (arr[attrId] !== undefined) {
+            temp = arr[attrId].length > 0 ? 'Yes' : 'No';
+          }
+          str.push(temp);
+        } else {
+          str.push(arr[attrId] ? arr[attrId] : 'NA');
+        }
+      });
+      return str;
+    };
+
     return content;
   })();
 })(window.iViz,

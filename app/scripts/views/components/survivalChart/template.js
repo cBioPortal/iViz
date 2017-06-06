@@ -27,11 +27,12 @@
     },
     data: function() {
       return {
-        chartDivId: 'chart-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, '') + '-div',
-        resetBtnId: 'chart-' +
-        this.attributes.attr_id.replace(/\(|\)| /g, '') + '-reset',
-        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ''),
+        chartDivId:
+          iViz.util.getDefaultDomId('chartDivId', this.attributes.attr_id),
+        resetBtnId:
+          iViz.util.getDefaultDomId('resetBtnId', this.attributes.attr_id),
+        chartId:
+          iViz.util.getDefaultDomId('chartId', this.attributes.attr_id),
         displayName: this.attributes.display_name,
         chartInst: {},
         showOperations: false,
@@ -39,7 +40,7 @@
         fromFilter: false,
         hasChartTitle: true,
         showLoad: true,
-        showDownloadIcon: false,
+        showDownloadIcon: true,
         invisibleDimension: {},
         mainDivQtip: ''
       };
@@ -50,9 +51,9 @@
       },
       'update-special-charts': function(hasFilters) {
         var _type = this.attributes.group_type;
-        var attrId = _type === 'patient' ? 'patient_id' : 'sample_id';
+        var attrId = _type === 'patient' ? 'patient_uid' : 'sample_uid';
         var _selectedCases = [];
-        var _allCases = Object.keys(iViz.getCaseIndices(_type));
+        var _allCases = iViz.getCaseUIDs(_type);
         var groups = [];
 
         if (hasFilters) {
@@ -172,8 +173,8 @@
               group.caseIds);
           }
           _.each(group.caseIds, function(id) {
-            var _index = iViz.getCaseIndices(survivalType)[id];
-            group.data.push(data_[_index]);
+          //  var _index = iViz.getCaseIndices(survivalType)[id];
+            group.data.push(data_[id]);
           });
         });
         return groups;
@@ -220,7 +221,7 @@
       var _self = this;
       _self.showLoad = true;
       var attrId =
-        this.attributes.group_type === 'patient' ? 'patient_id' : 'sample_id';
+        this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
       this.invisibleDimension = this.ndx.dimension(function(d) {
         return d[attrId];
       });
@@ -242,7 +243,7 @@
         id: 0,
         name: 'All Patients',
         curveHex: '#2986e2',
-        caseIds: Object.keys(iViz.getCaseIndices(_type))
+        caseIds: iViz.getCaseUIDs(_type)
       }];
       groups = this.calcCurvesData(groups, _type);
 
