@@ -215,7 +215,6 @@
         } else {
           this.data.smallDataFlag = false;
         }
-        
         var findExtremeResult = cbio.util.findExtremes(this.data.meta);
         this.data.min = findExtremeResult[0];
         this.data.max = findExtremeResult[1];
