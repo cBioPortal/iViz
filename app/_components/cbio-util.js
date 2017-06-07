@@ -676,9 +676,13 @@ cbio.util = (function() {
   function getDecimalExponents(data){
 
     // Copy the values, rather than operating on references to existing values
+    if (data === null || data.length < 1) {//if data is null or empty, return data
+      return data;
+    }
+    
     var values = [];
     _.each(data, function(item) {
-      if ($.isNumeric(item)) {
+      if (!isNaN(item)) {
         values.push(Number(item));
       }
     });
@@ -688,24 +692,25 @@ cbio.util = (function() {
       return a - b;
     });
     
-    var minZeros = 0;
+    var minZeros = 0, maxZeros = 0;
+      
     while (values[0] < 1) {
       values[0] *= 10;
       minZeros++;
     }
 
-    var maxZeros = 0;
     while (values[values.length-1] < 1) {
       values[values.length-1] *= 10;
       maxZeros++;
     }
-    
+
     var expoents = [];
-    
+
     for(var i = maxZeros;i <= minZeros; i++){
       expoents.push(-i);
     }
     return expoents;
+    
   }
 
   return {

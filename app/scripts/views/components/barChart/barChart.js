@@ -14,7 +14,7 @@
 
     var initDc_ = function(logScale) {
       var tickVal = [];
-      var i = 0;
+      var i = 0;  
 
       dcDimension = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
@@ -254,6 +254,8 @@
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
         max: data_.max,
+        minExponent: data_.minExponent,
+        maxExponent: data_.maxExponent,
         smallDataFlag: data_.smallDataFlag
       }, opts.logScaleChecked));
       ndx_ = ndx;
@@ -271,6 +273,8 @@
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
         max: data_.max,
+        minExponent: data_.minExponent,
+        maxExponent: data_.maxExponent,
         smallDataFlag: data_.smallDataFlag
       }, logScaleChecked));
 
@@ -388,6 +392,13 @@
         var i = 0;
         var _tmpValue;
         
+        var minExponent, maxExponent, exponentRange;
+        if(data.smallDataFlag){
+          minExponent = data.minExponent;
+          maxExponent = data.maxExponent;
+          exponentRange = maxExponent - minExponent;
+        }
+        
         // Set divider based on the number m in 10(m)
         for (i = 0; i < rangeL; i++) {
           config.divider *= 10;
@@ -403,15 +414,15 @@
           max > 10) {
           config.divider = 2;
         } else if (data.smallDataFlag) {
-          if (range > 20) {
+          if (exponentRange > 20) {
             config.divider = 8;
-          } else if (range > 9 && range <= 20) {
+          } else if (exponentRange > 9 && exponentRange <= 20) {
             config.divider = 4;
-          } else if (range > 4 && range <= 9) {
+          } else if (exponentRange > 4 && exponentRange <= 9) {
             config.divider = 2;
-          } else if (range > 2 && range <= 4) {
+          } else if (exponentRange > 2 && exponentRange <= 4) {
             config.divider = 1;
-          } else if (range >= 0 && range <= 2) {
+          } else if (exponentRange >= 0 && exponentRange <= 2) {
             config.divider = 0.5;
           }
         }
@@ -455,12 +466,12 @@
             }
           }
         } else if (data.smallDataFlag) {// use decimal scientific ticks for 0 < data < 0.1
-          config.xDomain.push(Math.pow(10, min - config.divider));// add "<=" marker
-          for (i = min; i <= max; i += config.divider) {
+          config.xDomain.push(Math.pow(10, minExponent - config.divider));// add "<=" marker
+          for (i = minExponent; i <= maxExponent; i += config.divider) {
             config.xDomain.push(Math.pow(10, i));
           }
-          config.xDomain.push(Math.pow(10, max + config.divider));// add ">=" marker
-          config.xDomain.push(Math.pow(10, max + config.divider * 2));// add "NA" marker
+          config.xDomain.push(Math.pow(10, maxExponent + config.divider));// add ">=" marker
+          config.xDomain.push(Math.pow(10, maxExponent + config.divider * 2));// add "NA" marker
         } else {
           if (!_.isNaN(range)) {
             for (i = 0; i <= config.numOfGroups; i++) {
