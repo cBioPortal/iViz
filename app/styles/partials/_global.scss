@@ -14,6 +14,9 @@
 .input-group {
   float: left;
   width: 140px;
+  i.fa {
+    font-size: 14px;
+  }
   .btn {
     padding: 4px 12px;
   }
@@ -26,6 +29,11 @@
       height: 28px;
       line-height: 28px;
       padding: 0 12px;
+    }
+  }
+  .manage-cohort-btn {
+    i {
+      line-height: 20px;
     }
   }
 }
