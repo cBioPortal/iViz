@@ -135,7 +135,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     createGroupNdx: function(group) {
       var def = new $.Deferred();
       var _caseAttrId = group.type === 'patient' ? 'patient_uid' : 'sample_uid';
-      var _attrIds = [_caseAttrId, 'study_id'];
+      if(_caseAttrId === 'sample_uid'){
+        //add 'sample_id' to get mutation count and cna fraction for scatter plot
+        var _attrIds = [_caseAttrId, 'sample_id', 'study_id'];
+      } else {
+        var _attrIds = [_caseAttrId, 'study_id'];
+      }
       _attrIds = _attrIds.concat(_.pluck(group.attributes, 'attr_id'));
       $.when(iViz.getDataWithAttrs(group.type, _attrIds)).then(function(selectedData_) {
         groupNdxMap_[group.id] = {};
@@ -390,6 +395,54 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       } else {
         def.resolve(tableData_[attrId]);
       }
+      return def.promise();
+    },
+    getScatterData: function(groupId) {
+      var def = new $.Deferred();
+      var self = this;
+      var data = self.getGroupNdx(groupId);
+      
+     
+      $.when(window.iviz.datamanager.getCnaFractionData(),
+        window.iviz.datamanager.getMutationCount())
+        .then(function(_cnaFractionData, _mutationCountData) {
+          var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
+          var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
+          
+          _.each(data, function(_sampleDatum) {
+            // mutation count
+            if (_hasMutationCountData) {
+              if (_mutationCountData[_sampleDatum.study_id] === undefined ||
+                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
+                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
+                // if (_sequencedCaseUIdsMap[_sampleDatum.sample_uid] === undefined) {
+                //   _sampleDatum.mutation_count = 'NA';
+                // } else {
+                _sampleDatum.mutation_count = 0;
+                //}
+              } else {
+                _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
+              }
+            }
+            
+            // cna fraction
+            if (_hasCNAFractionData) {
+              if (_cnaFractionData[_sampleDatum.study_id] === undefined ||
+                _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
+                _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
+                _sampleDatum.cna_fraction = 'NA';
+                _sampleDatum.copy_number_alterations = 'NA';
+              } else {
+                _sampleDatum.cna_fraction = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
+                _sampleDatum.copy_number_alterations = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
+              }
+            }
+          });
+          def.resolve(data);
+        }, function() {
+          def.reject();
+        });
+      
       return def.promise();
     },
     getCasesMap: function(type) {

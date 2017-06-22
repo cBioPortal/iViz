@@ -657,132 +657,54 @@ window.DataManagerForIviz = (function($, _) {
                 }
               };
 
-              $.when(self.getCnaFractionData(),
-                self.getMutationCount())
-                .then(function(_cnaFractionData, _mutationCountData) {
-                  var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
-                  var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
 
-                  _.each(_result.groups.sample.data, function(_sampleDatum) {
-                    // mutation count
-                    if (_hasMutationCountData) {
-                      _hasSampleAttrData.mutation_count = '';
-                      if (_mutationCountData[_sampleDatum.study_id] === undefined ||
-                        _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                        _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                        if (_sequencedCaseUIdsMap[_sampleDatum.sample_uid] === undefined) {
-                          _sampleDatum.mutation_count = 'NA';
-                        } else {
-                          _sampleDatum.mutation_count = 0;
-                        }
-                      } else {
-                        _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                      }
-                    }
-                    // cna fraction
-                    if (_hasCNAFractionData) {
-                      _hasSampleAttrData.copy_number_alterations = '';
-                      _hasSampleAttrData.cna_fraction = '';
-                      if (_cnaFractionData[_sampleDatum.study_id] === undefined ||
-                        _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                        _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                        _sampleDatum.cna_fraction = 'NA';
-                        _sampleDatum.copy_number_alterations = 'NA';
-                      } else {
-                        _sampleDatum.cna_fraction = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                        _sampleDatum.copy_number_alterations = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                      }
-                    }
-                  });
+              // add Mutation count vs. CNA fraction
+             //if (_hasSampleAttrData.mutation_count !== undefined && _hasSampleAttrData.cna_fraction !== undefined) {
+                var _mutCntAttrMeta = {};
+                _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
+                _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
+                _mutCntAttrMeta.view_type = 'scatter_plot';
+                _mutCntAttrMeta.description = '';
+                _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
+                _mutCntAttrMeta.filter = [];
+                _mutCntAttrMeta.show = true;
+                _mutCntAttrMeta.keys = {};
+                _mutCntAttrMeta.numOfDatum = 0;
+                _mutCntAttrMeta.priority = 2;
+                _mutCntAttrMeta.attrList = ['cna_fraction'];
+                _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
+             // }
 
-                  // add Mutation count vs. CNA fraction
-                  if (_hasSampleAttrData.mutation_count !== undefined && _hasSampleAttrData.cna_fraction !== undefined) {
-                    var _mutCntAttrMeta = {};
-                    _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
-                    _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
-                    _mutCntAttrMeta.view_type = 'scatter_plot';
-                    _mutCntAttrMeta.description = '';
-                    _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
-                    _mutCntAttrMeta.filter = [];
-                    _mutCntAttrMeta.show = true;
-                    _mutCntAttrMeta.keys = {};
-                    _mutCntAttrMeta.numOfDatum = 0;
-                    _mutCntAttrMeta.priority = 2;
-                    _mutCntAttrMeta.attrList = ['cna_fraction'];
-                    _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
-                  }
+              var hiddenAttrs = content.util.getHiddenAttrs();
+              _.each(content.util.sortClinicalAttrs(
+                _.values(_.extend({}, _patientAttributes, _sampleAttributes))
+              ), function(attr, index) {
+                var attrId = attr.attr_id;
+                var groupRef = _sampleAttributes;
 
-                  // add mutation count
-                  if (_hasSampleAttrData.mutation_count !== undefined) {
-                    var _MutationCountMeta = {};
-                    _MutationCountMeta.datatype = 'NUMBER';
-                    _MutationCountMeta.description = '';
-                    _MutationCountMeta.display_name = 'Mutation Count';
-                    _MutationCountMeta.attr_id = 'mutation_count';
-                    _MutationCountMeta.view_type = 'bar_chart';
-                    _MutationCountMeta.filter = [];
-                    _MutationCountMeta.keys = {};
-                    _MutationCountMeta.numOfDatum = 0;
-                    _MutationCountMeta.priority = 5;
-                    _MutationCountMeta.show = true;
-                    _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
-                    _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
-                  }
+                if (_patientAttributes.hasOwnProperty(attrId)) {
+                  groupRef = _patientAttributes;
+                }
 
-                  // add CNA Table
-                  if (self.hasCnaSegmentData()) {
-                    _hasSampleAttrData.cna_details = '';
-                    var _cnaAttrMeta = {};
-                    _cnaAttrMeta.type = 'cna';
-                    _cnaAttrMeta.view_type = 'table';
-                    _cnaAttrMeta.display_name = 'CNA Genes';
-                    _cnaAttrMeta.description = 'This table only shows ' +
-                      '<a href="cancer_gene_list.jsp" target="_blank">cbio cancer genes</a> in the cohort.';
-                    _cnaAttrMeta.attr_id = 'cna_details';
-                    _cnaAttrMeta.filter = [];
-                    _cnaAttrMeta.show = true;
-                    _cnaAttrMeta.keys = {};
-                    _cnaAttrMeta.numOfDatum = 0;
-                    _cnaAttrMeta.priority = 4;
-                    _cnaAttrMeta.attrList = [_cnaAttrMeta.attr_id];
-                    _cnaAttrMeta.options = {
-                      allCases: _allCaseUIDs,
-                      sequencedCases: _cnaCaseUIDs
-                    };
-                    _sampleAttributes[_cnaAttrMeta.attr_id] = _cnaAttrMeta;
-                  }
+                if (hiddenAttrs.hasOwnProperty(attrId) &&
+                  (hiddenAttrs[attrId].indexOf('general') !== -1 ||
+                  _.intersection(hiddenAttrs[attrId],
+                    Object.keys(_studyToSampleToPatientMap)).length !== 0)) {
+                  groupRef[attrId].priority = 1000;
+                } else if (attr.priority === -1) {
+                  groupRef[attrId].priority = 10 + index;
+                }
+              });
 
-                  var hiddenAttrs = content.util.getHiddenAttrs();
-                  _.each(content.util.sortClinicalAttrs(
-                    _.values(_.extend({}, _patientAttributes, _sampleAttributes))
-                  ), function(attr, index) {
-                    var attrId = attr.attr_id;
-                    var groupRef = _sampleAttributes;
+              _result.groups.patient.attr_meta =
+                content.util
+                  .sortByClinicalPriority(_.values(_patientAttributes));
+              _result.groups.sample.attr_meta =
+                content.util
+                  .sortByClinicalPriority(_.values(_sampleAttributes));
 
-                    if (_patientAttributes.hasOwnProperty(attrId)) {
-                      groupRef = _patientAttributes;
-                    }
-
-                    if (hiddenAttrs.hasOwnProperty(attrId) &&
-                      (hiddenAttrs[attrId].indexOf('general') !== -1 ||
-                      _.intersection(hiddenAttrs[attrId],
-                        Object.keys(_studyToSampleToPatientMap)).length !== 0)) {
-                      groupRef[attrId].priority = 1000;
-                    } else if (attr.priority === -1) {
-                      groupRef[attrId].priority = 10 + index;
-                    }
-                  });
-
-                  _result.groups.patient.attr_meta =
-                    content.util
-                      .sortByClinicalPriority(_.values(_patientAttributes));
-                  _result.groups.sample.attr_meta =
-                    content.util
-                      .sortByClinicalPriority(_.values(_sampleAttributes));
-
-                  self.initialSetupResult = _result;
-                  _def.resolve(_result);
-                });
+              self.initialSetupResult = _result;
+              _def.resolve(_result);
             });
         });
       });
@@ -955,6 +877,8 @@ window.DataManagerForIviz = (function($, _) {
       cancerStudyIds: [],
       mutationProfileIdsMap: {},
       cnaProfileIdsMap: {},
+      // mutationCountIdsMap:{},
+      // cnaFractionIdsMap:{},
       panelSampleMap: {},
       portalUrl: _portalUrl,
       studyCasesMap: _study_cases_map,
@@ -965,6 +889,14 @@ window.DataManagerForIviz = (function($, _) {
       hasCnaSegmentData: function() {
         return _.keys(this.cnaProfileIdsMap).length > 0;
       },
+      // hasMutationCountData: function() {
+      //   console.log(this.mutationCountIdsMap);
+      //   return _.keys(this.mutationCountIdsMap).length > 0;
+      // },
+      // hasCnaFractionData: function() {
+      //   console.log(this.cnaFractionIdsMap);
+      //   return _.keys(this.cnaFractionIdsMap).length > 0;
+      // },
       getCancerStudyIds: function() {
         if (this.cancerStudyIds.length === 0) {
           this.cancerStudyIds = _.keys(this.studyCasesMap);
@@ -1305,7 +1237,7 @@ window.DataManagerForIviz = (function($, _) {
         }
         return def.promise();
       },
-      getSampleLists: function() {
+      getSampleLists: function(){
         var def = new $.Deferred();
         var self = this;
         var fetch_promises = [];

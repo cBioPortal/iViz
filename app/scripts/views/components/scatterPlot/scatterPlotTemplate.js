@@ -145,19 +145,25 @@
         width: window.iViz.styles.vars.scatter.width,
         height: window.iViz.styles.vars.scatter.height
       };
+      
       var attrId =
         this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
       this.invisibleDimension = this.ndx.dimension(function(d) {
         return d[attrId];
       });
 
-      var data = iViz.getGroupNdx(this.attributes.group_id);
       _self.chartInst = new iViz.view.component.ScatterPlot();
-      _self.chartInst.init(data, _opts);
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
 
-      _self.attachPlotlySelectedEvent();
-      _self.showLoad = false;
+      $.when(iViz.getScatterData(this.attributes.group_id))
+        .then(function(_scatterData) {
+          _self.chartInst.init(_scatterData, _opts);
+          _self.attachPlotlySelectedEvent();
+          _self.showLoad = false;
+        }, function() {
+          _self.failedToInit = true;
+        });
+      
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
