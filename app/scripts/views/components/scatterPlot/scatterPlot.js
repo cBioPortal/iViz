@@ -13,7 +13,7 @@
     var layout_;
     var getQtipString = function(_data) {
       var toReturn = 'Cancer Study:' + _data.study_id + '<br>Sample Id: ' +
-        iViz.getCaseIdUsingUID('sample', _data.study_id, _data.sample_uid) + '<br>CNA fraction: ';
+        iViz.getCaseIdUsingUID('sample', _data.sample_uid) + '<br>CNA fraction: ';
       if (isNaN(_data.cna_fraction)) {
         toReturn += _data.cna_fraction;
       } else {
@@ -95,7 +95,7 @@
         var _pts_sample_uid =
           data.points[0].data.sample_uid[data.points[0].pointNumber];
         window.open(
-          cbio.util.getLinkToSampleView(_pts_study_id, iViz.getCaseIdUsingUID('sample', _pts_study_id, _pts_sample_uid)));
+          cbio.util.getLinkToSampleView(_pts_study_id, iViz.getCaseIdUsingUID('sample', _pts_sample_uid)));
       });
 
       groups_ = [{
@@ -197,7 +197,7 @@
       _data = [_data.join('\t')];
       _.each(groups_, function(group) {
         _.each(group.data, function(item) {
-          var _sampleId = iViz.getCaseIdUsingUID('sample', item.study_id, item.sample_uid);
+          var _sampleId = iViz.getCaseIdUsingUID('sample', item.sample_uid);
           var _patientId = iViz.getPatientId(item.study_id, _sampleId);
           var _txt = (_patientId ? _patientId : 'NA') +
             '\t' + _sampleId + '\t' + item.mutation_count + '\t' +
