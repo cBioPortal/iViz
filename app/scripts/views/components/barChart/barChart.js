@@ -102,10 +102,7 @@
         .renderHorizontalGridLines(false)
         .renderVerticalGridLines(false);
 
-      if (logScale) {
-        chartInst_.x(d3.scale.log().nice()
-          .domain([0.7, opts_.maxDomain]));
-      } else if (data_.smallDataFlag) {
+      if (logScale || data_.smallDataFlag) {
         chartInst_.x(d3.scale.log().nice()
           .domain([opts_.minDomain, opts_.maxDomain]));
       } else {
@@ -131,6 +128,7 @@
       var _returnValue = v;
       var index = 0;
       var e = d3.format('.1e');// convert small data to scientific notation format
+      var formattedValue = '';
       
       if (logScale) {
         if (v === opts_.emptyMappingVal) {
@@ -151,15 +149,17 @@
           _returnValue = 'NA';
         }
       } else if (v === opts_.xDomain[0]) {
+        formattedValue = opts_.xDomain[1];
         if (data_.smallDataFlag) {
-          return '<=' + e(opts_.xDomain[1]);
+          return '<=' + e(formattedValue);
         }
-        return '<=' + opts_.xDomain[1];
+        return '<=' + formattedValue;
       } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
+        formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
         if (data_.smallDataFlag) {
-          return '>' + e(opts_.xDomain[opts_.xDomain.length - 3]);
+          return '>' + e(formattedValue);
         }
-        return '>' + opts_.xDomain[opts_.xDomain.length - 3];
+        return '>' + formattedValue;
       } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
         return 'NA';
       } else if (data_.min > 1500 &&
@@ -378,7 +378,7 @@
         gutter: 0.2,
         startPoint: -1,
         maxVal: '',
-        minDomain: 0.1, // Design specifically for log scale
+        minDomain: 0.7, // Design specifically for log scale
         maxDomain: 10000 // Design specifically for log scale
       };
 
