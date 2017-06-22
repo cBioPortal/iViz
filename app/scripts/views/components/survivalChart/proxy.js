@@ -36,7 +36,7 @@
         typeof _status !== 'undefined' && typeof _time !== 'undefined') {
         var _datum = jQuery.extend(true, {}, datum_);
         _datum.patient_uid = _dataObj.patient_uid;
-        _datum.patient_id = iViz.getCaseIdUsingUID('patient', _dataObj.study_id, _dataObj.patient_uid);
+        _datum.patient_id = iViz.getCaseIdUsingUID('patient', _dataObj.patient_uid);
         _datum.study_id = _dataObj.study_id;
         _datum.time = parseFloat(_time);
         _datum.status = _status;

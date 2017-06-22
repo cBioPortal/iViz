@@ -413,7 +413,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         return (_uid === undefined) ? a : a.concat(_uid);
       }, []);
     },
-    getCaseIdUsingUID: function(type, study_id, case_uid) {
+    getCaseIdUsingUID: function(type, case_uid) {
       if (type === 'sample') {
         return data_.groups.sample.data[parseInt(case_uid, 10)].sample_id;
       }
