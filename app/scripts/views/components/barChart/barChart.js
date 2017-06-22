@@ -107,10 +107,7 @@
           .domain([0.7, opts_.maxDomain]));
       } else if (data_.smallDataFlag) {
         chartInst_.x(d3.scale.log().nice()
-          .domain([
-            opts_.xDomain[0] / 2,
-            opts_.xDomain[opts_.xDomain.length - 1] * 2]
-          ));
+          .domain([opts_.minDomain, opts_.maxDomain]));
       } else {
         chartInst_.x(d3.scale.linear()
           .domain([
@@ -381,6 +378,7 @@
         gutter: 0.2,
         startPoint: -1,
         maxVal: '',
+        minDomain: 0.1, // Design specifically for log scale
         maxDomain: 10000 // Design specifically for log scale
       };
 
@@ -414,19 +412,10 @@
           max > 10) {
           config.divider = 2;
         } else if (data.smallDataFlag) {
-          if (exponentRange > 20) {
-            config.divider = 8;
-          } else if (exponentRange > 9 && exponentRange <= 20) {
-            config.divider = 4;
-          } else if (exponentRange > 4 && exponentRange <= 9) {
-            config.divider = 2;
-          } else if (exponentRange > 2 && exponentRange <= 4) {
-            config.divider = 1;
-          } else if (exponentRange >= 0 && exponentRange <= 2) {
-            config.divider = 0.5;
-          }
+          var numberOfTickValues = 4;
+          config.divider = Math.round(exponentRange / numberOfTickValues);
         }
-
+          
         if (max <= 1 && max > 0 && min >= -1 && min < 0) {
           config.maxVal = (parseInt(max / config.divider, 10) + 1) *
             config.divider;
@@ -466,12 +455,14 @@
             }
           }
         } else if (data.smallDataFlag) {// use decimal scientific ticks for 0 < data < 0.1
+          config.minDomain = Math.pow(10, minExponent - config.divider * 1.5);
           config.xDomain.push(Math.pow(10, minExponent - config.divider));// add "<=" marker
           for (i = minExponent; i <= maxExponent; i += config.divider) {
             config.xDomain.push(Math.pow(10, i));
           }
           config.xDomain.push(Math.pow(10, maxExponent + config.divider));// add ">=" marker
           config.xDomain.push(Math.pow(10, maxExponent + config.divider * 2));// add "NA" marker
+          config.maxDomain = Math.pow(10, maxExponent + config.divider * 2.5);
         } else {
           if (!_.isNaN(range)) {
             for (i = 0; i <= config.numOfGroups; i++) {

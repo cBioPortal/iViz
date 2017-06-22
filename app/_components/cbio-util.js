@@ -674,13 +674,16 @@ cbio.util = (function() {
 
 
   function getDecimalExponents(data){
-
     // Copy the values, rather than operating on references to existing values
-    if (data === null || data.length < 1) {//if data is null or empty, return data
+    if (!_.isArray(data) || data.length < 1) {//if data is not an array or is empty, return data
       return data;
     }
     
     var values = [];
+    var minZeros = 0, maxZeros = 0;
+    var head, tail;
+    var expoents = [];
+    
     _.each(data, function(item) {
       if (!isNaN(item)) {
         values.push(Number(item));
@@ -692,23 +695,33 @@ cbio.util = (function() {
       return a - b;
     });
     
-    var minZeros = 0, maxZeros = 0;
-      
-    while (values[0] < 1) {
-      values[0] *= 10;
-      minZeros++;
+    //make sure that min and max values are numbers.
+    for (head = 0; head < values.length; head++){
+      if ($.isNumeric(values[head])) {
+        while (values[head] < 1) {
+          values[head] *= 10;
+          minZeros++;
+        }
+        break;
+      }
+    }
+    
+    for (tail = values.length - 1; tail >= 0; tail--) {
+      if ($.isNumeric(values[head])) {
+        while (values[tail] < 1) {
+          values[tail] *= 10;
+          maxZeros++;
+        }
+        break;
+      }
     }
 
-    while (values[values.length-1] < 1) {
-      values[values.length-1] *= 10;
-      maxZeros++;
+    if(head <= tail){
+      for(var i = maxZeros;i <= minZeros; i++){
+        expoents.push(-i);
+      }
     }
-
-    var expoents = [];
-
-    for(var i = maxZeros;i <= minZeros; i++){
-      expoents.push(-i);
-    }
+    
     return expoents;
     
   }
