@@ -415,9 +415,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     },
     getCaseIdUsingUID: function(type, study_id, case_uid) {
       if (type === 'sample') {
-        return data_.groups.group_mapping.studyMap[study_id].uid_to_sample[case_uid];
+        return data_.groups.sample.data[parseInt(case_uid, 10)].sample_id;
       }
-      return data_.groups.group_mapping.studyMap[study_id].uid_to_patient[case_uid];
+      return data_.groups.patient.data[parseInt(case_uid, 10)].patient_id;
     },
     getPatientUIDs: function(sampleUID) {
       return this.getCasesMap('sample')[sampleUID];
