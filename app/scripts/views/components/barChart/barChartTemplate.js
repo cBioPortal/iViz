@@ -129,7 +129,7 @@
             this.barChart.getCurrentCategories().length > this.numOfSurvivalCurveLimit) {
             this.showSurvivalIcon = false;
           } else {
-            this.showSurvivalIcon = true;
+            this.showSurvivalIcon = true
           }
         } else {
           this.showSurvivalIcon = false;
@@ -203,26 +203,20 @@
         }
         return number;
       });
+
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
-        if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001) {
-          this.data.smallDataFlag = true;
-          this.data.exponents = cbio.util.getDecimalExponents(this.data.meta);
-          var findExtremeExponentResult = cbio.util.findExtremes(this.data.exponents);
-          this.data.minExponent = findExtremeExponentResult[0];
-          this.data.maxExponent = findExtremeExponentResult[1];
-        } else {
-          this.data.smallDataFlag = false;
-        }
         var findExtremeResult = cbio.util.findExtremes(this.data.meta);
         this.data.min = findExtremeResult[0];
         this.data.max = findExtremeResult[1];
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
+
         if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
           this.settings.showLogScale = true;
         }
+
         this.barChart = new iViz.view.component.BarChart();
         this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
         this.initChart(this.settings.showLogScale);

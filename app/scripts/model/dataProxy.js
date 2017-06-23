@@ -656,8 +656,7 @@ window.DataManagerForIviz = (function($, _) {
                   has_attr_data: _hasSampleAttrData
                 }
               };
-
-
+              
               // add Mutation count vs. CNA fraction
              //if (_hasSampleAttrData.mutation_count !== undefined && _hasSampleAttrData.cna_fraction !== undefined) {
                 var _mutCntAttrMeta = {};

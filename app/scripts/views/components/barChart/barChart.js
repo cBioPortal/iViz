@@ -14,7 +14,7 @@
 
     var initDc_ = function(logScale) {
       var tickVal = [];
-      var i = 0;  
+      var i = 0;
 
       dcDimension = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
@@ -31,22 +31,6 @@
               _min = opts_.xDomain[i - 1];
               _max = opts_.xDomain[i];
               break;
-            }
-          }
-        } else if (data_.smallDataFlag) {
-          if (d[data_.attrId] <= opts_.xDomain[1]) {
-            val = opts_.xDomain[0];
-          } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
-            val = opts_.xDomain[opts_.xDomain.length - 2];
-          } else {
-            for (i = 2; i < opts_.xDomain.length - 2; i++) {
-              if (d[data_.attrId] <= opts_.xDomain[i] &&
-                d[data_.attrId] >= opts_.xDomain[i - 1]) {
-                _min = opts_.xDomain[i - 1];
-                _max = opts_.xDomain[i];
-                val = _min + (_max - _min)/3;
-                break;
-              }
             }
           }
         } else if (d[data_.attrId] <= opts_.xDomain[1]) {
@@ -105,12 +89,6 @@
       if (logScale) {
         chartInst_.x(d3.scale.log().nice()
           .domain([0.7, opts_.maxDomain]));
-      } else if (data_.smallDataFlag) {
-        chartInst_.x(d3.scale.log().nice()
-          .domain([
-            opts_.xDomain[0] / 2,
-            opts_.xDomain[opts_.xDomain.length - 1] * 2]
-          ));
       } else {
         chartInst_.x(d3.scale.linear()
           .domain([
@@ -118,6 +96,7 @@
             opts_.xDomain[opts_.xDomain.length - 1] + opts_.gutter
           ]));
       }
+
       chartInst_.yAxis().ticks(6);
       chartInst_.yAxis().tickFormat(d3.format('d'));
       chartInst_.xAxis().tickFormat(function(v) {
@@ -133,8 +112,6 @@
     function getTickFormat(v, logScale) {
       var _returnValue = v;
       var index = 0;
-      var e = d3.format('.1e');// convert small data to scientific notation format
-      
       if (logScale) {
         if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
@@ -154,14 +131,8 @@
           _returnValue = 'NA';
         }
       } else if (v === opts_.xDomain[0]) {
-        if (data_.smallDataFlag) {
-          return '<=' + e(opts_.xDomain[1]);
-        }
         return '<=' + opts_.xDomain[1];
       } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
-        if (data_.smallDataFlag) {
-          return '>' + e(opts_.xDomain[opts_.xDomain.length - 3]);
-        }
         return '>' + opts_.xDomain[opts_.xDomain.length - 3];
       } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
         return 'NA';
@@ -176,14 +147,6 @@
         }
       } else {
         _returnValue = v;
-      }
-
-      if (data_.smallDataFlag) {
-        _returnValue = e(_returnValue);
-        var _tempValue = e(v).toString();
-        if (_tempValue.charAt(0) !== '1') {// hide tick values whose format is not 1.0e-N
-          _returnValue = '';
-        }
       }
       return _returnValue;
     }
@@ -203,23 +166,25 @@
       data.push(header.join('\t'));
 
       for (var i = 0; i < _cases.length; i++) {
+        var sampleId = _cases[i].sample_uid;
+        var patientId = _cases[i].patient_uid;
         var row = [];
         if (opts_.groupType === 'patient') {
-          var patientUID = _cases[i].patient_uid;
-          var patientId = iViz.getCaseIdUsingUID('patient', _cases[i].study_id, patientUID);
-          var sampleIds = iViz.getSampleIds(_cases[i].study_id, patientId);
-          if (_.isArray(sampleIds)) {
-            sampleIds = sampleIds.join(', ');
+          sampleId = iViz.getSampleIds(patientId);
+          if (_.isArray(sampleId)) {
+            sampleId = sampleId.join(', ');
           } else {
-            sampleIds = '';
+            sampleId = '';
           }
           row.push(patientId);
-          row.push(sampleIds);
+          row.push(sampleId);
         } else {
-          var sampleUID = _cases[i].sample_uid;
-          var sampleId = iViz.getCaseIdUsingUID('sample', _cases[i].study_id, sampleUID);
-          var patientId = iViz.getPatientId(_cases[i].study_id, sampleId);
-
+          patientId = iViz.getPatientIds(sampleId);
+          if (_.isArray(patientId)) {
+            patientId = patientId.join(', ');
+          } else {
+            patientId = '';
+          }
           row.push(sampleId);
           row.push(patientId);
         }
@@ -253,10 +218,7 @@
       data_ = data;
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
-        max: data_.max,
-        minExponent: data_.minExponent,
-        maxExponent: data_.maxExponent,
-        smallDataFlag: data_.smallDataFlag
+        max: data_.max
       }, opts.logScaleChecked));
       ndx_ = ndx;
 
@@ -272,10 +234,7 @@
     content.redraw = function(logScaleChecked) {
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
-        max: data_.max,
-        minExponent: data_.minExponent,
-        maxExponent: data_.maxExponent,
-        smallDataFlag: data_.smallDataFlag
+        max: data_.max
       }, logScaleChecked));
 
       initDc_(logScaleChecked);
@@ -391,14 +350,7 @@
         var rangeL = parseInt(range, 10).toString().length - 2;
         var i = 0;
         var _tmpValue;
-        
-        var minExponent, maxExponent, exponentRange;
-        if(data.smallDataFlag){
-          minExponent = data.minExponent;
-          maxExponent = data.maxExponent;
-          exponentRange = maxExponent - minExponent;
-        }
-        
+
         // Set divider based on the number m in 10(m)
         for (i = 0; i < rangeL; i++) {
           config.divider *= 10;
@@ -413,18 +365,6 @@
         } else if (max < 100 &&
           max > 10) {
           config.divider = 2;
-        } else if (data.smallDataFlag) {
-          if (exponentRange > 20) {
-            config.divider = 8;
-          } else if (exponentRange > 9 && exponentRange <= 20) {
-            config.divider = 4;
-          } else if (exponentRange > 4 && exponentRange <= 9) {
-            config.divider = 2;
-          } else if (exponentRange > 2 && exponentRange <= 4) {
-            config.divider = 1;
-          } else if (exponentRange >= 0 && exponentRange <= 2) {
-            config.divider = 0.5;
-          }
         }
 
         if (max <= 1 && max > 0 && min >= -1 && min < 0) {
@@ -465,13 +405,6 @@
               break;
             }
           }
-        } else if (data.smallDataFlag) {// use decimal scientific ticks for 0 < data < 0.1
-          config.xDomain.push(Math.pow(10, minExponent - config.divider));// add "<=" marker
-          for (i = minExponent; i <= maxExponent; i += config.divider) {
-            config.xDomain.push(Math.pow(10, i));
-          }
-          config.xDomain.push(Math.pow(10, maxExponent + config.divider));// add ">=" marker
-          config.xDomain.push(Math.pow(10, maxExponent + config.divider * 2));// add "NA" marker
         } else {
           if (!_.isNaN(range)) {
             for (i = 0; i <= config.numOfGroups; i++) {
