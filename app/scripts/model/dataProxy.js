@@ -674,6 +674,7 @@ window.DataManagerForIviz = (function($, _) {
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
              // }
 
+              
               var hiddenAttrs = content.util.getHiddenAttrs();
               _.each(content.util.sortClinicalAttrs(
                 _.values(_.extend({}, _patientAttributes, _sampleAttributes))
