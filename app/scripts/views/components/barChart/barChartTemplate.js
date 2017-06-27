@@ -99,13 +99,11 @@
         var groups = [];
         var categories = this.barChart.getCurrentCategories('key');
         _.each(categories, function(category) {
-          if (category.name !== 'NA') {
-            groups.push({
-              name: category.name,
-              caseIds: category.caseIds,
-              curveHex: category.color
-            });
-          }
+          groups.push({
+            name: category.name,
+            caseIds: category.caseIds,
+            curveHex: category.color
+          });
         });
         this.barChart.colorBars(categories);
         this.$dispatch('create-rainbow-survival', {
