@@ -34,7 +34,7 @@ body {
 
 .dc-survival-chart-qtip {
   .category-item {
-    margin: 5px;
+    margin: 5px 5px 5px 0;
     display: inline-flex;
     svg {
       margin: 0 5px 0 0;
@@ -45,5 +45,12 @@ body {
   }
   .category-item:hover{
     cursor: pointer;
+  }
+  .checkbox-div {
+    margin-top: 5px;
+    display: inline-flex;
+    .checkbox {
+      margin: 1px 5px 0 0;
+    }
   }
 }
