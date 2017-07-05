@@ -209,11 +209,11 @@
 
     window.cbioURL = 'http://www.cbioportal.org/';
     window.cbioResourceURL = 'resources/';
-    window.mutationProfileId = 'ucec_tcga_mutations';
-    window.cnaProfileId = 'ucec_tcga_gistic';
+    window.mutationProfileId = 'hnsc_tcga_mutations';
+    window.cnaProfileId = 'hnsc_tcga_gistic';
     window.case_set_id = '-1';
     var studyCasesMap = {};
-    studyCasesMap['ucec_tcga'] = {};
+    studyCasesMap['hnsc_tcga'] = {};
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
     $.when(
