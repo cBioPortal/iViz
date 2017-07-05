@@ -115,7 +115,11 @@
       chartInst_.yAxis().ticks(6);
       chartInst_.yAxis().tickFormat(d3.format('d'));
       chartInst_.xAxis().tickFormat(function(v) {
-        return getTickFormat(v, logScale);
+        var tick = getTickFormat(v, logScale);
+        if (tick !== '') {
+          opts_.xTicks.push(tick);
+        }
+        return tick;
       });
 
       chartInst_.xAxis().tickValues(opts_.xDomain);
@@ -140,7 +144,11 @@
           }
         }
       } else if (opts_.xDomain.length === 1) {
-        return 'NA';
+        if (!isNaN(opts_.xDomain[0])) {// when there is only one value in the data
+          return _returnValue;
+        } else { // when the value is not number in the data
+          return 'NA';
+        }
       } else if (opts_.xDomain.length === 2) {
         // when there is only one value and NA in the data
         if (v === opts_.xDomain[0]) {
@@ -256,7 +264,7 @@
         smallDataFlag: data_.smallDataFlag
       }, opts.logScaleChecked));
       ndx_ = ndx;
-
+      
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
       chartInst_ = dc.barChart('#' + opts.chartId, opts.groupid);
@@ -264,6 +272,11 @@
       initDc_(opts.logScaleChecked);
 
       return chartInst_;
+    };
+    
+    content.getOpts = function(opts) {
+      opts_ = _.extend(opts_, opts);
+      return opts_;
     };
 
     content.redraw = function(logScaleChecked) {
@@ -379,7 +392,8 @@
         startPoint: -1,
         maxVal: '',
         minDomain: 0.7, // Design specifically for log scale
-        maxDomain: 10000 // Design specifically for log scale
+        maxDomain: 10000, // Design specifically for log scale
+        xTicks: []
       };
 
       if (!_.isUndefined(data.min) && !_.isUndefined(data.max)) {
@@ -415,8 +429,10 @@
           var numberOfTickValues = 4;
           config.divider = Math.round(exponentRange / numberOfTickValues);
         }
-          
-        if (max <= 1 && max > 0 && min >= -1 && min < 0) {
+
+        if (range === 0) {
+          config.startPoint = min;
+        } else if (max <= 1 && max > 0 && min >= -1 && min < 0) {
           config.maxVal = (parseInt(max / config.divider, 10) + 1) *
             config.divider;
           config.gutter = 0.2;
@@ -488,7 +504,11 @@
           if (config.xDomain.length === 0) {
             config.xDomain.push(Number(config.startPoint));
           } else if (config.xDomain.length === 1) {
-            config.xDomain.push(Number(config.xDomain[0] + config.gutter));
+            if(range === 0) {// exclude NA value when data have only 1 single point
+              return config;
+            } else {
+              config.xDomain.push(Number(config.xDomain[0] + config.gutter));
+            }
           } else if (Math.abs(min) > 1500) {
             // currently we always add ">max" and "NA" marker
             // add marker for greater than maximum

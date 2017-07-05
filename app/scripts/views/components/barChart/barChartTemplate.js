@@ -145,6 +145,7 @@
         });
 
         this.chartInst = this.barChart.init(this.ndx, this.data, this.opts);
+        var getOpts_ = this.barChart.getOpts(this.opts);
         var self_ = this;
         this.chartInst.on('filtered', function(_chartInst, _filter) {
           // TODO : Right now we are manually checking for brush mouseup event.
@@ -159,8 +160,55 @@
                 if (typeof _filter !== 'undefined' && _filter !== null &&
                   _filter.length > 1 && self_.chartInst.hasFilter()) {
                   var tempFilters_ = [];
-                  tempFilters_[0] = _filter[0].toFixed(2);
-                  tempFilters_[1] = _filter[1].toFixed(2);
+                  if (logScaleChecked) {
+                    if (_filter[0] > getOpts_.xTicks[getOpts_.xTicks.length - 2] && _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
+                      tempFilters_[0] = getOpts_.xTicks[getOpts_.xTicks.length - 2];
+                      if (_filter[1] <= getOpts_.xDomain[getOpts_.xDomain.length - 1] && getOpts_.xTicks[getOpts_.xTicks.length - 1] === 'NA') {
+                        tempFilters_[1] = '∞';
+                      } else {
+                        tempFilters_[1] = 'NA';
+                      }
+                    }
+                  } else {
+                    if (_filter[0] > getOpts_.xTicks[getOpts_.xTicks.length - 3] && _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
+                      tempFilters_[0] = getOpts_.xTicks[getOpts_.xTicks.length - 2];
+                      if (_filter[1] <= getOpts_.xDomain[getOpts_.xDomain.length - 1] && getOpts_.xTicks[getOpts_.xTicks.length - 1] === 'NA') {
+                        tempFilters_[1] = '∞';
+                      } else {
+                        tempFilters_[1] = 'NA';
+                      }
+                    }
+                  }
+                  
+                  if (_filter[1] <= getOpts_.xTicks[1]) {
+                    tempFilters_[0] = 0;
+                    tempFilters_[1] = getOpts_.xTicks[0];
+                  } else {
+                    for (var i = 0; i <= getOpts_.xTicks.length - 1; i++) {
+                      if (_filter[0] > getOpts_.xTicks[i] && _filter[0] <= getOpts_.xTicks[i + 1]) {
+                        tempFilters_[0] = getOpts_.xTicks[i];
+                      } else if (_filter[0] <= getOpts_.xTicks[1]) {
+                        tempFilters_[0] = getOpts_.xTicks[0];
+                      }
+                      
+                      if (_filter[1] > getOpts_.xTicks[i - 1] && _filter[1] <= getOpts_.xTicks[i]) {
+                        tempFilters_[1] = getOpts_.xTicks[i];
+                      } else if (_filter[1] > getOpts_.xTicks[getOpts_.xTicks.length - 3]) {
+                        tempFilters_[1] = getOpts_.xTicks[getOpts_.xTicks.length - 2];
+                      }
+                      
+                      // for 'NA' value
+                      if (getOpts_.xTicks[i] === 'NA') {
+                        if (_filter[0] > getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
+                          tempFilters_[0] = getOpts_.xTicks[i];
+                          tempFilters_[1] = getOpts_.xTicks[i];
+                        }
+                        if (_filter[1] > getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
+                          tempFilters_[1] = getOpts_.xTicks[i];
+                        }
+                      }
+                    }
+                  }
                   self_.attributes.filter = tempFilters_;
                   self_.$dispatch('update-filters');
                 } else if (self_.attributes.filter.length > 0) {
