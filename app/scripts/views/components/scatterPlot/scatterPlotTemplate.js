@@ -18,7 +18,10 @@
     'style="float:none !important;" id={{chartId}} ></div>' +
     ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
-    ' <img src="images/ajax-loader.gif" alt="loading"></div></div>',
+    ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
+    '<div :class="{\'error-init\': failedToInit}" ' +
+    'style="display: none;">' +
+    '<span class="content">Failed to load data, refresh the page may help</span></div></div>',
     props: [
       'ndx', 'attributes'
     ],
@@ -161,6 +164,7 @@
           _self.attachPlotlySelectedEvent();
           _self.showLoad = false;
         }, function() {
+          _self.showLoad = false;
           _self.failedToInit = true;
         });
       

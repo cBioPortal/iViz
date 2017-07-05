@@ -464,10 +464,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             }, function() {
               def.reject();
             });
-          
         });
       });
-      
       return def.promise();
     },
     getCasesMap: function(type) {

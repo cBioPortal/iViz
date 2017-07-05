@@ -148,6 +148,7 @@
         this.showOperations = false;
       },
       submitClick: function(_selectedRowData) {
+        console.log(_selectedRowData);
         var selectedSamplesUnion = [];
         var selectedRowsUids = _.pluck(_selectedRowData, 'uniqueid');
 
