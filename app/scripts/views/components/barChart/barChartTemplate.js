@@ -189,8 +189,7 @@
 
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
-        if (typeof d === 'undefined' || d === 'na' || d === '' ||
-          d === 'NaN' || d == null) {
+        if (iViz.util.strIsNa(d, true)) {
           d = 'NA';
         }
         return d !== 'NA';
