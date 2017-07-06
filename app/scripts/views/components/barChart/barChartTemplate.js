@@ -161,59 +161,97 @@
                   _filter.length > 1 && self_.chartInst.hasFilter()) {
                   var tempFilters_ = [];
                   if (logScaleChecked) {
-                    if (_filter[0] < getOpts_.xTicks[0]) {
-                      tempFilters_[0] = 0;
-                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 2] && _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[0] = getOpts_.xTicks[getOpts_.xTicks.length - 2];
+                    if (_filter[0] < getOpts_.xDomain[0]) {
+                      tempFilters_[0] = '';
                     } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
                       tempFilters_[0] = 'NA';
+                      tempFilters_[1] = '';
                     }
                     
-                    if (_filter[1] < getOpts_.xTicks[0]) {
-                      tempFilters_[1] = getOpts_.xTicks[0];
-                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 2] && _filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[1] = '∞';
-                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[1] = 'NA';
+                    if (_filter[1] < getOpts_.xDomain[0]) {
+                      tempFilters_[1] = '< ' + getOpts_.xDomain[0];
+                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 2] &&
+                      _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 1]){
+                      if (_filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
+                        tempFilters_[1] = '> ' + getOpts_.xDomain[getOpts_.xDomain.length - 2];
+                      } else {
+                        tempFilters_[1] = '> ' + getOpts_.xDomain[getOpts_.xDomain.length - 2] + ', NA';
+                      }
                     }
 
-                    for (var i = 0; i <= getOpts_.xTicks.length - 2; i++) {
-                      if (_filter[0] >= getOpts_.xTicks[i] && _filter[0] < getOpts_.xTicks[i + 1]) {
-                        tempFilters_[0] = getOpts_.xTicks[i];
+                    for (var i = 0; i <= getOpts_.xDomain.length - 2; i++) {
+                      if (_filter[0] >= getOpts_.xDomain[i] &&
+                        _filter[0] < getOpts_.xDomain[i + 1]) {
+                        if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 2]) {
+                          tempFilters_[1] = '';
+                          if(_filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1]){
+                            tempFilters_[0] = '> ' + getOpts_.xDomain[i];
+                          }else {
+                            tempFilters_[0] = '> ' + getOpts_.xDomain[i] + ', NA';
+                          }
+                        } else {
+                          tempFilters_[0] = getOpts_.xDomain[i];
+                        }
                       }
 
-                      if (_filter[1] >= getOpts_.xTicks[i - 1] && _filter[1] < getOpts_.xTicks[i]) {
-                        tempFilters_[1] = getOpts_.xTicks[i];
+                      if (_filter[1] >= getOpts_.xDomain[i - 1] && 
+                        _filter[1] < getOpts_.xDomain[i]) {
+                        if (_filter[0] <= getOpts_.xDomain[0]) {
+                          tempFilters_[0] = '';
+                          tempFilters_[1] = '<= ' + getOpts_.xDomain[i];
+                        } else {
+                          tempFilters_[1] = getOpts_.xDomain[i];
+                        }
                       } 
                     }
                   } else {
                     if (_filter[0] <= getOpts_.xTicks[1]) {
-                      tempFilters_[0] = 0;
-                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 3] && _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 2]) {
-                      tempFilters_[0] = getOpts_.xTicks[getOpts_.xTicks.length - 3];
-                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 2] && _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[0] = getOpts_.xTicks[getOpts_.xTicks.length - 2];
-                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[0] = 'NA';
-                    }
+                      tempFilters_[0] = '';
+                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 3]) {
+                      tempFilters_[0] = '';
+                      if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
+                        tempFilters_[1] = 'NA';
+                      }
+                    } 
 
                     if (_filter[1] < getOpts_.xTicks[1]) {
                       tempFilters_[1] = getOpts_.xTicks[0];
-                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 3] && _filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 2]) {
+                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 3] && 
+                      _filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1] && 
+                      _filter[0] > getOpts_.xDomain[getOpts_.xDomain.length - 3]) {
+                      tempFilters_[0] = '';
                       tempFilters_[1] = getOpts_.xTicks[getOpts_.xTicks.length - 2];
-                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 2] && _filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[1] = '∞';
-                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[1] = 'NA';
+                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 1] && 
+                      _filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 3] &&
+                      _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
+                      tempFilters_[0] = '';
+                      tempFilters_[1] = getOpts_.xTicks[getOpts_.xTicks.length - 2] + ', NA';
                     }
-
-                    for (var i = 1; i <= getOpts_.xTicks.length - 3; i++) {
-                      if (_filter[0] > getOpts_.xTicks[i] && _filter[0] <= getOpts_.xTicks[i + 1]) {
-                        tempFilters_[0] = getOpts_.xTicks[i];
+                    
+                    for (var i = 1; i <= getOpts_.xDomain.length - 3; i++) {
+                      if (_filter[0] > getOpts_.xDomain[i] && 
+                          _filter[0] <= getOpts_.xDomain[i + 1] && 
+                          i < getOpts_.xDomain.length - 3) {
+                        if (_filter[1] > getOpts_.xDomain[getOpts_.xDomain.length - 3]) {
+                          tempFilters_[0] = '';
+                          if (_filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
+                            tempFilters_[1] = '> ' + getOpts_.xDomain[i];
+                          } else {
+                            tempFilters_[1] = '> ' + getOpts_.xDomain[i] + ', NA';
+                          }
+                        } else {
+                          tempFilters_[0] = getOpts_.xDomain[i];
+                        }
                       } 
 
-                      if (_filter[1] > getOpts_.xTicks[i - 1] && _filter[1] <= getOpts_.xTicks[i]) {
-                        tempFilters_[1] = getOpts_.xTicks[i];
+                      if (_filter[1] > getOpts_.xDomain[i - 1] && 
+                        _filter[1] <= getOpts_.xDomain[i]) {
+                        if (_filter[0] <= getOpts_.xDomain[1]) {
+                          tempFilters_[0] = '';
+                          tempFilters_[1] = '<= ' + getOpts_.xDomain[i];
+                        } else {
+                          tempFilters_[1] = getOpts_.xDomain[i];
+                        }
                       } 
                     }
                   }
