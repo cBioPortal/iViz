@@ -84,4 +84,14 @@
   .dc-chart-drag:hover {
     cursor: move;
   }
+
+  .checkbox-div {
+    float: left;
+    display: inline-flex;
+    font-size: 10px;
+    line-height: 10px;
+    .checkbox {
+      margin: 1px 5px 0 0;
+    }
+  }
 }
