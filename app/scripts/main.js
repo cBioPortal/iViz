@@ -46,6 +46,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       transitionDuration: 400
     }
   };
+  var mutationCountMap_ = {};
 
   return {
 
@@ -102,7 +103,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         }
         charts[attrData.attr_id] = attrData;
       });
-
+      
       groups.push({
         type: 'sample',
         id: vm_.groupCount,
@@ -373,6 +374,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       tableData_.cna_details.geneMeta = _cnaMeta;
       return tableData_.cna_details;
     },
+    getMutationCountData: function() {
+      return mutationCountMap_;
+    },
     getTableData: function(attrId) {
       var def = new $.Deferred();
       var self = this;
@@ -403,7 +407,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var data = self.getGroupNdx(groupId);
 
       $.when(window.iviz.datamanager.getStudyToSampleToPatientdMap()).then(function(_studyToSampleToPatientMap) {
-        $.when(window.iviz.datamanager.getCaseLists()).then(function(_caseLists){
+        $.when(window.iviz.datamanager.getCaseLists()).then(function(_caseLists) {
           var _sequencedCaseUIDs = [];
           var _allCaseUIDs = [];
           var _sequencedCaseUIdsMap = {};
@@ -445,6 +449,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
                   } else {
                     _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
                   }
+                  mutationCountMap_[_sampleDatum.sample_id] = _sampleDatum.mutation_count;
                 }
 
                 // cna fraction

@@ -177,6 +177,8 @@
       var _dataIssue = false;
       this.settings.width = window.iViz.styles.vars.barchart.width;
       this.settings.height = window.iViz.styles.vars.barchart.height;
+      var groupNdxData = {};
+      var mutationCountData = {};
 
       this.opts = _.extend(this.opts, {
         groupType: this.attributes.group_type,
@@ -188,7 +190,15 @@
         width: this.settings.width,
         height: this.settings.height
       });
-
+      groupNdxData = iViz.getGroupNdx(this.opts.groupid);
+      
+      if(this.opts.attrId === 'mutation_count') {
+        mutationCountData = iViz.getMutationCountData();
+        _.each(groupNdxData, function(sampleData) {
+          sampleData.mutation_count = mutationCountData[sampleData.sample_id];
+        });
+      }
+      
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
         if (typeof d === 'undefined' || d === 'na' || d === '' ||
@@ -203,7 +213,7 @@
         }
         return number;
       });
-
+      
       if (_dataIssue) {
         this.failedToInit = true;
       } else {

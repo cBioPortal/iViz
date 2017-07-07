@@ -639,7 +639,7 @@ window.DataManagerForIviz = (function($, _) {
                   show: true
                 };
               }
-
+              
               _result.groups = {
                 group_mapping: {
                   patient_to_sample: _patientToSampleMap,
@@ -676,6 +676,23 @@ window.DataManagerForIviz = (function($, _) {
                 _mutCntAttrMeta.attrList = ['cna_fraction'];
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
              // }
+
+              // add mutation count
+              //if (_hasSampleAttrData.mutation_count !== undefined) {
+                var _MutationCountMeta = {};
+                _MutationCountMeta.datatype = 'NUMBER';
+                _MutationCountMeta.description = '';
+                _MutationCountMeta.display_name = 'Mutation Count';
+                _MutationCountMeta.attr_id = 'mutation_count';
+                _MutationCountMeta.view_type = 'bar_chart';
+                _MutationCountMeta.filter = [];
+                _MutationCountMeta.keys = {};
+                _MutationCountMeta.numOfDatum = 0;
+                _MutationCountMeta.priority = 5;
+                _MutationCountMeta.show = false;
+                _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
+                _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
+              //}
               
               var hiddenAttrs = content.util.getHiddenAttrs();
               _.each(content.util.sortClinicalAttrs(
@@ -891,14 +908,6 @@ window.DataManagerForIviz = (function($, _) {
       hasCnaSegmentData: function() {
         return _.keys(this.cnaProfileIdsMap).length > 0;
       },
-      // hasMutationCountData: function() {
-      //   console.log(this.mutationCountIdsMap);
-      //   return _.keys(this.mutationCountIdsMap).length > 0;
-      // },
-      // hasCnaFractionData: function() {
-      //   console.log(this.cnaFractionIdsMap);
-      //   return _.keys(this.cnaFractionIdsMap).length > 0;
-      // },
       getCancerStudyIds: function() {
         if (this.cancerStudyIds.length === 0) {
           this.cancerStudyIds = _.keys(this.studyCasesMap);
