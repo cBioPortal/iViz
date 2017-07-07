@@ -11,7 +11,7 @@
     '<span class="chart-title-span" id="{{chartId}}-title">{{displayName}}' +
     '</span></div>' +
     '<div :class="[showOperations?chartOperationsActive:chartOperations]">' +
-    '<div class="checkbox-div" v-if="showLogScale">' +
+    '<div class="checkbox-div" v-if="showLogScale && chartInitialed"">' +
     '<input type="checkbox" value="" id="" ' +
     'class="checkbox" v-model="logChecked">' +
     '<span id="scale-span-{{chartId}}">' +
@@ -22,13 +22,13 @@
     'class="fa fa-info-circle icon hover" ' +
     'id="{{chartId}}-description-icon"' +
     'aria-hidden="true"></i>' +
-    '<i v-if="showTableIcon" class="fa fa-table icon hover" ' +
+    '<i v-if="showTableIcon && chartInitialed" class="fa fa-table icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
-    '<i v-if="showPieIcon" class="fa fa-pie-chart icon hover" ' +
+    '<i v-if="showPieIcon && chartInitialed"" class="fa fa-pie-chart icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
-    '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" ' +
+    '<img v-if="showSurvivalIcon && chartInitialed"" src="images/survival_icon.svg" ' +
     'class="icon hover" @click="getRainbowSurvival" alt="Survival Analysis"/>' +
-    '<div v-if="showDownloadIcon" id="{{chartId}}-download-icon-wrapper" class="download">' +
+    '<div v-if="showDownloadIcon && chartInitialed"" id="{{chartId}}-download-icon-wrapper" class="download">' +
     '<i class="fa fa-download icon hover" alt="download" ' +
     'id="{{chartId}}-download"></i>' +
     '</div>' +
@@ -71,6 +71,9 @@
       }, attributes: {
         type: Object
       }, showDownloadIcon: {
+        type: Boolean,
+        default: true
+      }, chartInitialed: {
         type: Boolean,
         default: true
       }
