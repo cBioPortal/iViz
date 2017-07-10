@@ -39,9 +39,6 @@
   <script src="scripts/session/sessionEvent.js"></script>
   <script src="scripts/session/sessionUtil.js"></script>
   <script src="scripts/session/sessionServices.js"></script>
-  <script src="scripts/views/components/vc/editableFieldComponent.js"></script>
-  <script src="scripts/views/components/vc/editableRowComponent.js"></script>
-  <script src="scripts/views/components/vc/modalTemplate.js"></script>
   <script src="scripts/views/components/vc/sessionComponent.js"></script>
   <!-- endbuild -->
 </head>
@@ -49,11 +46,9 @@
 
 <div id="cohort-component">
   <session-component :show-save-button="showSaveButton"
-                     :show-manage-button="showManageButton"
                      :load-user-specific-cohorts="loadUserSpecificCohorts"
                      :stats="stats"
-                     :update-stats.sync="updateStats"
-                     :show-share-button="showShareButton"></session-component>
+                     :update-stats.sync="updateStats"></session-component>
 </div>
 
 
