@@ -32,7 +32,6 @@
     var opts = {};
     var genePanelMap = {};
     var renderedReactTable;
-    var tableLoaded = false;
 
     // Category based color assignment. Avoid color changing
     var assignedColors = {
@@ -52,10 +51,6 @@
       selectedRowData = [];
     };
     
-    content.isTableLoaded = function() {
-      return tableLoaded;
-    }
-
     content.init =
       function(_attributes, _opts, _selectedSamples, _selectedGenes,
                _data, _callbacks, _geneData, _dimension, _genePanelMap) {
@@ -82,7 +77,6 @@
           initPieTableData();
         }
         initReactTable(true);
-        tableLoaded = true;
       };
 
     content.update = function(_selectedSampleUIDs, _selectedRows) {
