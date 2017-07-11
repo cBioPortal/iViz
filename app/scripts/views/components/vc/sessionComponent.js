@@ -1,54 +1,19 @@
 'use strict';
 (function(Vue, $, vcSession) {
   Vue.component('sessionComponent', {
-    template: '<div v-if="showManageButton || showSaveButton" ' +
-    'class="input-group"><span class="input-group-addon">Cohort</span>' +
-    '<div class="input-group-btn">' +
-    '<button v-if="showSaveButton" type="button" ' +
-    'class="btn btn-default save-cohort-btn">' +
-    '<i class="fa fa-bookmark" alt="Save Cohort"></i></button>' +
-    '<button v-if="showManageButton" type="button" @click="manageCohorts()" ' +
-    'class="btn btn-default manage-cohort-btn">' +
-    '<i class="fa fa-bars" alt="Manage Cohort"></i></button>' +
-    '</div></div>' +
-    ' <modaltemplate :show.sync="showVCList" size="modal-xlg"> <div' +
-    ' slot="header"> <h4 class="modal-title">Virtual Cohorts</h4> </div>' +
-    ' <div slot="body"> <table class="table table-bordered table-hover' +
-    ' table-condensed"> <thead> <tr style="font-weight: bold"> <td' +
-    ' style="width:20%">Name</td> <td style="width:40%">Description</td>' +
-    ' <td style="width:10%">Patients</td> <td' +
-    ' style="width:10%">Samples</td> <td' +
-    ' style="width:20%">Operations</td> </tr> </thead> <tr' +
-    ' is="editable-row" :data="virtualCohort"' +
-    ' :showmodal.sync="showVCList" :show-share-button="showShareButton" v-for="virtualCohort in' +
-    ' virtualCohorts"> </tr> </table> </div> <div slot="footer"> </div>' +
-    ' </modaltemplate>',
+    template: 
+    '<div v-if="showSaveButton" class="btn btn-default iviz-header-button"><span type="button" ' +
+    'class="save-cohort-btn ">' +
+    '<i class="fa fa-floppy-o" alt="Save Cohort"></i></span></div>',
     props: [
-      'loadUserSpecificCohorts', 'selectedPatientsNum', 'selectedSamplesNum', 'userid', 'showSaveButton',
-      'showManageButton', 'stats', 'updateStats', 'showShareButton'
+      'selectedPatientsNum', 'selectedSamplesNum',
+      'stats', 'updateStats', 'showSaveButton'
     ],
     data: function() {
       return {
-        showVCList: false,
-        virtualCohorts: [],
         savedVC: null
       };
-    }, events: {
-      'remove-cohort': function(cohort) {
-        this.virtualCohorts.$remove(cohort);
-      }
     }, methods: {
-      manageCohorts: function() {
-        var self = this;
-        self.showVCList = true;
-        if (self.loadUserSpecificCohorts) {
-          $.when(vcSession.model.loadUserVirtualCohorts()).then(function(_virtualCohorts) {
-            self.virtualCohorts = _virtualCohorts;
-          });
-        } else {
-          this.virtualCohorts = vcSession.utils.getVirtualCohorts();
-        }
-      },
       saveCohort: function() {
         var _self = this;
         _self.updateStats = true;
@@ -59,7 +24,7 @@
     }, ready: function() {
       var self_ = this;
       if (this.showSaveButton) {
-        $('.save-cohort-btn .fa-bookmark').qtip({
+        $('.iviz-header-button').qtip({
           style: {
             classes: 'qtip-light qtip-rounded qtip-shadow'
           },
@@ -71,19 +36,6 @@
             viewport: $(window)
           },
           content: 'Save Cohort'
-        });
-        $('.manage-cohort-btn').qtip({
-          style: {
-            classes: 'qtip-light qtip-rounded qtip-shadow'
-          },
-          show: {event: 'mouseover', ready: false},
-          hide: {fixed: true, delay: 200, event: 'mouseleave'},
-          position: {
-            my: 'bottom center',
-            at: 'top center',
-            viewport: $(window)
-          },
-          content: 'Manage Cohort'
         });
         $('.save-cohort-btn').qtip({
           style: {
