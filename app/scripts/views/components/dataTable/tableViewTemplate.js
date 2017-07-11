@@ -48,8 +48,7 @@
         showSurvivalIcon: false,
         genePanelMap: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
-        pausedSelectedRows: [],
-        pausedSelectedCases: {}
+        dataLoaded: false
       };
     },
     watch: {
@@ -62,11 +61,6 @@
       },
       'showedSurvivalPlot': function() {
         this.showRainbowSurvival();
-      },
-      showLoad: function() {
-        if (this.showLoad === false){
-          this.$dispatch('table-loaded');
-        }
       }
     },
     events: {
@@ -79,36 +73,23 @@
         genes = $.extend(true, [], genes);
         this.chartInst.updateGenes(genes);
       },
-      'table-loaded': function() {
-        //update when async tables loaded
-        if (_.keys(this.pausedSelectedCases).length > 0) {
-          this.chartInst.update(this.pausedSelectedCases, this.pausedSelectedRows);
-          this.setDisplayTitle(this.chartInst.getCases().length);
-          this.showLoad = false;
-          this.showRainbowSurvival();
-        }
-      },
       'update-special-charts': function() {
         // Do not update chart if the selection is made on itself
         if (!this.failedToInit) {
           if (this.madeSelection && !this.isMutatedGeneCna) {
             this.madeSelection = false;
           } else {
-            var tableLoaded = this.chartInst.isTableLoaded();
             var attrId =
               this.attributes.group_type === 'patient' ?
                 'patient_uid' : 'sample_uid';
             var _selectedCases =
               _.pluck(this.invisibleDimension.top(Infinity), attrId);
-            if (tableLoaded) {
+            if (this.dataLoaded) {
               this.chartInst.update(_selectedCases, this.selectedRows);
               this.setDisplayTitle(this.chartInst.getCases().length);
               this.showLoad = false;
               this.showRainbowSurvival();
-            } else {
-              this.pausedSelectedRows = this.selectedRows;
-              this.pausedSelectedCases = _selectedCases;
-            }
+            } 
           }
         }
       },
@@ -224,11 +205,25 @@
           height: window.iViz.styles.vars.specialTables.height,
           chartId: this.chartId
         };
+        
+        this.dataLoaded = true;
+        
         this.chartInst.init(this.attributes, opts, this.$root.selectedsampleUIDs,
           this.$root.selectedgenes, data, {
             addGeneClick: this.addGeneClick,
             submitClick: this.submitClick
           }, this.isMutatedGeneCna ? _data.geneMeta : null, this.invisibleDimension, this.genePanelMap);
+
+        if (this.selectedRows) {
+          var attrId =
+            this.attributes.group_type === 'patient' ?
+              'patient_uid' : 'sample_uid';
+          var _selectedCases =
+            _.pluck(this.invisibleDimension.top(Infinity), attrId);
+          this.chartInst.update(_selectedCases, this.selectedRows);
+          this.showRainbowSurvival();
+        } 
+        
         this.setDisplayTitle(this.chartInst.getCases().length);
         if (!this.isMutatedGeneCna &&
           Object.keys(this.attributes.keys).length <= 3) {
@@ -279,6 +274,7 @@
             $.when(window.iviz.datamanager.getGenePanelMap())
               .then(function(_genePanelMap) {
                 // create gene panel map
+                this.dataLoaded = true;
                 _self.genePanelMap = _genePanelMap;
                 _self.processTableData(_tableData);
               }, function() {
