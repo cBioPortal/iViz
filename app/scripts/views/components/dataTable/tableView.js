@@ -32,6 +32,7 @@
     var opts = {};
     var genePanelMap = {};
     var renderedReactTable;
+    var tableLoaded = false;
 
     // Category based color assignment. Avoid color changing
     var assignedColors = {
@@ -50,6 +51,10 @@
     content.clearSelectedRowData = function() {
       selectedRowData = [];
     };
+    
+    content.isTableLoaded = function() {
+      return tableLoaded;
+    }
 
     content.init =
       function(_attributes, _opts, _selectedSamples, _selectedGenes,
@@ -77,6 +82,7 @@
           initPieTableData();
         }
         initReactTable(true);
+        tableLoaded = true;
       };
 
     content.update = function(_selectedSampleUIDs, _selectedRows) {
@@ -258,6 +264,7 @@
     function updateCategories() {
       var _labels = {};
       var _currentSampleSize = 0;
+      
       _.each(group.top(Infinity), function(label) {
         var _labelDatum = {};
         var _labelValue = Number(label.value);

@@ -47,7 +47,9 @@
         madeSelection: false,
         showSurvivalIcon: false,
         genePanelMap: {},
-        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20
+        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
+        pausedSelectedRows: [],
+        pausedSelectedCases: {}
       };
     },
     watch: {
@@ -60,6 +62,11 @@
       },
       'showedSurvivalPlot': function() {
         this.showRainbowSurvival();
+      },
+      showLoad: function() {
+        if (this.showLoad === false){
+          this.$dispatch('table-loaded');
+        }
       }
     },
     events: {
@@ -72,21 +79,36 @@
         genes = $.extend(true, [], genes);
         this.chartInst.updateGenes(genes);
       },
+      'table-loaded': function() {
+        //update when async tables loaded
+        if (_.keys(this.pausedSelectedCases).length > 0) {
+          this.chartInst.update(this.pausedSelectedCases, this.pausedSelectedRows);
+          this.setDisplayTitle(this.chartInst.getCases().length);
+          this.showLoad = false;
+          this.showRainbowSurvival();
+        }
+      },
       'update-special-charts': function() {
         // Do not update chart if the selection is made on itself
-        if(!this.failedToInit) {
+        if (!this.failedToInit) {
           if (this.madeSelection && !this.isMutatedGeneCna) {
             this.madeSelection = false;
           } else {
+            var tableLoaded = this.chartInst.isTableLoaded();
             var attrId =
               this.attributes.group_type === 'patient' ?
                 'patient_uid' : 'sample_uid';
             var _selectedCases =
               _.pluck(this.invisibleDimension.top(Infinity), attrId);
-            this.chartInst.update(_selectedCases, this.selectedRows);
-            this.setDisplayTitle(this.chartInst.getCases().length);
-            this.showLoad = false;
-            this.showRainbowSurvival();
+            if (tableLoaded) {
+              this.chartInst.update(_selectedCases, this.selectedRows);
+              this.setDisplayTitle(this.chartInst.getCases().length);
+              this.showLoad = false;
+              this.showRainbowSurvival();
+            } else {
+              this.pausedSelectedRows = this.selectedRows;
+              this.pausedSelectedCases = _selectedCases;
+            }
           }
         }
       },
@@ -135,7 +157,7 @@
         this.$dispatch('create-rainbow-survival', {
           attrId: this.attributes.attr_id,
           subtitle: ' (' + this.attributes.display_name + ')',
-          groups: groups,
+          groups: groups,  
           groupType: this.attributes.group_type
         });
       }
@@ -175,6 +197,7 @@
             filtersMap[filter] = true;
           }
         });
+        
         this.invisibleDimension.filterFunction(function(d) {
           return (filtersMap[d] !== undefined);
         });
@@ -231,7 +254,7 @@
       _self.showLoad = true;
       var callbacks = {};
       var attrId = this.attributes.attr_id;
-
+      
       this.isMutatedGeneCna =
         ['mutated_genes', 'cna_details']
           .indexOf(_self.attributes.attr_id) !== -1;
@@ -248,6 +271,7 @@
         }
         return d[attrId];
       });
+      
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.TableView();
@@ -276,6 +300,7 @@
       } else {
         _self.processTableData();
       }
+      
       this.showRainbowSurvival();
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
