@@ -14,7 +14,7 @@
 
     var initDc_ = function(logScale) {
       var tickVal = [];
-      var i = 0;
+      var i = 0;  
 
       dcDimension = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
@@ -31,6 +31,22 @@
               _min = opts_.xDomain[i - 1];
               _max = opts_.xDomain[i];
               break;
+            }
+          }
+        } else if (data_.smallDataFlag) {
+          if (d[data_.attrId] <= opts_.xDomain[1]) {
+            val = opts_.xDomain[0];
+          } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+            val = opts_.xDomain[opts_.xDomain.length - 2];
+          } else {
+            for (i = 2; i < opts_.xDomain.length - 2; i++) {
+              if (d[data_.attrId] <= opts_.xDomain[i] &&
+                d[data_.attrId] >= opts_.xDomain[i - 1]) {
+                _min = opts_.xDomain[i - 1];
+                _max = opts_.xDomain[i];
+                val = _min + (_max - _min)/3;
+                break;
+              }
             }
           }
         } else if (d[data_.attrId] <= opts_.xDomain[1]) {
@@ -86,9 +102,9 @@
         .renderHorizontalGridLines(false)
         .renderVerticalGridLines(false);
 
-      if (logScale) {
+      if (logScale || data_.smallDataFlag) {
         chartInst_.x(d3.scale.log().nice()
-          .domain([0.7, opts_.maxDomain]));
+          .domain([opts_.minDomain, opts_.maxDomain]));
       } else {
         chartInst_.x(d3.scale.linear()
           .domain([
@@ -96,11 +112,14 @@
             opts_.xDomain[opts_.xDomain.length - 1] + opts_.gutter
           ]));
       }
-
       chartInst_.yAxis().ticks(6);
       chartInst_.yAxis().tickFormat(d3.format('d'));
       chartInst_.xAxis().tickFormat(function(v) {
-        return getTickFormat(v, logScale);
+        var tick = getTickFormat(v, logScale);
+        if (tick !== '') {
+          opts_.xTicks.push(tick);
+        }
+        return tick;
       });
 
       chartInst_.xAxis().tickValues(opts_.xDomain);
@@ -112,6 +131,9 @@
     function getTickFormat(v, logScale) {
       var _returnValue = v;
       var index = 0;
+      var e = d3.format('.1e');// convert small data to scientific notation format
+      var formattedValue = '';
+      
       if (logScale) {
         if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
@@ -122,7 +144,11 @@
           }
         }
       } else if (opts_.xDomain.length === 1) {
-        return 'NA';
+        if (!isNaN(opts_.xDomain[0])) {// when there is only one value in the data
+          return _returnValue;
+        } else { // when the value is not number in the data
+          return 'NA';
+        }
       } else if (opts_.xDomain.length === 2) {
         // when there is only one value and NA in the data
         if (v === opts_.xDomain[0]) {
@@ -131,9 +157,17 @@
           _returnValue = 'NA';
         }
       } else if (v === opts_.xDomain[0]) {
-        return '<=' + opts_.xDomain[1];
+        formattedValue = opts_.xDomain[1];
+        if (data_.smallDataFlag) {
+          return '<=' + e(formattedValue);
+        }
+        return '<=' + formattedValue;
       } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
-        return '>' + opts_.xDomain[opts_.xDomain.length - 3];
+        formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
+        if (data_.smallDataFlag) {
+          return '>' + e(formattedValue);
+        }
+        return '>' + formattedValue;
       } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
         return 'NA';
       } else if (data_.min > 1500 &&
@@ -147,6 +181,14 @@
         }
       } else {
         _returnValue = v;
+      }
+
+      if (data_.smallDataFlag) {
+        _returnValue = e(_returnValue);
+        var _tempValue = e(v).toString();
+        if (_tempValue.charAt(0) !== '1') {// hide tick values whose format is not 1.0e-N
+          _returnValue = '';
+        }
       }
       return _returnValue;
     }
@@ -182,7 +224,7 @@
           var sampleUID = _cases[i].sample_uid;
           var sampleId = iViz.getCaseIdUsingUID('sample', sampleUID);
           var patientId = iViz.getPatientId(_cases[i].study_id, sampleId);
-          
+
           row.push(sampleId);
           row.push(patientId);
         }
@@ -216,10 +258,13 @@
       data_ = data;
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
-        max: data_.max
+        max: data_.max,
+        minExponent: data_.minExponent,
+        maxExponent: data_.maxExponent,
+        smallDataFlag: data_.smallDataFlag
       }, opts.logScaleChecked));
       ndx_ = ndx;
-
+      
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
       chartInst_ = dc.barChart('#' + opts.chartId, opts.groupid);
@@ -228,11 +273,19 @@
 
       return chartInst_;
     };
+    
+    content.getOpts = function(opts) {
+      opts_ = _.extend(opts_, opts);
+      return opts_;
+    };
 
     content.redraw = function(logScaleChecked) {
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
-        max: data_.max
+        max: data_.max,
+        minExponent: data_.minExponent,
+        maxExponent: data_.maxExponent,
+        smallDataFlag: data_.smallDataFlag
       }, logScaleChecked));
 
       initDc_(logScaleChecked);
@@ -338,7 +391,9 @@
         gutter: 0.2,
         startPoint: -1,
         maxVal: '',
-        maxDomain: 10000 // Design specifically for log scale
+        minDomain: 0.7, // Design specifically for log scale
+        maxDomain: 10000, // Design specifically for log scale
+        xTicks: []
       };
 
       if (!_.isUndefined(data.min) && !_.isUndefined(data.max)) {
@@ -348,7 +403,14 @@
         var rangeL = parseInt(range, 10).toString().length - 2;
         var i = 0;
         var _tmpValue;
-
+        
+        var minExponent, maxExponent, exponentRange;
+        if(data.smallDataFlag){
+          minExponent = data.minExponent;
+          maxExponent = data.maxExponent;
+          exponentRange = maxExponent - minExponent;
+        }
+        
         // Set divider based on the number m in 10(m)
         for (i = 0; i < rangeL; i++) {
           config.divider *= 10;
@@ -363,9 +425,14 @@
         } else if (max < 100 &&
           max > 10) {
           config.divider = 2;
+        } else if (data.smallDataFlag) {
+          var numberOfTickValues = 4;
+          config.divider = Math.round(exponentRange / numberOfTickValues);
         }
 
-        if (max <= 1 && max > 0 && min >= -1 && min < 0) {
+        if (range === 0) {
+          config.startPoint = min;
+        } else if (max <= 1 && max > 0 && min >= -1 && min < 0) {
           config.maxVal = (parseInt(max / config.divider, 10) + 1) *
             config.divider;
           config.gutter = 0.2;
@@ -403,6 +470,15 @@
               break;
             }
           }
+        } else if (data.smallDataFlag) {// use decimal scientific ticks for 0 < data < 0.1
+          config.minDomain = Math.pow(10, minExponent - config.divider * 1.5);
+          config.xDomain.push(Math.pow(10, minExponent - config.divider));// add "<=" marker
+          for (i = minExponent; i <= maxExponent; i += config.divider) {
+            config.xDomain.push(Math.pow(10, i));
+          }
+          config.xDomain.push(Math.pow(10, maxExponent + config.divider));// add ">=" marker
+          config.xDomain.push(Math.pow(10, maxExponent + config.divider * 2));// add "NA" marker
+          config.maxDomain = Math.pow(10, maxExponent + config.divider * 2.5);
         } else {
           if (!_.isNaN(range)) {
             for (i = 0; i <= config.numOfGroups; i++) {
@@ -428,7 +504,11 @@
           if (config.xDomain.length === 0) {
             config.xDomain.push(Number(config.startPoint));
           } else if (config.xDomain.length === 1) {
-            config.xDomain.push(Number(config.xDomain[0] + config.gutter));
+            if(range === 0) {// exclude NA value when data have only 1 single point
+              return config;
+            } else {
+              config.xDomain.push(Number(config.xDomain[0] + config.gutter));
+            }
           } else if (Math.abs(min) > 1500) {
             // currently we always add ">max" and "NA" marker
             // add marker for greater than maximum
