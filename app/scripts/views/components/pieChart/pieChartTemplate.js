@@ -170,7 +170,7 @@
         return d[_attrId];
       });
         
-      cluster.group().all().map(function(d) {
+      _cluster.group().all().map(function(d) {
         if (d.key.includes('<')) {
           hasSpecialCharacters = true;
           if (d.key.includes('<=') && min <= d.key.slice(2)) {
