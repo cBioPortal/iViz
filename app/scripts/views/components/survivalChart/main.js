@@ -41,28 +41,39 @@
     var data_ = {};
     var opts_ = {};
 
-    content_.dataForDownload = {};
     content_.init = function(_data, _opts, _selectedPatientList) { //_attrId here indicates chart type (OS or DFS)
       opts_ = $.extend(true, {}, _opts);
       $('#' + opts_.chartId).empty();
       data_ = _data;
       var _dataProxy = new survivalChartProxy(_data, opts_.attrId);
       this.chartInst_ = new survivalCurve(opts_.chartId, _dataProxy.get(), opts_);
-      this.update(_selectedPatientList, opts_.chartId, opts_.attrId)
+      this.update(_selectedPatientList, opts_.chartId, opts_.attrId);
     };
+
     content_.update = function(_selectedPatients, _chartId, _attrId) {
+
       // remove previous curves
       this.chartInst_.removeCurves();
-      // settings for selected samples curve
-      var _selectedData = _.filter(data_, function(_dataObj) {
-        return $.inArray(_dataObj.patient_id, _selectedPatients) !== -1;
+
+      // separate selected and unselected data
+      var _selectedData = [], _unselectedData = [];
+      var _tmpSelectedPatientIdMap = {};
+      _.each(_selectedPatients, function(_patientId) {
+        _tmpSelectedPatientIdMap[_patientId] = '';
       });
+      _.each(Object.keys(iViz.getCaseIndices(opts_.type)), function(_patientId) {
+        var _index = iViz.getCaseIndices(opts_.type)[_patientId];
+        if (_tmpSelectedPatientIdMap.hasOwnProperty(_patientId)) {
+          _selectedData.push(data_[_index]);
+        } else {
+          _unselectedData.push(data_[_index]);
+        }
+      });
+      
+      // settings for different curves
       var _selectedDataProxy = new survivalChartProxy(_selectedData, _attrId);
-      // settings for unselected samples curve
-      var _unselectedData = _.filter(data_, function(_dataObj) {
-        return $.inArray(_dataObj.patient_id, _selectedPatients) === -1;
-      });
       var _unselectedDataProxy = new survivalChartProxy(_unselectedData, _attrId);
+
       // add curves
       if (_unselectedDataProxy.get().length === 0) {
         this.chartInst_.addCurve(_selectedDataProxy.get(), 0, "#006bb3");
@@ -72,7 +83,12 @@
         this.chartInst_.addCurve(_unselectedDataProxy.get(), 1, "#006bb3");
         this.chartInst_.addPval(_selectedDataProxy.get(), _unselectedDataProxy.get());
       }
-      initCanvasDownloadData();
+    }
+
+    content_.updateDataForDownload = function(fileType) {
+      if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
     }
     
     function initCanvasDownloadData() {

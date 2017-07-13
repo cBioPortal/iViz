@@ -34,42 +34,30 @@
  */
 'use strict';
 (function(Vue, dc, iViz, $, d3) {
-  var settings_ = {
-    pieChart: {
-      width: 150,
-      height: 150,
-      innerRadius: 15
-    },
-    barChart: {
-      width: 400,
-      height: 180
-    },
-    transitionDuration: iViz.opts.dc.transitionDuration
-  };
   Vue.component('chartGroup', {
     template: ' <div is="individual-chart"' +
-    ' :ndx="ndx" :data="data"  :groupid="groupid"' +
-    ' :attributes.sync="attribute" v-for="attribute in attributes" :indices="indices"></div>',
+    ' :ndx="ndx" :groupid="groupid"' +
+    ' :attributes.sync="attribute" v-for="attribute in attributes"></div>',
     props: [
-      'data', 'attributes', 'type', 'mappedsamples', 'id',
-      'mappedpatients', 'groupid', 'redrawgroups', 'hasfilters', 'indices'
+      'attributes', 'type', 'mappedsamples', 'id',
+      'mappedpatients', 'groupid', 'redrawgroups'
     ], created: function() {
-      var ndx_ = crossfilter(this.data); //crossfilters the data
-      var invisibleBridgeChart_ = iViz.bridgeChart.init(ndx_, settings_,
-        this.type, this.id);
+      //TODO: update this.data
+      var data_ = iViz.getAttrData(this.type);
+      var ndx_ = crossfilter(data_);
+      var attrId = this.type==='patient'?'patient_id':'sample_id';
+      this.invisibleBridgeDimension =  ndx_.dimension(function (d) { return d[attrId]; });
       this.groupid = this.id;
       this.ndx = ndx_; //property ndx contains the crossfiltered data array
-      this.chartInvisible = invisibleBridgeChart_;
+      this.invisibleChartFilters = [];
     }, destroyed: function() {
-      this.chartInvisible.resetSvg();
-      var id_ = this.type + '_' + this.id + '_id_chart_div';
-      $('#' + id_).remove()
       dc.chartRegistry.clear(this.groupid);
     },
     data: function() {
       return {
         syncPatient: true,
-        syncSample: true
+        syncSample: true,
+        clearGroup:false
       }
     },
     watch: {
@@ -79,12 +67,8 @@
             this.updateInvisibleChart(val);
           }else {
             this.syncSample = true;
-            if(!this.hasfilters){
-              this.updateInvisibleChart(val);
-            }
           }
         }
-        this.redrawgroups.push(true);
       },
       'mappedpatients': function(val) {
         if (this.type === 'patient') {
@@ -92,35 +76,71 @@
             this.updateInvisibleChart(val);
           } else {
             this.syncPatient = true;
-            if(!this.hasfilters){
-              this.updateInvisibleChart(val);
-            }
           }
         }
-        this.redrawgroups.push(true);
       }
     },
     events: {
+      'clear-group':function(){
+        this.clearGroup = true;
+        this.invisibleBridgeDimension.filterAll();
+        this.invisibleChartFilters = [];
+        iViz.deleteGroupFilteredCases(this.id);
+        this.$broadcast('clear-chart-filters');
+        var self_ = this;
+        this.$nextTick(function(){
+          self_.clearGroup = false;
+        });
+      },
       'update-filters': function() {
-        this.syncPatient = false;
-        this.syncSample = false;
-        this.$dispatch('update-all-filters', this.type);
-      },
-      'update-samples': function(_sampleIds) {
-        this.syncPatient = false;
-        this.syncSample = false;
-        this.chartInvisible.filter(null);
-        this.chartInvisible.filter([_sampleIds]);
-        this.$dispatch('update-all-filters', this.type);
-      },
-      'update-samples-from-table':function() {
-        this.$dispatch('update-all-filters', this.type);
+        if(!this.clearGroup){
+          this.syncPatient = false;
+          this.syncSample = false;
+          var _filters = [], _caseSelect = [];
+          var attrId = this.type==='patient'?'patient_id':'sample_id';
+          if(this.invisibleChartFilters.length>0) {
+            this.invisibleBridgeDimension.filterAll();
+          }
+          var filteredCases = _.pluck(this.invisibleBridgeDimension.top(Infinity),attrId).sort();
+          //hackey way to check if filter selected filter cases is same as original case list
+          if(filteredCases.length !== this.ndx.size()){
+            iViz.setGroupFilteredCases(this.id, filteredCases);
+          }else{
+            iViz.deleteGroupFilteredCases(this.id)
+          }
+
+          if(this.invisibleChartFilters.length>0){
+            var filtersMap = {};
+            _.each(this.invisibleChartFilters,function(filter){
+              if(filtersMap[filter] === undefined){
+                filtersMap[filter] = true;
+              }
+            });
+            this.invisibleBridgeDimension.filterFunction(function(d){
+              return (filtersMap[d] !== undefined);
+            });
+          }
+          this.$dispatch('update-all-filters', this.type);
+        }
       }
     },
     methods: {
       updateInvisibleChart: function(val) {
-        this.chartInvisible.filter(null);
-        this.chartInvisible.filter([val]);
+        this.invisibleChartFilters = val;
+        var filtersMap = {};
+        if(val.length>0){
+          _.each(val,function(filter){
+            if(filtersMap[filter] === undefined){
+              filtersMap[filter] = true;
+            }
+          });
+          this.invisibleBridgeDimension.filterFunction(function(d){
+            return (filtersMap[d] !== undefined);
+          });
+        }else{
+          this.invisibleBridgeDimension.filterAll();
+        }
+        this.redrawgroups.push(this.id);
       }
     }
   });

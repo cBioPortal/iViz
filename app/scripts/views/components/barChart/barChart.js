@@ -32,7 +32,6 @@
 
 'use strict';
 (function(iViz, dc, _, $, d3) {
-  // iViz pie chart component. It includes DC pie chart.
   iViz.view.component.BarChart = function() {
     var content = this;
 
@@ -53,7 +52,7 @@
 
       var cluster = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
-        if (val === 'NA' || val === '' || val === 'NaN') {
+        if (typeof val === 'undefined' || val === 'NA' || val === '' || val === 'NaN') {
           hasEmptyValue_ = true;
           val = opts_.emptyMappingVal;
         } else {
@@ -255,7 +254,10 @@
         data += _cases[i].patient_id + '\t';
         data += iViz.util.restrictNumDigits(_cases[i][data_.attrId]);
       }
-      content.setDownloadData('tsv', data);
+      content.setDownloadData('tsv', {
+        fileName: data_.displayName,
+        data: data
+      });
     }
 
     function initCanvasDownloadData() {
@@ -273,8 +275,6 @@
       });
     }
 
-    content.dataForDownload = {};
-
     content.hasLogScale = function() {
       if (data_ !== undefined) {
         if (data_.min !== null && data_.max !== null) {
@@ -284,7 +284,9 @@
       return false;
     };
 
-    content.init = function(ndx, data, opts) {
+    content.init = function(ndx, opts) {
+      //TODO: need to update logic of getting min and max
+      var data = iViz.getAttrData(opts.group_type);
       data_.meta = _.map(_.filter(_.pluck(data, opts.attrId), function(d) {
         return d !== 'NA';
       }), function(d) {
@@ -303,6 +305,7 @@
       opts_.chartDivId = opts.chartDivId;
       opts_.chartId = opts.chartId;
       ndx_ = ndx;
+      hasEmptyValue_ = false;
 
       colors_ = $.extend(true, {}, iViz.util.getColors());
 
@@ -322,9 +325,6 @@
         }
       }
       chartInst_.render();
-
-      initTsvDownloadData();
-      initCanvasDownloadData();
       return chartInst_;
     };
 

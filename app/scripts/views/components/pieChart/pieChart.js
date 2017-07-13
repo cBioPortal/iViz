@@ -37,7 +37,7 @@
 'use strict';
 (function(iViz, dc, _, $) {
   // iViz pie chart component. It includes DC pie chart.
-  iViz.view.component.PieChart = function(ndx, attributes, opts) {
+  iViz.view.component.PieChart = function(ndx, attributes, opts, cluster) {
     var content = this;
     var v = {};
 
@@ -63,10 +63,9 @@
     var labelMetaData = [];
     var maxLabelValue = 0;
     var currentView = 'pie';
+    var updateQtip = true;
 
     initDCPieChart();
-
-    content.dataForDownload = {};
     
     content.getChart = function() {
       return v.chart;
@@ -112,6 +111,13 @@
         position: {my:'left center',at:'center right', viewport: $(window)},
         content: '<div id="qtip-' + v.opts.charDivId + '-content-react">Loading....</div>',
         events: {
+          show:function(event){
+            if(updateQtip){
+              labelMetaData = [];
+              updateQtip = false;
+              updatePieLabels();
+            }
+          },
           render: function() {
             updateCurrentLabels();
             initReactData();
@@ -129,6 +135,14 @@
       });
     };
 
+    content.updateDataForDownload = function(fileType) {
+      if (fileType === 'tsv') {
+        initTsvDownloadData();
+      } else if (['pdf', 'svg'].indexOf(fileType) !== -1) {
+        initCanvasDownloadData();
+      }
+    }
+
     /**
      * This is the function to initialize dc pie chart instance.
      */
@@ -140,10 +154,6 @@
         var height = v.opts.height;
         var radius = (width - 20) / 2;
         var color = $.extend(true, [], v.data.color);
-        var attr = v.data.attr_id;
-        var cluster = v.data.ndx.dimension(function(d) {
-          return d[attr];
-        });
 
         v.chart = dc.pieChart('#' + v.opts.chartId, v.opts.groupid);
 
@@ -178,15 +188,18 @@
             return d.key;
           });
         v.chart.on("postRender",function(){
-          initLabels();
-          initReactData();
+          //TODO:commented this because this is taking much time to load chart, need to find different way
+          //initLabels();
+         // initReactData();
         });
         v.chart.on("preRedraw",function(){
           removeMarker();
         });
         v.chart.on("postRedraw",function(){
           if ( $("#"+v.opts.charDivId).length ) {
-            updatePieLabels();
+            //TODO:commented this because this is taking much time to redraw after applying filter, need to find different way
+            updateQtip = true;
+          //  updatePieLabels();
           }
         });
       } else {
@@ -197,17 +210,20 @@
       }
     }
 
-    function initTsvDownloadData(meta) {
+    function initTsvDownloadData() {
       var data = v.data.display_name + '\tCount';
 
-      meta = meta || labelMetaData;
+      var meta = labels || [];
       
       for (var i = 0; i < meta.length; i++) {
         data += '\r\n';
         data += meta[i].name + '\t';
         data += meta[i].samples;
       }
-      content.setDownloadData('tsv', data);
+      content.setDownloadData('tsv', {
+        fileName: v.data.display_name || 'Pie Chart',
+        data: data
+      });
     }
 
     function initCanvasDownloadData() {
@@ -251,8 +267,6 @@
     function initLabels() {
       labelMetaData = initLabelInfo();
       labels = $.extend(true, [], labelMetaData);
-      initTsvDownloadData();
-      initCanvasDownloadData();
     }
 
     function initLabelInfo() {
@@ -333,8 +347,6 @@
 
     function updateCurrentLabels() {
       labels = filterLabels();
-      initTsvDownloadData(labels);
-      initCanvasDownloadData();
     }
 
     function findLabel(labelName) {
@@ -595,8 +607,6 @@
         'stroke-width': '1px'
       });
     }
-    
-    // return content;
   };
 
   iViz.view.component.PieChart.prototype = new iViz.view.component.GeneralChart('pieChart');

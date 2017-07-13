@@ -119,17 +119,31 @@
     content.idMapping = function(mappingObj, inputCases) {
       var _selectedMappingCases = [];
       _selectedMappingCases.length = 0;
+      var resultArr_ = [];
+      var tempArr_ = {};
       _.each(inputCases, function(_case) {
-        if (Array.isArray(mappingObj[_case])) {
-          _.each(mappingObj[_case], function(_id) {
-            _selectedMappingCases.push(_id);
-          });
-        } else {
-          _selectedMappingCases.push(mappingObj[_case]);
-
+        _.each(mappingObj[_case],function(_caseSel){
+          if(tempArr_[_caseSel] === undefined){
+            tempArr_[_caseSel] = true;
+            resultArr_.push(_caseSel)
+          }
+        });
+        //_selectedMappingCases = _selectedMappingCases.concat(mappingObj[_case]);
+      });
+      return resultArr_;
+      //return content.unique(_selectedMappingCases);
+    };
+    
+    content.unique = function(arr_){
+      var resultArr_ = [];
+      var tempArr_ = {};
+      _.each(arr_,function(obj_){
+        if(tempArr_[obj_] === undefined){
+          tempArr_[obj_] = true;
+          resultArr_.push(obj_);
         }
       });
-      return _.uniq(_selectedMappingCases);
+      return resultArr_;
     };
 
     content.isRangeFilter = function(filterObj) {
@@ -157,7 +171,7 @@
     };
 
     content.download = function(chartType, fileType, content) {
-      switch (chartType) {
+      switch (chartType) { 
         case 'pieChart':
           pieChartDownload(fileType, content);
           break;
@@ -170,6 +184,14 @@
         case 'scatterPlot':
           survivalChartDownload(fileType, content);
           break;
+        case 'lineChart':
+          lineChartDownload(fileType, content);
+          break;
+        case 'overtimeChart':
+            overtimeChartDownload(fileType, content);
+            break;
+        case 'table':
+          tableDownload(fileType, content);
         default:
           break;
       }
@@ -186,10 +208,20 @@
       return str;
     }
 
+    function tableDownload(fileType, content) {
+      switch (fileType) {
+        case 'tsv':
+          csvDownload(content.fileName, content.data);
+          break;
+        default:
+          break;
+      }
+    }
+
     function pieChartDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
-          csvDownload('test', content);
+          csvDownload(content.fileName || 'data', content.data);
           break;
         case 'svg':
           pieChartCanvasDownload(content, {
@@ -539,6 +571,457 @@
       cbio.download.initDownload(
         _svgElement, downloadOpts);
     }
+    
+    function lineChartDownload(fileType, content) { //used barchartdownload as an example
+      switch (fileType) {
+        case 'tsv':
+          csvDownload(content.fileName || 'data', content.data);
+          break;
+        case 'svg':
+          lineChartCanvasDownload(content, {
+            filename: content.fileName + '.svg'
+          });
+          break;
+        case 'pdf':
+          lineChartCanvasDownload(content, {
+            filename: content.fileName + '.pdf',
+            contentType: 'application/pdf',
+            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+          });
+          break;
+        default:
+          break;
+      }
+    }
+    
+    function lineChartCanvasDownload(data, downloadOpts) {
+      var _svgElement = ''; //will contain the linechart
+      var _svgRangeElement = ''; //will contain the rangechart
+      var _svg = $(data.chartId + ' svg');
+      var _svgRange = $(data.rangeChartId + ' svg');
+      var _brush = _svgRange.find('g.brush');
+      var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
+      var i = 0;
+
+      if (_brushWidth === 0) {
+        _brush.css('display', 'none');
+      }
+
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '0.2',
+          'fill': '#2986e2'
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '#eee',
+          'stroke': '#666'
+        });
+      
+      _svgRange.find('g.y') //remove y axis of range chart
+        .css({
+         'display': 'none'         
+        });
+
+      // Change deselected bar chart
+      var _chartBody = _svgRange.find('.chart-body');
+      var _deselectedCharts = _chartBody.find('.bar.deselected');
+      var _deselectedChartsLength = _deselectedCharts.length;
+
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': '#ccc'
+        });
+      }
+      //change axis style of line chart
+      var _axis = _svg.find('.axis');
+      var _axisDomain = _axis.find('.domain');
+      var _axisDomainLength = _axisDomain.length;
+      var _axisTick = _axis.find('.tick.major line');
+      var _axisTickLength = _axisTick.length;
+
+      for (i = 0; i < _axisDomainLength; i++) {
+        $(_axisDomain[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLength; i++) {
+        $(_axisTick[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      // Change axis style of range chart
+      var _axisRange = _svgRange.find('.axis');
+      var _axisDomainRange = _axisRange.find('.domain');
+      var _axisDomainLengthRange = _axisDomainRange.length;
+      var _axisTickRange = _axisRange.find('.tick.major line');
+      var _axisTickLengthRange = _axisTickRange.length;
+
+      for (i = 0; i < _axisDomainLengthRange; i++) {
+        $(_axisDomainRange[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthRange; i++) {
+        $(_axisTickRange[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      //change x/y axis text size of line chart
+      var _chartText = _svg.find('.axis text'),
+        _chartTextLength = _chartText.length;
+
+      for (i = 0; i < _chartTextLength; i++) {
+        $(_chartText[i]).css({
+          'font-size': '12px'
+        });
+      }
+      
+      //Change x/y axis text size of range chart
+      var _chartTextRange = _svgRange.find('.axis text'),
+        _chartTextLengthRange = _chartTextRange.length;
+
+      for (i = 0; i < _chartTextLengthRange; i++) {
+        $(_chartTextRange[i]).css({
+          'font-size': '12px'
+        });
+      }
+      
+      //change line style of line chart
+      _svg.find('g.chart-body').css({
+         'fill': 'none' 
+      });
+      
+      //convert SVGs to strings
+      $(data.chartId + ' svg>g').each(function(i, e) {
+        _svgElement += cbio.download.serializeHtml(e);
+      });
+      $(data.chartId + ' svg>defs').each(function(i, e) {
+        _svgElement += cbio.download.serializeHtml(e);
+      });
+      $(data.rangeChartId + ' svg>g').each(function(i,e){
+         _svgRangeElement += cbio.download.serializeHtml(e);
+      });
+      $(data.rangeChartId + ' svg>defs').each(function(i,e){
+         _svgRangeElement += cbio.download.serializeHtml(e) ;
+      });
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="375" height="340">' +
+        '<g><text x="180" y="20" style="font-weight: bold; text-anchor: middle">' +
+        data.title + '</text></g>' + //data.title is from initCanvasDownloadData in lineChart.js
+        '<g transform="translate(0, 20)">' + _svgElement + '</g>' +
+        '<g transform="translate(0,260)">' +_svgRangeElement + '</g></svg>';
+
+      cbio.download.initDownload(
+        svg, downloadOpts);
+      
+      // Remove added styles of LINE chart
+      for (i = 0; i < _axisDomainLength; i++) {
+        $(_axisDomain[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLength; i++) {
+        $(_axisTick[i]).css({
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _chartTextLength; i++) {
+        $(_chartText[i]).css({
+          'font-size': ''
+        });
+      }
+    
+      // Remove added styles of RANGE chart
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': ''
+        });
+      }
+      _brush.css('display', '');
+      
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '',
+          'fill': ''
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '',
+          'stroke': ''
+        });
+        
+      _svgRange.find('g.y').css('display', '');
+      
+      for (i = 0; i < _axisDomainLengthRange; i++) {
+        $(_axisDomain[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthRange; i++) {
+        $(_axisTick[i]).css({
+          'stroke': ''
+        });
+      }
+      
+      for (i = 0; i < _chartTextLengthRange; i++) {
+        $(_chartTextRange[i]).css({
+          'font-size': ''
+        });
+      }
+
+    };
+    
+    function overtimeChartDownload(fileType, content){
+        switch (fileType) {
+        case 'tsv':
+          csvDownload(content.fileName || 'data', content.data);
+          break;
+        case 'svg':
+          overtimeChartCanvasDownload(content, {
+            filename: content.fileName + '.svg'
+          });
+          break;
+        case 'pdf':
+          overtimeCanvasDownload(content, {
+            filename: content.fileName + '.pdf',
+            contentType: 'application/pdf',
+            servletName: 'http://localhost:8080/cbioportal/svgtopdf.do'
+          });
+          break;
+        default:
+          break;
+      }
+    }
+    
+    function overtimeChartCanvasDownload (data, downloadOpts){
+       var _svgBarElement = ''; //will contain the bar chart
+      var _svgOvertimeLineElement = ''; //will contain the overtime line
+      var _svgBar = $(data.chartId + ' svg'); //bar chart
+      var _svgOvertimeLine = $(data.overtimeLineId + ' svg'); //overtime line
+      var _brush = _svgBar.find('g.brush');
+      var _brushWidth = Number(_brush.find('rect.extent').attr('width'));
+      var i = 0;
+
+      if (_brushWidth === 0) {
+        _brush.css('display', 'none');
+      }
+
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '0.2',
+          'fill': '#2986e2'
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '#eee',
+          'stroke': '#666'
+        });
+      
+      _svgOvertimeLine.find('.line')
+        .css({
+            'fill': 'none',
+            'stroke': 'steelblue',
+            'stroke-width': '1.5'     
+        });
+      
+      _svgBar.find('g.y') //remove y axis of bar chart
+        .css({
+         'display': 'none'         
+        });
+
+      // Change deselected bar chart
+      var _chartBody = _svgBar.find('.chart-body');
+      var _deselectedCharts = _chartBody.find('.bar.deselected');
+      var _deselectedChartsLength = _deselectedCharts.length;
+
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': '#ccc'
+        });
+      }
+      //change axis style of overtime line
+      var _axisOvertimeLine = _svgOvertimeLine.find('.axis');
+      var _axisDomainOvertimeLine = _axisOvertimeLine.find('.domain');
+      var _axisDomainLengthOvertimeLine = _axisDomainOvertimeLine.length;
+      var _axisTickOvertimeLine = _axisOvertimeLine.find('.tick.major line');
+      var _axisTickLengthOvertimeLine = _axisTickOvertimeLine.length;
+
+      for (i = 0; i < _axisDomainLengthOvertimeLine; i++) {
+        $(_axisDomainOvertimeLine[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthOvertimeLine; i++) {
+        $(_axisTickOvertimeLine[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      // Change axis style of bar chart
+      var _axisBar = _svgBar.find('.axis');
+      var _axisDomainBar = _axisBar.find('.domain');
+      var _axisDomainLengthBar = _axisDomainBar.length;
+      var _axisTickBar = _axisBar.find('.tick.major line');
+      var _axisTickLengthBar = _axisTickBar.length;
+
+      for (i = 0; i < _axisDomainLengthBar; i++) {
+        $(_axisDomainBar[i]).css({
+          'fill': 'white',
+          'fill-opacity': '0',
+          'stroke': 'black'
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthBar; i++) {
+        $(_axisTickBar[i]).css({
+          'stroke': 'black'
+        });
+      }
+
+      //change x/y axis text size of overtime chart
+      var _chartTextOvertimeLine = _svgOvertimeLine.find('.axis text'),
+        _chartTextLengthOvertimeLine = _chartTextOvertimeLine.lengthOvertimeLine;
+
+      for (i = 0; i < _chartTextLengthOvertimeLine; i++) {
+        $(_chartTextOvertimeLine[i]).css({
+          'font-size': '12px'
+        });
+      }
+      
+      //Change x/y axis text size of bar chart
+      var _chartTextBar = _svgBar.find('.axis text'),
+        _chartTextLengthBar = _chartTextBar.length;
+
+      for (i = 0; i < _chartTextLengthBar; i++) {
+        $(_chartTextBar[i]).css({
+          'font-size': '12px'
+        });
+      }
+      
+      //change line style of overtimeline 
+      _svgOvertimeLine.find('g.chart-body').css({
+         'fill': 'none' 
+      });
+      
+      //convert SVGs to strings
+      $(data.chartId + ' svg>g').each(function(i, e) {
+        _svgBarElement += cbio.download.serializeHtml(e);
+      });
+      $(data.chartId + ' svg>defs').each(function(i, e) {
+        _svgBarElement += cbio.download.serializeHtml(e);
+      });
+      $(data.overtimeLineId + ' svg>g').each(function(i,e){
+         _svgOvertimeLineElement += cbio.download.serializeHtml(e);
+      });
+      $(data.overtimeLineId + ' svg>defs').each(function(i,e){
+         _svgOvertimeLineElement += cbio.download.serializeHtml(e) ;
+      });
+
+      var svg = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="375" height="340">' +
+        '<g><text x="180" y="20" style="font-weight: bold; text-anchor: middle">' +
+        data.title + '</text></g>' + //data.title is from initCanvasDownloadData in overtimeChart.js
+        '<g transform="translate(0, 20)">' + _svgOvertimeLineElement + '</g>' +
+        '<g transform="translate(0,260)">' +_svgBarElement + '</g></svg>';
+
+      cbio.download.initDownload(
+        svg, downloadOpts);
+      
+      // Remove added styles of Overtime line
+      for (i = 0; i < _axisDomainLengthOvertimeLine; i++) {
+        $(_axisDomainOvertimeLine[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthOvertimeLine; i++) {
+        $(_axisTickOvertimeLine[i]).css({
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _chartTextLengthOvertimeLine; i++) {
+        $(_chartTextOvertimeLine[i]).css({
+          'font-size': ''
+        });
+      }
+    
+      // Remove added styles of Bar chart
+      for (i = 0; i < _deselectedChartsLength; i++) {
+        $(_deselectedCharts[i]).css({
+          'stroke': '',
+          'fill': ''
+        });
+      }
+      _brush.css('display', '');
+      
+      _brush.find('rect.extent')
+        .css({
+          'fill-opacity': '',
+          'fill': ''
+        });
+
+      _brush.find('.resize path')
+        .css({
+          'fill': '',
+          'stroke': ''
+        });
+        
+     _svgOvertimeLine.find('.line')
+        .css({
+            'fill': '',
+            'stroke': '',
+            'stroke-width': ''     
+        });   
+        
+      _svgBar.find('g.y').css('display', '');
+      
+      for (i = 0; i < _axisDomainLengthBar; i++) {
+        $(_axisDomainBar[i]).css({
+          'fill': '',
+          'fill-opacity': '',
+          'stroke': ''
+        });
+      }
+
+      for (i = 0; i < _axisTickLengthBar; i++) {
+        $(_axisTickBar[i]).css({
+          'stroke': ''
+        });
+      }
+      
+      for (i = 0; i < _chartTextLengthBar; i++) {
+        $(_chartTextBar[i]).css({
+          'font-size': ''
+        });
+      } 
+    }
 
     function csvDownload(fileName, content) {
       fileName = fileName || 'test';
@@ -554,7 +1037,7 @@
     function barChartDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
-          csvDownload('test', content);
+          csvDownload(content.fileName || 'data', content.data);
           break;
         case 'svg':
           barChartCanvasDownload(content, {
@@ -576,6 +1059,46 @@
     function downloadTextFile(content, delimiter) {
 
     }
+
+    /**
+     * Finds the intersection elements between two arrays in a simple fashion.
+     * Should have O(n) operations, where n is n = MIN(a.length, b.length)
+     *
+     * @param a {Array} first array, must already be sorted
+     * @param b {Array} second array, must already be sorted
+     * @returns {Array}
+     */
+    content.intersection = function(a, b) {
+      var result = [], i = 0, j = 0, aL = a.length, bL = b.length, size = 0;
+      while (i < aL && j < bL) {
+        if (a[i] < b[j]) {
+          ++i;
+        }
+        else if (a[i] > b[j]) {
+          ++j;
+        }
+        else /* they're equal */
+        {
+          result.push(a[i]);
+          ++i;
+          ++j;
+        }
+      }
+
+      return result;
+    };
+
+    content.compare = function(arr1, arr2) {
+      if (arr1.length != arr2.length){
+        return false;
+      }else{
+        for (var i = 0; i < arr1.length; i++) {
+          if (arr1[i] !== arr2[i])
+            return false;
+        }
+      }
+      return true;
+    };
 
     return content;
   })();

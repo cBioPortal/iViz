@@ -54,15 +54,15 @@
     '<div class="dc-chart dc-bar-chart" align="center" style="float:none !important;" id={{chartId}} ></div><span class="text-center chart-title-span">{{displayName}}</span>' +
     '</div>',
     props: [
-      'data', 'ndx', 'attributes', 'filters', 'groupid'
+      'ndx', 'attributes', 'filters', 'groupid'
     ],
     data: function() {
       return {
-        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
+        chartDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") +
         '-div',
-        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") +
+        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") +
         '-reset',
-        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
+        chartId: 'chart-new-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
         displayName: this.attributes.display_name,
         chartInst:'',
         barChart:'',
@@ -77,6 +77,7 @@
           this.filtersUpdated = true;
           if (newVal.length == 0) {
             this.chartInst.filter(null);
+            dc.redrawAll(this.groupid);
             this.$dispatch('update-filters');
           }
         } else{
@@ -100,7 +101,8 @@
         this.showOperations = false;
       },initChart:function(logScaleChecked){
         this.chartInst =
-          this.barChart.init(this.ndx, this.data, {
+          this.barChart.init(this.ndx, {
+            group_type:this.attributes.group_type,
             attrId: this.attributes.attr_id,
             displayName: this.attributes.display_name,
             chartDivId: this.chartDivId,
@@ -117,7 +119,7 @@
             self_.filtersUpdated = true;
             var tempFilters_ = $.extend(true, [], self_.filters);
             tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-              self_.attributes.view_type);
+              self_.attributes.view_type[0]);
             if (typeof tempFilters_ !== 'undefined' && tempFilters_.length !== 0) {
               tempFilters_[0] = tempFilters_[0].toFixed(2);
               tempFilters_[1] = tempFilters_[1].toFixed(2);
@@ -132,6 +134,7 @@
     },
     ready: function() {
       this.barChart = new iViz.view.component.BarChart();
+      this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
       settings_.barChart.width = window.style.vars.barchartWidth || 150;
       settings_.barChart.height = window.style.vars.barchartHeight || 150;
       this.initChart();

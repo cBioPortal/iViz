@@ -35,6 +35,8 @@ var iViz = (function (_, $) {
   var data_;
   var vm_;
   var grid_;
+  var tableData_ = [];
+  var groupFiltersMap_ = {};
 
   return {
 
@@ -42,7 +44,6 @@ var iViz = (function (_, $) {
 
       vm_ = iViz.vue.manage.getInstance();
 
-      vm_.isloading = false;
       data_ = _rawDataJSON;
 
       if (_inputSampleList !== undefined && _inputPatientList !== undefined) {
@@ -69,60 +70,342 @@ var iViz = (function (_, $) {
         
       // ---- generating data matrix & fill the empty slots ----
       _.each(data_.groups.patient.data, function (_dataObj) {
-        _.each(_.pluck(data_.groups.patient.attr_meta, 'attr_id'), function (_attrId) {
-            if (!_dataObj.hasOwnProperty(_attrId)) {
-              _dataObj[_attrId] = 'NA';
-            }     
-      });
         _dataObj.DATE_OF_DIAGNOSIS = iViz.util.getRandomDate();
-  });
-      
-      _.each(data_.groups.sample.data, function (_dataObj) {
-        _.each(_.pluck(data_.groups.sample.attr_meta, 'attr_id'), function (_attrId) {
-          if (!_dataObj.hasOwnProperty(_attrId)) {
-            _dataObj[_attrId] = 'NA';
-          }
-        });
-      });
+        _dataObj.DATE_OVERTIME = iViz.util.getRandomDate();
+    });
+    //---- change view_type of each attribute into an array
+    
+  
+      var _patientIds = _.keys(data_.groups.patient.data_indices.patient_id);
+      var _sampleIds = _.keys(data_.groups.sample.data_indices.sample_id);
 
-      var _patientIds = _.uniq(_.pluck(data_.groups.patient.data, 'patient_id'));
-      var _sampleIds = _.uniq(_.pluck(data_.groups.sample.data, 'sample_id'));
-
+      var chartsCount = 0;
+      var groupAttrs = [];
+      var group = {};
+      var charts = {};
       var groups = [];
-      var id_ = 1;
-      for (var count = 0; count < Math.ceil(data_.groups.patient.attr_meta.length / 31); count++) {
-        var group = {};
-        var lowerLimit = count + (count * 31);
-        var upperLimit = lowerLimit + 31;
-        group.attributes = data_.groups.patient.attr_meta.slice(lowerLimit, upperLimit);
-        group.data = data_.groups.patient.data;
-        group.indices = data_.groups.patient.data_indices.patient_id;
-        group.type = 'patient';
-        group.id = group.type + '_' + id_;
-        groups.push(group);
-        id_++;
-      }
-      id_ = 1;
-      for (var count = 0; count < Math.ceil(data_.groups.sample.attr_meta.length / 31); count++) {
-        var lowerLimit = count + (count * 31);
-        var upperLimit = lowerLimit + 31;
-        var group = {};
-        group.attributes = data_.groups.sample.attr_meta.slice(lowerLimit, upperLimit);
-        group.data = data_.groups.sample.data;
-        group.indices = data_.groups.sample.data_indices.sample_id;
-        group.type = 'sample';
-        group.id = group.type + '_' + id_;
-        groups.push(group);
-        id_++;
-      }
 
+      // group.data = data_.groups.patient.data;
+      group.type = 'patient';
+      group.id = vm_.groupCount;
+      group.selectedcases = [];
+      group.hasfilters = false;
+      _.each(data_.groups.patient.attr_meta,function(attrData){//for the patient group type
+        attrData.group_type = group.type;
+        if(attrData.view_type[0]=='table'){
+          tableData_[attrData.attr_id]=attrData['gene_list'];
+          attrData.gene_list = undefined;
+        }
+        if(chartsCount<31){
+          if(attrData.show){
+            attrData.group_id = group.id;
+            groupAttrs.push(attrData);
+            chartsCount++;
+          }
+        }else{
+          attrData.show = false;
+        }
+        charts[attrData.attr_id]=attrData;
+        switch(attrData.datatype){ //replace the view_type with an array containing all possible view_type (for patient data)
+            case 'OVERTIME':
+                attrData.view_type = ['overtime_chart', 'pie_chart', 'bar_chart', 'line_chart', 'survival'];
+                break;
+            case 'DATE':
+                attrData.view_type = ['line_chart', 'pie_chart', 'bar_chart', 'overtime_chart'];
+                break;
+            case 'STRING':
+                attrData.view_type = ['pie_chart'];
+                break;
+            case 'NUMBER': 
+                attrData.view_type = ['bar_chart', 'line_chart'];
+                break;
+            case 'SURVIVAL':
+                attrData.view_type = ['survival']; //TODO: need to make this into a string, or change how the
+                                                           //switch construct in the addchart looks for the selected viewtype
+                break;
+            default:
+                attrData.view_type = [attrData.view_type];
+                break;
+        }
+        if (attrData.hasOwnProperty("datatype")){
+           attrData.view_type.push('table');
+       };
+      });
+      
+      group.attributes = groupAttrs;
+      groups.push(group);
+
+      chartsCount = 0;
+      groupAttrs = [];
+      group = {};
+      vm_.groupCount = vm_.groupCount+1;
+      //group.data = data_.groups.sample.data;
+      group.type = 'sample';
+      group.id = vm_.groupCount;
+      group.selectedcases = [];
+      group.hasfilters = false;
+      _.each(data_.groups.sample.attr_meta,function(attrData){
+        attrData.group_type = group.type;
+        if(attrData.view_type[0]=='table'){
+          tableData_[attrData.attr_id]=attrData['gene_list'];
+          attrData.gene_list = undefined;
+        }
+        if(chartsCount<31){
+          if(attrData.show){
+            attrData.group_id = group.id;
+            groupAttrs.push(attrData);
+            chartsCount++;
+          }
+        }else{
+          attrData.show = false;
+        }
+        charts[attrData.attr_id]=attrData;
+        switch(attrData.datatype){ //replace the view_type with an array containing all possible view_type (for sample data)
+             case 'OVERTIME':
+                attrData.view_type = ['overtime_chart', 'pie_chart', 'bar_chart', 'line_chart', 'survival'];
+                break;
+            case 'DATE':
+                attrData.view_type = ['line_chart', 'pie_chart', 'bar_chart', 'overtime_chart'];
+                break;
+            case 'STRING':
+                attrData.view_type = ['pie_chart'];
+                break;
+            case 'NUMBER': 
+                attrData.view_type = ['bar_chart', 'line_chart'];
+                break;
+            case 'SURVIVAL':
+                attrData.view_type = ['survival']; //TODO: need to make this into a string, or change how the
+                                                           //switch construct in the addchart looks for the selected viewtype
+                break;
+            default:
+                attrData.view_type = [attrData.view_type];
+                break;
+        }
+       if (attrData.hasOwnProperty("datatype")){
+           attrData.view_type.push('table');
+       }; 
+      });
+      vm_.groupCount = vm_.groupCount+1;
+      group.attributes = groupAttrs;
+      groups.push(group);
+
+
+
+      vm_.isloading = false;
       vm_.selectedsamples = _sampleIds;
       vm_.selectedpatients = _patientIds;
-      vm_.patientmap = data_.groups.group_mapping.patient.sample;
-      vm_.samplemap = data_.groups.group_mapping.sample.patient;
+      // vm_.patientmap = data_.groups.group_mapping.patient.sample;
+      // vm_.samplemap = data_.groups.group_mapping.sample.patient;
       vm_.groups = groups;
-    }, // ---- close init function ----
+      vm_.charts = charts;
 
+
+    }, // ---- close init function ----groups
+    setGroupFilteredCases : function(groupId_, filters_){
+      groupFiltersMap_[groupId_] = filters_;
+    },
+    getGroupFilteredCases : function(groupId_){
+      return groupFiltersMap_[groupId_];
+    },deleteGroupFilteredCases : function(groupId_){
+      groupFiltersMap_[groupId_] = undefined;
+    },
+    getAttrData : function(type, attr){
+      var _data = {};
+      var toReturn_ = [];
+      if(type === 'sample'){
+        _data = data_.groups.sample.data;
+      }else if(type === 'patient'){
+        _data = data_.groups.patient.data;
+      }
+      if(attr !== undefined){
+        _.each(_data,function(val){
+          if(val[attr] !== undefined){
+            toReturn_.push(val[attr]);
+          }
+        });
+      }else{
+        toReturn_ = _data
+      }
+      return toReturn_;
+    },
+    getTableData : function(attrId) {
+      return tableData_[attrId];
+    },
+    getCompleteData : function(){
+      return data_;
+    },
+    getCasesMap : function(type){
+      if(type === 'sample'){
+        return data_.groups.group_mapping.sample.patient;
+      }else{
+        return data_.groups.group_mapping.patient.sample;
+      }
+    },
+    getCaseIndices : function(type){
+      if(type === 'sample'){
+        return data_.groups.sample.data_indices.sample_id;
+      }else{
+        return data_.groups.patient.data_indices.patient_id;
+      }
+    },
+    openCases:function(){
+      var studyId = '';
+      var possible = true;
+      var selectedCases_ = vm_.selectedpatients;
+      var caseIndices_ =this.getCaseIndices('patient');
+      var patientData_ = data_.groups.patient.data;
+
+      $.each(selectedCases_,function(key,caseId){
+        if(key === 0){
+          studyId = patientData_[caseIndices_[caseId]]['study_id'];
+        }else{
+          if(studyId !== patientData_[caseIndices_[caseId]]['study_id']){
+            possible = false;
+            return false;
+          }
+        }
+      });
+      if(possible){
+        var _selectedPatientIds = selectedCases_.sort();
+        var _url =  window.cbioURL+"/case.do?cancer_study_id="+
+          studyId+
+          "&case_id="+_selectedPatientIds[0]+
+          "#nav_case_ids="+_selectedPatientIds.join(",");
+        window.open(_url);
+      }else{
+        new Notification().createNotification('This feature is not available to multiple studies for now!', {message_type: 'info'});
+      }
+    },
+    downloadCaseData:function(){
+      var content = '';
+      var sampleIds_ = vm_.selectedsamples;
+      var attr = {};
+
+      attr['CANCER_TYPE_DETAILED']='Cancer Type Detailed';
+      attr['CANCER_TYPE']='Cancer Type';
+      attr['study_id']='Study ID';
+      attr['patient_id']='Patient ID';
+      attr['sample_id']='Sample ID';
+      attr['mutated_genes']='With Mutation Data';
+      attr['cna_details']='With CNA Data';
+
+      var arr = [];
+      var attrL = 0, arrL = 0;
+      var strA = [];
+
+      var sampleAttr_ = data_.groups.sample.attr_meta;
+      var patientAttr_ = data_.groups.patient.attr_meta;
+
+      _.each(sampleAttr_,function(_attr){
+        if(attr[_attr.attr_id] === undefined && 'scatter_plot' !== _attr.view_type[0])
+          attr[_attr.attr_id] = _attr.display_name
+      });
+
+      _.each(patientAttr_,function(_attr){
+        if(attr[_attr.attr_id] === undefined && 'survival' !== _attr.view_type[0])
+          attr[_attr.attr_id] = _attr.display_name
+      });
+
+      attrL = attr.length;
+      _.each(attr,function(displayName,attrId){
+        strA.push(displayName || 'Unknown');
+      });
+      content = strA.join('\t');
+      strA.length =0;
+      var sampleIndices_ = data_.groups.sample.data_indices.sample_id;
+      var patienIndices_ = data_.groups.patient.data_indices.patient_id;
+      var sampleData_ = data_.groups.sample.data;
+      var patientData_ = data_.groups.patient.data;
+      var samplePatientMapping = data_.groups.group_mapping.sample.patient;
+      _.each(sampleIds_,function(sampleId){
+        var temp = sampleData_[sampleIndices_[sampleId]];
+        var temp1 = $.extend(true,temp,patientData_[patienIndices_[samplePatientMapping[sampleId][0]]]);
+        arr.push(temp1);
+      });
+
+      arrL = arr.length;
+
+      for (var i = 0; i < arrL; i++) {
+        strA.length = 0;
+        _.each(attr,function(displayName,attrId){
+          if('cna_details' === attrId || 'mutated_genes' === attrId ){
+            var temp = 'No';
+            if(arr[i][attrId] !== undefined)
+              temp = arr[i][attrId].length>0?'Yes':'No';
+            strA.push(temp);
+          }else{
+            strA.push(arr[i][attrId]);
+          }
+        });
+        content += '\r\n' + strA.join('\t');
+      }
+
+      var downloadOpts = {
+        filename: "study_view_clinical_data.txt",
+        contentType: "text/plain;charset=utf-8",
+        preProcess: false
+      };
+
+      cbio.download.initDownload(content, downloadOpts);
+
+    },
+    submitForm : function(){
+      var selectedCases_ = vm_.selectedsamples;
+      var studyId_ = '';
+      var possibleTOQuery = true;
+      _.each(selectedCases_,function(_caseId,key){
+        var index_ = data_.groups.sample.data_indices.sample_id[_caseId];
+        if(key === 0){
+          studyId_ = data_.groups.sample.data[index_]['study_id'];
+        }else{
+          if(studyId_ !== data_.groups.sample.data[index_]['study_id']){
+            possibleTOQuery = false;
+            return false;
+          }
+        }
+      });
+      if(possibleTOQuery){
+        $("#iviz-form").get(0).setAttribute('action',window.cbioURL+'/index.do');
+        $('<input>').attr({
+          type: 'hidden',
+          value: studyId_,
+          name: 'cancer_study_id'
+        }).appendTo("#iviz-form");
+
+        $('<input>').attr({
+          type: 'hidden',
+          value: window.case_set_id,
+          name: 'case_set_id'
+        }).appendTo("#iviz-form");
+
+        $('<input>').attr({
+          type: 'hidden',
+          value: selectedCases_.join(' '),
+          name: 'case_ids'
+        }).appendTo("#iviz-form");
+        
+        window.studyId = studyId_;
+        if(!QueryByGeneTextArea.isEmpty()) {
+          event.preventDefault();
+          QueryByGeneTextArea.validateGenes(this.decideSubmit, false);
+        }else{
+          $("#iviz-form").trigger("submit");
+        }
+      }else{
+        new Notification().createNotification('Querying multiple studies features is not yet ready!', {message_type: 'info'});
+      }
+    },
+    decideSubmit:function(allValid){
+      // if all genes are valid, submit, otherwise show a notification
+      if(allValid){
+        new QueryByGeneUtil().addStudyViewFields(window.studyId, window.mutationProfileId, window.cnaProfileId);
+        $("#iviz-form").trigger("submit");
+      }
+      else {
+        new Notification().createNotification("There were problems with the selected genes. Please fix.", {message_type: "danger"});
+        $("#query-by-gene-textarea").focus();
+      }
+    },
     stat: function () {
       var _result = {};
       _result['filters'] = {};
@@ -208,58 +491,6 @@ var iViz = (function (_, $) {
         _selectedPatients = _selectedPatients.concat(_arr);
       });
       iViz.init(data_, _selectedSamples, _selectedPatients);
-    },
-    resetAll: function () {
-      var _selectedStudyIds = [];
-      var _currentURL = window.location.href;
-      if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") !== -1) {
-        var _vcId;
-        var query = location.search.substr(1);
-        _.each(query.split('&'), function (_part) {
-          var item = _part.split('=');
-          if (item[0] === 'vc_id') {
-            _vcId = item[1];
-          } else if (item[0] === 'study_id') {
-            _selectedStudyIds = _selectedStudyIds.concat(item[1].split(','));
-          }
-        });
-        $.getJSON(URL + _vcId, function (response) {
-          _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
-          var _selectedPatientIds = [];
-          _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function (_patientIds) {
-            _selectedPatientIds = _selectedPatientIds.concat(_patientIds);
-          });
-          var _selectedSampleIds = [];
-          _.each(_.pluck(response.data.virtualCohort.selectedCases, "samples"), function (_sampleIds) {
-            _selectedSampleIds = _selectedSampleIds.concat(_sampleIds);
-          });
-          iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
-        });
-      } else if (_currentURL.indexOf("vc_id") === -1 && _currentURL.indexOf("study_id") !== -1) {
-        _selectedStudyIds = _selectedStudyIds.concat(location.search.split('study_id=')[1].split(','));
-        iViz.init(_selectedStudyIds);
-      } else if (_currentURL.indexOf("vc_id") !== -1 && _currentURL.indexOf("study_id") === -1) {
-        var _vcId = location.search.split('vc_id=')[1];
-        $.getJSON(URL + _vcId, function (response) {
-          _selectedStudyIds = _selectedStudyIds.concat(_.pluck(response.data.virtualCohort.selectedCases, "studyID"));
-          var _selectedPatientIds = [];
-          _.each(_.pluck(response.data.virtualCohort.selectedCases, "patients"), function (_patientIds) {
-            _selectedPatientIds = _selectedPatientIds.concat(_patientIds);
-          });
-          var _selectedSampleIds = [];
-          _.each(_.pluck(response.data.virtualCohort.selectedCases, "samples"), function (_sampleIds) {
-            _selectedSampleIds = _selectedSampleIds.concat(_sampleIds);
-          });
-          iViz.init(_selectedStudyIds, _selectedSampleIds, _selectedPatientIds);
-        });
-      } else {
-        iViz.vue.manage.getInstance().initialize();
-        iViz.init(data_);
-      }
     }
   };
 }(window._, window.$));
-
-
-
-

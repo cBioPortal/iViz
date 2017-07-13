@@ -35,11 +35,13 @@
 'use strict';
 (function(Vue, iViz, $, Clipboard) {
   Vue.component('manageCharts', {
-    template: '<option id="{{attribute.attr_id}}" v-if="!attribute.show" v-for="attribute in data.attributes" value="{{parent}}---{{ $index }}">{{attribute.display_name}}</option>',
+    /*template: '<option id="{{attribute.attr_id}}" v-if="!attribute.show" v-for="attribute in data.attributes" value="{{parent}}---{{ $index }}">{{attribute.display_name}}</option>',
+     */
+    template: '<option id="{{data.attr_id}}" v-if="!data.show" value="{{data.attr_id}}">{{data.display_name}}</option>',
     props: [
-      'data', 'parent'
+      'data'
     ], ready: function() {
-      $("#study-view-add-chart").trigger("chosen:updated");
+      $("#iviz-add-chart").trigger("chosen:updated");
     }
   });
 })(window.Vue, window.iViz,
