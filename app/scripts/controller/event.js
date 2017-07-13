@@ -41,7 +41,7 @@
   iViz.shared = {};
 
   iViz.shared.resetAll = function(_chartInst, _groupid, _attributes) {
-    if ((_attributes !== undefined) && (_attributes.view_type === 'scatter_plot')) {
+    if ((_attributes !== undefined) && (_attributes.view_type[0] === 'scatter_plot')) {
       _chartInst.reset();
     } else {
       if(_chartInst.filters().length>0){
@@ -59,7 +59,16 @@
         dc.events.trigger(function() {
           filters = filter
         }, 0);
-      } else if (type === 'pie_chart') {
+      }else if (type === 'overtime_chart') {
+        //delay event trigger for bar charts
+        dc.events.trigger(function() {
+          filters = filter
+        }, 0);
+      }else if (type === 'line_chart') {
+        dc.events.trigger(function() {
+          filters = filter
+        }, 0);
+      }else if (type === 'pie_chart') {
           //add filter
         if(filter instanceof Array){
           filters = filter;

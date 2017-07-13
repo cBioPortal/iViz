@@ -48,15 +48,11 @@
             groups: [],
             selectedsamples: [],
             selectedpatients: [],
-            patientmap: [],
-            samplemap: [],
             selectedgenes: [],
-            showVCList: false,
             addNewVC: false,
             selectedPatientsNum: 0,
             selectedSamplesNum: 0,
             hasfilters: false,
-            virtualCohorts: [],
             isloading: true,
             redrawgroups:[],
             customfilter:{
@@ -65,34 +61,52 @@
               sampleIds:[],
               patientIds:[]
             },
-            initializedSampleSpecialCharts:true,
-            initializedPatientSpecialCharts:true
+            charts: {},
+            groupCount:0,
+            updateSpecialCharts:false,
+            showSaveButton:true,
+            showManageButton:true,
+            userid:'DEFAULT',
+            stats:'',
+            updateStats:false,
+            highlightAllButtons:false,
+            highlightCaseButtons:false,
+            viewtypes:[],
+            attrid:'', 
+            datatype:''
           }, watch: {
+            'updateSpecialCharts':function(newVla,oldVal) {
+              var self_ = this;
+              //TODO: need to update setting timeout
+              var interval = setTimeout(function () {
+                clearInterval(interval);
+                self_.$broadcast('update-special-charts');
+              }, 500);
+            },
+            'updateStats':function(newVal){
+              this.stats = iViz.stat();
+            },
             'redrawgroups':function(newVal,oldVal){
               if(newVal.length>0){
-                _.each(this.groups, function(group){
-                  dc.redrawAll(group.id);
+                this.$broadcast('show-loader');
+                _.each(newVal, function(groupid){
+                  dc.redrawAll(groupid);
                 });
                 this.redrawgroups = [];
+                var self_ =this;
+                 this.$nextTick(function(){
+                   self_.updateSpecialCharts = !self_.updateSpecialCharts;
+                 });
+                
               }
             },
             'selectedsamples': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
-                if(!this.initializedSampleSpecialCharts) {
-                  this.$broadcast('selected-sample-update', newVal);
-                }else{
-                  this.initializedSampleSpecialCharts = false;
-                }
                 this.selectedSamplesNum = newVal.length;
               }
             },
             'selectedpatients': function(newVal,oldVal) {
               if(newVal.length!==oldVal.length){
-                if(!this.initializedPatientSpecialCharts) {
-                  this.$broadcast('survival-update', newVal);
-                }else{
-                  this.initializedPatientSpecialCharts = false;
-                }
                 this.selectedPatientsNum = newVal.length;
               }
             }
@@ -103,28 +117,18 @@
               this.updateGeneList(geneList,false);
             },'set-selected-cases' : function(selectionType, selectedCases){
               this.setSelectedCases(selectionType, selectedCases);
+            },'remove-chart':function(attrId,groupId){
+              this.removeChart(attrId,groupId);
             }
           },methods: {
-            initialize: function() {
-                this.groups = [];
-                this.selectedsamples = [];
-                this.selectedpatients = [];
-                this.selectedgenes = [];
-                this.patientmap = [];
-                this.samplemap = [];
-                this.showVCList = false;
-                this.addNewVC = false;
-                this.selectedPatientsNum = 0;
-                this.selectedSamplesNum = 0;
-                this.hasfilters = false;
-                this.virtualCohorts = [];
-                this.isloading = true;
-                this.customfilter ={
-                  display_name:"Custom",
-                  type:"",
-                  sampleIds:[],
-                  patientIds:[]
-                }
+            openCases:function(){
+              iViz.openCases();
+            },
+            downloadCaseData:function(){
+              iViz.downloadCaseData();
+            },
+            submitForm:function(){
+              iViz.submitForm();
             },
             clearAll: function(){
               if(this.customfilter.patientIds.length>0||this.customfilter.sampleIds.length>0){
@@ -132,7 +136,92 @@
                 this.customfilter.patientIds = [];
                 this.$broadcast('update-all-filters');
               }
-              this.$broadcast('clear-all-filters');
+              this.$broadcast('clear-all-groups');
+              var self_ = this;
+              this.hasfilters = false;
+              self_.$nextTick(function () {
+                self_.selectedsamples =  _.keys(iViz.getCasesMap('sample'));
+                self_.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+                self_.$broadcast('update-special-charts');
+                _.each(this.groups,function(group){
+                  dc.redrawAll(group.id);
+                });
+              });
+            },
+            addChart: function(attrId, selected_chart){ 
+              var self_ = this;
+              var attrData = self_.charts[attrId]; 
+              var index;
+              function shiftSelectedChart(viewtypeArray, selected_chart){
+                  var index = viewtypeArray.indexOf(selected_chart);
+                  viewtypeArray.splice(index, 1);
+                  viewtypeArray.unshift(selected_chart);
+              };
+                switch (selected_chart){ //modify the attrData.view_type and changed it to selected_chart- modifying the array, need a way to revert changes
+                    case 'overtimechart':
+                        shiftSelectedChart(attrData.view_type, 'overtime_chart');
+                        break;
+                    case 'linechart':
+                        shiftSelectedChart(attrData.view_type, 'line_chart');
+                        break;
+                    case 'piechart':
+                        shiftSelectedChart(attrData.view_type, 'pie_chart');
+                        break;
+                    case 'barchart':
+                        shiftSelectedChart(attrData.view_type, 'bar_chart');
+                        break;
+                    case 'tablechart':
+                        shiftSelectedChart(attrData.view_type, 'table');
+                        break;
+                }
+              var _attrAdded = false;
+              var _group = {};
+              _.each(self_.groups,function(group){
+                if(group.type === attrData.group_type){
+                  if(group.attributes.length<31){
+                    attrData.group_id = group.id;
+                    group.attributes.push(attrData);
+                    _attrAdded = true;
+                    return false;
+                  }else{
+                    _group = group;
+                  }
+                }
+              });
+              if(!_attrAdded){
+                var newgroup_ = {};
+                var groupAttrs = [];
+                groupAttrs.push(attrData);
+                // newgroup_.data = _group.data;
+                newgroup_.type = _group.type;
+                newgroup_.id = self_.groupCount;
+                self_.groupCount = self_.groupCount+1;
+                newgroup_.attributes = groupAttrs;
+                self_.groups.push(newgroup_);
+              }
+
+            },
+            removeChart: function(attrId){
+              var self = this;
+              var attrData = self.charts[attrId];
+              var attributes = self.groups[attrData.group_id].attributes;
+              attributes.$remove(attrData);
+
+              self.$nextTick(function () {
+                self.$broadcast('update-grid',true);
+                $("#iviz-add-chart").trigger("chosen:updated");
+              })
+            },
+            updateAttributesPanel: function(attrId){
+                var self = this;
+                var attrData = self.charts[attrId];
+                this.attrid = attrId;
+                this.viewtypes = attrData.view_type;
+                this.datatype = attrData.datatype;
+                this.$nextTick(function(){
+                    self.$broadcast('openPanel');
+                }
+                );
             },
             updateGeneList : function(geneList,reset){
               var self_ = this;
@@ -157,7 +246,7 @@
               var unmappedCaseIds = [];
 
               if (radioVal === 'patient') {
-                var patientIdsList = Object.keys(vmInstance_.patientmap);
+                var patientIdsList = Object.keys(iViz.getCasesMap('patient'));
                 _.each(selectedCases, function (id) {
                   if(patientIdsList.indexOf(id) !== -1){
                     selectedCaseIds.push(id);
@@ -166,7 +255,7 @@
                   }
                 });
               } else {
-                var sampleIdsList = Object.keys(vmInstance_.samplemap);
+                var sampleIdsList = Object.keys(iViz.getCasesMap('sample'));
                 _.each(selectedCases, function (id) {
                   if(sampleIdsList.indexOf(id) !== -1){
                     selectedCaseIds.push(id);
@@ -185,13 +274,13 @@
                 new Notification().createNotification(selectedCaseIds.length + ' case(s) selected.', {message_type: 'info'});
               }
 
-              $('#study-view-header-right-1').qtip('toggle');
+              $('#iviz-header-right-1').qtip('toggle');
               if(selectedCaseIds.length > 0) {
                 this.clearAll();
                 var self_ = this;
                 Vue.nextTick(function () {
 
-                  $.each(self_.groups,function(key,group){
+                  _.each(self_.groups,function(group){
                     if(group.type === radioVal){
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;
@@ -216,6 +305,20 @@
                 this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
               }
             });
+            $('.iviz-header-left-5').qtip({
+              content: {text: 'Click to view the selected cases' },
+              style: { classes: 'qtip-light qtip-rounded qtip-shadow' },
+              show: {event: 'mouseover'},
+              hide: {fixed:true, delay: 100, event: 'mouseout'},
+              position: {my:'bottom center', at:'top center', viewport: $(window)}
+            });
+            $('#iviz-header-left-6').qtip({
+              content: {text: 'Click to download the selected cases' },
+              style: { classes: 'qtip-light qtip-rounded qtip-shadow' },
+              show: {event: 'mouseover'},
+              hide: {fixed:true, delay: 100, event: 'mouseout'},
+              position: {my:'bottom center', at:'top center', viewport: $(window)}
+            })
           }
         });
       },
@@ -240,24 +343,32 @@
 
   Vue.directive('select', {
     twoWay: true,
-    params: ['groups'],
+    params: ['charts'],
+    paramWatchers: {
+      charts: function (val, oldVal) {
+        $("#iviz-add-chart").trigger("chosen:updated");
+      }
+    },
     bind: function() {
-      var self = this;
+
       $(this.el).chosen({
           width: '30%'
         })
         .change(function() {
-            if (this.value !== '') {
-              var value = this.el.value.split('---');
-              self.params.groups[value[0]].attributes[value[1]].show = true
-            }
-          }.bind(this)
+            var self=this;
+            var value = this.el.value;
+            self.params.charts[value].show = true;
+            self.vm.$nextTick(function () {
+                self.vm.updateAttributesPanel(value);
+            }); 
+          }   
+            .bind(this)
         );
     }
   });
 
   // This is an example to add sample to a virtual cohort from scatter plot
-  iViz.vue.vmScatter = (function() {
+/*  iViz.vue.vmScatter = (function() {
     var vmInstance_;
 
     return {
@@ -286,5 +397,5 @@
         return vmInstance_;
       }
     };
-  })();
+  })();*/
 })(window.Vue, window.iViz, window.dc,window._);

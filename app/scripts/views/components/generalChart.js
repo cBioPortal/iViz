@@ -57,5 +57,13 @@
     this.getDownloadFileTypes = function() {
       return Object.keys(this.dataForDownload);
     };
+    this.setDownloadDataTypes = function(types) {
+      var _self = this;
+      _.each(types, function(type) {
+        if (!_self.dataForDownload.hasOwnProperty(type)) {
+          _self.dataForDownload[type] = '';
+        }
+      });
+    };
   };
 })(window.iViz, window._);

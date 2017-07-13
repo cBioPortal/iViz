@@ -39,14 +39,14 @@
     template: /*'<div v-if="attributes.show">' +*/
     '<component :is="currentView" :groupid="groupid"  v-show="attributes.show"' +
     ' :filters.sync="attributes.filter" v-if="attributes.show" ' +
-    ':ndx="ndx" :attributes.sync="attributes" :data="data" :indices="indices"></component>'
+    ':ndx="ndx" :attributes.sync="attributes"></component>'
     /*'</div>'*/,
     props: [
-      'data', 'ndx', 'attributes', 'groupid', 'indices'
+      'ndx', 'attributes', 'groupid'
     ],
     data: function() {
       var currentView = '';
-      switch (this.attributes.view_type) {
+      switch (this.attributes.view_type[0]) {
         case 'pie_chart':
           currentView = 'pie-chart';
           break;
@@ -65,6 +65,9 @@
         case 'line_chart':
           currentView = 'line-chart';
           break;
+        case 'overtime_chart':
+          currentView = 'overtime-chart';
+          break;    
       }
       return {
         currentView: currentView
@@ -74,23 +77,20 @@
       'attributes.show': function(newVal) {
         if (!newVal)
           this.$dispatch('update-grid',true);
-        $("#study-view-add-chart").trigger("chosen:updated");
+        $("#iviz-add-chart").trigger("chosen:updated");
       }
     },
     events: {
-      'close': function() {
+      'close': function () {
         this.attributes.show = false;
-      }/*,
-      'update-grid':function(){
-        this.$dispatch('update-grid')
-      }*/
-    }, ready: function() {
-      var _self = this;
-      _self.$on('clear-all-filters',function(){
-        if(_self.attributes.filter.length>0){
+        this.$dispatch('remove-chart', this.attributes.attr_id, this.attributes.group_id)
+      },
+      'clear-chart-filters': function () {
+        var _self = this;
+        if (_self.attributes.filter.length > 0) {
           _self.attributes.filter = [];
         }
-      });
+      }
     }
   });
 })(window.Vue, window.dc, window.iViz,

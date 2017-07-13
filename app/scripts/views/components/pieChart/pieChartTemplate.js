@@ -46,15 +46,15 @@
               '<div id={{chartTableId}} :class="{view: showTableIcon}"></div>'+
               '</div>',
     props: [
-      'ndx', 'attributes', 'filters', 'groupid','data','options','indices'
+      'ndx', 'attributes', 'filters', 'groupid','options'
     ],
     data: function() {
       return {
         v: {},
-        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-div',
-        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, "") + '-reset',
-        chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)/g, ""),
-        chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)/g, ""),
+        charDivId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-div',
+        resetBtnId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, "") + '-reset',
+        chartId: 'chart-' + this.attributes.attr_id.replace(/\(|\)| /g, ""),
+        chartTableId : 'table-'+ this.attributes.attr_id.replace(/\(|\)| /g, ""),
         displayName: this.attributes.display_name,
         chartInst: '',
         component: '',
@@ -78,10 +78,11 @@
                 this.chartInst.filter(newVal);
             }
             else{
-              var temp =newVal.length>1?[newVal]:newVal;
+              var temp = newVal.length > 1? [newVal]: newVal;
               this.chartInst.replaceFilter(temp);
             }
           }
+          dc.redrawAll(this.groupid);
           this.$dispatch('update-filters');
         }else{
           this.filtersUpdated = false;
@@ -90,7 +91,7 @@
     },
     events: {
       'toTableView': function() {
-        this.piechart.changeView(this,!this.showTableIcon);
+        this.piechart.changeView(this, !this.showTableIcon);
       },
       'closeChart':function(){
         $('#' +this.charDivId).qtip('destroy');
@@ -113,32 +114,44 @@
       }
     },
     ready: function() {
-      this.$once('initMainDivQtip',this.initMainDivQtip);
-      var opts = {
-        chartId : this.chartId,
-        charDivId : this.charDivId,
-        groupid : this.groupid,
-        chartTableId : this.chartTableId,
-        transitionDuration : iViz.opts.dc.transitionDuration,
-        width: window.style['piechart-svg-width'] | 130,
-        height: window.style['piechart-svg-height'] | 130
-      };
-      this.piechart = new iViz.view.component.PieChart(this.ndx, this.attributes, opts);
-      this.chartInst = this.piechart.getChart();
-      var self_ = this;
-      this.chartInst.on('filtered', function(_chartInst, _filter) {
-        if(!self_.filtersUpdated) {
-          self_.filtersUpdated = true;
-          var tempFilters_ = $.extend(true, [], self_.filters);
-          tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
-            self_.attributes.view_type);
-          self_.filters = tempFilters_;
-          self_.$dispatch('update-filters');
-        }else{
-          self_.filtersUpdated = false;
-        }
+      
+      var _self = this;
+
+      // check if there's data for this attribute  
+      //var _hasData = false;
+      var _attrId = _self.attributes.attr_id;
+      var _cluster = _self.ndx.dimension(function(d) {
+        if (typeof d[_attrId] === 'undefined') d[_attrId] = 'NA';
+        return d[_attrId];
       });
-      this.$dispatch('data-loaded', true);
+      
+        _self.$once('initMainDivQtip', _self.initMainDivQtip);
+        var opts = {
+          chartId : _self.chartId,
+          charDivId : _self.charDivId,
+          groupid : _self.groupid,
+          chartTableId : _self.chartTableId,
+          transitionDuration : iViz.opts.dc.transitionDuration,
+          width: window.style['piechart-svg-width'] | 130,
+          height: window.style['piechart-svg-height'] | 130
+        };
+        _self.piechart = new iViz.view.component.PieChart(_self.ndx, _self.attributes, opts, _cluster);
+        _self.piechart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
+        _self.chartInst = _self.piechart.getChart();
+        _self.chartInst.on('filtered', function(_chartInst, _filter) {
+          if(!_self.filtersUpdated) {
+            _self.filtersUpdated = true;
+            var tempFilters_ = $.extend(true, [], _self.filters);
+            tempFilters_ = iViz.shared.updateFilters(_filter, tempFilters_,
+              _self.attributes.view_type[0]);
+            _self.filters = tempFilters_;
+            _self.$dispatch('update-filters');
+          }else{
+            _self.filtersUpdated = false;
+          }
+        });
+        _self.$dispatch('data-loaded', true);
+      
     }
   });
 })(window.Vue, window.dc, window.iViz,

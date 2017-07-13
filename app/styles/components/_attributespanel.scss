@@ -1,0 +1,31 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug 10, 2016, 2:35:32 PM
+    Author     : jamesxu
+*/
+#iviz-attributes-panel{
+    position: fixed;
+    top:80px;
+    display:none;
+    right:20px;
+    background-color:#cce6ff;
+}
+#iviz-attributes-panel-text{
+    text-align:center;
+    font-family:sans-serif;
+    font-size:25px;
+    color:#1c75cd;
+}
+
+#iviz-attributes-panel-button{
+    width:235px;
+    height:156px;
+    padding-top:5px;
+    padding-right:5px;
+    padding-bottom:5px;
+    padding-left:5px;
+}
