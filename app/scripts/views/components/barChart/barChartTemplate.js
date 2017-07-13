@@ -193,7 +193,7 @@
       if(this.opts.attrId === 'mutation_count') {
         mutationCountData = iViz.getMutationCountData();
         _.each(groupNdxData, function(sampleData) {
-          sampleData.mutation_count = mutationCountData[sampleData.sample_id];
+          sampleData.mutation_count = mutationCountData[sampleData.sample_uid];
         });
       }
       

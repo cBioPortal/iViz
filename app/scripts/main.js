@@ -449,7 +449,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
                   } else {
                     _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
                   }
-                  mutationCountMap_[_sampleDatum.sample_id] = _sampleDatum.mutation_count;
+                  mutationCountMap_[_sampleDatum.sample_uid] = _sampleDatum.mutation_count;
                 }
 
                 // cna fraction
