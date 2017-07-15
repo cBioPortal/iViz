@@ -56,10 +56,6 @@
   <!-- endbower -->
   <!-- endbuild -->
 
-  <!-- build:css(.tmp) styles/vc-session.css -->
-  <link rel="stylesheet" href="styles/vendor/vc-session.css"/>
-  <!-- endbuild -->
-
   <!-- build:css(.tmp) styles/iviz.css -->
   <link rel="stylesheet" href="styles/main.css"/>
   <!-- endbuild -->
@@ -73,8 +69,10 @@
   <script src="_components/cbioportal-client.js"></script>
   <!-- endbuild -->
 
-  <!-- build:js scripts/vc-session.js -->
-  <script src="_components/vc-session.js"></script>
+  <!-- build:js scripts/vs-session.js -->
+  <script src="scripts/session/sessionEvent.js"></script>
+  <script src="scripts/session/sessionServices.js"></script>
+  <script src="scripts/session/sessionUtil.js"></script>
   <!-- endbuild -->
 
   <!-- build:js scripts/iviz.js -->
@@ -108,6 +106,7 @@
   <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <script src="scripts/views/components/errorHandle.js"></script>
+  <script src="scripts/views/components/saveVirtualStudy/saveVirtualStudy.js"></script>
   <!-- endbuild -->
 </head>
 <body>
@@ -116,21 +115,14 @@
   <nav class="navbar navbar-default navbar-fixed-top">
     <div id="main-header" style="display: none" :class="{show:!isloading}">
       <div id="iviz-header-left">
-        <div id="cohort-component" style="float: left">
-          <div style="float: left; margin-right: 10px;">
-            <session-component :show-save-button="showSaveButton" :show-manage-button="showManageButton"
-                               :load-user-specific-cohorts="loadUserSpecificCohorts" :stats="stats"
-                               :update-stats.sync="updateStats"
-                               :show-share-button="false"></session-component>
-          </div>
-        </div>
-
         <div class="iviz-header-left-case">
           <span class="name" style="display: block;">Selected:</span>
           <span class="content">
             <span>{{ selectedSamplesNum }} samples / {{ selectedPatientsNum }} patients</span>
           </span>
         </div>
+        <save-virtual-study :show-save-button="showSaveButton" :stats="stats"
+                           :update-stats.sync="updateStats"></save-virtual-study>
         <span id="iviz-header-left-patient-select" class="iviz-header-button"
               @click="openCases" class="number"
               role="button" tabindex="0" style="display: block;"><i class="fa fa-user-circle-o" aria-hidden="true"></i></span>
@@ -210,7 +202,6 @@
             'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
 
     // This is used to indicate how to disable two buttons. By default, they are set to false.
-    iViz.vue.manage.getInstance().showManageButton = true;
     iViz.vue.manage.getInstance().showSaveButton = true;
 
     //Set this to true if want to load user specific cohorts(this is for cbioportal)
