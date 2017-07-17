@@ -4,7 +4,7 @@
     template: 
     '<div v-if="showSaveButton" class="save-virtual-study">' +
     '<div class="save-cohort-btn">' +
-    '<i class="fa fa-floppy-o" alt="Save Cohort"></i></div></div>',
+    '<i class="fa fa-floppy-o" alt="Save Virtual Study"></i></div></div>',
     props: [
       'selectedPatientsNum', 'selectedSamplesNum',
       'stats', 'updateStats', 'showSaveButton'
@@ -35,7 +35,7 @@
             at: 'top center',
             viewport: $(window)
           },
-          content: 'Save Cohort'
+          content: 'Save Virtual Study'
         });
         $('.save-cohort-btn').qtip({
           style: {
@@ -81,12 +81,12 @@
                       .done(function(response) {
                         self_.savedVC = response;
                         tooltip.find('.savedMessage').text(
-                          'Added to new Virtual Cohort');
+                          'Added virtual study ' + cohortName);
                       })
                       .fail(function() {
                         tooltip.find('.savedMessage').html(
                           '<i class="fa fa-exclamation-triangle"></i>' +
-                          'Failed to save virtual cohort, ' +
+                          'Failed to save virtual study, ' +
                           'please try again later.');
                       })
                       .always(function() {
@@ -148,19 +148,19 @@
           '<i class="fa fa-times-circle-o"></i></div>' +
           '<div class="dialog"><div class="input-group">' +
           '<input type="text" class="form-control cohort-name" ' +
-          'placeholder="New Cohort Name"> <span class="input-group-btn">' +
+          'placeholder="Virtual study Name"> <span class="input-group-btn">' +
           '<button class="btn btn-default save-cohort" ' +
           'type="button" disabled>Save</button></span>' +
           '</div><div>' +
           '<textarea class="form-control cohort-description" rows="5" ' +
-          'placeholder="New Cohort Description (Optional)"></textarea>' +
+          'placeholder="Virtual study description (Optional)"></textarea>' +
           '</div></div>' +
           '<div class="saving" style="display: none;">' +
-          '<i class="fa fa-spinner fa-spin"></i> Saving virtual cohort</div>' +
+          '<i class="fa fa-spinner fa-spin"></i> Saving virtual study</div>' +
           '<div class="saved" style="display: none;">' +
           '<span class="savedMessage"></span>' +
           '<button class="btn btn-default btn-sm query"' +
-          '>Query Virtual Cohort</button></div>' +
+          '>View this virtual study</button></div>' +
           '</div>'
         });
       }
