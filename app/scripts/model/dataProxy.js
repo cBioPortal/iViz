@@ -662,6 +662,7 @@ window.DataManagerForIviz = (function($, _) {
               
               // add Mutation count vs. CNA fraction
              //if (_hasSampleAttrData.mutation_count !== undefined && _hasSampleAttrData.cna_fraction !== undefined) {
+              if (self.hasMutationData() && self.hasCnaSegmentData()) {
                 var _mutCntAttrMeta = {};
                 _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
                 _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
@@ -675,10 +676,12 @@ window.DataManagerForIviz = (function($, _) {
                 _mutCntAttrMeta.priority = 2;
                 _mutCntAttrMeta.attrList = ['cna_fraction'];
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
+              }
              // }
 
               // add mutation count
               //if (_hasSampleAttrData.mutation_count !== undefined) {
+              if (self.hasMutationData()) {
                 var _MutationCountMeta = {};
                 _MutationCountMeta.datatype = 'NUMBER';
                 _MutationCountMeta.description = '';
@@ -692,6 +695,7 @@ window.DataManagerForIviz = (function($, _) {
                 _MutationCountMeta.show = false;
                 _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
                 _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
+              }
               //}
               
               var hiddenAttrs = content.util.getHiddenAttrs();
@@ -896,8 +900,6 @@ window.DataManagerForIviz = (function($, _) {
       cancerStudyIds: [],
       mutationProfileIdsMap: {},
       cnaProfileIdsMap: {},
-      // mutationCountIdsMap:{},
-      // cnaFractionIdsMap:{},
       panelSampleMap: {},
       portalUrl: _portalUrl,
       studyCasesMap: _study_cases_map,
@@ -1029,7 +1031,7 @@ window.DataManagerForIviz = (function($, _) {
                 self.cnaProfileIdsMap[_profile.study_id] = _profile.id;
               } else if (_profile.genetic_alteration_type === 'MUTATION_EXTENDED' && (_profile.study_id + '_mutations_uncalled' !== _profile.id)) {
                 self.mutationProfileIdsMap[_profile.study_id] = _profile.id;
-              }
+              } 
             });
             fetch_promise.resolve(_profiles);
           }).fail(function() {
@@ -1297,7 +1299,7 @@ window.DataManagerForIviz = (function($, _) {
                 url: self.portalUrl + 'cna.json?',
                 data: _data,
                 success: function(response) {
-                  if(Object.keys(response).length > 0) {
+                  if (Object.keys(response).length > 0) {
                     _ajaxCnaFractionData[_studyId] = response;
                   }
                   _def.resolve();
