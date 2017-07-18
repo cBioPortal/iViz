@@ -662,7 +662,6 @@ window.DataManagerForIviz = (function($, _) {
               
               // add Mutation count vs. CNA fraction
              //if (_hasSampleAttrData.mutation_count !== undefined && _hasSampleAttrData.cna_fraction !== undefined) {
-              if (self.hasMutationData() && self.hasCnaSegmentData()) {
                 var _mutCntAttrMeta = {};
                 _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
                 _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
@@ -676,12 +675,10 @@ window.DataManagerForIviz = (function($, _) {
                 _mutCntAttrMeta.priority = 2;
                 _mutCntAttrMeta.attrList = ['cna_fraction'];
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
-              }
              // }
 
               // add mutation count
               //if (_hasSampleAttrData.mutation_count !== undefined) {
-              if (self.hasMutationData()) {
                 var _MutationCountMeta = {};
                 _MutationCountMeta.datatype = 'NUMBER';
                 _MutationCountMeta.description = '';
@@ -695,7 +692,6 @@ window.DataManagerForIviz = (function($, _) {
                 _MutationCountMeta.show = false;
                 _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
                 _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
-              }
               //}
               
               var hiddenAttrs = content.util.getHiddenAttrs();
