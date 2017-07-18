@@ -896,8 +896,6 @@ window.DataManagerForIviz = (function($, _) {
       cancerStudyIds: [],
       mutationProfileIdsMap: {},
       cnaProfileIdsMap: {},
-      // mutationCountIdsMap:{},
-      // cnaFractionIdsMap:{},
       panelSampleMap: {},
       portalUrl: _portalUrl,
       studyCasesMap: _study_cases_map,

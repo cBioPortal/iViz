@@ -159,9 +159,15 @@
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
 
       $.when(iViz.getScatterData(this.attributes.group_id))
-        .then(function(_scatterData) {
-          _self.chartInst.init(_scatterData, _opts);
-          _self.attachPlotlySelectedEvent();
+        .then(function(_scatterData, _hasCNAFractionData, _hasMutationCountData) {
+          if (_hasCNAFractionData && _hasMutationCountData) {
+            _self.chartInst.init(_scatterData, _opts);
+            _self.attachPlotlySelectedEvent();
+          } else { //data source is not complete
+            dc.deregisterChart(_self.chartInst, _scatterData);
+            $('#' + _opts.chartDivId).remove();
+            _self.$dispatch('remove-grid-item', '#' + _opts.chartDivId);//rearrange layout
+          }
           _self.showLoad = false;
         }, function() {
           _self.showLoad = false;

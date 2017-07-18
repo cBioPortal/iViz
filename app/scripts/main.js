@@ -465,7 +465,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
                   }
                 }
               });
-              def.resolve(data);
+              def.resolve(data, _hasCNAFractionData, _hasMutationCountData);
             }, function() {
               def.reject();
             });
