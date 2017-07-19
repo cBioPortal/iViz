@@ -47,6 +47,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     }
   };
   var mutationCountMap_ = {};
+  var firstScatterShow = true;
 
   return {
 
@@ -401,7 +402,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       }
       return def.promise();
     },
-    getScatterData: function(groupId) {
+    getScatterData: function(_self, groupId) {
       var def = new $.Deferred();
       var self = this;
       var data = self.getGroupNdx(groupId);
@@ -435,6 +436,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
               var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
 
+              if ((!_hasCNAFractionData || !_hasMutationCountData) && firstScatterShow) {
+                charts['MUT_CNT_VS_CNA'].show = false;
+                firstScatterShow = false;
+                _self.$dispatch('remove-chart', 'MUT_CNT_VS_CNA', groupId);//rearrange layout
+              }
+
               _.each(data, function(_sampleDatum) {
                 // mutation count
                 if (_hasMutationCountData) {
@@ -465,7 +472,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
                   }
                 }
               });
-              def.resolve(data, _hasCNAFractionData, _hasMutationCountData);
+              def.resolve(data);
             }, function() {
               def.reject();
             });

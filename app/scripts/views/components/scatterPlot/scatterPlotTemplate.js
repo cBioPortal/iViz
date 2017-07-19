@@ -148,7 +148,7 @@
         width: window.iViz.styles.vars.scatter.width,
         height: window.iViz.styles.vars.scatter.height
       };
-      
+
       var attrId =
         this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
       this.invisibleDimension = this.ndx.dimension(function(d) {
@@ -158,16 +158,10 @@
       _self.chartInst = new iViz.view.component.ScatterPlot();
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
 
-      $.when(iViz.getScatterData(this.attributes.group_id))
-        .then(function(_scatterData, _hasCNAFractionData, _hasMutationCountData) {
-          if (_hasCNAFractionData && _hasMutationCountData) {
-            _self.chartInst.init(_scatterData, _opts);
-            _self.attachPlotlySelectedEvent();
-          } else { //data source is not complete
-            dc.deregisterChart(_self.chartInst, _scatterData);
-            $('#' + _opts.chartDivId).remove();
-            _self.$dispatch('remove-grid-item', '#' + _opts.chartDivId);//rearrange layout
-          }
+      $.when(iViz.getScatterData(_self, this.attributes.group_id))
+        .then(function(_scatterData) {
+          _self.chartInst.init(_scatterData, _opts);
+          _self.attachPlotlySelectedEvent();
           _self.showLoad = false;
         }, function() {
           _self.showLoad = false;
