@@ -71,7 +71,7 @@
             if (tickVal.indexOf(val) === -1) {
                 tickVal.push(Number(val));
             }
-
+          
             if (!mapTickToCaseIds.hasOwnProperty(val)) {
                 mapTickToCaseIds[val] = {
                     caseIds: [],
@@ -222,7 +222,7 @@
         var row = [];
         if (opts_.groupType === 'patient') {
           var patientUID = _cases[i].patient_uid;
-          var patientId = iViz.getCaseIdUsingUID('patient', _cases[i].study_id, patientUID);
+          var patientId = iViz.getCaseIdUsingUID('patient', patientUID);
           var sampleIds = iViz.getSampleIds(_cases[i].study_id, patientId);
           if (_.isArray(sampleIds)) {
             sampleIds = sampleIds.join(', ');
@@ -233,7 +233,7 @@
           row.push(sampleIds);
         } else {
           var sampleUID = _cases[i].sample_uid;
-          var sampleId = iViz.getCaseIdUsingUID('sample', _cases[i].study_id, sampleUID);
+          var sampleId = iViz.getCaseIdUsingUID('sample', sampleUID);
           var patientId = iViz.getPatientId(_cases[i].study_id, sampleId);
 
           row.push(sampleId);

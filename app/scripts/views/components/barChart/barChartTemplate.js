@@ -9,7 +9,8 @@
     ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
-    ':show-operations="showOperations && !failedToInit" :groupid="attributes.group_id" ' +
+    ':show-operations="showOperations" :groupid="attributes.group_id" ' +
+    ':chart-initialed = "!failedToInit"' +
     ':show-survival-icon.sync="showSurvivalIcon"' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
@@ -69,8 +70,10 @@
       }
     }, events: {
       closeChart: function() {
-        dc.deregisterChart(this.chartInst, this.attributes.group_id);
-        this.chartInst.dimension().dispose();
+        if (!this.failedToInit) {
+          dc.deregisterChart(this.chartInst, this.attributes.group_id);
+          this.chartInst.dimension().dispose();
+        }
         this.$dispatch('close');
       },
       changeLogScale: function(logScaleChecked) {
@@ -99,13 +102,11 @@
         var groups = [];
         var categories = this.barChart.getCurrentCategories('key');
         _.each(categories, function(category) {
-          if (category.name !== 'NA') {
-            groups.push({
-              name: category.name,
-              caseIds: category.caseIds,
-              curveHex: category.color
-            });
-          }
+          groups.push({
+            name: category.name,
+            caseIds: category.caseIds,
+            curveHex: category.color
+          });
         });
         this.barChart.colorBars(categories);
         this.$dispatch('create-rainbow-survival', {
