@@ -145,7 +145,6 @@
         });
 
         this.chartInst = this.barChart.init(this.ndx, this.data, this.opts);
-        var getOpts_ = this.barChart.getOpts(this.opts);
         var self_ = this;
         this.chartInst.on('filtered', function(_chartInst, _filter) {
           // TODO : Right now we are manually checking for brush mouseup event.
@@ -159,104 +158,7 @@
                 self_.filtersUpdated = true;
                 if (typeof _filter !== 'undefined' && _filter !== null &&
                   _filter.length > 1 && self_.chartInst.hasFilter()) {
-                  var tempFilters_ = [];
-                  if (logScaleChecked) {
-                    if (_filter[0] < getOpts_.xDomain[0]) {
-                      tempFilters_[0] = '';
-                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[0] = 'NA';
-                      tempFilters_[1] = '';
-                    }
-                    
-                    if (_filter[1] < getOpts_.xDomain[0]) {
-                      tempFilters_[1] = '< ' + getOpts_.xDomain[0];
-                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 2] &&
-                      _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 1]){
-                      if (_filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                        tempFilters_[1] = '> ' + getOpts_.xDomain[getOpts_.xDomain.length - 2];
-                      } else {
-                        tempFilters_[1] = '> ' + getOpts_.xDomain[getOpts_.xDomain.length - 2] + ', NA';
-                      }
-                    }
-
-                    for (var i = 0; i <= getOpts_.xDomain.length - 2; i++) {
-                      if (_filter[0] >= getOpts_.xDomain[i] &&
-                        _filter[0] < getOpts_.xDomain[i + 1]) {
-                        if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 2]) {
-                          tempFilters_[1] = '';
-                          if(_filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1]){
-                            tempFilters_[0] = '> ' + getOpts_.xDomain[i];
-                          }else {
-                            tempFilters_[0] = '> ' + getOpts_.xDomain[i] + ', NA';
-                          }
-                        } else {
-                          tempFilters_[0] = getOpts_.xDomain[i];
-                        }
-                      }
-
-                      if (_filter[1] >= getOpts_.xDomain[i - 1] && 
-                        _filter[1] < getOpts_.xDomain[i]) {
-                        if (_filter[0] <= getOpts_.xDomain[0]) {
-                          tempFilters_[0] = '';
-                          tempFilters_[1] = '<= ' + getOpts_.xDomain[i];
-                        } else {
-                          tempFilters_[1] = getOpts_.xDomain[i];
-                        }
-                      } 
-                    }
-                  } else {
-                    if (_filter[0] <= getOpts_.xTicks[1]) {
-                      tempFilters_[0] = '';
-                    } else if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 3]) {
-                      tempFilters_[0] = '';
-                      if (_filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                        tempFilters_[1] = 'NA';
-                      }
-                    } 
-
-                    if (_filter[1] < getOpts_.xTicks[1]) {
-                      tempFilters_[1] = getOpts_.xTicks[0];
-                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 3] && 
-                      _filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1] && 
-                      _filter[0] > getOpts_.xDomain[getOpts_.xDomain.length - 3]) {
-                      tempFilters_[0] = '';
-                      tempFilters_[1] = getOpts_.xTicks[getOpts_.xTicks.length - 2];
-                    } else if (_filter[1] >= getOpts_.xDomain[getOpts_.xDomain.length - 1] && 
-                      _filter[0] >= getOpts_.xDomain[getOpts_.xDomain.length - 3] &&
-                      _filter[0] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                      tempFilters_[0] = '';
-                      tempFilters_[1] = getOpts_.xTicks[getOpts_.xTicks.length - 2] + ', NA';
-                    }
-                    
-                    for (var i = 1; i <= getOpts_.xDomain.length - 3; i++) {
-                      if (_filter[0] > getOpts_.xDomain[i] && 
-                          _filter[0] <= getOpts_.xDomain[i + 1] && 
-                          i < getOpts_.xDomain.length - 3) {
-                        if (_filter[1] > getOpts_.xDomain[getOpts_.xDomain.length - 3]) {
-                          tempFilters_[0] = '';
-                          if (_filter[1] < getOpts_.xDomain[getOpts_.xDomain.length - 1]) {
-                            tempFilters_[1] = '> ' + getOpts_.xDomain[i];
-                          } else {
-                            tempFilters_[1] = '> ' + getOpts_.xDomain[i] + ', NA';
-                          }
-                        } else {
-                          tempFilters_[0] = getOpts_.xDomain[i];
-                        }
-                      } 
-
-                      if (_filter[1] > getOpts_.xDomain[i - 1] && 
-                        _filter[1] <= getOpts_.xDomain[i]) {
-                        if (_filter[0] <= getOpts_.xDomain[1]) {
-                          tempFilters_[0] = '';
-                          tempFilters_[1] = '<= ' + getOpts_.xDomain[i];
-                        } else {
-                          tempFilters_[1] = getOpts_.xDomain[i];
-                        }
-                      } 
-                    }
-                  }
-                  
-                  self_.attributes.filter = tempFilters_;
+                  self_.attributes.filter = self_.barChart.rangeFilter(logScaleChecked, _filter);
                   self_.$dispatch('update-filters');
                 } else if (self_.attributes.filter.length > 0) {
                   self_.attributes.filter = [];
@@ -287,21 +189,23 @@
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
         if (typeof d === 'undefined' || d === 'na' || d === '' ||
-          d === 'NaN' || d == null) {
+          d === 'NaN' || d === null) {
           d = 'NA';
         }
         return d !== 'NA';
-      }), function(d) {
-        var number = parseFloat(d);
-        if (isNaN(number)) {
+      }), function (d) {
+        var number = d;
+        if (isNaN(d)) {
           _dataIssue = true;
+        } else {
+          number = parseFloat(d);
         }
         return number;
       });
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
-        if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001) {
+        if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001 && this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] > 0) {
           this.data.smallDataFlag = true;
           this.data.exponents = cbio.util.getDecimalExponents(this.data.meta);
           var findExtremeExponentResult = cbio.util.findExtremes(this.data.exponents);
@@ -310,9 +214,11 @@
         } else {
           this.data.smallDataFlag = false;
         }
+
         var findExtremeResult = cbio.util.findExtremes(this.data.meta);
         this.data.min = findExtremeResult[0];
         this.data.max = findExtremeResult[1];
+        this.data.sortedData = findExtremeResult[3];
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
         if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {

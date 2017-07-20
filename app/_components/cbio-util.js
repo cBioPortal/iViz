@@ -598,7 +598,7 @@ cbio.util = (function() {
      */
     var q1 = values[Math.floor((values.length / 4))];
     // Likewise for q3. 
-    var q3 = values[(Math.ceil((values.length * (3 / 4))) > values.length - 1 ? values.length - 1 : Math.ceil((values.length * (3 / 4))))];
+    var q3 = values[(Math.floor(values.length * (3 / 4)))];
     var iqr = q3 - q1;
 
     if (values[Math.ceil((values.length * (1 / 2)))] < 0.001) {
@@ -640,7 +640,7 @@ cbio.util = (function() {
       }
     }
 
-    return [minValue, maxValue, smallDataFlag];
+    return [minValue, maxValue, smallDataFlag, values];
   }
 
   function getDatahubStudiesList() {
@@ -674,16 +674,16 @@ cbio.util = (function() {
 
 
   function getDecimalExponents(data){
-    // Copy the values, rather than operating on references to existing values
+    //Copy the values, rather than operating on references to existing values
     if (!_.isArray(data) || data.length < 1) {//if data is not an array or is empty, return data
       return data;
     }
-    
+
     var values = [];
     var minZeros = 0, maxZeros = 0;
     var head, tail;
     var expoents = [];
-    
+
     _.each(data, function(item) {
       if (!isNaN(item)) {
         values.push(Number(item));
@@ -694,10 +694,10 @@ cbio.util = (function() {
     values.sort(function(a, b) {
       return a - b;
     });
-    
-    //make sure that min and max values are numbers.
+
+    //make sure that min and max values are greater than 0.
     for (head = 0; head < values.length; head++){
-      if ($.isNumeric(values[head])) {
+      if (values[head] > 0) {
         while (values[head] < 1) {
           values[head] *= 10;
           minZeros++;
@@ -705,9 +705,9 @@ cbio.util = (function() {
         break;
       }
     }
-    
+
     for (tail = values.length - 1; tail >= 0; tail--) {
-      if ($.isNumeric(values[head])) {
+      if (values[tail] > 0) {
         while (values[tail] < 1) {
           values[tail] *= 10;
           maxZeros++;
