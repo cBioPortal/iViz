@@ -11,7 +11,7 @@
     '<span class="chart-title-span" id="{{chartId}}-title">{{displayName}}' +
     '</span></div>' +
     '<div :class="[showOperations?chartOperationsActive:chartOperations]">' +
-    '<div class="log-scale" v-if="showLogScale">' +
+    '<div class="checkbox-div" v-if="showLogScale && chartInitialed"">' +
     '<input type="checkbox" value="" id="" ' +
     'class="checkbox" v-model="logChecked">' +
     '<span id="scale-span-{{chartId}}">' +
@@ -22,13 +22,13 @@
     'class="fa fa-info-circle icon hover" ' +
     'id="{{chartId}}-description-icon"' +
     'aria-hidden="true"></i>' +
-    '<i v-if="showTableIcon" class="fa fa-table icon hover" ' +
+    '<i v-if="showTableIcon && chartInitialed" class="fa fa-table icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
-    '<i v-if="showPieIcon" class="fa fa-pie-chart icon hover" ' +
+    '<i v-if="showPieIcon && chartInitialed"" class="fa fa-pie-chart icon hover" ' +
     'aria-hidden="true" @click="changeView()"></i>' +
-    '<img v-if="showSurvivalIcon" src="images/survival_icon.svg" ' +
+    '<img v-if="showSurvivalIcon && chartInitialed"" src="images/survival_icon.svg" ' +
     'class="icon hover" @click="getRainbowSurvival" alt="Survival Analysis"/>' +
-    '<div v-if="showDownloadIcon" id="{{chartId}}-download-icon-wrapper" class="download">' +
+    '<div v-if="showDownloadIcon && chartInitialed"" id="{{chartId}}-download-icon-wrapper" class="download">' +
     '<i class="fa fa-download icon hover" alt="download" ' +
     'id="{{chartId}}-download"></i>' +
     '</div>' +
@@ -46,7 +46,7 @@
       }, chartCtrl: {
         type: Object
       }, groupid: {
-        type: Number
+        type: String
       }, hasChartTitle: {
         type: Boolean,
         default: false
@@ -73,6 +73,9 @@
       }, showDownloadIcon: {
         type: Boolean,
         default: true
+      }, chartInitialed: {
+        type: Boolean,
+        default: true
       }
     },
     data: function() {
@@ -94,7 +97,8 @@
       logChecked: function(newVal) {
         this.reset();
         this.$dispatch('changeLogScale', newVal);
-      }, filters: function(newVal) {
+      },
+      filters: function(newVal) {
         this.hasFilters = newVal.length > 0;
       },
       showSurvivalIcon: function(newVal) {
@@ -236,10 +240,16 @@
       if (self.showLogScale) {
         _numOfIcons++;
       }
-      
-      if(self.showDownloadIcon) {
+
+      if (self.showDownloadIcon) {
         _numOfIcons++;
       }
+
+      if (self.attributes.view_type
+        && self.attributes.view_type === 'survival') {
+        _numOfIcons += 5;
+      }
+
       this.numOfIcons = _numOfIcons;
     }
   });
