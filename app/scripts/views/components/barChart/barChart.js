@@ -51,7 +51,7 @@
                         }
                     }
                 }
-            } else if (data_.sortedData.length > 5) {
+            } else if (!data_.valueAsTick) {
                 if (d[data_.attrId] <= opts_.xDomain[1]) {
                     val = opts_.xDomain[0];
                 } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
@@ -113,7 +113,7 @@
         .renderHorizontalGridLines(false)
         .renderVerticalGridLines(false);
 
-      if (data_.sortedData.length <= 5 && data_.sortedData.length > 0) {
+      if (data_.valueAsTick) {
         chartInst_.barPadding(1);// separate continuous bar
       }
 
@@ -167,13 +167,13 @@
         } else {
           _returnValue = 'NA';
         }
-      } else if (v === opts_.xDomain[0] && data_.sortedData.length > 5) {
+      } else if (v === opts_.xDomain[0] && !data_.valueAsTick) {
         formattedValue = opts_.xDomain[1];
         if (data_.smallDataFlag) {
           return '<=' + e(formattedValue);
         }
         return '<=' + formattedValue;
-      } else if (v === opts_.xDomain[opts_.xDomain.length - 2] && data_.sortedData.length > 5) {
+      } else if (v === opts_.xDomain[opts_.xDomain.length - 2] && !data_.valueAsTick) {
         formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
         if (data_.smallDataFlag) {
           return '>' + e(formattedValue);
@@ -273,7 +273,8 @@
         sortedData: data_.sortedData,
         minExponent: data_.minExponent,
         maxExponent: data_.maxExponent,
-        smallDataFlag: data_.smallDataFlag
+        smallDataFlag: data_.smallDataFlag,
+        valueAsTick: data_.valueAsTick
       }, opts.logScaleChecked));
       ndx_ = ndx;
 
@@ -402,7 +403,8 @@
         sortedData: data_.sortedData,
         minExponent: data_.minExponent,
         maxExponent: data_.maxExponent,
-        smallDataFlag: data_.smallDataFlag
+        smallDataFlag: data_.smallDataFlag,
+        valueAsTick: data_.valueAsTick
       }, logScaleChecked));
 
       initDc_(logScaleChecked);
@@ -623,7 +625,7 @@
           }
         } else {
           if (!_.isNaN(range)) {
-            if (data.sortedData.length <= 5 && data.sortedData.length > 0) {// for data has at most 5 points
+            if (data.valueAsTick) {// for data has at most 5 points
               _.each(data.sortedData, function(value) {
                 config.xDomain.push(value);
               });
@@ -667,7 +669,7 @@
             config.emptyMappingVal =
               config.xDomain[config.xDomain.length - 1] + config.gutter;
             config.xDomain.push(config.emptyMappingVal);
-          } else if (data.sortedData.length <= 5 && data.sortedData.length > 0) {
+          } else if (data.valueAsTick) {
             // add marker for NA values
             config.emptyMappingVal =
               Number(cbio.util.toPrecision(

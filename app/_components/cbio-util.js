@@ -640,7 +640,7 @@ cbio.util = (function() {
       }
     }
 
-    return [minValue, maxValue, smallDataFlag, values];
+    return [minValue, maxValue, smallDataFlag, values, iqr];
   }
 
   function getDatahubStudiesList() {

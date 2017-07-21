@@ -218,7 +218,15 @@
         var findExtremeResult = cbio.util.findExtremes(this.data.meta);
         this.data.min = findExtremeResult[0];
         this.data.max = findExtremeResult[1];
+        this.data.valueAsTick = false;
         this.data.sortedData = findExtremeResult[3];
+        if (this.data.meta.length <= 5 && this.data.meta.length > 0) {
+          var maxData = _.max(this.data.meta);
+          var minData = _.min(this.data.meta);
+          if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
+            this.data.valueAsTick = true;
+          }
+        }
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
         if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
