@@ -50,7 +50,7 @@
     content.clearSelectedRowData = function() {
       selectedRowData = [];
     };
-
+    
     content.init =
       function(_attributes, _opts, _selectedSamples, _selectedGenes,
                _data, _callbacks, _geneData, _dimension, _genePanelMap) {
@@ -160,9 +160,9 @@
       return _.values(categories_);
     };
 
-    function initReactTable(_reloadData, _selectedMap, _selectedSampleIds) {
+    function initReactTable(_reloadData, _selectedMap, _selectedSampleUids) {
       if (_reloadData) {
-        reactTableData = initReactData(_selectedMap, _selectedSampleIds);
+        reactTableData = initReactData(_selectedMap, _selectedSampleUids);
       }
       var _opts = {
         input: reactTableData,
@@ -258,6 +258,7 @@
     function updateCategories() {
       var _labels = {};
       var _currentSampleSize = 0;
+      
       _.each(group.top(Infinity), function(label) {
         var _labelDatum = {};
         var _labelValue = Number(label.value);
@@ -278,8 +279,14 @@
       categories_ = _labels;
     }
 
-    function mutatedGenesData(_selectedGenesMap, _selectedSampleIds) {
-
+    function mutatedGenesData(_selectedGenesMap, _selectedSampleUids) {
+      var _selectedSampleIds;
+      if (_.isArray(_selectedSampleUids)) {
+        _selectedSampleIds = [];
+        _.each(_selectedSampleUids, function(uid) {
+          _selectedSampleIds.push(iViz.getCaseIdUsingUID('sample', uid));
+        });
+      }
       genePanelMap = window.iviz.datamanager.updateGenePanelMap(genePanelMap, _selectedSampleIds);
 
       selectedGeneData.length = 0;
@@ -357,7 +364,7 @@
       return selectedGeneData;
     }
 
-    function initReactData(_selectedMap, _selectedSampleIds) {
+    function initReactData(_selectedMap, _selectedSampleUids) {
       attr_ = iViz.util.tableView.getAttributes(type_);
       var result = {
         data: [],
@@ -365,7 +372,7 @@
       };
 
       if (isMutatedGeneCna) {
-        var _mutationData = mutatedGenesData(_selectedMap, _selectedSampleIds);
+        var _mutationData = mutatedGenesData(_selectedMap, _selectedSampleUids);
         _.each(_mutationData, function(item) {
           for (var key in item) {
             if (item.hasOwnProperty(key)) {
