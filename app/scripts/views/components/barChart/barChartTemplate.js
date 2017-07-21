@@ -198,20 +198,18 @@
         return d !== 'NA';
       }), function(d) {
         var number = d;
-        var strNumber;
         if (isNaN(d)) {
-          strNumber = d.toString();
-          if (strNumber.includes('<')) {
-            if (strNumber.includes('<=')) {
-              number = strNumber.slice(2);
+          if (number.includes('<')) {
+            if (number.includes('<=')) {
+              number = number.slice(2);
             } else {
-              number = strNumber.slice(1);
+              number = number.slice(1);
             }
-          } else if (strNumber.includes('>')) {
-            if (strNumber.includes('>=')) {
-              number = strNumber.slice(2);
+          } else if (number.includes('>')) {
+            if (number.includes('>=')) {
+              number = number.slice(2);
             } else {
-              number = strNumber.slice(1);
+              number = number.slice(1);
             }
           } else {
             _dataIssue = true;
