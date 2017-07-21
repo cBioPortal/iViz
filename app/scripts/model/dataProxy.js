@@ -532,7 +532,8 @@ window.DataManagerForIviz = (function($, _) {
                 _cnaAttrMeta.view_type = 'table';
                 _cnaAttrMeta.display_name = 'CNA Genes';
                 _cnaAttrMeta.description = 'This table only shows ' +
-                  '<a href="cancer_gene_list.jsp" target="_blank">cbio cancer genes</a> in the cohort.';
+                  '<a href="cancer_gene_list.jsp" target="_blank">' +
+                  'cBioPortal cancer genes</a> in the cohort.';
                 _cnaAttrMeta.attr_id = 'cna_details';
                 _cnaAttrMeta.filter = [];
                 _cnaAttrMeta.show = true;
@@ -555,7 +556,9 @@ window.DataManagerForIviz = (function($, _) {
                 _mutDataAttrMeta.view_type = 'table';
                 _mutDataAttrMeta.display_name = 'Mutated Genes';
                 _mutDataAttrMeta.description = 'This table shows ' +
-                  '<a href="cancer_gene_list.jsp" target="_blank" target="_blank">cbio cancer genes</a> with 1 or more mutations, as well as any ' +
+                  '<a href="cancer_gene_list.jsp" target="_blank">' +
+                  'cBioPortal cancer genes</a> ' +
+                  'with 1 or more mutations, as well as any ' +
                   'gene with 2 or more mutations';
                 _mutDataAttrMeta.attr_id = 'mutated_genes';
                 _mutDataAttrMeta.filter = [];
@@ -727,29 +730,6 @@ window.DataManagerForIviz = (function($, _) {
                     _MutationCountMeta.show = true;
                     _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
                     _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
-                  }
-
-                  // add CNA Table
-                  if (self.hasCnaSegmentData()) {
-                    _hasSampleAttrData.cna_details = '';
-                    var _cnaAttrMeta = {};
-                    _cnaAttrMeta.type = 'cna';
-                    _cnaAttrMeta.view_type = 'table';
-                    _cnaAttrMeta.display_name = 'CNA Genes';
-                    _cnaAttrMeta.description = 'This table only shows ' +
-                      '<a href="cancer_gene_list.jsp" target="_blank">cbio cancer genes</a> in the cohort.';
-                    _cnaAttrMeta.attr_id = 'cna_details';
-                    _cnaAttrMeta.filter = [];
-                    _cnaAttrMeta.show = true;
-                    _cnaAttrMeta.keys = {};
-                    _cnaAttrMeta.numOfDatum = 0;
-                    _cnaAttrMeta.priority = 4;
-                    _cnaAttrMeta.attrList = [_cnaAttrMeta.attr_id];
-                    _cnaAttrMeta.options = {
-                      allCases: _allCaseUIDs,
-                      sequencedCases: _cnaCaseUIDs
-                    };
-                    _sampleAttributes[_cnaAttrMeta.attr_id] = _cnaAttrMeta;
                   }
 
                   var hiddenAttrs = content.util.getHiddenAttrs();
@@ -1084,7 +1064,7 @@ window.DataManagerForIviz = (function($, _) {
             _.each(_profiles, function(_profile) {
               if (_profile.genetic_alteration_type === 'COPY_NUMBER_ALTERATION' && _profile.datatype === 'DISCRETE') {
                 self.cnaProfileIdsMap[_profile.study_id] = _profile.id;
-              } else if (_profile.genetic_alteration_type === 'MUTATION_EXTENDED') {
+              } else if (_profile.genetic_alteration_type === 'MUTATION_EXTENDED' && (_profile.study_id + '_mutations_uncalled' !== _profile.id)) {
                 self.mutationProfileIdsMap[_profile.study_id] = _profile.id;
               }
             });

@@ -100,9 +100,7 @@
           this.attributes.attr_id
         );
         _.each(categories, function(category) {
-          if (dataForCategories.hasOwnProperty(category.name) &&
-            // Remove pie chart NA group by default
-            category.name !== 'NA') {
+          if (dataForCategories.hasOwnProperty(category.name)) {
             groups.push({
               name: category.name,
               caseIds: dataForCategories[category.name],

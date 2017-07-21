@@ -517,6 +517,9 @@
             servletName: window.cbioURL + 'svgtopdf.do'
           });
           break;
+      case 'tsv':
+        csvDownload(content.fileName, content.data);
+        break;
         default:
           break;
       }
@@ -680,6 +683,27 @@
         }
       });
       return str;
+    };
+
+    /**
+     * If input is na, NA, NaN, n/a, null or undefined, return true
+     * Else, return false.
+     * @param str
+     * @param includeEmptyStr Whether empty string should be treated as NA
+     * @returns {boolean}
+     */
+    content.strIsNa = function(str, includeEmptyStr) {
+      var status = false;
+      includeEmptyStr = _.isBoolean(includeEmptyStr) ? includeEmptyStr : false;
+      if (_.isString(str)) {
+        if (['na', 'nan', 'n/a'].indexOf(str.toLowerCase()) > -1 ||
+          (includeEmptyStr && !str)) {
+          status = true;
+        }
+      } else if (typeof str === 'undefined' || str === null) {
+        status = true;
+      }
+      return status;
     };
 
     return content;

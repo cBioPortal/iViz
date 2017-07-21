@@ -25,19 +25,6 @@
   .download {
     float: left;
   }
-  .log-scale {
-    height: 12px;
-    line-height: 12px;
-    font-size: 10px;
-    float: left;
-    color: grey;
-    margin-right: 10px;
-    .checkbox {
-      margin-right: 2px;
-      margin-top: 1px !important;
-      float: left;
-    }
-  }
   .chart-title-span {
     @extend .chart-title-span;
   }
@@ -53,7 +40,7 @@
     width: 100%; // 2 icons on chart header
   }
   .chart-title-active-1 {
-    width: calc(100% - 15px); // 2 icons on chart header
+    width: calc(100% - 15px); // 1 icons on chart header
   }
   .chart-title-active-2 {
     width: calc(100% - 30px); // 2 icons on chart header
@@ -62,19 +49,25 @@
     width: calc(100% - 45px); // 3 icons on chart header, each occupies 15px
   }
   .chart-title-active-4 {
-    width: calc(100% - 60px); // 6 icons on chart header
+    width: calc(100% - 60px); // 4 icons on chart header
   }
   .chart-title-active-5 {
-    width: calc(100% - 75px); // 6 icons on chart header
+    width: calc(100% - 75px); // 5 icons on chart header
   }
   .chart-title-active-6 {
     width: calc(100% - 90px); // 6 icons on chart header
   }
   .chart-title-active-7 {
-    width: calc(100% - 105px); // 6 icons on chart header
+    width: calc(100% - 105px); // 7 icons on chart header
   }
   .chart-title-active-8 {
-    width: calc(100% - 120px); // 6 icons on chart header
+    width: calc(100% - 120px); // 8 icons on chart header
+  }
+  .chart-title-active-9 {
+    width: calc(100% - 135px); // 9 icons on chart header
+  }
+  .chart-title-active-10 {
+    width: calc(100% - 150px); // 10 icons on chart header
   }
 
   .iviz-chart-header {
@@ -90,5 +83,15 @@
 
   .dc-chart-drag:hover {
     cursor: move;
+  }
+
+  .checkbox-div {
+    float: left;
+    display: inline-flex;
+    font-size: 10px;
+    line-height: 10px;
+    .checkbox {
+      margin: 1px 5px 0 0;
+    }
   }
 }
