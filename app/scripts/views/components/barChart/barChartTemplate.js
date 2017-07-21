@@ -192,14 +192,32 @@
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
         if (typeof d === 'undefined' || d === 'na' || d === '' ||
-          d === 'NaN' || d == null) {
+          d === 'NaN' || d == null || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {
           d = 'NA';
         }
         return d !== 'NA';
       }), function(d) {
-        var number = parseFloat(d);
-        if (isNaN(number)) {
-          _dataIssue = true;
+        var number = d;
+        var strNumber;
+        if (isNaN(d)) {
+          strNumber = d.toString();
+          if (strNumber.includes('<')) {
+            if (strNumber.includes('<=')) {
+              number = strNumber.slice(2);
+            } else {
+              number = strNumber.slice(1);
+            }
+          } else if (strNumber.includes('>')) {
+            if (strNumber.includes('>=')) {
+              number = strNumber.slice(2);
+            } else {
+              number = strNumber.slice(1);
+            }
+          } else {
+            _dataIssue = true;
+          }
+        } else {
+          number = parseFloat(d);
         }
         return number;
       });

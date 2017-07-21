@@ -20,8 +20,25 @@
         var val = d[data_.attrId];
         var _min;
         var _max;
+        var strVal = val.toString();
+        
+
+        if (strVal.includes('<')) {
+          if (strVal.includes('<=')) {
+            val = strVal.slice(2);
+          } else {
+            val = Number(strVal.slice(1)) - opts_.gutter / 4;
+          }
+        } else if (strVal.includes('>')) {
+          if (strVal.includes('>=')) {
+            val = strVal.slice(2);
+          } else {
+            val = Number(strVal.slice(1)) + opts_.gutter / 4;
+          }
+        } 
+        
         if (typeof val === 'undefined' || val === 'NA' || val === '' ||
-          val === 'NaN') {
+          val === 'NaN' || isNaN(val)) {
           val = opts_.xDomain[opts_.xDomain.length - 1];
         } else if (logScale) {
           for (i = 1; i < opts_.xDomain.length; i++) {

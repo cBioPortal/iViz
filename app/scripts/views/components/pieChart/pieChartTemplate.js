@@ -146,12 +146,13 @@
     ready: function() {
       var _self = this;
       var _attrId = _self.attributes.attr_id;
-      var min = 0;
-      var minKey = '';
-      var max = Infinity;
-      var maxKey = '';
-      var hasSpecialCharacters = false;
-      
+      var _cluster = _self.ndx.dimension(function(d) {
+        if (typeof d[_attrId] === 'undefined') {
+          d[_attrId] = 'NA';
+        }
+        return d[_attrId];
+      });
+
       _self.$once('initMainDivQtip', _self.initMainDivQtip);
       var opts = {
         chartId: _self.chartId,
@@ -162,71 +163,8 @@
         width: window.iViz.styles.vars.piechart.width,
         height: window.iViz.styles.vars.piechart.height
       };
-
-      var _cluster = _self.ndx.dimension(function(d) {
-        if (typeof d[_attrId] === 'undefined') {
-          d[_attrId] = 'NA';
-        }
-        return d[_attrId];
-      });
-        
-      _cluster.group().all().map(function(d) {
-        if (d.key.includes('<')) {
-          hasSpecialCharacters = true;
-          if (d.key.includes('<=') && min <= d.key.slice(2)) {
-            min = d.key.slice(2);
-            minKey = '<=' + min;
-          } else if (!d.includes('<=') && min < d.key.slice(1)) {
-            min = d.key.slice(1);
-            minKey = '<' + min;
-          }
-        } else if (d.key.includes('>')) {
-          hasSpecialCharacters = true;
-          if (d.key.includes('>=') && max >= d.key.slice(2)) {
-            max = d.key.slice(2);
-            maxKey = '>=' + max;
-          } else if (!d.includes('>=') && max > d.key.slice(1)) {
-            max = d.key.slice(1);
-            maxKey = '>' + max;
-          }
-        }
-      });
-      
-      if (hasSpecialCharacters) {
-        min = Number(min);
-        max = Number(max);
-        
-        var _filteredCluster = _self.ndx.dimension(function(d) {
-          if (typeof d[_attrId] === 'undefined') {
-            d[_attrId] = 'NA';
-          }
-
-          if (!isNaN(d[_attrId])) {
-            if (d[_attrId] < min) {
-              d[_attrId] = minKey;
-            } else if (d[_attrId] > max) {
-              d[_attrId] = maxKey;
-            } else if (d[_attrId] == min && minKey.includes('<=')) {
-              d[_attrId] = minKey;
-            } else if (d[_attrId] == max && maxKey.includes('>=')) {
-              d[_attrId] = maxKey;
-            }
-          } else if (d[_attrId].includes('<') && d[_attrId] !== minKey) {
-            d[_attrId] = minKey;
-          } else if (d[_attrId].includes('>') && d[_attrId] !== maxKey) {
-            d[_attrId] = maxKey;
-          }
-          
-          return d[_attrId];
-        });
-        
-        _self.piechart = new iViz.view.component.PieChart(
-          _self.ndx, _self.attributes, opts, _filteredCluster);
-      } else {
-        _self.piechart = new iViz.view.component.PieChart(
-          _self.ndx, _self.attributes, opts, _cluster);
-      }
-      
+      _self.piechart = new iViz.view.component.PieChart(
+        _self.ndx, _self.attributes, opts, _cluster);
       _self.piechart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
       _self.chartInst = _self.piechart.getChart();
       _self.chartInst.on('filtered', function(_chartInst, _filter) {
