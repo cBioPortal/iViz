@@ -20,22 +20,6 @@
         var val = d[data_.attrId];
         var _min;
         var _max;
-        var strVal = val.toString();
-        
-
-        if (strVal.includes('<')) {
-          if (strVal.includes('<=')) {
-            val = strVal.slice(2);
-          } else {
-            val = Number(strVal.slice(1)) - opts_.gutter / 4;
-          }
-        } else if (strVal.includes('>')) {
-          if (strVal.includes('>=')) {
-            val = strVal.slice(2);
-          } else {
-            val = Number(strVal.slice(1)) + opts_.gutter / 4;
-          }
-        } 
         
         if (typeof val === 'undefined' || val === 'NA' || val === '' ||
           val === 'NaN' || isNaN(val)) {

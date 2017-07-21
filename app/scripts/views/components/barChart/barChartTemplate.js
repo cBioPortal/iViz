@@ -176,6 +176,8 @@
     },
     ready: function() {
       var _dataIssue = false;
+      var smallerOutlier = [];
+      var greaterOutlier = [];
       this.settings.width = window.iViz.styles.vars.barchart.width;
       this.settings.height = window.iViz.styles.vars.barchart.height;
 
@@ -200,18 +202,14 @@
       }), function(d) {
         var number = d;
         if (isNaN(d)) {
-          if (number.includes('<')) {
-            if (number.includes('<=')) {
-              number = number.slice(2);
-            } else {
-              number = number.slice(1);
-            }
-          } else if (number.includes('>')) {
-            if (number.includes('>=')) {
-              number = number.slice(2);
-            } else {
-              number = number.slice(1);
-            }
+          if (number.includes('<=')) {
+            smallerOutlier.push(number.slice(2));
+          } else if (number.includes('<') && !number.includes('<=')) {
+            smallerOutlier.push(number.slice(1));
+          } else if (number.includes('>=')) {
+            greaterOutlier.push(number.slice(2));
+          } else if (number.includes('>') && !number.includes('>=')) {
+            greaterOutlier.push(number.slice(1));
           } else {
             _dataIssue = true;
           }
@@ -224,9 +222,15 @@
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
-        var findExtremeResult = cbio.util.findExtremes(this.data.meta);
-        this.data.min = findExtremeResult[0];
-        this.data.max = findExtremeResult[1];
+        if (smallerOutlier.length > 0 && greaterOutlier.length > 0) {
+          this.data.min = _.min(smallerOutlier);
+          this.data.max = _.max(greaterOutlier);
+        } else {
+          var findExtremeResult = cbio.util.findExtremes(this.data.meta);
+          this.data.min = findExtremeResult[0];
+          this.data.max = findExtremeResult[1];
+        }
+        
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
         
