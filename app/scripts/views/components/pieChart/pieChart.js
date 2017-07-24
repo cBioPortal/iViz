@@ -137,10 +137,9 @@
       }
     };
 
-    content.filtered = function() {
+    content.filtered = function(filters) {
       updateTables();
-      isFiltered = true;
-      updateQtip = false;
+      isFiltered = _.isArray(filters) && filters.length > 0;
     };
 
     content.getCurrentCategories = function(sortBy) {
