@@ -46,7 +46,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       transitionDuration: 400
     }
   };
-  var mutationCountMap_ = {};
   var firstScatterShow = true;
 
   return {
@@ -191,6 +190,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var hasAttrDataMap = isPatientAttributes ? data_.groups.patient.has_attr_data : data_.groups.sample.has_attr_data;
       var attrDataToGet = [];
       var updatedAttrIds = [];
+      
       _.each(attrIds, function(_attrId) {
         if (charts[_attrId] === undefined) {
           updatedAttrIds = updatedAttrIds.concat(_attrId);
@@ -375,9 +375,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       tableData_.cna_details.geneMeta = _cnaMeta;
       return tableData_.cna_details;
     },
-    getMutationCountData: function() {
-      return mutationCountMap_;
-    },
     getTableData: function(attrId) {
       var def = new $.Deferred();
       var self = this;
@@ -406,78 +403,60 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var def = new $.Deferred();
       var self = this;
       var data = self.getGroupNdx(groupId);
-
-      $.when(window.iviz.datamanager.getStudyToSampleToPatientdMap()).then(function(_studyToSampleToPatientMap) {
-        $.when(window.iviz.datamanager.getCaseLists()).then(function(_caseLists) {
-          var _sequencedCaseUIDs = [];
-          var _allCaseUIDs = [];
-          var _sequencedCaseUIdsMap = {};
+      
+      $.when(window.iviz.datamanager.getCnaFractionData(),
+        window.iviz.datamanager.getMutationCount())
+        .then(function(_cnaFractionData, _mutationCountData) {
+          var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
+          var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
           
-          $.each(_caseLists, function(studyId, caseList) {
-            if (caseList.sequencedSampleIds.length > 0) {
-              $.each(caseList.sequencedSampleIds, function(index, sampleId) {
-                _sequencedCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
-              });
-            }
-            if (caseList.allSampleIds.length > 0) {
-              $.each(caseList.allSampleIds, function(index, sampleId) {
-                _allCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
-              });
-            }
-          });
-          _sequencedCaseUIDs = _sequencedCaseUIDs.length > 0 ? _sequencedCaseUIDs : _allCaseUIDs;
-          _.each(_sequencedCaseUIDs, function(_sampleUid) {
-            _sequencedCaseUIdsMap[_sampleUid] = _sampleUid;
-          });
+          // firstScatterShow is a global variable. If web page is just initialized, firstScatterShow is true and 
+          // it turns to false when cna.json or mutation.json returns null. When people want to add the empty 
+          // scatter chart, firstScatterChart(false) ensures the "remove empty chart" module won't be executed.
+          if ((!_hasCNAFractionData || !_hasMutationCountData) && firstScatterShow) { // remove empty scatter chart when web page just loaded
+            charts['MUT_CNT_VS_CNA'].show = false;
+            firstScatterShow = false;
+            _self.$dispatch('remove-chart', 'MUT_CNT_VS_CNA', groupId);//rearrange layout
+          }
 
-          $.when(window.iviz.datamanager.getCnaFractionData(),
-            window.iviz.datamanager.getMutationCount())
-            .then(function(_cnaFractionData, _mutationCountData) {
-              var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
-              var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
-
-              if ((!_hasCNAFractionData || !_hasMutationCountData) && firstScatterShow) {
-                charts['MUT_CNT_VS_CNA'].show = false;
-                firstScatterShow = false;
-                _self.$dispatch('remove-chart', 'MUT_CNT_VS_CNA', groupId);//rearrange layout
+          _.each(data, function(_sampleDatum) {
+            // mutation count
+            if (_hasMutationCountData) {
+              if (_mutationCountData[_sampleDatum.study_id] === undefined ||
+                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
+                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
+                if (_self.attributes.sequencedCaseUIdsMap[_sampleDatum.sample_uid] === undefined) {
+                  _sampleDatum.mutation_count = 'NA';
+                } else {
+                  _sampleDatum.mutation_count = 0;
+                }
+              } else {
+                _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
               }
+              // add mutation_count into data_
+              if (data_.groups.sample.data[_sampleDatum.sample_uid] !== undefined && 
+               data_.groups.sample.data[_sampleDatum.sample_uid] !== null) {
+               data_.groups.sample.data[_sampleDatum.sample_uid].mutation_count = _sampleDatum.mutation_count;
+              }
+            }
 
-              _.each(data, function(_sampleDatum) {
-                // mutation count
-                if (_hasMutationCountData) {
-                  if (_mutationCountData[_sampleDatum.study_id] === undefined ||
-                    _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                    _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                    if (_sequencedCaseUIdsMap[_sampleDatum.sample_uid] === undefined) {
-                      _sampleDatum.mutation_count = 'NA';
-                    } else {
-                      _sampleDatum.mutation_count = 0;
-                    }
-                  } else {
-                    _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                  }
-                  mutationCountMap_[_sampleDatum.sample_uid] = _sampleDatum.mutation_count;
-                }
-
-                // cna fraction
-                if (_hasCNAFractionData) {
-                  if (_cnaFractionData[_sampleDatum.study_id] === undefined ||
-                    _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                    _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                    _sampleDatum.cna_fraction = 'NA';
-                    _sampleDatum.copy_number_alterations = 'NA';
-                  } else {
-                    _sampleDatum.cna_fraction = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                    _sampleDatum.copy_number_alterations = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                  }
-                }
-              });
-              def.resolve(data);
-            }, function() {
-              def.reject();
-            });
+            // cna fraction
+            if (_hasCNAFractionData) {
+              if (_cnaFractionData[_sampleDatum.study_id] === undefined ||
+                _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
+                _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
+                _sampleDatum.cna_fraction = 'NA';
+                _sampleDatum.copy_number_alterations = 'NA';
+              } else {
+                _sampleDatum.cna_fraction = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
+                _sampleDatum.copy_number_alterations = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
+              }
+            }
+          });
+          def.resolve(data);
+        }, function() {
+          def.reject();
         });
-      });
       return def.promise();
     },
     getCasesMap: function(type) {

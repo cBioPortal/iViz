@@ -674,6 +674,7 @@ window.DataManagerForIviz = (function($, _) {
                 _mutCntAttrMeta.numOfDatum = 0;
                 _mutCntAttrMeta.priority = 2;
                 _mutCntAttrMeta.attrList = ['cna_fraction'];
+                _mutCntAttrMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap;//This attribute is used for getScatterData()
                 _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
              // }
 
