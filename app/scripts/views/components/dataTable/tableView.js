@@ -404,7 +404,7 @@
         selectedRowData.push(data);
       } else {
         selectedRowData = _.filter(selectedRowData, function(item) {
-          return (item.uniqueId !== data.uniqueId);
+          return (item.uniqueid !== data.uniqueid);
         });
       }
     }
