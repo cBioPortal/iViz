@@ -184,7 +184,7 @@
             _self.$dispatch('update-filters');
           }
           // Trigger pie chart filtered event.
-          _self.piechart.filtered();
+          _self.piechart.filtered(_self.attributes.filter);
         }
       });
 
