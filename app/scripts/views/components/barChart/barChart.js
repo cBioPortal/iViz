@@ -21,8 +21,7 @@
         var _min;
         var _max;
         
-        if (typeof val === 'undefined' || val === 'NA' || val === '' ||
-          val === 'NaN' || isNaN(val)) {
+        if (iViz.util.strIsNa(val, true) || isNaN(val)) {
           val = opts_.xDomain[opts_.xDomain.length - 1];
         } else if (logScale) {
           for (i = 1; i < opts_.xDomain.length; i++) {

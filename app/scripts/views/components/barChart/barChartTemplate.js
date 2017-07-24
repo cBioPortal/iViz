@@ -194,22 +194,17 @@
 
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
-        if (typeof d === 'undefined' || d === 'na' || d === '' ||
-          d === 'NaN' || d == null || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {
+        if (iViz.util.strIsNa(d, true) || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {
           d = 'NA';
         }
         return d !== 'NA';
       }), function(d) {
         var number = d;
         if (isNaN(d)) {
-          if (number.includes('<=')) {
-            smallerOutlier.push(number.slice(2));
-          } else if (number.includes('<') && !number.includes('<=')) {
-            smallerOutlier.push(number.slice(1));
-          } else if (number.includes('>=')) {
-            greaterOutlier.push(number.slice(2));
-          } else if (number.includes('>') && !number.includes('>=')) {
-            greaterOutlier.push(number.slice(1));
+          if (number.includes('<')) {
+            smallerOutlier.push(number.replace(/[^0-9.]/g, ''));
+          } else if (number.includes('>')) {
+            greaterOutlier.push(number.replace(/[^0-9.]/g, ''));
           } else {
             _dataIssue = true;
           }
