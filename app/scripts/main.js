@@ -46,7 +46,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       transitionDuration: 400
     }
   };
-  var firstScatterShow = true;
 
   return {
 
@@ -399,26 +398,19 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       }
       return def.promise();
     },
-    getScatterData: function(_self, groupId) {
+    getScatterData: function(_self) {
       var def = new $.Deferred();
       var self = this;
-      var data = self.getGroupNdx(groupId);
+      var data = {};
       
       $.when(window.iviz.datamanager.getCnaFractionData(),
         window.iviz.datamanager.getMutationCount())
         .then(function(_cnaFractionData, _mutationCountData) {
           var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
           var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
+          var groupId = _self.attributes.group_id;
+          data = self.getGroupNdx(groupId);
           
-          // firstScatterShow is a global variable. If web page is just initialized, firstScatterShow is true and 
-          // it turns to false when cna.json or mutation.json returns null. When people want to add the empty 
-          // scatter chart, firstScatterChart(false) ensures the "remove empty chart" module won't be executed.
-          if ((!_hasCNAFractionData || !_hasMutationCountData) && firstScatterShow) { // remove empty scatter chart when web page just loaded
-            charts['MUT_CNT_VS_CNA'].show = false;
-            firstScatterShow = false;
-            _self.$dispatch('remove-chart', 'MUT_CNT_VS_CNA', groupId);//rearrange layout
-          }
-
           _.each(data, function(_sampleDatum) {
             // mutation count
             if (_hasMutationCountData) {
@@ -453,7 +445,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               }
             }
           });
-          def.resolve(data);
+          def.resolve(data, _hasCNAFractionData, _hasMutationCountData);
         }, function() {
           def.reject();
         });
