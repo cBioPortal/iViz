@@ -200,10 +200,12 @@
         return d !== 'NA';
       }), function(d) {
         var number = d;
+        var smallerOutlierPattern = new RegExp('^<|(>=|>)$');
+        var greaterOutlierPattern = new RegExp('^>|(<=|<)$');
         if (isNaN(d)) {
-          if (number.includes('<')) {
+          if (smallerOutlierPattern.test(number)) {
             smallerOutlier.push(number.replace(/[^0-9.]/g, ''));
-          } else if (number.includes('>')) {
+          } else if (greaterOutlierPattern.test(number)) {
             greaterOutlier.push(number.replace(/[^0-9.]/g, ''));
           } else {
             _dataIssue = true;
@@ -218,8 +220,8 @@
         this.failedToInit = true;
       } else {
         if (smallerOutlier.length > 0 && greaterOutlier.length > 0) {
-          this.data.min = _.min(smallerOutlier);
-          this.data.max = _.max(greaterOutlier);
+          this.data.min = _.max(smallerOutlier);
+          this.data.max = _.min(greaterOutlier);
         } else {
           var findExtremeResult = cbio.util.findExtremes(this.data.meta);
           this.data.min = findExtremeResult[0];
