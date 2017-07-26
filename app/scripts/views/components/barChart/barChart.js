@@ -20,7 +20,8 @@
         var val = d[data_.attrId];
         var _min;
         var _max;
-        
+
+        //isNaN(val) treats string in data as 'NA', such as "withheld" and "cannotReleaseHIPAA"
         if (iViz.util.strIsNa(val, true) || isNaN(val)) {
           val = opts_.xDomain[opts_.xDomain.length - 1];
         } else if (logScale) {

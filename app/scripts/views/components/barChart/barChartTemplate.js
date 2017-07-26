@@ -200,8 +200,8 @@
         return d !== 'NA';
       }), function(d) {
         var number = d;
-        var smallerOutlierPattern = new RegExp('^<|(>=|>)$');
-        var greaterOutlierPattern = new RegExp('^>|(<=|<)$');
+        var smallerOutlierPattern = new RegExp('^<|(>=?)$');
+        var greaterOutlierPattern = new RegExp('^>|(<=?)$');
         if (isNaN(d)) {
           if (smallerOutlierPattern.test(number)) {
             smallerOutlier.push(number.replace(/[^0-9.]/g, ''));
