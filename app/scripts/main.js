@@ -40,10 +40,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           height: 134
         }
       }
-    },
-    numOfSurvivalCurveLimit: 20,
-    dc: {
-      transitionDuration: 400
     }
   };
 
@@ -65,7 +61,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
       _.each(data_.groups.patient.attr_meta, function(attrData) {
         attrData.group_type = 'patient';
-        if (chartsCount < 20 && patientChartsCount < 10) {
+        if (chartsCount < iViz.opts.numOfChartsLimit &&
+          patientChartsCount < iViz.opts.numOfChartsLimit / 2) {
           if (attrData.show) {
             attrData.group_id = vm_.groupCount.toString();
             groupAttrs.push(attrData);
@@ -85,13 +82,14 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         id: vm_.groupCount.toString(),
         selectedcases: [],
         hasfilters: false,
-        attributes: groupAttrs});
+        attributes: groupAttrs
+      });
 
       groupAttrs = [];
       vm_.groupCount += 1;
       _.each(data_.groups.sample.attr_meta, function(attrData) {
         attrData.group_type = 'sample';
-        if (chartsCount < 20) {
+        if (chartsCount < iViz.opts.numOfChartsLimit) {
           if (attrData.show) {
             attrData.group_id = vm_.groupCount.toString();
             groupAttrs.push(attrData);
@@ -108,7 +106,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         id: vm_.groupCount.toString(),
         selectedcases: [],
         hasfilters: false,
-        attributes: groupAttrs});
+        attributes: groupAttrs
+      });
       vm_.groupCount += 1;
       var _self = this;
       var requests = groups.map(function(group) {
@@ -259,8 +258,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         .then(function(clinicalData) {
           var idType = isPatientAttributes ? 'patient_id' : 'sample_id';
           var type = isPatientAttributes ? 'patient' : 'sample';
+          var attrsFromServer = {};
           _.each(clinicalData, function(_clinicalAttributeData, _attrId) {
             var selectedAttrMeta = charts[_attrId];
+
+            // If there is clinical data returned from server side.
+            attrsFromServer[_attrId] = 1;
 
             hasAttrDataMap[_attrId] = '';
             selectedAttrMeta.keys = {};
@@ -276,8 +279,42 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               ++selectedAttrMeta.keys[_dataObj.attr_val];
               ++selectedAttrMeta.numOfDatum;
             });
+
+            // Hide chart which only has no more than one category.
+            var numOfKeys = Object.keys(selectedAttrMeta.keys).length;
+            if (numOfKeys <= 1) {
+              selectedAttrMeta.show = false;
+            }
+
+            if (selectedAttrMeta.datatype === 'STRING' &&
+              numOfKeys > iViz.opts.pie2TableLimit) {
+              // Change pie chart to table if the number of categories
+              // more then the pie2TableLimit configuration
+              var uids = isPatientAttributes ?
+                Object.keys(data_.groups.group_mapping.patient_to_sample) :
+                Object.keys(data_.groups.group_mapping.sample_to_patient);
+
+              selectedAttrMeta.view_type = 'table';
+              selectedAttrMeta.layout = [1, 4];
+              selectedAttrMeta.type = 'pieLabel';
+              selectedAttrMeta.options = {
+                allCases: uids,
+                sequencedCases: uids
+              };
+            }
           });
 
+          // Hide all attributes if no data available for selected cases.
+          // Basically all NAs
+          _.each(_.difference(attrIds, Object.keys(attrsFromServer)), function(_attrId) {
+            var selectedAttrMeta = charts[_attrId];
+
+            hasAttrDataMap[_attrId] = '';
+            selectedAttrMeta.keys = {};
+            selectedAttrMeta.numOfDatum = 0;
+            selectedAttrMeta.show = false;
+          });
+          
           def.resolve();
         }, function() {
           def.reject();
@@ -329,14 +366,14 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           var _geneSymbol = _cnaDataPerStudy.gene[_index];
           var _altType = '';
           switch (_cnaDataPerStudy.alter[_index]) {
-            case -2:
-              _altType = 'DEL';
-              break;
-            case 2:
-              _altType = 'AMP';
-              break;
-            default:
-              break;
+          case -2:
+            _altType = 'DEL';
+            break;
+          case 2:
+            _altType = 'AMP';
+            break;
+          default:
+            break;
           }
           var _uniqueId = _geneSymbol + '-' + _altType;
           _.each(_caseIdsPerGene, function(_caseId) {

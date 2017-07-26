@@ -6,10 +6,12 @@
   Vue.component('barChart', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" ' +
-    ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
+    ':attribute-id="attributes.attr_id" @mouseenter="mouseEnter" ' +
+    ':layout-number="attributes.layout" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
-    ':show-operations="showOperations && !failedToInit" :groupid="attributes.group_id" ' +
+    ':show-operations="showOperations" :groupid="attributes.group_id" ' +
+    ':chart-initialed = "!failedToInit"' +
     ':show-survival-icon.sync="showSurvivalIcon"' +
     ':reset-btn-id="resetBtnId" :chart-ctrl="barChart" ' +
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
@@ -69,8 +71,10 @@
       }
     }, events: {
       closeChart: function() {
-        dc.deregisterChart(this.chartInst, this.attributes.group_id);
-        this.chartInst.dimension().dispose();
+        if (!this.failedToInit) {
+          dc.deregisterChart(this.chartInst, this.attributes.group_id);
+          this.chartInst.dimension().dispose();
+        }
         this.$dispatch('close');
       },
       changeLogScale: function(logScaleChecked) {
@@ -189,8 +193,7 @@
       
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
-        if (typeof d === 'undefined' || d === 'na' || d === '' ||
-          d === 'NaN' || d == null) {
+        if (iViz.util.strIsNa(d, true)) {
           d = 'NA';
         }
         return d !== 'NA';
