@@ -38,7 +38,8 @@
             showScreenLoad: false,
             showDropDown: false,
             numOfSurvivalPlots: 0,
-            showedSurvivalPlot: false
+            showedSurvivalPlot: false,
+            userMovedChart: false
           }, watch: {
             charts: function() {
               this.checkForDropDownCharts();
@@ -95,6 +96,9 @@
               this.setSelectedCases(selectionType, selectedCases);
             }, 'remove-chart': function(attrId, groupId) {
               this.removeChart(attrId, groupId);
+            },
+            'user-moved-chart': function() {
+              this.userMovedChart = true;
             }
           }, methods: {
             checkForDropDownCharts: function() {
