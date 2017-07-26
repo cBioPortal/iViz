@@ -144,10 +144,16 @@
                 nonNaCases: []
               };
             }
-            filteredClinicalAttrs[group.id].attrs =
-              _.pluck(_.filter(group.attributes, function(attr) {
-                return attr.filter.length > 0;
-              }), 'attr_id');
+            filteredClinicalAttrs[group.id].attrs = [];
+            
+            // Loop through attrList instead of only using attr_id
+            // Combination chart has its own attr_id, but the clinical data
+            // it's using are listed under attrList
+            _.each(_.filter(group.attributes, function(attr) {
+              return attr.filter.length > 0;
+            }), function(item) {
+              filteredClinicalAttrs[group.id].attrs.push(_.pick(item, 'attr_id', 'attrList'));
+            });
           });
           if (this.excludeNa) {
             // Find qualified cases in each group.
@@ -159,7 +165,7 @@
                 var hasNaWithinAttrs = false;
 
                 //Check whether case contains NA value on filtered attrs
-                _.some(group.attrs, function(attr) {
+                _.some(_.flatten(_.pluck(group.attrs, 'attrList')), function(attr) {
                   if (iViz.util.strIsNa(data[attr], false)) {
                     hasNaWithinAttrs = true;
                     return true;
