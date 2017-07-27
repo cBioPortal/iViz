@@ -118,7 +118,8 @@
         });
       },
       resetBarColor: function(exceptionAttrIds) {
-        if (_.isArray(exceptionAttrIds) && exceptionAttrIds.indexOf(this.attributes.attr_id) === -1) {
+        if (!this.failedToInit &&
+          _.isArray(exceptionAttrIds) && exceptionAttrIds.indexOf(this.attributes.attr_id) === -1) {
           this.barChart.resetBarColor();
         }
       }
@@ -204,7 +205,7 @@
         }
         return number;
       });
-      
+
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
@@ -213,7 +214,7 @@
         this.data.max = findExtremeResult[1];
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
-        
+
         if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
           this.settings.showLogScale = true;
         }
