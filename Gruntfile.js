@@ -56,7 +56,7 @@ module.exports = function(grunt) {
         tasks: ['json_to_sass', 'newer:copy:styles', 'postcss']
       },
       configFiles: {
-        files: ['<%= config.app %>/resources/attributes.json', 'Gruntfile.js'],
+        files: ['<%= config.app %>/resources/configs.json', 'Gruntfile.js'],
         options: {
           reload: true
         }

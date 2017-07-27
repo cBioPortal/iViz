@@ -6,7 +6,7 @@
   Vue.component('survival', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-h-2 grid-item-w-2" ' +
-    ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
+    ':attribute-id="attributes.attr_id" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':show-download-icon.sync="showDownloadIcon" ' +
@@ -300,7 +300,7 @@
           style: {
             classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width dc-survival-chart-qtip'
           },
-          show: {event: 'mouseover', delay: 300, ready: true},
+          show: {event: 'mouseover', delay: 300},
           hide: {fixed: true, delay: 300, event: 'mouseleave'},
           // hide: false,
           position: {
