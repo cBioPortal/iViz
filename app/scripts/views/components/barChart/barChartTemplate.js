@@ -177,6 +177,8 @@
     },
     ready: function() {
       var _dataIssue = false;
+      var smallerOutlier = [];
+      var greaterOutlier = [];
       this.settings.width = window.iViz.styles.vars.barchart.width;
       this.settings.height = window.iViz.styles.vars.barchart.height;
 
@@ -193,14 +195,24 @@
 
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
-        if (iViz.util.strIsNa(d, true)) {
+        if (iViz.util.strIsNa(d, true) || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {
           d = 'NA';
         }
         return d !== 'NA';
       }), function(d) {
-        var number = parseFloat(d);
-        if (isNaN(number)) {
-          _dataIssue = true;
+        var number = d;
+        var smallerOutlierPattern = new RegExp('^<|(>=?)$');
+        var greaterOutlierPattern = new RegExp('^>|(<=?)$');
+        if (isNaN(d)) {
+          if (smallerOutlierPattern.test(number)) {
+            smallerOutlier.push(number.replace(/[^0-9.]/g, ''));
+          } else if (greaterOutlierPattern.test(number)) {
+            greaterOutlier.push(number.replace(/[^0-9.]/g, ''));
+          } else {
+            _dataIssue = true;
+          }
+        } else {
+          number = parseFloat(d);
         }
         return number;
       });
@@ -208,9 +220,15 @@
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
-        var findExtremeResult = cbio.util.findExtremes(this.data.meta);
-        this.data.min = findExtremeResult[0];
-        this.data.max = findExtremeResult[1];
+        if (smallerOutlier.length > 0 && greaterOutlier.length > 0) {
+          this.data.min = _.max(smallerOutlier);
+          this.data.max = _.min(greaterOutlier);
+        } else {
+          var findExtremeResult = cbio.util.findExtremes(this.data.meta);
+          this.data.min = findExtremeResult[0];
+          this.data.max = findExtremeResult[1];
+        }
+        
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
         
