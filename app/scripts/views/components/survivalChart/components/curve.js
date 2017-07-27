@@ -102,19 +102,20 @@
     _self.elem_.curves = {};
   };
 
-  iViz.view.component.SurvivalCurve.prototype.addCurve = function(_data,
+  iViz.view.component.SurvivalCurve.prototype.addCurve = function(data,
     _curveIndex,
     _lineColor) {
     var _self = this;
+    var _data = data;
 
     // add an empty/zero point so the curve starts from zero time point
     if (_data !== null && _data.length !== 0) {
       if (_data[0].time !== 0) {
-        _data.unshift({
+        _data = [{
           status: 0,
           survival_rate: 1,
           time: 0
-        });
+        }].concat(_data);
       }
     }
 
@@ -265,8 +266,6 @@
     function(_selectedData, _unselectedData) {
       var _self = this;
       _self.elem_.svg.selectAll('.pval').remove();
-      _selectedData.splice(0, 1);
-      _unselectedData.splice(0, 1);
       var _pVal = LogRankTest.calc(_selectedData, _unselectedData);
       _self.elem_.svg.append('text')
         .attr('class', 'pval')
@@ -313,8 +312,10 @@
         } else {
           _self.opts_.curves[curveIndex].highlighted = true;
         }
+        // Don't highlight the time equal to 0. This is a fake node added
+        // in addCurve function
         _self.elem_.curves[curveIndex].invisibleDots
-          .selectAll('path')
+          .selectAll('path:not([time="0"])')
           .style('opacity', opacity);
       }
     };

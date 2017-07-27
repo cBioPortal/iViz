@@ -6,7 +6,8 @@
   Vue.component('barChart', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-w-2 grid-item-h-1 bar-chart" ' +
-    ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
+    ':attribute-id="attributes.attr_id" @mouseenter="mouseEnter" ' +
+    ':layout-number="attributes.layout" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-log-scale="settings.showLogScale"' +
     ':show-operations="showOperations" :groupid="attributes.group_id" ' +
@@ -173,6 +174,8 @@
     },
     ready: function() {
       var _dataIssue = false;
+      var smallerOutlier = [];
+      var greaterOutlier = [];
       this.settings.width = window.iViz.styles.vars.barchart.width;
       this.settings.height = window.iViz.styles.vars.barchart.height;
 
@@ -189,15 +192,22 @@
 
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
-        if (typeof d === 'undefined' || d === 'na' || d === '' ||
-          d === 'NaN' || d === null) {
+        if (iViz.util.strIsNa(d, true) || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {
           d = 'NA';
         }
         return d !== 'NA';
-      }), function (d) {
+      }), function(d) {
         var number = d;
+        var smallerOutlierPattern = new RegExp('^<|(>=?)$');
+        var greaterOutlierPattern = new RegExp('^>|(<=?)$');
         if (isNaN(d)) {
-          _dataIssue = true;
+          if (smallerOutlierPattern.test(number)) {
+            smallerOutlier.push(number.replace(/[^0-9.]/g, ''));
+          } else if (greaterOutlierPattern.test(number)) {
+            greaterOutlier.push(number.replace(/[^0-9.]/g, ''));
+          } else {
+            _dataIssue = true;
+          }
         } else {
           number = parseFloat(d);
         }
@@ -206,6 +216,7 @@
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
+        //for scientific small number
         if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001 && this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] > 0) {
           this.data.smallDataFlag = true;
           this.data.exponents = cbio.util.getDecimalExponents(this.data.meta);
@@ -216,18 +227,25 @@
           this.data.smallDataFlag = false;
         }
 
-        var findExtremeResult = cbio.util.findExtremes(this.data.meta);
-        this.data.min = findExtremeResult[0];
-        this.data.max = findExtremeResult[1];
+        if (smallerOutlier.length > 0 && greaterOutlier.length > 0) {// data contain ">, >=,<, <="
+          this.data.min = _.max(smallerOutlier);
+          this.data.max = _.min(greaterOutlier);
+        } else {
+          var findExtremeResult = cbio.util.findExtremes(this.data.meta);
+          this.data.min = findExtremeResult[0];
+          this.data.max = findExtremeResult[1];
+        }
+        
         this.data.valueAsTick = false;
-        this.data.sortedData = findExtremeResult[3];
-        if (this.data.meta.length <= 5 && this.data.meta.length > 0) {
+        if (this.data.meta.length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
           var maxData = _.max(this.data.meta);
           var minData = _.min(this.data.meta);
           if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
             this.data.valueAsTick = true;
+            this.data.sortedData = findExtremeResult[3];// use sorted value as ticks directly
           }
         }
+
         this.data.attrId = this.attributes.attr_id;
         this.data.groupType = this.attributes.group_type;
         if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {

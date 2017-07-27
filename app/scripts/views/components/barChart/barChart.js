@@ -22,8 +22,8 @@
             var _min;
             var _max;
 
-            if (typeof val === 'undefined' || val === 'NA' || val === '' ||
-                val === 'NaN') {
+             //isNaN(val) treats string in data as 'NA', such as "withheld" and "cannotReleaseHIPAA"
+            if (iViz.util.strIsNa(val, true) || isNaN(val)) {
                 val = opts_.xDomain[opts_.xDomain.length - 1];
             } else if (logScale) {
                 for (i = 1; i < opts_.xDomain.length; i++) {
@@ -70,7 +70,6 @@
             barSet.add(val);
             if (tickVal.indexOf(val) === -1) {
                 tickVal.push(Number(val));
-            }
           
             if (!mapTickToCaseIds.hasOwnProperty(val)) {
                 mapTickToCaseIds[val] = {
