@@ -118,7 +118,8 @@
         });
       },
       resetBarColor: function(exceptionAttrIds) {
-        if (_.isArray(exceptionAttrIds) && exceptionAttrIds.indexOf(this.attributes.attr_id) === -1) {
+        if (!this.failedToInit &&
+          _.isArray(exceptionAttrIds) && exceptionAttrIds.indexOf(this.attributes.attr_id) === -1) {
           this.barChart.resetBarColor();
         }
       }
@@ -213,6 +214,7 @@
         }
         return number;
       });
+      
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
