@@ -216,8 +216,9 @@
       if (_dataIssue) {
         this.failedToInit = true;
       } else {
-        //for scientific small number
-        if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001 && this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] > 0) {
+        // for scientific small number
+        if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001 && 
+          this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] > 0) {
           this.data.smallDataFlag = true;
           this.data.exponents = cbio.util.getDecimalExponents(this.data.meta);
           var findExtremeExponentResult = cbio.util.findExtremes(this.data.exponents);
@@ -226,7 +227,7 @@
         } else {
           this.data.smallDataFlag = false;
         }
-
+        
         if (smallerOutlier.length > 0 && greaterOutlier.length > 0) {// data contain ">, >=,<, <="
           this.data.min = _.max(smallerOutlier);
           this.data.max = _.min(greaterOutlier);
@@ -234,15 +235,17 @@
           var findExtremeResult = cbio.util.findExtremes(this.data.meta);
           this.data.min = findExtremeResult[0];
           this.data.max = findExtremeResult[1];
-        }
-        
-        this.data.valueAsTick = false;
-        if (this.data.meta.length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
-          var maxData = _.max(this.data.meta);
-          var minData = _.min(this.data.meta);
-          if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
-            this.data.valueAsTick = true;
-            this.data.sortedData = findExtremeResult[3];// use sorted value as ticks directly
+          
+          // noGrouping is true when number of different values less than or equal to 5. 
+          // In this case, the chart sets data value as ticks' value directly. 
+          this.data.noGrouping = false;
+          if (_.unique(this.data.meta).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
+            var maxData = _.max(this.data.meta);
+            var minData = _.min(this.data.meta);
+            if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
+              this.data.noGrouping = true;
+              this.data.sortedData = findExtremeResult[3];// use sorted value as ticks directly
+            }
           }
         }
 

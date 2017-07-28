@@ -16,79 +16,82 @@
       var tickVal = [];
       var i = 0;
       var barSet = new Set();
+      
+      dcDimension = ndx_.dimension(function (d) {
+        var val = d[data_.attrId];
+        var _min;
+        var _max;
 
-        dcDimension = ndx_.dimension(function (d) {
-            var val = d[data_.attrId];
-            var _min;
-            var _max;
-
-             //isNaN(val) treats string in data as 'NA', such as "withheld" and "cannotReleaseHIPAA"
-            if (iViz.util.strIsNa(val, true) || isNaN(val)) {
-                val = opts_.xDomain[opts_.xDomain.length - 1];
-            } else if (logScale) {
-                for (i = 1; i < opts_.xDomain.length; i++) {
-                    if (d[data_.attrId] < opts_.xDomain[i] &&
-                        d[data_.attrId] >= opts_.xDomain[i - 1]) {
-                        val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
-                        _min = opts_.xDomain[i - 1];
-                        _max = opts_.xDomain[i];
-                        break;
-                    }
-                }
-            } else if (data_.smallDataFlag) {
-                if (d[data_.attrId] <= opts_.xDomain[1]) {
-                    val = opts_.xDomain[0];
-                } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
-                    val = opts_.xDomain[opts_.xDomain.length - 2];
-                } else {
-                    for (i = 2; i < opts_.xDomain.length - 2; i++) {
-                        if (d[data_.attrId] <= opts_.xDomain[i] &&
-                            d[data_.attrId] >= opts_.xDomain[i - 1]) {
-                            _min = opts_.xDomain[i - 1];
-                            _max = opts_.xDomain[i];
-                            val = _min + (_max - _min) / 3;
-                            break;
-                        }
-                    }
-                }
-            } else if (!data_.valueAsTick) {
-                if (d[data_.attrId] <= opts_.xDomain[1]) {
-                    val = opts_.xDomain[0];
-                } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
-                    val = opts_.xDomain[opts_.xDomain.length - 2];
-                } else {
-                    // minus half of separateDistance to make the margin values
-                    // always map to the left side. Thus for any value x, it is in the
-                    // range of (a, b] which means a < x <= b
-                    val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
-                        opts_.gutter + opts_.startPoint - opts_.gutter / 2;
-                    _min = val - opts_.gutter / 2;
-                    _max = val + opts_.gutter / 2;
+        // isNaN(val) treats string in data as 'NA', such as "withheld" and "cannotReleaseHIPAA"
+        if (iViz.util.strIsNa(val, true) || isNaN(val)) {
+            val = opts_.xDomain[opts_.xDomain.length - 1];
+        } else if (logScale) {
+            for (i = 1; i < opts_.xDomain.length; i++) {
+                if (d[data_.attrId] < opts_.xDomain[i] &&
+                    d[data_.attrId] >= opts_.xDomain[i - 1]) {
+                    val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
+                    _min = opts_.xDomain[i - 1];
+                    _max = opts_.xDomain[i];
+                    break;
                 }
             }
-
-            barSet.add(val);
-            if (tickVal.indexOf(val) === -1) {
-                tickVal.push(Number(val));
-          
-            if (!mapTickToCaseIds.hasOwnProperty(val)) {
-                mapTickToCaseIds[val] = {
-                    caseIds: [],
-                    tick: getTickFormat(val, logScale)
-                };
-                if (!_.isUndefined(_min) && !_.isUndefined(_max)) {
-                    mapTickToCaseIds[val].range = _min + '< ~ <=' + _max;
+        } else if (!data_.noGrouping) {
+          if (data_.smallDataFlag) {
+            if (d[data_.attrId] <= opts_.xDomain[1]) {
+              val = opts_.xDomain[0];
+            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+              val = opts_.xDomain[opts_.xDomain.length - 2];
+            } else {
+              for (i = 2; i < opts_.xDomain.length - 2; i++) {
+                if (d[data_.attrId] <= opts_.xDomain[i] &&
+                  d[data_.attrId] >= opts_.xDomain[i - 1]) {
+                  _min = opts_.xDomain[i - 1];
+                  _max = opts_.xDomain[i];
+                  val = _min + (_max - _min) / 3;
+                  break;
                 }
+              }
             }
-            mapTickToCaseIds[val].caseIds.push(
-                data_.groupType === 'patient' ? d.patient_uid : d.sample_uid);
-            return val;
-        });
+          } else {
+            if (d[data_.attrId] <= opts_.xDomain[1]) {
+              val = opts_.xDomain[0];
+            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+              val = opts_.xDomain[opts_.xDomain.length - 2];
+            } else {
+              // minus half of separateDistance to make the margin values
+              // always map to the left side. Thus for any value x, it is in the
+              // range of (a, b] which means a < x <= b
+              val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
+                opts_.gutter + opts_.startPoint - opts_.gutter / 2;
+              _min = val - opts_.gutter / 2;
+              _max = val + opts_.gutter / 2;
+            }
+          }
+        } 
+        
+        barSet.add(val);
+        if (tickVal.indexOf(val) === -1) {
+          tickVal.push(Number(val));
+        }
 
-        opts_.xBarValues = Array.from(barSet);
-        opts_.xBarValues.sort(function (a, b) {
-            return a < b ? -1 : 1;
-        });
+        if (!mapTickToCaseIds.hasOwnProperty(val)) {
+          mapTickToCaseIds[val] = {
+            caseIds: [],
+            tick: getTickFormat(val, logScale)
+          };
+          if (!_.isUndefined(_min) && !_.isUndefined(_max)) {
+            mapTickToCaseIds[val].range = _min + '< ~ <=' + _max;
+          }
+        }
+        mapTickToCaseIds[val].caseIds.push(
+          data_.groupType === 'patient' ? d.patient_uid : d.sample_uid);
+        return val;
+      });
+    
+      opts_.xBarValues = Array.from(barSet);
+      opts_.xBarValues.sort(function (a, b) {
+          return a < b ? -1 : 1;
+      });
 
       tickVal.sort(function(a, b) {
         return a < b ? -1 : 1;
@@ -112,7 +115,7 @@
         .renderHorizontalGridLines(false)
         .renderVerticalGridLines(false);
 
-      if (data_.valueAsTick) {
+      if (data_.noGrouping) {
         chartInst_.barPadding(1);// separate continuous bar
       }
 
@@ -143,8 +146,14 @@
       var index = 0;
       var e = d3.format('.1e');// convert small data to scientific notation format
       var formattedValue = '';
-
-      if (logScale) {
+      
+      if (data_.noGrouping) {
+        if (v === opts_.emptyMappingVal) {
+          _returnValue = 'NA';
+        } else {
+          _returnValue = v;
+        }
+      } else if (logScale) {
         if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
         } else {
@@ -154,11 +163,7 @@
           }
         }
       } else if (opts_.xDomain.length === 1) {
-        if (!isNaN(opts_.xDomain[0])) {// when there is only one value in the data
-          return _returnValue;
-        } else { // when the value is not number in the data
-          return 'NA';
-        }
+        return 'NA';
       } else if (opts_.xDomain.length === 2) {
         // when there is only one value and NA in the data
         if (v === opts_.xDomain[0]) {
@@ -166,13 +171,13 @@
         } else {
           _returnValue = 'NA';
         }
-      } else if (v === opts_.xDomain[0] && !data_.valueAsTick) {
+      } else if (v === opts_.xDomain[0]) {
         formattedValue = opts_.xDomain[1];
         if (data_.smallDataFlag) {
           return '<=' + e(formattedValue);
         }
         return '<=' + formattedValue;
-      } else if (v === opts_.xDomain[opts_.xDomain.length - 2] && !data_.valueAsTick) {
+      } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
         formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
         if (data_.smallDataFlag) {
           return '>' + e(formattedValue);
@@ -269,11 +274,12 @@
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
         max: data_.max,
+        meta: data_.meta,
         sortedData: data_.sortedData,
         minExponent: data_.minExponent,
         maxExponent: data_.maxExponent,
         smallDataFlag: data_.smallDataFlag,
-        valueAsTick: data_.valueAsTick
+        noGrouping: data_.noGrouping
       }, opts.logScaleChecked));
       ndx_ = ndx;
 
@@ -399,11 +405,12 @@
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
         max: data_.max,
+        meta: data_.meta,
         sortedData: data_.sortedData,
         minExponent: data_.minExponent,
         maxExponent: data_.maxExponent,
         smallDataFlag: data_.smallDataFlag,
-        valueAsTick: data_.valueAsTick
+        noGrouping: data_.noGrouping
       }, logScaleChecked));
 
       initDc_(logScaleChecked);
@@ -551,7 +558,7 @@
             config.divider = 2 * Math.pow(10, minExponent);
           }
         }
-
+        
         if (range === 0) {
           config.startPoint = min;
         } else if (max <= 1 && max > 0 && min >= -1 && min < 0) {
@@ -623,12 +630,19 @@
             config.maxDomain = Math.pow(10, maxExponent + 1) + config.divider * 2;
           }
         } else {
-          if (!_.isNaN(range)) {
-            if (data.valueAsTick) {// for data has at most 5 points
-              _.each(data.sortedData, function(value) {
-                config.xDomain.push(value);
-              });
-            } else {
+          // for data has at most 5 points
+          if (data.noGrouping) {
+            _.each(_.unique(data.sortedData), function(value) {
+              config.xDomain.push(value);
+            });
+            if (_.contains(data.meta, 'NA')) {
+              // add marker for NA values
+              config.emptyMappingVal =
+                config.xDomain[config.xDomain.length - 1] + config.gutter;
+              config.xDomain.push(config.emptyMappingVal);
+            }
+          } else {
+            if (!_.isNaN(range)) {
               for (i = 0; i <= config.numOfGroups; i++) {
                 _tmpValue = i * config.gutter + config.startPoint;
                 if (config.startPoint < 1500) {
@@ -649,44 +663,34 @@
                 }
               }
             }
-          }
-          if (config.xDomain.length === 0) {
-            config.xDomain.push(Number(config.startPoint));
-          } else if (config.xDomain.length === 1) {
-            if (range === 0) {// exclude NA value when data have only 1 single point
-              return config;
-            } else {
+
+            if (config.xDomain.length === 0) {
+              config.xDomain.push(Number(config.startPoint));
+            } else if (config.xDomain.length === 1) {
               config.xDomain.push(Number(config.xDomain[0] + config.gutter));
+            } else if (Math.abs(min) > 1500) {
+              // currently we always add ">max" and "NA" marker
+              // add marker for greater than maximum
+              config.xDomain.push(
+                Number(config.xDomain[config.xDomain.length - 1] +
+                  config.gutter));
+              // add marker for NA values
+              config.emptyMappingVal =
+                config.xDomain[config.xDomain.length - 1] + config.gutter;
+              config.xDomain.push(config.emptyMappingVal);
+            } else {
+              // add marker for greater than maximum
+              config.xDomain.push(
+                Number(cbio.util.toPrecision(
+                  Number(config.xDomain[config.xDomain.length - 1] +
+                    config.gutter), 3, 0.1)));
+              // add marker for NA values
+              config.emptyMappingVal =
+                Number(cbio.util.toPrecision(
+                  Number(config.xDomain[config.xDomain.length - 1] +
+                    config.gutter), 3, 0.1));
+              config.xDomain.push(config.emptyMappingVal);
             }
-          } else if (Math.abs(min) > 1500) {
-            // currently we always add ">max" and "NA" marker
-            // add marker for greater than maximum
-            config.xDomain.push(
-              Number(config.xDomain[config.xDomain.length - 1] +
-                config.gutter));
-            // add marker for NA values
-            config.emptyMappingVal =
-              config.xDomain[config.xDomain.length - 1] + config.gutter;
-            config.xDomain.push(config.emptyMappingVal);
-          } else if (data.valueAsTick) {
-            // add marker for NA values
-            config.emptyMappingVal =
-              Number(cbio.util.toPrecision(
-                Number(config.xDomain[config.xDomain.length - 1] +
-                  config.gutter), 3, 0.1));
-            config.xDomain.push(config.emptyMappingVal);
-          } else {
-            // add marker for greater than maximum
-            config.xDomain.push(
-              Number(cbio.util.toPrecision(
-                Number(config.xDomain[config.xDomain.length - 1] +
-                  config.gutter), 3, 0.1)));
-            // add marker for NA values
-            config.emptyMappingVal =
-              Number(cbio.util.toPrecision(
-                Number(config.xDomain[config.xDomain.length - 1] +
-                  config.gutter), 3, 0.1));
-            config.xDomain.push(config.emptyMappingVal);
           }
         }
       }
