@@ -174,10 +174,7 @@
               _.pluck(_self.invisibleDimension.top(Infinity), attrId);
             if (_self.hasFilters) {
               _self.chartInst.update(_selectedCases);
-            } else {
-              _self.chartInst.update([]);
             }
-
             _self.attachPlotlySelectedEvent();
           }
          

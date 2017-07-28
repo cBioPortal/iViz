@@ -579,43 +579,48 @@ window.DataManagerForIviz = (function($, _) {
               };
               
               // add Mutation count vs. CNA fraction
-             //if (_hasSampleAttrData.mutation_count !== undefined && _hasSampleAttrData.cna_fraction !== undefined) {
-                var _mutCntAttrMeta = {};
-                _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
-                _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
-                _mutCntAttrMeta.view_type = 'scatter_plot';
-                _mutCntAttrMeta.description = '';
-                _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
-                _mutCntAttrMeta.filter = [];
-                _mutCntAttrMeta.show = true;
-                _mutCntAttrMeta.addChartBy = 'default';
-                _mutCntAttrMeta.keys = {};
-                _mutCntAttrMeta.numOfDatum = 0;
-                _mutCntAttrMeta.priority = 2;
-                _mutCntAttrMeta.attrList = ['cna_fraction'];
-                _mutCntAttrMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap;//This attribute is used for getScatterData()
-                _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
-             // }
+              _hasSampleAttrData.copy_number_alterations = '';
+              _hasSampleAttrData.cna_fraction = '';
+              var _mutCntAttrMeta = {};
+              _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
+              _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
+              _mutCntAttrMeta.view_type = 'scatter_plot';
+              _mutCntAttrMeta.layout = [-1, 4],
+              _mutCntAttrMeta.description = '';
+              _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
+              _mutCntAttrMeta.filter = [];
+              _mutCntAttrMeta.keys = {};
+              _mutCntAttrMeta.numOfDatum = 0;
+              _mutCntAttrMeta.priority =
+                iViz.priorityManager
+                  .getDefaultPriority('MUT_CNT_VS_CNA', true);
+              _mutCntAttrMeta.show = _mutCntAttrMeta.priority !== 0;
+              _mutCntAttrMeta.addChartBy = 'default';
+              _mutCntAttrMeta.attrList = ['mutation_count', 'cna_fraction'];
+              // This attribute is used for getScatterData()
+              _mutCntAttrMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap; 
+              _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
 
               // add mutation count
-              //if (_hasSampleAttrData.mutation_count !== undefined) {
-                var _MutationCountMeta = {};
-                _MutationCountMeta.datatype = 'NUMBER';
-                _MutationCountMeta.description = '';
-                _MutationCountMeta.display_name = 'Mutation Count';
-                _MutationCountMeta.attr_id = 'mutation_count';
-                _MutationCountMeta.view_type = 'bar_chart';
-                _MutationCountMeta.filter = [];
-                _MutationCountMeta.keys = {};
-                _MutationCountMeta.numOfDatum = 0;
-                _MutationCountMeta.priority = 5;
-                _MutationCountMeta.show = false;
-                _MutationCountMeta.addChartBy = 'default';
-                _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
-                _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
-              //}
-           
-
+              _hasSampleAttrData.mutation_count = '';
+              var _MutationCountMeta = {};
+              _MutationCountMeta.datatype = 'NUMBER';
+              _MutationCountMeta.description = '';
+              _MutationCountMeta.display_name = 'Mutation Count';
+              _MutationCountMeta.attr_id = 'mutation_count';
+              _MutationCountMeta.view_type = 'bar_chart';
+              _MutationCountMeta.layout = [-1, 2, 'h'];
+              _MutationCountMeta.filter = [];
+              _MutationCountMeta.keys = {};
+              _MutationCountMeta.numOfDatum = 0;
+              _MutationCountMeta.priority =
+                iViz.priorityManager
+                  .getDefaultPriority(_MutationCountMeta.attr_id);
+              _MutationCountMeta.show = _MutationCountMeta.priority !== 0;
+              _MutationCountMeta.addChartBy = 'default';
+              _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
+              _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
+              
               _result.groups.patient.attr_meta =
                 content.util
                   .sortByClinicalPriority(_.values(_patientAttributes));
