@@ -15,39 +15,61 @@
     var initDc_ = function(logScale) {
       var tickVal = [];
       var i = 0;
-
-      dcDimension = ndx_.dimension(function(d) {
+      var barSet = new Set();
+      
+      dcDimension = ndx_.dimension(function (d) {
         var val = d[data_.attrId];
         var _min;
         var _max;
 
-        //isNaN(val) treats string in data as 'NA', such as "withheld" and "cannotReleaseHIPAA"
+        // isNaN(val) treats string in data as 'NA', such as "withheld" and "cannotReleaseHIPAA"
         if (iViz.util.strIsNa(val, true) || isNaN(val)) {
-          val = opts_.xDomain[opts_.xDomain.length - 1];
+            val = opts_.xDomain[opts_.xDomain.length - 1];
         } else if (logScale) {
-          for (i = 1; i < opts_.xDomain.length; i++) {
-            if (d[data_.attrId] < opts_.xDomain[i] &&
-              d[data_.attrId] >= opts_.xDomain[i - 1]) {
-              val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
-              _min = opts_.xDomain[i - 1];
-              _max = opts_.xDomain[i];
-              break;
+            for (i = 1; i < opts_.xDomain.length; i++) {
+                if (d[data_.attrId] < opts_.xDomain[i] &&
+                    d[data_.attrId] >= opts_.xDomain[i - 1]) {
+                    val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
+                    _min = opts_.xDomain[i - 1];
+                    _max = opts_.xDomain[i];
+                    break;
+                }
+            }
+        } else if (!data_.noGrouping) {
+          if (data_.smallDataFlag) {
+            if (d[data_.attrId] <= opts_.xDomain[1]) {
+              val = opts_.xDomain[0];
+            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+              val = opts_.xDomain[opts_.xDomain.length - 2];
+            } else {
+              for (i = 2; i < opts_.xDomain.length - 2; i++) {
+                if (d[data_.attrId] <= opts_.xDomain[i] &&
+                  d[data_.attrId] >= opts_.xDomain[i - 1]) {
+                  _min = opts_.xDomain[i - 1];
+                  _max = opts_.xDomain[i];
+                  val = _min + (_max - _min) / 3;
+                  break;
+                }
+              }
+            }
+          } else {
+            if (d[data_.attrId] <= opts_.xDomain[1]) {
+              val = opts_.xDomain[0];
+            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+              val = opts_.xDomain[opts_.xDomain.length - 2];
+            } else {
+              // minus half of separateDistance to make the margin values
+              // always map to the left side. Thus for any value x, it is in the
+              // range of (a, b] which means a < x <= b
+              val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
+                opts_.gutter + opts_.startPoint - opts_.gutter / 2;
+              _min = val - opts_.gutter / 2;
+              _max = val + opts_.gutter / 2;
             }
           }
-        } else if (d[data_.attrId] <= opts_.xDomain[1]) {
-          val = opts_.xDomain[0];
-        } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
-          val = opts_.xDomain[opts_.xDomain.length - 2];
-        } else {
-          // minus half of separateDistance to make the margin values
-          // always map to the left side. Thus for any value x, it is in the
-          // range of (a, b] which means a < x <= b
-          val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
-            opts_.gutter + opts_.startPoint - opts_.gutter / 2;
-          _min = val - opts_.gutter / 2;
-          _max = val + opts_.gutter / 2;
-        }
-
+        } 
+        
+        barSet.add(val);
         if (tickVal.indexOf(val) === -1) {
           tickVal.push(Number(val));
         }
@@ -65,10 +87,16 @@
           data_.groupType === 'patient' ? d.patient_uid : d.sample_uid);
         return val;
       });
+    
+      opts_.xBarValues = Array.from(barSet);
+      opts_.xBarValues.sort(function (a, b) {
+          return a < b ? -1 : 1;
+      });
 
       tickVal.sort(function(a, b) {
         return a < b ? -1 : 1;
       });
+
 
       chartInst_
         .width(opts_.width)
@@ -87,9 +115,13 @@
         .renderHorizontalGridLines(false)
         .renderVerticalGridLines(false);
 
-      if (logScale) {
+      if (data_.noGrouping) {
+        chartInst_.barPadding(1);// separate continuous bar
+      }
+
+      if (logScale || data_.smallDataFlag) {
         chartInst_.x(d3.scale.log().nice()
-          .domain([0.7, opts_.maxDomain]));
+          .domain([opts_.minDomain, opts_.maxDomain]));
       } else {
         chartInst_.x(d3.scale.linear()
           .domain([
@@ -97,7 +129,6 @@
             opts_.xDomain[opts_.xDomain.length - 1] + opts_.gutter
           ]));
       }
-
       chartInst_.yAxis().ticks(6);
       chartInst_.yAxis().tickFormat(d3.format('d'));
       chartInst_.xAxis().tickFormat(function(v) {
@@ -113,7 +144,16 @@
     function getTickFormat(v, logScale) {
       var _returnValue = v;
       var index = 0;
-      if (logScale) {
+      var e = d3.format('.1e');// convert small data to scientific notation format
+      var formattedValue = '';
+      
+      if (data_.noGrouping) {
+        if (v === opts_.emptyMappingVal) {
+          _returnValue = 'NA';
+        } else {
+          _returnValue = v;
+        }
+      } else if (logScale) {
         if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
         } else {
@@ -132,9 +172,17 @@
           _returnValue = 'NA';
         }
       } else if (v === opts_.xDomain[0]) {
-        return '<=' + opts_.xDomain[1];
+        formattedValue = opts_.xDomain[1];
+        if (data_.smallDataFlag) {
+          return '<=' + e(formattedValue);
+        }
+        return '<=' + formattedValue;
       } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
-        return '>' + opts_.xDomain[opts_.xDomain.length - 3];
+        formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
+        if (data_.smallDataFlag) {
+          return '>' + e(formattedValue);
+        }
+        return '>' + formattedValue;
       } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
         return 'NA';
       } else if (data_.min > 1500 &&
@@ -148,6 +196,14 @@
         }
       } else {
         _returnValue = v;
+      }
+
+      if (data_.smallDataFlag) {
+        _returnValue = e(_returnValue);
+        var _tempValue = e(v).toString();
+        if (_tempValue.charAt(0) !== '1') {// hide tick values whose format is not 1.0e-N
+          _returnValue = '';
+        }
       }
       return _returnValue;
     }
@@ -183,7 +239,7 @@
           var sampleUID = _cases[i].sample_uid;
           var sampleId = iViz.getCaseIdUsingUID('sample', sampleUID);
           var patientId = iViz.getPatientId(_cases[i].study_id, sampleId);
-          
+
           row.push(sampleId);
           row.push(patientId);
         }
@@ -217,7 +273,13 @@
       data_ = data;
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
-        max: data_.max
+        max: data_.max,
+        meta: data_.meta,
+        sortedData: data_.sortedData,
+        minExponent: data_.minExponent,
+        maxExponent: data_.maxExponent,
+        smallDataFlag: data_.smallDataFlag,
+        noGrouping: data_.noGrouping
       }, opts.logScaleChecked));
       ndx_ = ndx;
 
@@ -230,10 +292,125 @@
       return chartInst_;
     };
 
+    content.rangeFilter = function(logScaleChecked, _filter) {
+      var tempFilters_ = [];
+      var hasBar = false;
+      var minNumBarPoint = '';
+      var maxNumBarPoint = '';
+      var selectedNumBar = [];
+      var hasNA = false;
+      var hasGreaterOutlier = false;
+      var hasSmallerOutlier = false;
+      var startNumIndex = 0;
+      var endNumIndex = 0;
+
+      _.each(opts_.xBarValues, function(middle) {
+        if (middle >= _filter[0] && middle <= _filter[1]) {
+          hasBar = true;
+          if (middle === opts_.xDomain[opts_.xDomain.length - 1]) {
+            hasNA = true;
+          } else {
+            if (logScaleChecked) {
+              startNumIndex = 0;
+              endNumIndex = opts_.xDomain.length - 2;
+              selectedNumBar.push(middle);
+            } else {
+              startNumIndex = 1;
+              endNumIndex = opts_.xDomain.length - 3;
+              if (middle === opts_.xDomain[0]) {
+                hasSmallerOutlier = true;
+              } else if (middle === opts_.xDomain[opts_.xDomain.length - 2]) {
+                hasGreaterOutlier = true;
+              } else {
+                selectedNumBar.push(middle);
+              }
+            }
+          }
+        }
+      });
+
+      if (hasBar === true) {
+        for (var i = startNumIndex; i <= endNumIndex - 1; i++) {
+          if (selectedNumBar[0] >= opts_.xDomain[i] && selectedNumBar[0] < opts_.xDomain[i + 1]) {// check left range point
+            minNumBarPoint = opts_.xDomain[i];
+          }
+
+          if (selectedNumBar[selectedNumBar.length - 1] >= opts_.xDomain[i] && selectedNumBar[selectedNumBar.length - 1] < opts_.xDomain[i + 1]) {// check left range point
+            maxNumBarPoint = opts_.xDomain[i + 1];
+          }
+        }
+        
+        if (logScaleChecked) {
+          if (minNumBarPoint !== '' && maxNumBarPoint !== '') {
+            tempFilters_[0] = minNumBarPoint;
+            if (hasNA) {
+              tempFilters_[1] = maxNumBarPoint + ", NA";
+            } else {
+              tempFilters_[1] = maxNumBarPoint;
+            }
+          } else {//only select "NA" bar
+            tempFilters_[0] = 'NA';
+            tempFilters_[1] = '';
+          }
+        } else {
+          if (!hasNA && !hasSmallerOutlier && !hasGreaterOutlier) {
+            tempFilters_[0] = minNumBarPoint;
+            tempFilters_[1] = maxNumBarPoint;
+          } else if (hasNA && !hasSmallerOutlier) {
+            if (hasGreaterOutlier) { // "> Num, NA"
+              tempFilters_[0] = '';
+              if (minNumBarPoint === '') {// only select '>Num' and 'NA' bars
+                tempFilters_[1] = '> ' + opts_.xDomain[opts_.xDomain.length - 3] + ', NA';
+              } else {
+                tempFilters_[1] = '> ' + minNumBarPoint + ', NA';
+              }
+            } else { 
+              if (minNumBarPoint === '' && maxNumBarPoint === '') { //only select "NA" bar
+                tempFilters_[0] = 'NA';
+                tempFilters_[1] = '';
+              } else { // i.e., "30 ~ 80, NA"
+                tempFilters_[0] = minNumBarPoint;
+                tempFilters_[1] = maxNumBarPoint + ', NA';
+              }
+            }
+          } else if (!hasNA && hasGreaterOutlier) {
+            if (hasSmallerOutlier) {// 0 ~ ∞
+              tempFilters_[0] = 0;
+              tempFilters_[1] = '∞';
+            } else {// "> Num"
+              tempFilters_[0] = '';
+              if(minNumBarPoint === '') {
+                tempFilters_[1] = '> ' + opts_.xDomain[opts_.xDomain.length - 3];
+              } else {
+                tempFilters_[1] = '> ' + minNumBarPoint;
+              }
+            }
+          } else if (hasSmallerOutlier && !hasGreaterOutlier && !hasNA) {// "<= Num"
+            tempFilters_[0] = '';
+            if (maxNumBarPoint === '') {
+              tempFilters_[1] = '<= ' + opts_.xDomain[1];
+            } else {
+              tempFilters_[1] = '<= ' + maxNumBarPoint;
+            }
+          } else { // Invalid selection like select all bars 
+            tempFilters_[0] = '';
+            tempFilters_[1] = '';
+          }
+        }
+      }
+      return tempFilters_;
+    };
+
     content.redraw = function(logScaleChecked) {
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
         min: data_.min,
-        max: data_.max
+        max: data_.max,
+        meta: data_.meta,
+        sortedData: data_.sortedData,
+        minExponent: data_.minExponent,
+        maxExponent: data_.maxExponent,
+        smallDataFlag: data_.smallDataFlag,
+        noGrouping: data_.noGrouping
       }, logScaleChecked));
 
       initDc_(logScaleChecked);
@@ -339,7 +516,9 @@
         gutter: 0.2,
         startPoint: -1,
         maxVal: '',
-        maxDomain: 10000 // Design specifically for log scale
+        minDomain: 0.7, // Design specifically for log scale
+        maxDomain: 10000, // Design specifically for log scale
+        xBarValues: [],
       };
 
       if (!_.isUndefined(data.min) && !_.isUndefined(data.max)) {
@@ -349,6 +528,13 @@
         var rangeL = parseInt(range, 10).toString().length - 2;
         var i = 0;
         var _tmpValue;
+        var minExponent, maxExponent, exponentRange;
+
+        if (data.smallDataFlag) {
+          minExponent = data.minExponent;
+          maxExponent = data.maxExponent;
+          exponentRange = maxExponent - minExponent;
+        }
 
         // Set divider based on the number m in 10(m)
         for (i = 0; i < rangeL; i++) {
@@ -364,9 +550,18 @@
         } else if (max < 100 &&
           max > 10) {
           config.divider = 2;
+        } else if (data.smallDataFlag) {
+          var numberOfTickValues = 4;
+          if (exponentRange > 1) {
+            config.divider = Math.round(exponentRange / numberOfTickValues);
+          } else if (exponentRange === 0) {
+            config.divider = 2 * Math.pow(10, minExponent);
+          }
         }
-
-        if (max <= 1 && max > 0 && min >= -1 && min < 0) {
+        
+        if (range === 0) {
+          config.startPoint = min;
+        } else if (max <= 1 && max > 0 && min >= -1 && min < 0) {
           config.maxVal = (parseInt(max / config.divider, 10) + 1) *
             config.divider;
           config.gutter = 0.2;
@@ -404,54 +599,98 @@
               break;
             }
           }
+        } else if (data.smallDataFlag) {// use decimal scientific ticks for 0 < data < 0.1
+          if (exponentRange > 1) {
+            config.minDomain = Math.pow(10, minExponent - config.divider * 1.5);
+            config.xDomain.push(Math.pow(10, minExponent - config.divider));// add "<=" marker
+            for (i = minExponent; i <= maxExponent; i += config.divider) {
+              config.xDomain.push(Math.pow(10, i));
+            }
+            config.xDomain.push(Math.pow(10, maxExponent + config.divider));// add ">=" marker
+            config.emptyMappingVal = Math.pow(10, maxExponent + config.divider * 2);// add "NA" marker
+            config.xDomain.push(config.emptyMappingVal);
+            config.maxDomain = Math.pow(10, maxExponent + config.divider * 2.5);
+          } else if (exponentRange === 1) {
+            config.minDomain = Math.pow(10, minExponent - 1);
+            config.xDomain.push(Math.pow(10, minExponent) / 3); // add "<=" marker
+            for (i = minExponent; i <= maxExponent + 1; i++) {
+              config.xDomain.push(Math.pow(10, i));
+              config.xDomain.push(3 * Math.pow(10, i));
+            }
+            config.emptyMappingVal = Math.pow(10, maxExponent + 2);// add "NA" marker
+            config.xDomain.push(config.emptyMappingVal);
+            config.maxDomain = 3 * Math.pow(10, maxExponent + 2);
+          } else { // exponentRange = 0
+            config.minDomain = Math.pow(10, minExponent) - config.divider;
+            for (i = Math.pow(10, minExponent); i <= Math.pow(10, maxExponent + 1); i += config.divider) {
+              config.xDomain.push(i);
+            }
+            config.emptyMappingVal = Math.pow(10, maxExponent + 1) + config.divider;// add "NA" marker
+            config.xDomain.push(config.emptyMappingVal);
+            config.maxDomain = Math.pow(10, maxExponent + 1) + config.divider * 2;
+          }
         } else {
-          if (!_.isNaN(range)) {
-            for (i = 0; i <= config.numOfGroups; i++) {
-              _tmpValue = i * config.gutter + config.startPoint;
-              if (config.startPoint < 1500) {
-                _tmpValue =
-                  Number(cbio.util.toPrecision(Number(_tmpValue), 3, 0.1));
-              }
+          // for data has at most 5 points
+          if (data.noGrouping) {
+            _.each(_.unique(data.sortedData), function(value) {
+              config.xDomain.push(value);
+            });
+            if (_.contains(data.meta, 'NA')) {
+              // add marker for NA values
+              config.emptyMappingVal =
+                config.xDomain[config.xDomain.length - 1] + config.gutter;
+              config.xDomain.push(config.emptyMappingVal);
+            }
+          } else {
+            if (!_.isNaN(range)) {
+              for (i = 0; i <= config.numOfGroups; i++) {
+                _tmpValue = i * config.gutter + config.startPoint;
+                if (config.startPoint < 1500) {
+                  _tmpValue =
+                    Number(cbio.util.toPrecision(Number(_tmpValue), 3, 0.1));
+                }
 
-              // If the current tmpValue already bigger than maxmium number, the
-              // function should decrease the number of bars and also reset the
-              // Mappped empty value.
-              if (_tmpValue >= max) {
-                // if i = 0 and tmpValue bigger than maximum number, that means
-                // all data fall into NA category.
-                config.xDomain.push(_tmpValue);
-                break;
-              } else {
-                config.xDomain.push(_tmpValue);
+                // If the current tmpValue already bigger than maxmium number, the
+                // function should decrease the number of bars and also reset the
+                // Mappped empty value.
+                if (_tmpValue >= max) {
+                  // if i = 0 and tmpValue bigger than maximum number, that means
+                  // all data fall into NA category.
+                  config.xDomain.push(_tmpValue);
+                  break;
+                } else {
+                  config.xDomain.push(_tmpValue);
+                }
               }
             }
-          }
-          if (config.xDomain.length === 0) {
-            config.xDomain.push(Number(config.startPoint));
-          } else if (config.xDomain.length === 1) {
-            config.xDomain.push(Number(config.xDomain[0] + config.gutter));
-          } else if (Math.abs(min) > 1500) {
-            // currently we always add ">max" and "NA" marker
-            // add marker for greater than maximum
-            config.xDomain.push(
-              Number(config.xDomain[config.xDomain.length - 1] +
-                config.gutter));
-            // add marker for NA values
-            config.emptyMappingVal =
-              config.xDomain[config.xDomain.length - 1] + config.gutter;
-            config.xDomain.push(config.emptyMappingVal);
-          } else {
-            // add marker for greater than maximum
-            config.xDomain.push(
-              Number(cbio.util.toPrecision(
+
+            if (config.xDomain.length === 0) {
+              config.xDomain.push(Number(config.startPoint));
+            } else if (config.xDomain.length === 1) {
+              config.xDomain.push(Number(config.xDomain[0] + config.gutter));
+            } else if (Math.abs(min) > 1500) {
+              // currently we always add ">max" and "NA" marker
+              // add marker for greater than maximum
+              config.xDomain.push(
                 Number(config.xDomain[config.xDomain.length - 1] +
-                  config.gutter), 3, 0.1)));
-            // add marker for NA values
-            config.emptyMappingVal =
-              Number(cbio.util.toPrecision(
-                Number(config.xDomain[config.xDomain.length - 1] +
-                  config.gutter), 3, 0.1));
-            config.xDomain.push(config.emptyMappingVal);
+                  config.gutter));
+              // add marker for NA values
+              config.emptyMappingVal =
+                config.xDomain[config.xDomain.length - 1] + config.gutter;
+              config.xDomain.push(config.emptyMappingVal);
+            } else {
+              // add marker for greater than maximum
+              config.xDomain.push(
+                Number(cbio.util.toPrecision(
+                  Number(config.xDomain[config.xDomain.length - 1] +
+                    config.gutter), 3, 0.1)));
+              // add marker for NA values
+              config.emptyMappingVal =
+                Number(cbio.util.toPrecision(
+                  Number(config.xDomain[config.xDomain.length - 1] +
+                    config.gutter), 3, 0.1));
+              config.xDomain.push(config.emptyMappingVal);
+            }
           }
         }
       }
