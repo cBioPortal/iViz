@@ -482,6 +482,9 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               }
             }
           });
+
+          // Load barchart after data is ready
+          charts['mutation_count'].dataLoaded = true;
           def.resolve(data, _hasCNAFractionData, _hasMutationCountData);
         }, function() {
           def.reject();

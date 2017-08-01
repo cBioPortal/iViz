@@ -17,6 +17,9 @@
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
     ':attributes="attributes"' +
     ':filters.sync="attributes.filter"></chart-operations>' +
+    ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
+    'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} >' +
     '<error-handle v-if="failedToInit"></error-handle>' +
@@ -51,7 +54,8 @@
         failedToInit: false,
         opts: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
-        addingChart: false
+        addingChart: false,
+        showLoad: true
       };
     }, watch: {
       'attributes.filter': function(newVal) {
@@ -68,6 +72,9 @@
       },
       'showedSurvivalPlot': function() {
         this.updateShowSurvivalIcon();
+      },
+      'attributes.dataLoaded': function() {
+        this.processBarchartData();
       }
     }, events: {
       closeChart: function() {
@@ -138,6 +145,84 @@
           this.showSurvivalIcon = false;
         }
       },
+      processBarchartData: function () {
+        var _dataIssue = false;
+        var smallerOutlier = [];
+        var greaterOutlier = [];
+        
+        this.data.meta = _.map(_.filter(_.pluck(
+          iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
+          if (iViz.util.strIsNa(d, true) || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {
+            d = 'NA';
+          }
+          return d !== 'NA';
+        }), function(d) {
+          var number = d;
+          var smallerOutlierPattern = new RegExp('^<|(>=?)$');
+          var greaterOutlierPattern = new RegExp('^>|(<=?)$');
+          if (isNaN(d)) {
+            if (smallerOutlierPattern.test(number)) {
+              smallerOutlier.push(number.replace(/[^0-9.]/g, ''));
+            } else if (greaterOutlierPattern.test(number)) {
+              greaterOutlier.push(number.replace(/[^0-9.]/g, ''));
+            } else {
+              _dataIssue = true;
+            }
+          } else {
+            number = parseFloat(d);
+          }
+          return number;
+        });
+
+        if (_dataIssue) {
+          this.failedToInit = true;
+        } else {
+          // for scientific small number
+          if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001 &&
+            this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] > 0) {
+            this.data.smallDataFlag = true;
+            this.data.exponents = cbio.util.getDecimalExponents(this.data.meta);
+            var findExtremeExponentResult = cbio.util.findExtremes(this.data.exponents);
+            this.data.minExponent = findExtremeExponentResult[0];
+            this.data.maxExponent = findExtremeExponentResult[1];
+          } else {
+            this.data.smallDataFlag = false;
+          }
+
+          if (smallerOutlier.length > 0 && greaterOutlier.length > 0) {// data contain ">, >=,<, <="
+            this.data.min = _.max(smallerOutlier);
+            this.data.max = _.min(greaterOutlier);
+          } else {
+            var findExtremeResult = cbio.util.findExtremes(this.data.meta);
+            this.data.min = findExtremeResult[0];
+            this.data.max = findExtremeResult[1];
+
+            // noGrouping is true when number of different values less than or equal to 5. 
+            // In this case, the chart sets data value as ticks' value directly. 
+            this.data.noGrouping = false;
+            if (_.unique(this.data.meta).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
+              var maxData = _.max(this.data.meta);
+              var minData = _.min(this.data.meta);
+              if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
+                this.data.noGrouping = true;
+                this.data.sortedData = findExtremeResult[3];// use sorted value as ticks directly
+              }
+            }
+          }
+
+          this.data.attrId = this.attributes.attr_id;
+          this.data.groupType = this.attributes.group_type;
+          if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
+            this.settings.showLogScale = true;
+          }
+          this.barChart = new iViz.view.component.BarChart();
+          this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
+          this.initChart(this.settings.showLogScale);
+          this.showLoad = false;
+          this.updateShowSurvivalIcon();
+          this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
+        }
+      },
       mouseEnter: function() {
         this.showOperations = true;
       }, mouseLeave: function() {
@@ -174,9 +259,7 @@
       }
     },
     ready: function() {
-      var _dataIssue = false;
-      var smallerOutlier = [];
-      var greaterOutlier = [];
+      this.showLoad = true;
       this.settings.width = window.iViz.styles.vars.barchart.width;
       this.settings.height = window.iViz.styles.vars.barchart.height;
 
@@ -191,77 +274,9 @@
         height: this.settings.height
       });
       
-      this.data.meta = _.map(_.filter(_.pluck(
-        iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
-        if (iViz.util.strIsNa(d, true) || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {
-          d = 'NA';
-        }
-        return d !== 'NA';
-      }), function(d) {
-        var number = d;
-        var smallerOutlierPattern = new RegExp('^<|(>=?)$');
-        var greaterOutlierPattern = new RegExp('^>|(<=?)$');
-        if (isNaN(d)) {
-          if (smallerOutlierPattern.test(number)) {
-            smallerOutlier.push(number.replace(/[^0-9.]/g, ''));
-          } else if (greaterOutlierPattern.test(number)) {
-            greaterOutlier.push(number.replace(/[^0-9.]/g, ''));
-          } else {
-            _dataIssue = true;
-          }
-        } else {
-          number = parseFloat(d);
-        }
-        return number;
-      });
-      
-      if (_dataIssue) {
-        this.failedToInit = true;
-      } else {
-        // for scientific small number
-        if (this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] < 0.001 && 
-          this.data.meta[Math.ceil((this.data.meta.length * (1 / 2)))] > 0) {
-          this.data.smallDataFlag = true;
-          this.data.exponents = cbio.util.getDecimalExponents(this.data.meta);
-          var findExtremeExponentResult = cbio.util.findExtremes(this.data.exponents);
-          this.data.minExponent = findExtremeExponentResult[0];
-          this.data.maxExponent = findExtremeExponentResult[1];
-        } else {
-          this.data.smallDataFlag = false;
-        }
-        
-        if (smallerOutlier.length > 0 && greaterOutlier.length > 0) {// data contain ">, >=,<, <="
-          this.data.min = _.max(smallerOutlier);
-          this.data.max = _.min(greaterOutlier);
-        } else {
-          var findExtremeResult = cbio.util.findExtremes(this.data.meta);
-          this.data.min = findExtremeResult[0];
-          this.data.max = findExtremeResult[1];
-          
-          // noGrouping is true when number of different values less than or equal to 5. 
-          // In this case, the chart sets data value as ticks' value directly. 
-          this.data.noGrouping = false;
-          if (_.unique(this.data.meta).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
-            var maxData = _.max(this.data.meta);
-            var minData = _.min(this.data.meta);
-            if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
-              this.data.noGrouping = true;
-              this.data.sortedData = findExtremeResult[3];// use sorted value as ticks directly
-            }
-          }
-        }
-
-        this.data.attrId = this.attributes.attr_id;
-        this.data.groupType = this.attributes.group_type;
-        if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
-          this.settings.showLogScale = true;
-        }
-        this.barChart = new iViz.view.component.BarChart();
-        this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
-        this.initChart(this.settings.showLogScale);
-        this.updateShowSurvivalIcon();
-        this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
-      }
+      if (this.attributes.dataLoaded !== false) {
+        this.processBarchartData();
+      } 
     }
   });
 })(
