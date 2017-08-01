@@ -267,6 +267,7 @@ window.DataManagerForIviz = (function($, _) {
                 _metaObj.filter = [];
                 _metaObj.keys = {};
                 _metaObj.numOfDatum = 0;
+                _metaObj.addChartBy = 'default';
                 if (!_.isArray(_metaObj.priority)) {
                   iViz.priorityManager
                     .setClinicalAttrPriority(_metaObj.attr_id, Number(_metaObj.priority));
@@ -319,6 +320,7 @@ window.DataManagerForIviz = (function($, _) {
                 _metaObj.filter = [];
                 _metaObj.keys = {};
                 _metaObj.numOfDatum = 0;
+                _metaObj.addChartBy = 'default';
                 if (!_.isArray(_metaObj.priority)) {
                   iViz.priorityManager
                     .setClinicalAttrPriority(_metaObj.attr_id, Number(_metaObj.priority));
@@ -429,6 +431,7 @@ window.DataManagerForIviz = (function($, _) {
                   'cBioPortal cancer genes</a> in the cohort.';
                 _cnaAttrMeta.attr_id = 'cna_details';
                 _cnaAttrMeta.filter = [];
+                _cnaAttrMeta.addChartBy = 'default';
                 _cnaAttrMeta.keys = {};
                 _cnaAttrMeta.numOfDatum = 0;
                 _cnaAttrMeta.priority =
@@ -458,6 +461,7 @@ window.DataManagerForIviz = (function($, _) {
                   'gene with 2 or more mutations';
                 _mutDataAttrMeta.attr_id = 'mutated_genes';
                 _mutDataAttrMeta.filter = [];
+                _mutDataAttrMeta.addChartBy = 'default';
                 _mutDataAttrMeta.keys = {};
                 _mutDataAttrMeta.numOfDatum = 0;
                 _mutDataAttrMeta.priority =
@@ -481,6 +485,7 @@ window.DataManagerForIviz = (function($, _) {
                 _dfsSurvivalAttrMeta.description = '';
                 _dfsSurvivalAttrMeta.display_name = 'Disease Free Survival';
                 _dfsSurvivalAttrMeta.filter = [];
+                _dfsSurvivalAttrMeta.addChartBy = 'default';
                 _dfsSurvivalAttrMeta.keys = {};
                 _dfsSurvivalAttrMeta.numOfDatum = 0;
                 _dfsSurvivalAttrMeta.priority =
@@ -500,6 +505,7 @@ window.DataManagerForIviz = (function($, _) {
                 _osSurvivalAttrMeta.description = '';
                 _osSurvivalAttrMeta.display_name = 'Overall Survival';
                 _osSurvivalAttrMeta.filter = [];
+                _osSurvivalAttrMeta.addChartBy = 'default';
                 _osSurvivalAttrMeta.keys = {};
                 _osSurvivalAttrMeta.numOfDatum = 0;
                 _osSurvivalAttrMeta.priority =
@@ -525,6 +531,7 @@ window.DataManagerForIviz = (function($, _) {
                   numOfDatum: 0,
                   priority: iViz.priorityManager.getDefaultPriority(_id),
                   show: true,
+                  addChartBy: 'default',
                   attrList: [_id]
                 };
                 _patientAttributes.study_id.show = _patientAttributes.study_id.priority !== 0;
@@ -545,11 +552,12 @@ window.DataManagerForIviz = (function($, _) {
                   attrList: [_id],
                   keys: [],
                   numOfDatum: 0,
-                  show: true
+                  show: true, 
+                  addChartBy: 'default'
                 };
                 _sampleAttributes.copy_number_alterations.show = _sampleAttributes.copy_number_alterations.priority !== 0;
               }
-
+              
               _result.groups = {
                 group_mapping: {
                   patient_to_sample: _patientToSampleMap,
@@ -569,95 +577,59 @@ window.DataManagerForIviz = (function($, _) {
                   has_attr_data: _hasSampleAttrData
                 }
               };
+              
+              // add Mutation count vs. CNA fraction
+              _hasSampleAttrData.copy_number_alterations = '';
+              _hasSampleAttrData.cna_fraction = '';
+              var _mutCntAttrMeta = {};
+              _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
+              _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
+              _mutCntAttrMeta.view_type = 'scatter_plot';
+              _mutCntAttrMeta.layout = [-1, 4],
+              _mutCntAttrMeta.description = '';
+              _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
+              _mutCntAttrMeta.filter = [];
+              _mutCntAttrMeta.keys = {};
+              _mutCntAttrMeta.numOfDatum = 0;
+              _mutCntAttrMeta.priority =
+                iViz.priorityManager
+                  .getDefaultPriority('MUT_CNT_VS_CNA', true);
+              _mutCntAttrMeta.show = _mutCntAttrMeta.priority !== 0;
+              _mutCntAttrMeta.addChartBy = 'default';
+              _mutCntAttrMeta.attrList = ['mutation_count', 'cna_fraction'];
+              // This attribute is used for getScatterData()
+              _mutCntAttrMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap; 
+              _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
 
-              $.when(self.getCnaFractionData(),
-                self.getMutationCount())
-                .then(function(_cnaFractionData, _mutationCountData) {
-                  var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
-                  var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
+              // add mutation count
+              _hasSampleAttrData.mutation_count = '';
+              var _MutationCountMeta = {};
+              _MutationCountMeta.datatype = 'NUMBER';
+              _MutationCountMeta.description = '';
+              _MutationCountMeta.display_name = 'Mutation Count';
+              _MutationCountMeta.attr_id = 'mutation_count';
+              _MutationCountMeta.view_type = 'bar_chart';
+              _MutationCountMeta.layout = [-1, 2, 'h'];
+              _MutationCountMeta.filter = [];
+              _MutationCountMeta.keys = {};
+              _MutationCountMeta.numOfDatum = 0;
+              _MutationCountMeta.priority =
+                iViz.priorityManager
+                  .getDefaultPriority(_MutationCountMeta.attr_id);
+              _MutationCountMeta.show = _MutationCountMeta.priority !== 0;
+              _MutationCountMeta.addChartBy = 'default';
+              _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
+              _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
+              
+              _result.groups.patient.attr_meta =
+                content.util
+                  .sortByClinicalPriority(_.values(_patientAttributes));
+              _result.groups.sample.attr_meta =
+                content.util
+                  .sortByClinicalPriority(_.values(_sampleAttributes));
 
-                  _.each(_result.groups.sample.data, function(_sampleDatum) {
-                    // mutation count
-                    if (_hasMutationCountData) {
-                      _hasSampleAttrData.mutation_count = '';
-                      if (_mutationCountData[_sampleDatum.study_id] === undefined ||
-                        _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                        _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                        if (_sequencedCaseUIdsMap[_sampleDatum.sample_uid] === undefined) {
-                          _sampleDatum.mutation_count = 'NA';
-                        } else {
-                          _sampleDatum.mutation_count = 0;
-                        }
-                      } else {
-                        _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                      }
-                    }
-                    // cna fraction
-                    if (_hasCNAFractionData) {
-                      _hasSampleAttrData.copy_number_alterations = '';
-                      _hasSampleAttrData.cna_fraction = '';
-                      if (_cnaFractionData[_sampleDatum.study_id] === undefined ||
-                        _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                        _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                        _sampleDatum.cna_fraction = 'NA';
-                        _sampleDatum.copy_number_alterations = 'NA';
-                      } else {
-                        _sampleDatum.cna_fraction = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                        _sampleDatum.copy_number_alterations = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                      }
-                    }
-                  });
-
-                  // add Mutation count vs. CNA fraction
-                  if (_hasSampleAttrData.mutation_count !== undefined && _hasSampleAttrData.cna_fraction !== undefined) {
-                    var _mutCntAttrMeta = {};
-                    _mutCntAttrMeta.attr_id = 'MUT_CNT_VS_CNA';
-                    _mutCntAttrMeta.datatype = 'SCATTER_PLOT';
-                    _mutCntAttrMeta.view_type = 'scatter_plot';
-                    _mutCntAttrMeta.layout = [-1, 4],
-                    _mutCntAttrMeta.description = '';
-                    _mutCntAttrMeta.display_name = 'Mutation Count vs. CNA';
-                    _mutCntAttrMeta.filter = [];
-                    _mutCntAttrMeta.keys = {};
-                    _mutCntAttrMeta.numOfDatum = 0;
-                    _mutCntAttrMeta.priority =
-                      iViz.priorityManager
-                        .getDefaultPriority('MUT_CNT_VS_CNA', true);
-                    _mutCntAttrMeta.show = _mutCntAttrMeta.priority !== 0;
-                    _mutCntAttrMeta.attrList = ['mutation_count', 'cna_fraction'];
-                    _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
-                  }
-
-                  // add mutation count
-                  if (_hasSampleAttrData.mutation_count !== undefined) {
-                    var _MutationCountMeta = {};
-                    _MutationCountMeta.datatype = 'NUMBER';
-                    _MutationCountMeta.description = '';
-                    _MutationCountMeta.display_name = 'Mutation Count';
-                    _MutationCountMeta.attr_id = 'mutation_count';
-                    _MutationCountMeta.view_type = 'bar_chart';
-                    _MutationCountMeta.layout = [-1, 2, 'h'];
-                    _MutationCountMeta.filter = [];
-                    _MutationCountMeta.keys = {};
-                    _MutationCountMeta.numOfDatum = 0;
-                    _MutationCountMeta.priority =
-                      iViz.priorityManager
-                        .getDefaultPriority(_MutationCountMeta.attr_id);
-                    _MutationCountMeta.show = _MutationCountMeta.priority !== 0;
-                    _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
-                    _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
-                  }
-
-                  _result.groups.patient.attr_meta =
-                    content.util
-                      .sortByClinicalPriority(_.values(_patientAttributes));
-                  _result.groups.sample.attr_meta =
-                    content.util
-                      .sortByClinicalPriority(_.values(_sampleAttributes));
-
-                  self.initialSetupResult = _result;
-                  _def.resolve(_result);
-                });
+              self.initialSetupResult = _result;
+              _def.resolve(_result);
             });
         });
       });
@@ -947,7 +919,7 @@ window.DataManagerForIviz = (function($, _) {
                 self.cnaProfileIdsMap[_profile.study_id] = _profile.id;
               } else if (_profile.genetic_alteration_type === 'MUTATION_EXTENDED' && (_profile.study_id + '_mutations_uncalled' !== _profile.id)) {
                 self.mutationProfileIdsMap[_profile.study_id] = _profile.id;
-              }
+              } 
             });
             fetch_promise.resolve(_profiles);
           }).fail(function() {
@@ -1167,7 +1139,7 @@ window.DataManagerForIviz = (function($, _) {
         }
         return def.promise();
       },
-      getSampleLists: function() {
+      getSampleLists: function(){
         var def = new $.Deferred();
         var self = this;
         var fetch_promises = [];
