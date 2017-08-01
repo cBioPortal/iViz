@@ -276,7 +276,7 @@
       
       if (this.attributes.dataLoaded !== false) {
         this.processBarchartData();
-      } 
+      }
     }
   });
 })(
