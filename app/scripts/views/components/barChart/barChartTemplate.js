@@ -193,7 +193,7 @@
         width: this.settings.width,
         height: this.settings.height
       });
-
+      
       this.data.meta = _.map(_.filter(_.pluck(
         iViz.getGroupNdx(this.opts.groupid), this.opts.attrId), function(d) {
         if (iViz.util.strIsNa(d, true) || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {

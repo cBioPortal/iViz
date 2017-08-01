@@ -253,6 +253,7 @@
           index: index
         };
       });
+      
     }
 
     function updateCategories() {
@@ -272,7 +273,6 @@
           _labels[_labelDatum.id] = _labelDatum;
         }
       });
-
       _.each(_labels, function(label) {
         label.caseRate = iViz.util.calcFreq(Number(label.cases), _currentSampleSize);
       });
