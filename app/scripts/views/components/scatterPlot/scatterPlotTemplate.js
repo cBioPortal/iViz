@@ -18,7 +18,10 @@
     'style="float:none !important;" id={{chartId}} ></div>' +
     ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
-    ' <img src="images/ajax-loader.gif" alt="loading"></div></div>',
+    ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
+    '<div :class="{\'error-init\': failedToInit}" ' +
+    'style="display: none;">' +
+    '<span class="content">Failed to load data, refresh the page may help</span></div></div>',
     props: [
       'ndx', 'attributes'
     ],
@@ -52,19 +55,22 @@
         this.showLoad = true;
       },
       'update-special-charts': function(hasFilters) {
-        var attrId =
-          this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
-        var _selectedCases =
-          _.pluck(this.invisibleDimension.top(Infinity), attrId);
+        this.hasFilters = hasFilters;
+        if (this.dataLoaded) {
+          var attrId =
+            this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
+          var _selectedCases =
+            _.pluck(this.invisibleDimension.top(Infinity), attrId);
 
-        this.selectedSamples = _selectedCases;
-        if (hasFilters) {
-          this.chartInst.update(_selectedCases);
-        } else {
-          this.chartInst.update([]);
+          this.selectedSamples = _selectedCases;
+          if (hasFilters) {
+            this.chartInst.update(_selectedCases);
+          } else {
+            this.chartInst.update([]);
+          }
+          this.attachPlotlySelectedEvent();
+          this.showLoad = false;
         }
-        this.attachPlotlySelectedEvent();
-        this.showLoad = false;
       },
       'closeChart': function() {
         this.invisibleDimension.dispose();
@@ -138,26 +144,46 @@
     ready: function() {
       var _self = this;
       _self.showLoad = true;
-      var _opts = {
-        chartId: this.chartId,
-        chartDivId: this.chartDivId,
-        title: this.attributes.display_name,
-        width: window.iViz.styles.vars.scatter.width,
-        height: window.iViz.styles.vars.scatter.height
-      };
-      var attrId =
-        this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
-      this.invisibleDimension = this.ndx.dimension(function(d) {
-        return d[attrId];
-      });
+      
+      $.when(iViz.getScatterData(_self))
+        .then(function(_scatterData, _hasCnaFractionData, _hasMutationCountData) {
+          if ((!_hasCnaFractionData || !_hasMutationCountData) && _self.attributes.addChartBy === 'default') {
+            _self.attributes.show = false;
+            _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
+          } else {
+            var _opts = {
+              chartId: _self.chartId,
+              chartDivId: _self.chartDivId,
+              title: _self.attributes.display_name,
+              width: window.iViz.styles.vars.scatter.width,
+              height: window.iViz.styles.vars.scatter.height
+            };
 
-      var data = iViz.getGroupNdx(this.attributes.group_id);
-      _self.chartInst = new iViz.view.component.ScatterPlot();
-      _self.chartInst.init(data, _opts);
-      _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
+            var attrId =
+              _self.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
+            _self.invisibleDimension = _self.ndx.dimension(function(d) {
+              return d[attrId];
+            });
 
-      _self.attachPlotlySelectedEvent();
-      _self.showLoad = false;
+            _self.chartInst = new iViz.view.component.ScatterPlot();
+            _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
+            _self.chartInst.init(_scatterData, _opts);
+
+            _self.dataLoaded = true;
+            var _selectedCases =
+              _.pluck(_self.invisibleDimension.top(Infinity), attrId);
+            if (_self.hasFilters) {
+              _self.chartInst.update(_selectedCases);
+            }
+            _self.attachPlotlySelectedEvent();
+          }
+         
+          _self.showLoad = false;
+        }, function() {
+          _self.showLoad = false;
+          _self.failedToInit = true;
+        });
+      
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
   });
