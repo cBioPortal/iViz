@@ -167,6 +167,7 @@
               self_.$nextTick(function() {
                 if (_attrAdded) {
                   $.when(iViz.updateGroupNdx(attrData.group_id, attrData.attr_id)).then(function(isGroupNdxDataUpdated) {
+                    attrData.addChartBy = 'user';
                     self_.groups[_groupIdToPush].attributes.push(attrData);
                     if (isGroupNdxDataUpdated) {
                       self_.$broadcast('add-chart-to-group', attrData.group_id);
@@ -246,8 +247,6 @@
                   selectedCaseUIDs = selectedCaseUIDs.concat(caseUIDs);
                 }
               });
-
-
 
               if (unmappedCaseIDs.length > 0) {
                 new Notification().createNotification(selectedCaseUIDs.length +
