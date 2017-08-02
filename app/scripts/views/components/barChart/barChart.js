@@ -637,7 +637,9 @@
             _.each(_.unique(data.sortedData), function(value) {
               config.xDomain.push(value);
             });
-            config.gutter = (max - min) / config.xDomain.length;
+            if (max !== min) {
+              config.gutter = (max - min) / config.xDomain.length;
+            }
             if (data.hasNA) {
               // add marker for NA values
               config.emptyMappingVal =
