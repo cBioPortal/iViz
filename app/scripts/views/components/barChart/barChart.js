@@ -279,7 +279,8 @@
         minExponent: data_.minExponent,
         maxExponent: data_.maxExponent,
         smallDataFlag: data_.smallDataFlag,
-        noGrouping: data_.noGrouping
+        noGrouping: data_.noGrouping,
+        hasNA: data_.hasNA
       }, opts.logScaleChecked));
       ndx_ = ndx;
 
@@ -410,7 +411,8 @@
         minExponent: data_.minExponent,
         maxExponent: data_.maxExponent,
         smallDataFlag: data_.smallDataFlag,
-        noGrouping: data_.noGrouping
+        noGrouping: data_.noGrouping,
+        hasNA: data_.hasNA
       }, logScaleChecked));
 
       initDc_(logScaleChecked);
@@ -635,7 +637,8 @@
             _.each(_.unique(data.sortedData), function(value) {
               config.xDomain.push(value);
             });
-            if (_.contains(data.meta, 'NA')) {
+            config.gutter = (max - min) / config.xDomain.length;
+            if (data.hasNA) {
               // add marker for NA values
               config.emptyMappingVal =
                 config.xDomain[config.xDomain.length - 1] + config.gutter;
