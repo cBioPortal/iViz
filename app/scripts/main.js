@@ -485,6 +485,13 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
           // Load barchart after data is ready
           charts['mutation_count'].dataLoaded = true;
+          if (!_hasMutationCountData) {
+            charts['mutation_count'].emptyChart = true;
+            if (charts['mutation_count'].addChartBy === 'default') {
+              charts['mutation_count'].show = false;
+              _self.$dispatch('remove-chart', charts['mutation_count'].attr_id, charts['mutation_count'].group_id);//rearrange layou
+            }
+          }
           def.resolve(data, _hasCNAFractionData, _hasMutationCountData);
         }, function() {
           def.reject();
