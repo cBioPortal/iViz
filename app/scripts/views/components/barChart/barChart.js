@@ -343,11 +343,11 @@
         
         if (logScaleChecked) {
           if (minNumBarPoint !== '' && maxNumBarPoint !== '') {
-            tempFilters_[0] = minNumBarPoint;
+            tempFilters_[0] = minNumBarPoint + '<';
             if (hasNA) {
-              tempFilters_[1] = maxNumBarPoint + ", NA";
+              tempFilters_[1] = '<=' + maxNumBarPoint + ", NA";
             } else {
-              tempFilters_[1] = maxNumBarPoint;
+              tempFilters_[1] = '<=' + maxNumBarPoint;
             }
           } else {//only select "NA" bar
             tempFilters_[0] = 'NA';
@@ -355,8 +355,8 @@
           }
         } else {
           if (!hasNA && !hasSmallerOutlier && !hasGreaterOutlier) {
-            tempFilters_[0] = minNumBarPoint;
-            tempFilters_[1] = maxNumBarPoint;
+            tempFilters_[0] = minNumBarPoint + '<';
+            tempFilters_[1] = '<=' + maxNumBarPoint;
           } else if (hasNA && !hasSmallerOutlier) {
             if (hasGreaterOutlier) { // "> Num, NA"
               tempFilters_[0] = '';
@@ -370,14 +370,14 @@
                 tempFilters_[0] = 'NA';
                 tempFilters_[1] = '';
               } else { // i.e., "30 ~ 80, NA"
-                tempFilters_[0] = minNumBarPoint;
-                tempFilters_[1] = maxNumBarPoint + ', NA';
+                tempFilters_[0] = minNumBarPoint + '<';
+                tempFilters_[1] = '<=' + maxNumBarPoint + ', NA';
               }
             }
           } else if (!hasNA && hasGreaterOutlier) {
-            if (hasSmallerOutlier) {// 0 ~ ∞
-              tempFilters_[0] = 0;
-              tempFilters_[1] = '∞';
+            if (hasSmallerOutlier) {// Select all bars excluding NA
+              tempFilters_[0] = 'All Numbers';
+              tempFilters_[1] = '';
             } else {// "> Num"
               tempFilters_[0] = '';
               if(minNumBarPoint === '') {
@@ -393,8 +393,8 @@
             } else {
               tempFilters_[1] = '<= ' + maxNumBarPoint;
             }
-          } else { // Invalid selection like select all bars 
-            tempFilters_[0] = '';
+          } else { // Select all bars including NA
+            tempFilters_[0] = 'All';
             tempFilters_[1] = '';
           }
         }
