@@ -39,8 +39,10 @@
           if (data_.smallDataFlag) {
             if (d[data_.attrId] <= opts_.xDomain[1]) {
               val = opts_.xDomain[0];
-            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3] && data_.hasNA) {
               val = opts_.xDomain[opts_.xDomain.length - 2];
+            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 2] && !data_.hasNA) {
+              val = opts_.xDomain[opts_.xDomain.length - 1];
             } else {
               for (i = 2; i < opts_.xDomain.length - 2; i++) {
                 if (d[data_.attrId] <= opts_.xDomain[i] &&
@@ -55,8 +57,10 @@
           } else {
             if (d[data_.attrId] <= opts_.xDomain[1]) {
               val = opts_.xDomain[0];
-            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3]) {
+            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 3] && data_.hasNA) {
               val = opts_.xDomain[opts_.xDomain.length - 2];
+            } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 2] && !data_.hasNA) {
+              val = opts_.xDomain[opts_.xDomain.length - 1];
             } else {
               // minus half of separateDistance to make the margin values
               // always map to the left side. Thus for any value x, it is in the
@@ -162,29 +166,25 @@
             _returnValue = '';
           }
         }
-      } else if (opts_.xDomain.length === 1) {
+      } else if (v === opts_.emptyMappingVal || opts_.xDomain.length === 1) {
         return 'NA';
-      } else if (opts_.xDomain.length === 2) {
-        // when there is only one value and NA in the data
-        if (v === opts_.xDomain[0]) {
-          _returnValue = v;
-        } else {
-          _returnValue = 'NA';
-        }
       } else if (v === opts_.xDomain[0]) {
         formattedValue = opts_.xDomain[1];
         if (data_.smallDataFlag) {
           return '<=' + e(formattedValue);
         }
         return '<=' + formattedValue;
-      } else if (v === opts_.xDomain[opts_.xDomain.length - 2]) {
-        formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
+      } else if ((v === opts_.xDomain[opts_.xDomain.length - 2] && data_.hasNA) ||
+        (v === opts_.xDomain[opts_.xDomain.length - 1] && !data_.hasNA)) {
+        if (data_.hasNA) {
+          formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
+        } else {
+          formattedValue = opts_.xDomain[opts_.xDomain.length - 2];
+        }
         if (data_.smallDataFlag) {
           return '>' + e(formattedValue);
         }
         return '>' + formattedValue;
-      } else if (v === opts_.xDomain[opts_.xDomain.length - 1]) {
-        return 'NA';
       } else if (data_.min > 1500 &&
         opts_.xDomain.length > 7) {
         // this is the special case for printing out year
@@ -279,7 +279,8 @@
         minExponent: data_.minExponent,
         maxExponent: data_.maxExponent,
         smallDataFlag: data_.smallDataFlag,
-        noGrouping: data_.noGrouping
+        noGrouping: data_.noGrouping,
+        hasNA: data_.hasNA
       }, opts.logScaleChecked));
       ndx_ = ndx;
 
@@ -304,25 +305,53 @@
       var startNumIndex = 0;
       var endNumIndex = 0;
 
+      tempFilters_[0] = '';
+      tempFilters_[1] = '';
+
       _.each(opts_.xBarValues, function(middle) {
         if (middle >= _filter[0] && middle <= _filter[1]) {
           hasBar = true;
-          if (middle === opts_.xDomain[opts_.xDomain.length - 1]) {
+
+          if (data_.noGrouping) {
+            startNumIndex = 0;
+            if (data_.hasNA && middle === opts_.xDomain[opts_.xDomain.length - 1]) {
+              hasNA = true;
+              endNumIndex = opts_.xDomain.length - 2;
+            } else {
+              selectedNumBar.push(middle);
+              endNumIndex = opts_.xDomain.length - 1;
+            }
+          } else if (data_.hasNA && middle === opts_.xDomain[opts_.xDomain.length - 1]) {
             hasNA = true;
           } else {
             if (logScaleChecked) {
               startNumIndex = 0;
-              endNumIndex = opts_.xDomain.length - 2;
+              if (data_.hasNA) { // has 'NA' tick
+                endNumIndex = opts_.xDomain.length - 2;
+              } else {
+                endNumIndex = opts_.xDomain.length - 1;
+              }
               selectedNumBar.push(middle);
             } else {
               startNumIndex = 1;
-              endNumIndex = opts_.xDomain.length - 3;
               if (middle === opts_.xDomain[0]) {
                 hasSmallerOutlier = true;
-              } else if (middle === opts_.xDomain[opts_.xDomain.length - 2]) {
-                hasGreaterOutlier = true;
               } else {
-                selectedNumBar.push(middle);
+                if (data_.hasNA) {// has 'NA' tick
+                  endNumIndex = opts_.xDomain.length - 3;
+                  if (middle === opts_.xDomain[opts_.xDomain.length - 2]) {
+                    hasGreaterOutlier = true;
+                  } else {
+                    selectedNumBar.push(middle);
+                  }
+                } else {
+                  endNumIndex = opts_.xDomain.length - 2;
+                  if (middle === opts_.xDomain[opts_.xDomain.length - 1]) {
+                    hasGreaterOutlier = true;
+                  } else {
+                    selectedNumBar.push(middle);
+                  }
+                }
               }
             }
           }
@@ -339,62 +368,82 @@
             maxNumBarPoint = opts_.xDomain[i + 1];
           }
         }
-        
-        if (logScaleChecked) {
-          if (minNumBarPoint !== '' && maxNumBarPoint !== '') {
-            tempFilters_[0] = minNumBarPoint;
-            if (hasNA) {
-              tempFilters_[1] = maxNumBarPoint + ", NA";
-            } else {
-              tempFilters_[1] = maxNumBarPoint;
-            }
-          } else {//only select "NA" bar
+
+        if (data_.noGrouping) {
+          if (selectedNumBar.length === opts_.xBarValues.length ||
+            (_filter[0] <= opts_.xBarValues[0] && _filter[1] >= opts_.xBarValues[opts_.xBarValues.length - 2] &&
+            data_.hasNA && !hasNA)) {// select all number bars
+            tempFilters_[0] = 'All Numbers';
+          } else if (selectedNumBar.length === opts_.xBarValues.length - 1 && hasNA) { // select all bars
+            tempFilters_[0] = 'All';
+          } else if (selectedNumBar.length === 0 && hasNA) {// only choose NA bar
             tempFilters_[0] = 'NA';
-            tempFilters_[1] = '';
+          } else if (selectedNumBar.length === 1) {// only choose 1 number bar
+            if (hasNA) { // chose max num bar and NA bar
+              tempFilters_[0] = selectedNumBar[0] + ', NA';
+            } else {
+              tempFilters_[0] = selectedNumBar[0];
+            }
+          } else {
+            _.each(selectedNumBar, function(barValue) {
+              tempFilters_[0] += barValue + ', ';
+            });
+            if (hasNA) {
+              tempFilters_[0] += 'NA';
+            } else {
+              tempFilters_[0] = tempFilters_[0].slice(0, -2);// remove last coma
+            }
           }
         } else {
-          if (!hasNA && !hasSmallerOutlier && !hasGreaterOutlier) {
-            tempFilters_[0] = minNumBarPoint;
-            tempFilters_[1] = maxNumBarPoint;
-          } else if (hasNA && !hasSmallerOutlier) {
-            if (hasGreaterOutlier) { // "> Num, NA"
-              tempFilters_[0] = '';
-              if (minNumBarPoint === '') {// only select '>Num' and 'NA' bars
-                tempFilters_[1] = '> ' + opts_.xDomain[opts_.xDomain.length - 3] + ', NA';
+          if (logScaleChecked) {
+            if (minNumBarPoint !== '' && maxNumBarPoint !== '') {
+              tempFilters_[0] = minNumBarPoint + '<';
+              if (hasNA) {
+                tempFilters_[1] = '<=' + maxNumBarPoint + ", NA";
               } else {
-                tempFilters_[1] = '> ' + minNumBarPoint + ', NA';
+                tempFilters_[1] = '<=' + maxNumBarPoint;
               }
-            } else { 
-              if (minNumBarPoint === '' && maxNumBarPoint === '') { //only select "NA" bar
-                tempFilters_[0] = 'NA';
-                tempFilters_[1] = '';
-              } else { // i.e., "30 ~ 80, NA"
-                tempFilters_[0] = minNumBarPoint;
-                tempFilters_[1] = maxNumBarPoint + ', NA';
-              }
+            } else {//only select "NA" bar
+              tempFilters_[0] = 'NA';
             }
-          } else if (!hasNA && hasGreaterOutlier) {
-            if (hasSmallerOutlier) {// 0 ~ ∞
-              tempFilters_[0] = 0;
-              tempFilters_[1] = '∞';
-            } else {// "> Num"
-              tempFilters_[0] = '';
-              if(minNumBarPoint === '') {
-                tempFilters_[1] = '> ' + opts_.xDomain[opts_.xDomain.length - 3];
+          } else {
+            if (!hasNA && !hasSmallerOutlier && !hasGreaterOutlier) {
+              tempFilters_[0] = minNumBarPoint + '<';
+              tempFilters_[1] = '<=' + maxNumBarPoint;
+            } else if (hasNA && !hasSmallerOutlier) {
+              if (hasGreaterOutlier) { // "> Num, NA"
+                if (minNumBarPoint === '') {// only select '>Num' and 'NA' bars
+                  tempFilters_[1] = '> ' + opts_.xDomain[opts_.xDomain.length - 3] + ', NA';
+                } else {
+                  tempFilters_[1] = '> ' + minNumBarPoint + ', NA';
+                }
               } else {
-                tempFilters_[1] = '> ' + minNumBarPoint;
+                if (minNumBarPoint === '' && maxNumBarPoint === '') { //only select "NA" bar
+                  tempFilters_[0] = 'NA';
+                } else { // i.e., "30 ~ 80, NA"
+                  tempFilters_[0] = minNumBarPoint + '<';
+                  tempFilters_[1] = '<=' + maxNumBarPoint + ', NA';
+                }
               }
+            } else if (!hasNA && hasGreaterOutlier) {
+              if (hasSmallerOutlier) {// Select all bars excluding NA
+                tempFilters_[0] = 'All Numbers';
+              } else {// "> Num"
+                if(minNumBarPoint === '') {
+                  tempFilters_[1] = '> ' + opts_.xDomain[opts_.xDomain.length - 3];
+                } else {
+                  tempFilters_[1] = '> ' + minNumBarPoint;
+                }
+              }
+            } else if (hasSmallerOutlier && !hasGreaterOutlier && !hasNA) {// "<= Num"
+              if (maxNumBarPoint === '') {
+                tempFilters_[1] = '<= ' + opts_.xDomain[1];
+              } else {
+                tempFilters_[1] = '<= ' + maxNumBarPoint;
+              }
+            } else { // Select all bars including NA
+              tempFilters_[0] = 'All';
             }
-          } else if (hasSmallerOutlier && !hasGreaterOutlier && !hasNA) {// "<= Num"
-            tempFilters_[0] = '';
-            if (maxNumBarPoint === '') {
-              tempFilters_[1] = '<= ' + opts_.xDomain[1];
-            } else {
-              tempFilters_[1] = '<= ' + maxNumBarPoint;
-            }
-          } else { // Invalid selection like select all bars 
-            tempFilters_[0] = '';
-            tempFilters_[1] = '';
           }
         }
       }
@@ -410,7 +459,8 @@
         minExponent: data_.minExponent,
         maxExponent: data_.maxExponent,
         smallDataFlag: data_.smallDataFlag,
-        noGrouping: data_.noGrouping
+        noGrouping: data_.noGrouping,
+        hasNA: data_.hasNA
       }, logScaleChecked));
 
       initDc_(logScaleChecked);
@@ -567,6 +617,8 @@
           config.gutter = 0.2;
           config.startPoint = (parseInt(min / 0.2, 10) - 1) * 0.2;
           // config.emptyMappingVal = config.maxVal + 0.2;
+        } else if (range <= 0.1) {
+          config.gutter = 0.01;
         } else if (range <= 1 && min >= 0 && max <= 1) {
           config.gutter = 0.1;
           config.startPoint = 0;
@@ -593,8 +645,9 @@
             config.xDomain.push(_tmpValue);
             if (_tmpValue > data.max) {
               config.xDomain.push(Math.pow(10, i + 0.5));
-              config.emptyMappingVal = Math.pow(10, i + 1);
-              config.xDomain.push(config.emptyMappingVal);
+              if (data.hasNA) {
+                config.emptyMappingVal = Math.pow(10, i + 1);
+              }
               config.maxDomain = Math.pow(10, i + 1.5);
               break;
             }
@@ -607,8 +660,9 @@
               config.xDomain.push(Math.pow(10, i));
             }
             config.xDomain.push(Math.pow(10, maxExponent + config.divider));// add ">=" marker
-            config.emptyMappingVal = Math.pow(10, maxExponent + config.divider * 2);// add "NA" marker
-            config.xDomain.push(config.emptyMappingVal);
+            if (data.hasNA) {
+              config.emptyMappingVal = Math.pow(10, maxExponent + config.divider * 2);// add "NA" marker
+            }
             config.maxDomain = Math.pow(10, maxExponent + config.divider * 2.5);
           } else if (exponentRange === 1) {
             config.minDomain = Math.pow(10, minExponent - 1);
@@ -617,16 +671,18 @@
               config.xDomain.push(Math.pow(10, i));
               config.xDomain.push(3 * Math.pow(10, i));
             }
-            config.emptyMappingVal = Math.pow(10, maxExponent + 2);// add "NA" marker
-            config.xDomain.push(config.emptyMappingVal);
+            if (data.hasNA) {
+              config.emptyMappingVal = Math.pow(10, maxExponent + 2);// add "NA" marker
+            }
             config.maxDomain = 3 * Math.pow(10, maxExponent + 2);
           } else { // exponentRange = 0
             config.minDomain = Math.pow(10, minExponent) - config.divider;
             for (i = Math.pow(10, minExponent); i <= Math.pow(10, maxExponent + 1); i += config.divider) {
               config.xDomain.push(i);
             }
-            config.emptyMappingVal = Math.pow(10, maxExponent + 1) + config.divider;// add "NA" marker
-            config.xDomain.push(config.emptyMappingVal);
+            if (data.hasNA) {
+              config.emptyMappingVal = Math.pow(10, maxExponent + 1) + config.divider;// add "NA" marker
+            }
             config.maxDomain = Math.pow(10, maxExponent + 1) + config.divider * 2;
           }
         } else {
@@ -635,11 +691,10 @@
             _.each(_.unique(data.sortedData), function(value) {
               config.xDomain.push(value);
             });
-            if (_.contains(data.meta, 'NA')) {
+            if (data.hasNA) {
               // add marker for NA values
               config.emptyMappingVal =
                 config.xDomain[config.xDomain.length - 1] + config.gutter;
-              config.xDomain.push(config.emptyMappingVal);
             }
           } else {
             if (!_.isNaN(range)) {
@@ -674,24 +729,30 @@
               config.xDomain.push(
                 Number(config.xDomain[config.xDomain.length - 1] +
                   config.gutter));
-              // add marker for NA values
-              config.emptyMappingVal =
-                config.xDomain[config.xDomain.length - 1] + config.gutter;
-              config.xDomain.push(config.emptyMappingVal);
+              if (data.hasNA) {
+                // add marker for NA values
+                config.emptyMappingVal =
+                  config.xDomain[config.xDomain.length - 1] + config.gutter;
+              }
             } else {
               // add marker for greater than maximum
               config.xDomain.push(
                 Number(cbio.util.toPrecision(
                   Number(config.xDomain[config.xDomain.length - 1] +
                     config.gutter), 3, 0.1)));
-              // add marker for NA values
-              config.emptyMappingVal =
-                Number(cbio.util.toPrecision(
-                  Number(config.xDomain[config.xDomain.length - 1] +
-                    config.gutter), 3, 0.1));
-              config.xDomain.push(config.emptyMappingVal);
+              if (data.hasNA) {
+                // add marker for NA values
+                config.emptyMappingVal =
+                  Number(cbio.util.toPrecision(
+                    Number(config.xDomain[config.xDomain.length - 1] +
+                      config.gutter), 3, 0.1));
+              }
             }
           }
+        }
+
+        if (config.emptyMappingVal !== '') {
+          config.xDomain.push(config.emptyMappingVal);
         }
       }
       return config;
