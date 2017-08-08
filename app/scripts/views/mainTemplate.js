@@ -242,21 +242,12 @@
           }
         });
         return full;
-      }
+      },
     },
     events: {
       'update-grid': function() {
         this.grid_.layout();
       }, 'remove-grid-item': function(item) {
-        if (this.grid === undefined) {
-          this.grid_ = new Packery(document.querySelector('.grid'), {
-            itemSelector: '.grid-item',
-            columnWidth: window.iViz.styles.vars.width.one + 5,
-            rowHeight: window.iViz.styles.vars.height.one + 5,
-            gutter: 5,
-            initLayout: false
-          });
-        }
         this.grid_.remove(item);
         this.grid_.layout();
       },
