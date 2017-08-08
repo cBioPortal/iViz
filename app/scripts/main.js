@@ -468,6 +468,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
                data_.groups.sample.data[_sampleDatum.sample_uid].mutation_count = _sampleDatum.mutation_count;
               }
             }
+            
+            console.log("test");
 
             // cna fraction
             if (_hasCNAFractionData) {
