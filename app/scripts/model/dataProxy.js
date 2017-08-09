@@ -598,6 +598,9 @@ window.DataManagerForIviz = (function($, _) {
               _mutCntAttrMeta.addChartBy = 'default';
               _mutCntAttrMeta.attrList = ['mutation_count', 'cna_fraction'];
               // This attribute is used for getScatterData()
+              // This should not be added into attribute meta and should be saved into main.js 
+              // (Centralized place storing all data for sharing across directives)
+              // This needs to be updated after merging into virtual study branch
               _mutCntAttrMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap; 
               _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
 
