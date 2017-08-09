@@ -644,6 +644,9 @@ window.DataManagerForIviz = (function($, _) {
               _MutationCountMeta.show = _MutationCountMeta.priority !== 0;
               _MutationCountMeta.addChartBy = 'default';
               _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
+              // This attribute is used for async mutation_count barchart
+              _MutationCountMeta.dataLoaded = false;
+              _MutationCountMeta.emptyChart = false;
               _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
 
               _result.groups.patient.attr_meta =
