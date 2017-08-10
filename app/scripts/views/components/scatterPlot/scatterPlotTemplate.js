@@ -15,13 +15,13 @@
     ' :attributes="attributes" :filters.sync="attributes.filter"></chart-operations>' +
     ' <div :class="{\'start-loading\': showLoad}" ' +
     'class="dc-chart dc-scatter-plot" align="center" ' +
-    'style="float:none !important;" id={{chartId}} ></div>' +
+    'style="float:none !important;" id={{chartId}} >' +
     ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
-    '<div :class="{\'error-init\': failedToInit}" ' +
-    'style="display: none;">' +
-    '<span class="content">Failed to load data, refresh the page may help</span></div></div>',
+    '<div v-if="failedToInit" class="error-panel" style="padding-top: 30%;">' +
+    '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
+    '</div></div></div>',
     props: [
       'ndx', 'attributes'
     ],
@@ -39,6 +39,12 @@
         chartInst: {},
         hasFilters: false,
         showLoad: true,
+        errorMessage: {
+          dataInvalid: false,
+          noData: false,
+          failedToLoadData: false
+        },
+        failedToInit: false,
         invisibleDimension: {}
       };
     },
@@ -147,9 +153,14 @@
       
       $.when(iViz.getScatterData(_self))
         .then(function(_scatterData, _hasCnaFractionData, _hasMutationCountData) {
-          if ((!_hasCnaFractionData || !_hasMutationCountData) && _self.attributes.addChartBy === 'default') {
-            _self.attributes.show = false;
-            _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
+          if (!_hasCnaFractionData || !_hasMutationCountData) {
+            if (_self.attributes.addChartBy === 'default') {
+              _self.attributes.show = false;
+              _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
+            } else {
+              _self.errorMessage.noData = true;
+              _self.failedToInit = true;
+            }
           } else {
             var _opts = {
               chartId: _self.chartId,
@@ -181,6 +192,7 @@
           _self.showLoad = false;
         }, function() {
           _self.showLoad = false;
+          _self.errorMessage.failedToLoadData = true;
           _self.failedToInit = true;
         });
       

@@ -17,13 +17,14 @@
     ':chart-id="chartId" :show-log-scale="showLogScale" ' +
     ':attributes="attributes"' +
     ':filters.sync="attributes.filter"></chart-operations>' +
+    '<div class="dc-chart dc-bar-chart" align="center" ' +
+    'style="float:none !important;" id={{chartId}} >' +
     ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader" style="top: 30%; left: 37%; display: none;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
-    '<div class="dc-chart dc-bar-chart" align="center" ' +
-    'style="float:none !important;" id={{chartId}} >' +
-    '<error-handle v-if="failedToInit"></error-handle>' +
-    '</div>' +
+    '<div v-if="failedToInit" class="error-panel" style="padding-top: 15%;">' + 
+    '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
+    '</div></div>' +
     '<span class="text-center chart-title-span" ' +
     'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
@@ -52,6 +53,11 @@
           transitionDuration: iViz.opts.dc.transitionDuration
         },
         failedToInit: false,
+        errorMessage: {
+          dataInvalid: false,
+          noData: false, 
+          failedToLoadData: false
+        },
         opts: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
         addingChart: false,
@@ -174,6 +180,7 @@
         });
 
         if (_dataIssue) {
+          this.errorMessage.dataInvalid = true;
           this.failedToInit = true;
         } else {
           // for scientific small number
@@ -221,12 +228,6 @@
           this.updateShowSurvivalIcon();
           this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
         }
-      },
-      initEmptyChart: function () {
-        this.barChart = new iViz.view.component.BarChart();
-        this.initChart();
-        this.showLoad = false;
-        this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
       },
       mouseEnter: function() {
         this.showOperations = true;
@@ -290,21 +291,22 @@
               if (_self.attributes.addChartBy === 'default') {// Hide empty chart initially.
                 _self.attributes.show = false;
                 _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
-              } else {// User click "add mutation count chart" and show empty chart
-                _self.initEmptyChart();
+              } else {// User click "add mutation count chart" and show "No data available"
+                _self.errorMessage.noData = true;
+                _self.failedToInit = true;
               }
             } else {
               _self.processBarchartData(_mutationCountData);
             }
           }, function() {
             _self.showLoad = false;
+            _self.errorMessage.failedToLoadData = true;
             _self.failedToInit = true;
           });
       } else {
         _data = iViz.getGroupNdx(this.opts.groupid);
         _self.processBarchartData(_data);
       }
-
     }
   });
 })(

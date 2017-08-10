@@ -447,8 +447,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         self.getMutationCountData(_self))
         .then(function(_cnaFractionData, _mutationCountResult) {
           var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
-          var _hasMutationCountData = _mutationCountResult[1];
+          var _hasMutationCountData = false;
           var groupId = _self.attributes.group_id;
+
+          if (_mutationCountResult[1]) {
+            _hasMutationCountData = _mutationCountResult[1];
+          }
           data = self.getGroupNdx(groupId);
 
           _.each(data, function(_sampleDatum) {
