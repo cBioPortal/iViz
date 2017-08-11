@@ -15,13 +15,13 @@
     ' :attributes="attributes" :filters.sync="attributes.filter"></chart-operations>' +
     ' <div :class="{\'start-loading\': showLoad}" ' +
     'class="dc-chart dc-scatter-plot" align="center" ' +
-    'style="float:none !important;" id={{chartId}} >' +
+    'style="float:none !important;" id={{chartId}} ></div>' +
     ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    'class="chart-loader" style="top: 30%; left: 35%; display: none;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
-    '<div v-if="failedToInit" class="error-panel" style="padding-top: 30%;">' +
+    '<div v-if="failedToInit" class="error-panel" style="padding-left: 15%; padding-top: 30%;">' +
     '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
-    '</div></div></div>',
+    '</div></div>',
     props: [
       'ndx', 'attributes'
     ],
@@ -157,10 +157,9 @@
             if (_self.attributes.addChartBy === 'default') {
               _self.attributes.show = false;
               _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
-            } else {
-              _self.errorMessage.noData = true;
-              _self.failedToInit = true;
-            }
+            } 
+            _self.errorMessage.noData = true;
+            _self.failedToInit = true;
           } else {
             var _opts = {
               chartId: _self.chartId,

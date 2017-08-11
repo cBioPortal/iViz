@@ -19,12 +19,12 @@
     ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} >' +
-    ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 30%; left: 37%; display: none;">' +
-    ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
-    '<div v-if="failedToInit" class="error-panel" style="padding-top: 15%;">' + 
+    '<div v-if="failedToInit" class="error-panel" style="padding-top: 10%;">' +
     '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
     '</div></div>' +
+    ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
+    'class="chart-loader" style="top: 20%; left: 37%; display: none;">' +
+    ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
     '<span class="text-center chart-title-span" ' +
     'id="{{chartId}}-title">{{displayName}}</span>' +
     '</div>',
@@ -291,10 +291,12 @@
               if (_self.attributes.addChartBy === 'default') {// Hide empty chart initially.
                 _self.attributes.show = false;
                 _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
-              } else {// User click "add mutation count chart" and show "No data available"
-                _self.errorMessage.noData = true;
-                _self.failedToInit = true;
+              } else { // _self.attributes.addChartBy === 'user'
+                _self.$dispatch('data-loaded', _self.attributes.group_id, _self.chartDivId);
               }
+              _self.showLoad = false;
+              _self.errorMessage.noData = true;
+              _self.failedToInit = true;
             } else {
               _self.processBarchartData(_mutationCountData);
             }
