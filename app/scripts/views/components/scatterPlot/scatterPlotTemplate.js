@@ -150,6 +150,13 @@
     ready: function() {
       var _self = this;
       _self.showLoad = true;
+
+      // make scatterplot can be closed even if ajax fails
+      var attrId =
+        _self.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
+      _self.invisibleDimension = _self.ndx.dimension(function(d) {
+        return d[attrId];
+      });
       
       $.when(iViz.getScatterData(_self))
         .then(function(_scatterData, _hasCnaFractionData, _hasMutationCountData) {
@@ -168,13 +175,7 @@
               width: window.iViz.styles.vars.scatter.width,
               height: window.iViz.styles.vars.scatter.height
             };
-
-            var attrId =
-              _self.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
-            _self.invisibleDimension = _self.ndx.dimension(function(d) {
-              return d[attrId];
-            });
-
+            
             _self.chartInst = new iViz.view.component.ScatterPlot();
             _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
             _self.chartInst.init(_scatterData, _opts);
