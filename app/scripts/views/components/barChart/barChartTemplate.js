@@ -224,10 +224,10 @@
           this.barChart = new iViz.view.component.BarChart();
           this.barChart.setDownloadDataTypes(['tsv', 'pdf', 'svg']);
           this.initChart(this.settings.showLogScale);
-          this.showLoad = false;
           this.updateShowSurvivalIcon();
-          this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
         }
+        this.showLoad = false;
+        this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
       },
       mouseEnter: function() {
         this.showOperations = true;
@@ -304,6 +304,7 @@
             _self.showLoad = false;
             _self.errorMessage.failedToLoadData = true;
             _self.failedToInit = true;
+            _self.$dispatch('data-loaded', _self.attributes.group_id, _self.chartDivId);
           });
       } else {
         _data = iViz.getGroupNdx(this.opts.groupid);

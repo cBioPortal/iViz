@@ -75,8 +75,8 @@
             this.chartInst.update([]);
           }
           this.attachPlotlySelectedEvent();
-          this.showLoad = false;
         }
+        this.showLoad = false;
       },
       'closeChart': function() {
         this.invisibleDimension.dispose();
