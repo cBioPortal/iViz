@@ -22,8 +22,8 @@
     '<div v-if="failedToInit" class="error-panel" style="padding-top: 10%;">' +
     '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
     '</div></div>' +
-    ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 20%; left: 37%; display: none;">' +
+    ' <div :class="{\'show-loading\': showLoad}" ' +
+    'class="chart-loader" style="top: 20%; left: 37%;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
     '<span class="text-center chart-title-span" ' +
     'id="{{chartId}}-title">{{displayName}}</span>' +

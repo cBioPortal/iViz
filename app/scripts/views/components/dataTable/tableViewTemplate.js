@@ -18,8 +18,8 @@
     '</chart-operations><div class="dc-chart dc-table-plot" ' +
     ':class="{\'start-loading\': showLoad}" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
-    '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    '<div :class="{\'show-loading\': showLoad}" ' +
+    'class="chart-loader">' +
     '<img src="images/ajax-loader.gif" alt="loading"></div>' +
     '<div :class="{\'error-init\': failedToInit}" ' +
     'style="display: none;">' +
