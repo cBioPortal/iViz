@@ -19,7 +19,7 @@
     ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader" style="top: 30%; left: 35%; display: none;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
-    '<div v-if="failedToInit" class="error-panel" style="padding-left: 15%; padding-top: 30%;">' +
+    '<div v-if="failedToInit" class="error-panel">' +
     '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
     '</div></div>',
     props: [
