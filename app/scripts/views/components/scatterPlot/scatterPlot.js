@@ -12,15 +12,15 @@
     var opts_;
     var layout_;
     var getQtipString = function(_data) {
-      var toReturn = 'Cancer Study:' + _data.study_id + '<br>Sample Id: ' +
-        iViz.getCaseIdUsingUID('sample', _data.sample_uid) + '<br>CNA fraction: ';
+      var toReturn = ['Cancer Study:', _data.study_id, '<br>Sample Id: ',
+        iViz.getCaseIdUsingUID('sample', _data.sample_uid), '<br>CNA fraction: '];
       if (isNaN(_data.cna_fraction)) {
-        toReturn += _data.cna_fraction;
+        toReturn.push(_data.cna_fraction);
       } else {
-        toReturn += cbio.util.toPrecision(_data.cna_fraction, 2, 0.001);
+        toReturn.push(cbio.util.toPrecision(_data.cna_fraction, 2, 0.001));
       }
-      toReturn += '<br>Mutation count: ' + _data.mutation_count;
-      return toReturn;
+      toReturn.push('<br>Mutation count: ' + _data.mutation_count);
+      return toReturn.join('');
     };
 
     content.init = function(_data, opts) {
