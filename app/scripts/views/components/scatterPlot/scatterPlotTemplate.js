@@ -16,8 +16,8 @@
     ' <div :class="{\'start-loading\': showLoad}" ' +
     'class="dc-chart dc-scatter-plot" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
-    ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 30%; left: 35%; display: none;">' +
+    ' <div :class="{\'show-loading\': showLoad}" ' +
+    'class="chart-loader" style="left: 35%;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
     '<div v-if="failedToInit" class="error-panel" style="padding-left: 15%; padding-top: 30%;">' +
     '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
