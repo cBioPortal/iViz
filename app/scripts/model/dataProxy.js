@@ -1045,7 +1045,7 @@ window.DataManagerForIviz = (function($, _) {
               var patient_to_uid = {};
               var uid_to_patient = {};
               var resultMap = {};
-              var patientList = [];
+              var patientList = {};
               for (var i = 0; i < data.length; i++) {
                 uid_to_sample[_sample_uid] = data[i].id;
                 sample_to_uid[data[i].id] = _sample_uid.toString();
@@ -1060,14 +1060,14 @@ window.DataManagerForIviz = (function($, _) {
                 patient_to_sample[data[i].patient_id][data[i].id] = 1;
                 sample_to_patient[data[i].id] = data[i].patient_id;
                 sample_uid_to_patient_uid[_sample_uid] = patient_to_uid[data[i].patient_id];
-                patientList.push(data[i].patient_id);
+                patientList[data[i].patient_id] = 1;
                 _sample_uid++;
               }
               // set patient list in studyCasesMap if sample list is
               // passed in the input
               if (_.isArray(self.studyCasesMap[cancerStudyId].samples) &&
                 self.studyCasesMap[cancerStudyId].samples.length > 0) {
-                self.studyCasesMap[cancerStudyId].patients = _.unique(patientList);
+                self.studyCasesMap[cancerStudyId].patients = Object.keys(patientList);
               }
               resultMap.uid_to_sample = uid_to_sample;
               resultMap.uid_to_patient = uid_to_patient;
