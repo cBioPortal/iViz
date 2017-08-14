@@ -23,7 +23,7 @@
     '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
     '</div></div>' +
     ' <div :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 20%; left: 37%;">' +
+    'class="chart-loader">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
     '<span class="text-center chart-title-span" ' +
     'id="{{chartId}}-title">{{displayName}}</span>' +
