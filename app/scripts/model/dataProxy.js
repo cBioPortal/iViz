@@ -623,7 +623,10 @@ window.DataManagerForIviz = (function($, _) {
               _mutCntAttrMeta.addChartBy = 'default';
               _mutCntAttrMeta.attrList = ['mutation_count', 'cna_fraction'];
               // This attribute is used for getScatterData()
-              _mutCntAttrMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap;
+              // This should not be added into attribute meta and should be saved into main.js 
+              // (Centralized place storing all data for sharing across directives)
+              // This needs to be updated after merging into virtual study branch
+              _mutCntAttrMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap; 
               _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
 
               // add mutation count
@@ -644,6 +647,8 @@ window.DataManagerForIviz = (function($, _) {
               _MutationCountMeta.show = _MutationCountMeta.priority !== 0;
               _MutationCountMeta.addChartBy = 'default';
               _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
+              // This attribute is used for getMutationCountData()
+              _MutationCountMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap;
               _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
 
               _result.groups.patient.attr_meta =

@@ -17,11 +17,11 @@
     'class="dc-chart dc-scatter-plot" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
     ' <div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    'class="chart-loader" style="top: 30%; left: 35%; display: none;">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
-    '<div :class="{\'error-init\': failedToInit}" ' +
-    'style="display: none;">' +
-    '<span class="content">Failed to load data, refresh the page may help</span></div></div>',
+    '<div v-if="failedToInit" class="error-panel" style="padding-left: 15%; padding-top: 30%;">' +
+    '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
+    '</div></div>',
     props: [
       'ndx', 'attributes'
     ],
@@ -39,6 +39,12 @@
         chartInst: {},
         hasFilters: false,
         showLoad: true,
+        errorMessage: {
+          dataInvalid: false,
+          noData: false,
+          failedToLoadData: false
+        },
+        failedToInit: false,
         invisibleDimension: {}
       };
     },
@@ -69,8 +75,8 @@
             this.chartInst.update([]);
           }
           this.attachPlotlySelectedEvent();
-          this.showLoad = false;
         }
+        this.showLoad = false;
       },
       'closeChart': function() {
         this.invisibleDimension.dispose();
@@ -144,12 +150,23 @@
     ready: function() {
       var _self = this;
       _self.showLoad = true;
+
+      // make scatterplot can be closed even if ajax fails
+      var attrId =
+        _self.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
+      _self.invisibleDimension = _self.ndx.dimension(function(d) {
+        return d[attrId];
+      });
       
       $.when(iViz.getScatterData(_self))
         .then(function(_scatterData, _hasCnaFractionData, _hasMutationCountData) {
-          if ((!_hasCnaFractionData || !_hasMutationCountData) && _self.attributes.addChartBy === 'default') {
-            _self.attributes.show = false;
-            _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
+          if (!_hasCnaFractionData || !_hasMutationCountData) {
+            if (_self.attributes.addChartBy === 'default') {
+              _self.attributes.show = false;
+              _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
+            } 
+            _self.errorMessage.noData = true;
+            _self.failedToInit = true;
           } else {
             var _opts = {
               chartId: _self.chartId,
@@ -158,13 +175,7 @@
               width: window.iViz.styles.vars.scatter.width,
               height: window.iViz.styles.vars.scatter.height
             };
-
-            var attrId =
-              _self.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
-            _self.invisibleDimension = _self.ndx.dimension(function(d) {
-              return d[attrId];
-            });
-
+            
             _self.chartInst = new iViz.view.component.ScatterPlot();
             _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
             _self.chartInst.init(_scatterData, _opts);
@@ -181,6 +192,7 @@
           _self.showLoad = false;
         }, function() {
           _self.showLoad = false;
+          _self.errorMessage.failedToLoadData = true;
           _self.failedToInit = true;
         });
       

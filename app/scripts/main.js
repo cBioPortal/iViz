@@ -262,9 +262,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _.each(clinicalData, function(_clinicalAttributeData, _attrId) {
             var selectedAttrMeta = charts[_attrId];
 
-            // If there is clinical data returned from server side.
-            attrsFromServer[_attrId] = 1;
-
             hasAttrDataMap[_attrId] = '';
             selectedAttrMeta.keys = {};
             selectedAttrMeta.numOfDatum = 0;
@@ -284,6 +281,12 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             var numOfKeys = Object.keys(selectedAttrMeta.keys).length;
             if (numOfKeys <= 1) {
               selectedAttrMeta.show = false;
+              attrIds = attrIds.filter(function(obj) {
+                return obj !== _attrId;
+              });
+            } else {
+              // If there is clinical data returned from server side.
+              attrsFromServer[_attrId] = 1;
             }
 
             if (selectedAttrMeta.datatype === 'STRING' &&
@@ -441,34 +444,18 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var data = {};
       
       $.when(window.iviz.datamanager.getCnaFractionData(),
-        window.iviz.datamanager.getMutationCount())
-        .then(function(_cnaFractionData, _mutationCountData) {
+        self.getMutationCountData(_self))
+        .then(function(_cnaFractionData, _mutationCountResult) {
           var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
-          var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
+          var _hasMutationCountData = false;
           var groupId = _self.attributes.group_id;
-          data = self.getGroupNdx(groupId);
-          
-          _.each(data, function(_sampleDatum) {
-            // mutation count
-            if (_hasMutationCountData) {
-              if (_mutationCountData[_sampleDatum.study_id] === undefined ||
-                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                if (_self.attributes.sequencedCaseUIdsMap[_sampleDatum.sample_uid] === undefined) {
-                  _sampleDatum.mutation_count = 'NA';
-                } else {
-                  _sampleDatum.mutation_count = 0;
-                }
-              } else {
-                _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
-              }
-              // add mutation_count into data_
-              if (data_.groups.sample.data[_sampleDatum.sample_uid] !== undefined && 
-               data_.groups.sample.data[_sampleDatum.sample_uid] !== null) {
-               data_.groups.sample.data[_sampleDatum.sample_uid].mutation_count = _sampleDatum.mutation_count;
-              }
-            }
 
+          if (_mutationCountResult[1]) {
+            _hasMutationCountData = _mutationCountResult[1];
+          }
+          data = self.getGroupNdx(groupId);
+
+          _.each(data, function(_sampleDatum) {
             // cna fraction
             if (_hasCNAFractionData) {
               if (_cnaFractionData[_sampleDatum.study_id] === undefined ||
@@ -483,6 +470,39 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             }
           });
           def.resolve(data, _hasCNAFractionData, _hasMutationCountData);
+        }, function() {
+          def.reject();
+        });
+      return def.promise();
+    },
+    getMutationCountData: function(_self) {
+      var def = new $.Deferred();
+      var self = this;
+      var data = {};
+
+      $.when(window.iviz.datamanager.getMutationCount())
+        .then(function(_mutationCountData) {
+          var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
+          var groupId = _self.attributes.group_id;
+          data = self.getGroupNdx(groupId);
+
+          _.each(data, function(_sampleDatum) {
+            // mutation count
+            if (_hasMutationCountData) {
+              if (_mutationCountData[_sampleDatum.study_id] === undefined ||
+                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
+                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
+                if (_self.attributes.sequencedCaseUIdsMap[_sampleDatum.sample_uid] === undefined) {
+                  _sampleDatum.mutation_count = 'NA';
+                } else {
+                  _sampleDatum.mutation_count = 0;
+                }
+              } else {
+                _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
+              }
+            }
+          });
+          def.resolve(data, _hasMutationCountData);
         }, function() {
           def.reject();
         });
