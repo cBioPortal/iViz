@@ -299,7 +299,6 @@
 
     content.rangeFilter = function(logScaleChecked, _filter) {
       var tempFilters_ = [];
-      var hasBar = false;
       var minNumBarPoint = '';
       var maxNumBarPoint = '';
       var selectedNumBar = [];
@@ -332,14 +331,14 @@
         }
       }
 
-      _.each(opts_.xDomain, function(middle) {
-        if (middle >= _filter[0] && middle <= _filter[1]) {
-          if (data_.hasNA && middle === opts_.xDomain[opts_.xDomain.length - 1]) {
+      _.each(opts_.xDomain, function(tick) {
+        if (tick >= _filter[0] && tick <= _filter[1]) {
+          if (data_.hasNA && tick === opts_.xDomain[opts_.xDomain.length - 1]) {
             hasNA = true;
           } else if (!data_.noGrouping && !logScaleChecked) {
-            if (middle === opts_.xDomain[0]) {
+            if (tick === opts_.xDomain[0]) {
               hasSmallerOutlier = true;
-            } else if (middle === opts_.xDomain[endNumIndex + 1]) {
+            } else if (tick === opts_.xDomain[endNumIndex + 1]) {
               hasGreaterOutlier = true;
             }
           }
@@ -374,19 +373,18 @@
 
       for (var i = startNumIndex; i <= endNumIndex - 1; i++) {
         if (_filter[0] >= opts_.xDomain[i] && _filter[0] < opts_.xDomain[i + 1]) {// check left range point
-          //when there is a bar inside single slot
+          // when there is a bar inside single slot
           if (selectedNumBar[0] >= opts_.xDomain[i + 1] && selectedNumBar[0] < opts_.xDomain[i + 2]) {
             // left point is closer to the upward tick
             minNumBarPoint = opts_.xDomain[i + 1];
           } else {
-            // if ((_filter[0] - opts_.xDomain[i]) > (opts_.xDomain[i + 1] - _filter[0])) {
-            //   // left point is closer to the upward tick
-            //   minNumBarPoint = opts_.xDomain[i + 1];
-            // } else {
+            if ((_filter[0] - opts_.xDomain[i]) > (opts_.xDomain[i + 1] - _filter[0])) {
+              // left point is closer to the upward tick
+              minNumBarPoint = opts_.xDomain[i + 1];
+            } else {
               // left point is closer to the downward tick
               minNumBarPoint = opts_.xDomain[i];
-            //}
-            
+            }
           }
         }
 
@@ -396,17 +394,18 @@
             // right point is closer to the downward tick
             maxNumBarPoint = opts_.xDomain[i];
           } else {
-            // if ((_filter[1] - opts_.xDomain[i]) > (opts_.xDomain[i + 1] - _filter[1])) {
-            //   // right point is closer to the upward tick
-            //   maxNumBarPoint = opts_.xDomain[i + 1];
-            // } else {
-              // right point is closer to the downward tick
+            if ((_filter[1] - opts_.xDomain[i]) > (opts_.xDomain[i + 1] - _filter[1])) {
+              // right point is closer to the upward tick
               maxNumBarPoint = opts_.xDomain[i + 1];
-            //}
+            } else {
+              // right point is closer to the downward tick
+              maxNumBarPoint = opts_.xDomain[i];
+            }
           }
         }
       }
       
+      // avoid "min< ~ <=min"
       if (_.isNumber(minNumBarPoint) && _.isNumber(maxNumBarPoint) && minNumBarPoint === maxNumBarPoint) {
         tempFilters_[0] = 'Invalid Selection';
       } else if (_filter[0] < opts_.xDomain[0] && _filter[1] > opts_.xDomain[opts_.xDomain.length - 1]) {
