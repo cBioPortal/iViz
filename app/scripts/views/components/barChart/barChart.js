@@ -311,184 +311,191 @@
       tempFilters_[0] = '';
       tempFilters_[1] = '';
       
-      // set start and end indexes for number bars
-      if (opts_.xDomain.length >= 2) {
-        if (data_.noGrouping) {
-          if (data_.hasNA) {
-            endNumIndex = opts_.xDomain.length - 2 ;
-          }
-        } else {
-          if (logScaleChecked) {
-            if (data_.hasNA) { // has 'NA' tick
-              endNumIndex = opts_.xDomain.length - 2;
+      if (opts_.xDomain.length === 0) {
+        tempFilters_[0] = 'Invalid Selection';
+      } else {
+        // set start and end indexes for number bars
+        if (opts_.xDomain.length >= 2) {
+          if (data_.noGrouping) {
+            if (data_.hasNA) {
+              endNumIndex = opts_.xDomain.length - 2 ;
             }
           } else {
-            startNumIndex = 1;
-            if (data_.hasNA) {// has 'NA' tick
-              endNumIndex = opts_.xDomain.length >= 3 ? opts_.xDomain.length - 3 : endNumIndex;
+            if (logScaleChecked) {
+              if (data_.hasNA) { // has 'NA' tick
+                endNumIndex = opts_.xDomain.length - 2;
+              }
             } else {
-              endNumIndex = opts_.xDomain.length - 2;
+              startNumIndex = 1;
+              if (data_.hasNA) {// has 'NA' tick
+                endNumIndex = opts_.xDomain.length >= 3 ? opts_.xDomain.length - 3 : endNumIndex;
+              } else {
+                endNumIndex = opts_.xDomain.length - 2;
+              }
             }
           }
         }
-      }
 
-      _.each(opts_.xDomain, function(tick) {
-        if (tick >= _filter[0] && tick <= _filter[1]) {
-          if (data_.hasNA && tick === opts_.xDomain[opts_.xDomain.length - 1]) {
-            hasNA = true;
-          } else if (!data_.noGrouping && !logScaleChecked) {
-            if (tick === opts_.xDomain[0]) {
-              hasSmallerOutlier = true;
-            } else if (tick === opts_.xDomain[endNumIndex + 1]) {
-              hasGreaterOutlier = true;
+        _.each(opts_.xDomain, function(tick) {
+          if (tick >= _filter[0] && tick <= _filter[1]) {
+            if (data_.hasNA && tick === opts_.xDomain[opts_.xDomain.length - 1]) {
+              hasNA = true;
+            } else if (!data_.noGrouping && !logScaleChecked) {
+              if (tick === opts_.xDomain[0]) {
+                hasSmallerOutlier = true;
+              } else if (tick === opts_.xDomain[endNumIndex + 1]) {
+                hasGreaterOutlier = true;
+              }
             }
           }
-        }
-      });
+        });
 
-      // store all number bars' middle value in selected range
-      _.each(opts_.xBarValues, function(middle) {
-        if (middle >= _filter[0] && middle <= _filter[1]) {
-          if ((data_.noGrouping || logScaleChecked) && 
-            (data_.hasNA && middle !== opts_.xDomain[opts_.xDomain.length - 1])) {
-            // exclude 'NA' value
-            selectedNumBar.push(middle);
-          } else {
-            // exclude '>max', '<=min' and 'NA' value
-            if (middle !== opts_.xDomain[0] || middle !== opts_.xDomain[endNumIndex + 1] ||
+        // store all number bars' middle value in selected range
+        _.each(opts_.xBarValues, function(middle) {
+          if (middle >= _filter[0] && middle <= _filter[1]) {
+            if ((data_.noGrouping || logScaleChecked) &&
               (data_.hasNA && middle !== opts_.xDomain[opts_.xDomain.length - 1])) {
+              // exclude 'NA' value
               selectedNumBar.push(middle);
+            } else {
+              // exclude '>max', '<=min' and 'NA' value
+              if (middle !== opts_.xDomain[0] || middle !== opts_.xDomain[endNumIndex + 1] ||
+                (data_.hasNA && middle !== opts_.xDomain[opts_.xDomain.length - 1])) {
+                selectedNumBar.push(middle);
+              }
             }
           }
-        } 
-      });
+        });
 
-      // if left point between '<= min' and 'min'
-      if (_filter[0] > opts_.xDomain[0] && _filter[0] <= opts_.xDomain[1]) {
-        minNumBarPoint = opts_.xDomain[1];
-      }
-      // if right point between 'max' and '>max'
-      if (_filter[1] >= opts_.xDomain[endNumIndex] && _filter[1] < opts_.xDomain[endNumIndex + 1]) {
-        maxNumBarPoint = opts_.xDomain[endNumIndex];
-      }
-
-      for (var i = startNumIndex; i <= endNumIndex - 1; i++) {
-        if (_filter[0] >= opts_.xDomain[i] && _filter[0] < opts_.xDomain[i + 1]) {// check left range point
-          // when there is a bar inside single slot
-          if (selectedNumBar[0] >= opts_.xDomain[i + 1] && selectedNumBar[0] < opts_.xDomain[i + 2]) {
-            // left point is closer to the upward tick
-            minNumBarPoint = opts_.xDomain[i + 1];
-          } else {
-            if ((_filter[0] - opts_.xDomain[i]) > (opts_.xDomain[i + 1] - _filter[0])) {
+        // make sure x axis has "<=min" and ">max" ticks
+        if (!data_.noGrouping && !logScaleChecked && opts_.xDomain.length >= 2) {
+          // if left point between '<= min' and 'min'
+          if (_filter[0] > opts_.xDomain[0] && _filter[0] <= opts_.xDomain[1]) {
+            minNumBarPoint = opts_.xDomain[1];
+          }
+          // if right point between 'max' and '>max'
+          if (_filter[1] >= opts_.xDomain[endNumIndex] && _filter[1] < opts_.xDomain[endNumIndex + 1]) {
+            maxNumBarPoint = opts_.xDomain[endNumIndex];
+          }
+        }
+        
+        for (var i = startNumIndex; i <= endNumIndex - 1; i++) {
+          if (_filter[0] >= opts_.xDomain[i] && _filter[0] < opts_.xDomain[i + 1]) {// check left range point
+            // when there is a bar inside single slot
+            if (selectedNumBar[0] >= opts_.xDomain[i + 1] && selectedNumBar[0] < opts_.xDomain[i + 2]) {
               // left point is closer to the upward tick
               minNumBarPoint = opts_.xDomain[i + 1];
             } else {
-              // left point is closer to the downward tick
-              minNumBarPoint = opts_.xDomain[i];
+              if ((_filter[0] - opts_.xDomain[i]) > (opts_.xDomain[i + 1] - _filter[0])) {
+                // left point is closer to the upward tick
+                minNumBarPoint = opts_.xDomain[i + 1];
+              } else {
+                // left point is closer to the downward tick
+                minNumBarPoint = opts_.xDomain[i];
+              }
+            }
+          }
+
+          if (_filter[1] >= opts_.xDomain[i] && _filter[1] < opts_.xDomain[i + 1]) {// check right range point
+            if (selectedNumBar[selectedNumBar.length - 1] >= opts_.xDomain[i - 1] &&
+              selectedNumBar[selectedNumBar.length - 1] < opts_.xDomain[i]) {
+              // right point is closer to the downward tick
+              maxNumBarPoint = opts_.xDomain[i];
+            } else {
+              if ((_filter[1] - opts_.xDomain[i]) > (opts_.xDomain[i + 1] - _filter[1])) {
+                // right point is closer to the upward tick
+                maxNumBarPoint = opts_.xDomain[i + 1];
+              } else {
+                // right point is closer to the downward tick
+                maxNumBarPoint = opts_.xDomain[i];
+              }
             }
           }
         }
 
-        if (_filter[1] >= opts_.xDomain[i] && _filter[1] < opts_.xDomain[i + 1]) {// check right range point
-          if (selectedNumBar[selectedNumBar.length - 1] >= opts_.xDomain[i - 1] && 
-            selectedNumBar[selectedNumBar.length - 1] < opts_.xDomain[i]) {
-            // right point is closer to the downward tick
-            maxNumBarPoint = opts_.xDomain[i];
-          } else {
-            if ((_filter[1] - opts_.xDomain[i]) > (opts_.xDomain[i + 1] - _filter[1])) {
-              // right point is closer to the upward tick
-              maxNumBarPoint = opts_.xDomain[i + 1];
-            } else {
-              // right point is closer to the downward tick
-              maxNumBarPoint = opts_.xDomain[i];
-            }
-          }
-        }
-      }
-      
-      // avoid "min< ~ <=min"
-      if (_.isNumber(minNumBarPoint) && _.isNumber(maxNumBarPoint) && minNumBarPoint === maxNumBarPoint) {
-        tempFilters_[0] = 'Invalid Selection';
-      } else if (_filter[0] < opts_.xDomain[0] && _filter[1] > opts_.xDomain[opts_.xDomain.length - 1]) {
-        tempFilters_[0] = 'All';
-      } else {
-        if (data_.noGrouping) {
-          if (selectedNumBar.length === opts_.xBarValues.length ||
-            (_filter[0] <= opts_.xBarValues[0] && _filter[1] >= opts_.xBarValues[opts_.xBarValues.length - 2] &&
-            data_.hasNA && !hasNA)) {// select all number bars
-            tempFilters_[0] = 'All Numbers';
-          } else if (selectedNumBar.length === 0 && hasNA) {// only choose NA bar
-            tempFilters_[0] = 'NA';
-          } else if (selectedNumBar.length === 1) {// only choose 1 number bar
-            if (hasNA) { // chose max num bar and NA bar
-              tempFilters_[0] = selectedNumBar[0] + ', NA';
-            } else {
-              tempFilters_[0] = selectedNumBar[0];
-            }
-          } else {
-            _.each(selectedNumBar, function(barValue) {
-              tempFilters_[0] += barValue + ', ';
-            });
-            if (hasNA) {
-              tempFilters_[0] += 'NA';
-            } else {
-              tempFilters_[0] = tempFilters_[0].slice(0, -2);// remove last coma
-            }
-          }
+        // avoid "min< ~ <=min"
+        if (_.isNumber(minNumBarPoint) && _.isNumber(maxNumBarPoint) && minNumBarPoint === maxNumBarPoint) {
+          tempFilters_[0] = 'Invalid Selection';
+        } else if (_filter[0] < opts_.xDomain[0] && _filter[1] > opts_.xDomain[opts_.xDomain.length - 1]) {
+          tempFilters_[0] = 'All';
         } else {
-          if (logScaleChecked) {
-            if (!hasNA && _filter[0] < opts_.xDomain[startNumIndex] &&
-              _filter[1] > opts_.xDomain[endNumIndex]) {
+          if (data_.noGrouping) {
+            if (selectedNumBar.length === opts_.xBarValues.length ||
+              (_filter[0] <= opts_.xBarValues[0] && _filter[1] >= opts_.xBarValues[opts_.xBarValues.length - 2] &&
+              data_.hasNA && !hasNA)) {// select all number bars
               tempFilters_[0] = 'All Numbers';
-            } else if (!hasNA && minNumBarPoint !== '' && maxNumBarPoint !== '') {
-              tempFilters_[0] = minNumBarPoint + '<';
-              tempFilters_[1] = '<=' + maxNumBarPoint;
-            } else if (!hasNA && minNumBarPoint === '' && maxNumBarPoint !== '') {
-              tempFilters_[1] = '<=' + maxNumBarPoint;
-            } else if (hasNA && minNumBarPoint !== '' && maxNumBarPoint === '') {
-              tempFilters_[0] = minNumBarPoint + '<';
-              tempFilters_[1] = '<=' + opts_.xDomain[endNumIndex] + ", NA";
-            } else if (hasNA && minNumBarPoint === '' && maxNumBarPoint === ''){//only select "NA" bar
+            } else if (selectedNumBar.length === 0 && hasNA) {// only choose NA bar
               tempFilters_[0] = 'NA';
+            } else if (selectedNumBar.length === 1) {// only choose 1 number bar
+              if (hasNA) { // chose max num bar and NA bar
+                tempFilters_[0] = selectedNumBar[0] + ', NA';
+              } else {
+                tempFilters_[0] = selectedNumBar[0];
+              }
             } else {
-              tempFilters_[0] = 'Invalid Selection';
+              _.each(selectedNumBar, function(barValue) {
+                tempFilters_[0] += barValue + ', ';
+              });
+              if (hasNA) {
+                tempFilters_[0] += 'NA';
+              } else {
+                tempFilters_[0] = tempFilters_[0].slice(0, -2);// remove last coma
+              }
             }
           } else {
-            if (!hasNA && !hasSmallerOutlier && !hasGreaterOutlier &&
-              minNumBarPoint !== '' && maxNumBarPoint !== '') {
-              tempFilters_[0] = minNumBarPoint + '<';
-              tempFilters_[1] = '<=' + maxNumBarPoint;
-            } else if (hasNA && !hasSmallerOutlier) {
-              if (hasGreaterOutlier) { // "> Num, NA"
-                if (minNumBarPoint === '') {// only select '>Num' and 'NA' bars
-                  tempFilters_[1] = '> ' + opts_.xDomain[opts_.xDomain.length - 3] + ', NA';
-                } else {
-                  tempFilters_[1] = '> ' + minNumBarPoint + ', NA';
-                }
-              } else {
-                if (minNumBarPoint === '' && maxNumBarPoint === '') {
-                  tempFilters_[0] = 'NA';
-                }
-              }
-            } else if (!hasNA && hasGreaterOutlier) {
-              if (hasSmallerOutlier) {// Select all bars excluding NA
+            if (logScaleChecked) {
+              if (!hasNA && _filter[0] < opts_.xDomain[startNumIndex] &&
+                _filter[1] > opts_.xDomain[endNumIndex]) {
                 tempFilters_[0] = 'All Numbers';
-              } else {// "> Num"
-                if(minNumBarPoint === '') {
-                  tempFilters_[1] = '> ' + opts_.xDomain[endNumIndex];
-                } else {
-                  tempFilters_[1] = '> ' + minNumBarPoint;
-                }
-              }
-            } else if (hasSmallerOutlier && !hasGreaterOutlier && !hasNA) {// "<= Num"
-              if (maxNumBarPoint === '') {
-                tempFilters_[1] = '<= ' + opts_.xDomain[1];
+              } else if (!hasNA && minNumBarPoint !== '' && maxNumBarPoint !== '') {
+                tempFilters_[0] = minNumBarPoint + '<';
+                tempFilters_[1] = '<=' + maxNumBarPoint;
+              } else if (!hasNA && minNumBarPoint === '' && maxNumBarPoint !== '') {
+                tempFilters_[1] = '<=' + maxNumBarPoint;
+              } else if (hasNA && minNumBarPoint !== '' && maxNumBarPoint === '') {
+                tempFilters_[0] = minNumBarPoint + '<';
+                tempFilters_[1] = '<=' + opts_.xDomain[endNumIndex] + ", NA";
+              } else if (hasNA && minNumBarPoint === '' && maxNumBarPoint === ''){//only select "NA" bar
+                tempFilters_[0] = 'NA';
               } else {
-                tempFilters_[1] = '<= ' + maxNumBarPoint;
+                tempFilters_[0] = 'Invalid Selection';
               }
             } else {
-              tempFilters_[0] = 'Invalid Selection';
+              if (!hasNA && !hasSmallerOutlier && !hasGreaterOutlier &&
+                minNumBarPoint !== '' && maxNumBarPoint !== '') {
+                tempFilters_[0] = minNumBarPoint + '<';
+                tempFilters_[1] = '<=' + maxNumBarPoint;
+              } else if (hasNA && !hasSmallerOutlier) {
+                if (hasGreaterOutlier) { // "> Num, NA"
+                  if (minNumBarPoint === '') {// only select '>Num' and 'NA' bars
+                    tempFilters_[1] = '> ' + opts_.xDomain[opts_.xDomain.length - 3] + ', NA';
+                  } else {
+                    tempFilters_[1] = '> ' + minNumBarPoint + ', NA';
+                  }
+                } else {
+                  if (minNumBarPoint === '' && maxNumBarPoint === '') {
+                    tempFilters_[0] = 'NA';
+                  }
+                }
+              } else if (!hasNA && hasGreaterOutlier) {
+                if (hasSmallerOutlier) {// Select all bars excluding NA
+                  tempFilters_[0] = 'All Numbers';
+                } else {// "> Num"
+                  if(minNumBarPoint === '') {
+                    tempFilters_[1] = '> ' + opts_.xDomain[endNumIndex];
+                  } else {
+                    tempFilters_[1] = '> ' + minNumBarPoint;
+                  }
+                }
+              } else if (hasSmallerOutlier && !hasGreaterOutlier && !hasNA) {// "<= Num"
+                if (maxNumBarPoint === '') {
+                  tempFilters_[1] = '<= ' + opts_.xDomain[1];
+                } else {
+                  tempFilters_[1] = '<= ' + maxNumBarPoint;
+                }
+              } else {
+                tempFilters_[0] = 'Invalid Selection';
+              }
             }
           }
         }
