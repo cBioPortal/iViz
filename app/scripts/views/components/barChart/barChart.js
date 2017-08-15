@@ -499,8 +499,8 @@
             }
           }
         }
-      }
-      
+      }      
+
       return tempFilters_;
     };
 

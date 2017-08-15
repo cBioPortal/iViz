@@ -124,6 +124,10 @@
         var layoutB = [];
         var browserWidth = $('#main-grid').width() || 1200;
         var groupsPerRow = Math.floor(browserWidth / 400);
+        
+        // One group will be at least displayed on the page;
+        // Lower than 1 will also create infinite loop of following function
+        groupsPerRow = groupsPerRow < 1 ? 1 : groupsPerRow;
 
         for (var i = 0; i < layoutMatrix.length;) {
           var _group = [];

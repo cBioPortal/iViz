@@ -49,10 +49,18 @@
 }
 
 .chart-loader {
-  width: 100%;
+  width: 100px;
+  height: 100px;
   display: none;
   position: absolute;
-  top: 30%;
+  top: calc(50% - 50px);
+  left: calc(50% - 50px);
+}
+
+.error-panel {
+  width: 100%;
+  position: absolute;
+  padding-top: calc(50% - 50px);
 }
 
 .error-panel {
