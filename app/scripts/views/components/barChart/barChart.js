@@ -306,27 +306,29 @@
       var hasGreaterOutlier = false;
       var hasSmallerOutlier = false;
       var startNumIndex = 0;
-      var endNumIndex = opts_.xDomain.length - 1;
+      var endNumIndex = opts_.xDomain.length >= 1 ? opts_.xDomain.length - 1 : 0;
 
       tempFilters_[0] = '';
       tempFilters_[1] = '';
       
       // set start and end indexes for number bars
-      if (data_.noGrouping) {
-        if (data_.hasNA) {
-          endNumIndex = opts_.xDomain.length - 2;
-        } 
-      } else {
-        if (logScaleChecked) {
-          if (data_.hasNA) { // has 'NA' tick
-            endNumIndex = opts_.xDomain.length - 2;
-          } 
+      if (opts_.xDomain.length >= 2) {
+        if (data_.noGrouping) {
+          if (data_.hasNA) {
+            endNumIndex = opts_.xDomain.length - 2 ;
+          }
         } else {
-          startNumIndex = 1;
-          if (data_.hasNA) {// has 'NA' tick
-            endNumIndex = opts_.xDomain.length - 3;
+          if (logScaleChecked) {
+            if (data_.hasNA) { // has 'NA' tick
+              endNumIndex = opts_.xDomain.length - 2;
+            }
           } else {
-            endNumIndex = opts_.xDomain.length - 2;
+            startNumIndex = 1;
+            if (data_.hasNA) {// has 'NA' tick
+              endNumIndex = opts_.xDomain.length >= 3 ? opts_.xDomain.length - 3 : endNumIndex;
+            } else {
+              endNumIndex = opts_.xDomain.length - 2;
+            }
           }
         }
       }
@@ -345,7 +347,7 @@
         }
       });
 
-      //store all number bars' middle value in selected range
+      // store all number bars' middle value in selected range
       _.each(opts_.xBarValues, function(middle) {
         if (middle >= _filter[0] && middle <= _filter[1]) {
           if ((data_.noGrouping || logScaleChecked) && 
@@ -353,7 +355,7 @@
             // exclude 'NA' value
             selectedNumBar.push(middle);
           } else {
-            //exclude '>max', '<=min' and 'NA' value
+            // exclude '>max', '<=min' and 'NA' value
             if (middle !== opts_.xDomain[0] || middle !== opts_.xDomain[endNumIndex + 1] ||
               (data_.hasNA && middle !== opts_.xDomain[opts_.xDomain.length - 1])) {
               selectedNumBar.push(middle);
