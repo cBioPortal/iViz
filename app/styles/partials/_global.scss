@@ -57,6 +57,12 @@
   left: calc(50% - 50px);
 }
 
+.error-panel {
+  width: 100%;
+  position: absolute;
+  padding-top: calc(50% - 50px);
+}
+
 .chart-title-span {
   font-size: 10px;
   color: black;
