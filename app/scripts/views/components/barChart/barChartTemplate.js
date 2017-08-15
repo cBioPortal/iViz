@@ -19,7 +19,7 @@
     ':filters.sync="attributes.filter"></chart-operations>' +
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} >' +
-    '<div v-if="failedToInit" class="error-panel" style="padding-top: 10%;">' +
+    '<div v-if="failedToInit" class="error-panel" align="center" style="padding-top: 10%;">' +
     '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
     '</div></div>' +
     ' <div :class="{\'show-loading\': showLoad}" ' +
