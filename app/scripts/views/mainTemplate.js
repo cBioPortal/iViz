@@ -23,7 +23,8 @@
         selectedSamplesByFilters: [],
         initialized: false,
         renderGroups: [],
-        chartsGrid: []
+        chartsGrid: [],
+        windowResizeTimeout: ''
       };
     }, watch: {
       groups: function() {
@@ -63,9 +64,9 @@
       }
     }, methods: {
       sortByNumber: function(a, b) {
-        var aName = Number(a.element.attributes['data-number'].nodeValue);
-        var bName = Number(b.element.attributes['data-number'].nodeValue);
-        return aName - bName;
+        var _a = this.$root.charts[a.element.attributes['attribute-id'].nodeValue].layout[0];
+        var _b = this.$root.charts[b.element.attributes['attribute-id'].nodeValue].layout[0];
+        return _b - _a;
       },
       updateGrid: function(ChartsIds) {
         var self_ = this;
@@ -77,6 +78,7 @@
             gutter: 5,
             initLayout: false
           });
+          self_.updateLayoutMatrix();
           self_.grid_.items.sort(this.sortByNumber);
           _.each(self_.grid_.getItemElements(), function(_gridItem) {
             var _draggie = new Draggabilly(_gridItem, {
@@ -84,22 +86,193 @@
             });
             self_.grid_.bindDraggabillyEvents(_draggie);
           });
+          self_.grid_.on( 'dragItemPositioned', function() {
+            self_.$dispatch('user-moved-chart');
+          });
         } else {
+          var chartDivIds = _.pluck(self_.grid_.getItemElements(), 'id');
           _.each(ChartsIds, function(chartId) {
-            self_.grid_.addItems(document.getElementById(chartId));
-            var _draggie = new Draggabilly(document.getElementById(chartId), {
-              handle: '.dc-chart-drag'
-            });
-            self_.grid_.bindDraggabillyEvents(_draggie);
+            // make sure that async charts' divId not in current grids
+            if (!_.includes(chartDivIds, chartId)) {
+              self_.grid_.addItems(document.getElementById(chartId));
+              var _draggie = new Draggabilly(document.getElementById(chartId), {
+                handle: '.dc-chart-drag'
+              });
+              self_.grid_.bindDraggabillyEvents(_draggie);
+            }
           });
         }
         self_.grid_.layout();
-      }
+      },
+      updateLayoutMatrix: function() {
+        var self_ = this;
+        var _charts = _.values(this.$root.charts);
+        _charts.sort(function(a, b) {
+          return iViz.priorityManager.comparePriorities(a.priority, b.priority, false);
+        });
+
+        // Group attributes into 2*2 matrix
+        var layoutMatrix = [];
+        _.each(_charts, function(chart) {
+          if (chart.show) {
+            layoutMatrix = self_.getLayoutMatrix(layoutMatrix, chart);
+          }
+        });
+
+        // Layout group base on window width.
+        var layoutAttrs = [];
+        var layoutB = [];
+        var browserWidth = $('#main-grid').width() || 1200;
+        var groupsPerRow = Math.floor(browserWidth / 400);
+        
+        // One group will be at least displayed on the page;
+        // Lower than 1 will also create infinite loop of following function
+        groupsPerRow = groupsPerRow < 1 ? 1 : groupsPerRow;
+
+        for (var i = 0; i < layoutMatrix.length;) {
+          var _group = [];
+          for (var j = 0; j < groupsPerRow; j++) {
+            _group.push(layoutMatrix[i + j]);
+          }
+          layoutAttrs.push(_group);
+          i = i + groupsPerRow;
+        }
+
+        _.each(layoutAttrs, function(group) {
+          // Plot first two elements
+          _.each(group, function(item) {
+            if (item) {
+              for (var j = 0; j < 2; j++) {
+                layoutB.push(item.matrix[j]);
+              }
+            }
+          });
+          // Plot rest third and forth elements
+          _.each(group, function(item) {
+            if (item) {
+              for (var j = 2; j < 4; j++) {
+                layoutB.push(item.matrix[j]);
+              }
+            }
+          });
+        });
+        _.each(_.filter(_.uniq(layoutB).reverse(), function(item) {
+          return _.isString(item);
+        }), function(attrId, index) {
+          self_.$root.charts[attrId].layout[0] = index;
+        });
+      },
+      updateLayout: function() {
+        this.updateLayoutMatrix();
+        this.grid_.items.sort(this.sortByNumber);
+        this.grid_.layout();
+      },
+      getLayoutMatrix: function(layoutMatrix, chart) {
+        var self_ = this;
+        var neighborIndex;
+        var foundSpace = false;
+        var layout = chart.layout;
+        var space = layout[1];
+        var direction = 'h'; // h or v
+
+        _.some(layoutMatrix, function(layoutItem) {
+          if (foundSpace) {
+            return true;
+          }
+          if (layoutItem.notFull) {
+            var _matrix = layoutItem.matrix;
+            _.some(_matrix, function(item, _matrixIndex) {
+              if (space === 2) {
+                var _validIndex = false;
+                if (direction === 'v') {
+                  neighborIndex = _matrixIndex + 2;
+                  if (_matrixIndex < 2) {
+                    _validIndex = true;
+                  }
+                } else {
+                  neighborIndex = _matrixIndex + 1;
+                  if (_matrixIndex % 2 === 0) {
+                    _validIndex = true;
+                  }
+                }
+                if (neighborIndex < _matrix.length && _validIndex) {
+                  if (item === -1 && _matrix[neighborIndex] === -1) {
+                    // Found a place for chart
+                    _matrix[_matrixIndex] = _matrix[neighborIndex] = chart.attr_id;
+                    foundSpace = true;
+                    layoutItem.notFull = !self_.matrixIsFull(_matrix);
+                    return true;
+                  }
+                }
+              } else if (space === 1) {
+                if (item === -1) {
+                  // Found a place for chart
+                  _matrix[_matrixIndex] = chart.attr_id;
+                  foundSpace = true;
+                  if (_matrixIndex === _matrix.length - 1) {
+                    layoutItem.notFull = false;
+                  }
+                  return true;
+                }
+              } else if (space === 4) {
+                if (item === -1 && _matrix[0] === -1 && _matrix[1] === -1 && _matrix[2] === -1 && _matrix[3] === -1) {
+                  // Found a place for chart
+                  _matrix = [chart.attr_id, chart.attr_id, chart.attr_id, chart.attr_id];
+                  layoutItem.notFull = false;
+                  foundSpace = true;
+                  return true;
+                }
+              }
+            });
+            layoutItem.matrix = _matrix;
+          }
+        });
+
+        if (!foundSpace) {
+          layoutMatrix.push({
+            notFull: true,
+            matrix: [-1, -1, -1, -1]
+          });
+          layoutMatrix = self_.getLayoutMatrix(layoutMatrix, chart);
+        }
+        return layoutMatrix;
+      },
+      matrixIsFull: function(matrix) {
+        var full = true;
+        _.some(matrix, function(item) {
+          if (item === -1) {
+            full = false;
+            return true;
+          }
+        });
+        return full;
+      },
     },
     events: {
       'update-grid': function() {
         this.grid_.layout();
       }, 'remove-grid-item': function(item) {
+        var self_ = this;
+        if (self_.grid_ === '') {
+          self_.grid_ = new Packery(document.querySelector('.grid'), {
+            itemSelector: '.grid-item',
+            columnWidth: window.iViz.styles.vars.width.one + 5,
+            rowHeight: window.iViz.styles.vars.height.one + 5,
+            gutter: 5,
+            initLayout: false
+          });
+          self_.updateLayoutMatrix();
+          self_.grid_.items.sort(this.sortByNumber);
+          _.each(self_.grid_.getItemElements(), function(_gridItem) {
+            var _draggie = new Draggabilly(_gridItem, {
+              handle: '.dc-chart-drag'
+            });
+            self_.grid_.bindDraggabillyEvents(_draggie);
+          });
+          self_.grid_.on( 'dragItemPositioned', function() {
+            self_.$dispatch('user-moved-chart');
+          });
+        }
         this.grid_.remove(item);
         this.grid_.layout();
       },
@@ -252,6 +425,18 @@
       'remove-rainbow-survival': function() {
         this.$broadcast('resetBarColor', []);
       }
+    },
+    ready: function() {
+      var self_ = this;
+      // Register window resize event.
+      $(window).resize(function() {
+        clearTimeout(self_.windowResizeTimeout);
+        self_.windowResizeTimeout = setTimeout(function() {
+          if (!self_.$root.userMovedChart) {
+            self_.updateLayout();
+          }
+        }, 500);
+      });
     }
   });
 })(window.Vue,

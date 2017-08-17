@@ -50,7 +50,7 @@
     content.clearSelectedRowData = function() {
       selectedRowData = [];
     };
-
+    
     content.init =
       function(_attributes, _opts, _selectedSamples, _selectedGenes,
                _data, _callbacks, _geneData, _dimension, _genePanelMap) {
@@ -253,11 +253,13 @@
           index: index
         };
       });
+      
     }
 
     function updateCategories() {
       var _labels = {};
       var _currentSampleSize = 0;
+      
       _.each(group.top(Infinity), function(label) {
         var _labelDatum = {};
         var _labelValue = Number(label.value);
@@ -271,7 +273,6 @@
           _labels[_labelDatum.id] = _labelDatum;
         }
       });
-
       _.each(_labels, function(label) {
         label.caseRate = iViz.util.calcFreq(Number(label.cases), _currentSampleSize);
       });
@@ -403,7 +404,7 @@
         selectedRowData.push(data);
       } else {
         selectedRowData = _.filter(selectedRowData, function(item) {
-          return (item.uniqueId !== data.uniqueId);
+          return (item.uniqueid !== data.uniqueid);
         });
       }
     }

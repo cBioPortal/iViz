@@ -6,7 +6,7 @@
   Vue.component('tableView', {
     template: '<div id={{chartDivId}} ' +
     ':class="[\'grid-item\', classTableHeight, \'grid-item-w-2\', \'react-table\']" ' +
-    ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
+    ':attribute-id="attributes.attr_id" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':display-name="displayName" :chart-ctrl="chartInst"' +
@@ -18,8 +18,8 @@
     '</chart-operations><div class="dc-chart dc-table-plot" ' +
     ':class="{\'start-loading\': showLoad}" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
-    '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    '<div :class="{\'show-loading\': showLoad}" ' +
+    'class="chart-loader">' +
     '<img src="images/ajax-loader.gif" alt="loading"></div>' +
     '<div :class="{\'error-init\': failedToInit}" ' +
     'style="display: none;">' +
@@ -47,7 +47,8 @@
         madeSelection: false,
         showSurvivalIcon: false,
         genePanelMap: {},
-        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20
+        numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
+        dataLoaded: false
       };
     },
     watch: {
@@ -74,10 +75,10 @@
       },
       'update-special-charts': function() {
         // Do not update chart if the selection is made on itself
-        if(!this.failedToInit) {
+        if (!this.failedToInit) {
           if (this.madeSelection && !this.isMutatedGeneCna) {
             this.madeSelection = false;
-          } else {
+          } else if (this.dataLoaded) {
             var attrId =
               this.attributes.group_type === 'patient' ?
                 'patient_uid' : 'sample_uid';
@@ -133,7 +134,7 @@
         this.$dispatch('create-rainbow-survival', {
           attrId: this.attributes.attr_id,
           subtitle: ' (' + this.attributes.display_name + ')',
-          groups: groups,
+          groups: groups,  
           groupType: this.attributes.group_type
         });
       }
@@ -173,6 +174,7 @@
             filtersMap[filter] = true;
           }
         });
+        
         this.invisibleDimension.filterFunction(function(d) {
           return (filtersMap[d] !== undefined);
         });
@@ -201,15 +203,31 @@
           height: window.iViz.styles.vars.specialTables.height,
           chartId: this.chartId
         };
+        
+        this.dataLoaded = true;
+        
         this.chartInst.init(this.attributes, opts, this.$root.selectedsampleUIDs,
           this.$root.selectedgenes, data, {
             addGeneClick: this.addGeneClick,
             submitClick: this.submitClick
           }, this.isMutatedGeneCna ? _data.geneMeta : null, this.invisibleDimension, this.genePanelMap);
+
+        var attrId =
+          this.attributes.group_type === 'patient' ?
+            'patient_uid' : 'sample_uid';
+        var _selectedCases =
+          _.pluck(this.invisibleDimension.top(Infinity), attrId);
+        if (_selectedCases.length > 0) {
+          this.chartInst.update(_selectedCases, this.selectedRows);
+          this.showRainbowSurvival();
+        } 
+        
         this.setDisplayTitle(this.chartInst.getCases().length);
         if (!this.isMutatedGeneCna &&
           Object.keys(this.attributes.keys).length <= 3) {
           this.classTableHeight = 'grid-item-h-1';
+          this.attributes.layout[1] = 2;
+          this.attributes.layout[2] = 'h';
         }
         this.showLoad = false;
       },
@@ -229,7 +247,7 @@
       _self.showLoad = true;
       var callbacks = {};
       var attrId = this.attributes.attr_id;
-
+      
       this.isMutatedGeneCna =
         ['mutated_genes', 'cna_details']
           .indexOf(_self.attributes.attr_id) !== -1;
@@ -240,12 +258,12 @@
       }
 
       this.invisibleDimension = this.ndx.dimension(function(d) {
-        if (typeof d[attrId] === 'undefined' ||
-          ['na', 'n/a', 'N/A'].indexOf(d[attrId]) !== -1) {
+        if (iViz.util.strIsNa(d[attrId], false)) {
           d[attrId] = 'NA';
         }
         return d[attrId];
       });
+      
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.TableView();
@@ -256,6 +274,7 @@
             $.when(window.iviz.datamanager.getGenePanelMap())
               .then(function(_genePanelMap) {
                 // create gene panel map
+                this.dataLoaded = true;
                 _self.genePanelMap = _genePanelMap;
                 _self.processTableData(_tableData);
               }, function() {
@@ -274,6 +293,7 @@
       } else {
         _self.processTableData();
       }
+      
       this.showRainbowSurvival();
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }

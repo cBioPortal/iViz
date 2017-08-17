@@ -6,7 +6,7 @@
   Vue.component('pieChart', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-h-1 grid-item-w-1" ' +
-    ':data-number="attributes.priority" ' +
+    ':attribute-id="attributes.attr_id" ' +
     '@mouseenter="mouseEnter($event)" @mouseleave="mouseLeave($event)">' +
     '<chart-operations :has-chart-title="hasChartTitle" ' +
     ':display-name="displayName" :show-table-icon.sync="showTableIcon" ' +
@@ -184,7 +184,7 @@
             _self.$dispatch('update-filters');
           }
           // Trigger pie chart filtered event.
-          _self.piechart.filtered();
+          _self.piechart.filtered(_self.attributes.filter);
         }
       });
 

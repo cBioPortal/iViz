@@ -6,7 +6,7 @@
   Vue.component('survival', {
     template: '<div id={{chartDivId}} ' +
     'class="grid-item grid-item-h-2 grid-item-w-2" ' +
-    ':data-number="attributes.priority" @mouseenter="mouseEnter" ' +
+    ':attribute-id="attributes.attr_id" @mouseenter="mouseEnter" ' +
     '@mouseleave="mouseLeave">' +
     '<chart-operations :show-operations="showOperations" ' +
     ':show-download-icon.sync="showDownloadIcon" ' +
@@ -17,8 +17,8 @@
     '<div :class="{\'start-loading\': showLoad}" ' +
     'class="dc-chart dc-scatter-plot" align="center" ' +
     'style="float:none !important;" id={{chartId}} ></div>' +
-    '<div id="chart-loader"  :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader" style="top: 30%; left: 30%; display: none;">' +
+    '<div :class="{\'show-loading\': showLoad}" ' +
+    'class="chart-loader">' +
     '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
     props: [
       'ndx', 'attributes'
@@ -135,7 +135,7 @@
 
         if (this.hasFilters) {
           var filteredClinicalAttrs = {};
-          _.map(this.$root.groups, function(group) {
+          _.each(this.$root.groups, function(group) {
             var _attrId = group.type === 'patient' ? 'patient_uid' : 'sample_uid';
             if (!filteredClinicalAttrs.hasOwnProperty(group.id)) {
               filteredClinicalAttrs[group.id] = {
@@ -144,10 +144,16 @@
                 nonNaCases: []
               };
             }
-            filteredClinicalAttrs[group.id].attrs =
-              _.pluck(_.filter(group.attributes, function(attr) {
-                return attr.filter.length > 0;
-              }), 'attr_id');
+            filteredClinicalAttrs[group.id].attrs = [];
+            
+            // Loop through attrList instead of only using attr_id
+            // Combination chart has its own attr_id, but the clinical data
+            // it's using are listed under attrList
+            _.each(_.filter(group.attributes, function(attr) {
+              return attr.filter.length > 0;
+            }), function(item) {
+              filteredClinicalAttrs[group.id].attrs.push(_.pick(item, 'attr_id', 'attrList'));
+            });
           });
           if (this.excludeNa) {
             // Find qualified cases in each group.
@@ -156,14 +162,16 @@
               var nonNaCases = [];
 
               _.each(data_, function(data) {
-                var _intersection = _.intersection(Object.keys(data), group.attrs);
                 var hasNaWithinAttrs = false;
-                _.some(_intersection, function(attr) {
-                  if (data[attr].toString().toLowerCase() === 'na') {
+
+                //Check whether case contains NA value on filtered attrs
+                _.some(_.flatten(_.pluck(group.attrs, 'attrList')), function(attr) {
+                  if (iViz.util.strIsNa(data[attr], false)) {
                     hasNaWithinAttrs = true;
                     return true;
                   }
                 });
+
                 if (!hasNaWithinAttrs) {
                   var _caseId = data[group.attrId];
                   if (groupId !== _groupId) {
@@ -244,11 +252,11 @@
             (this.excludeNa ? 'checked' : '') + '><span>' +
             'Exclude patients with NA for any of the selected attribute(s)</span></div>');
           api.set('content.text', qtipContent.join(''));
-          
+
           // Tender tooltip after updating content
           // Otherwise, api.elements.tooltip will return null.
           api.render();
-          
+
           var tooltip = api.elements.tooltip;
           tooltip.find('.category-item').click(function() {
             var curveId = $(this).attr('curve-id');
@@ -292,7 +300,7 @@
           style: {
             classes: 'qtip-light qtip-rounded qtip-shadow forceZindex qtip-max-width dc-survival-chart-qtip'
           },
-          show: {event: 'mouseover', delay: 300, ready: true},
+          show: {event: 'mouseover', delay: 300},
           hide: {fixed: true, delay: 300, event: 'mouseleave'},
           // hide: false,
           position: {
