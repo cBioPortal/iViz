@@ -106,7 +106,7 @@
               });
               tooltip.find('.query').click(function() {
                 if(_.isObject(self_.savedVC) && self_.savedVC.id) {
-                  window.open(window.cbioURL + 'study?cohorts=' + self_.savedVC.id);
+                  window.open(window.cbioURL + 'study?id=' + self_.savedVC.id);
                 }
               });
               tooltip.find('.close-dialog i').click(function() {
