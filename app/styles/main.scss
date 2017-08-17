@@ -59,20 +59,6 @@ body {
 .iviz-save-cohort-btn-qtip {
   .qtip-content {
     padding: 9px;
-    .close-dialog {
-      width: 100%;
-      display: inline-block;
-      i {
-        float: right;
-        font-size: 15px;
-        color: grey;
-        margin-top: -5px;
-        margin-bottom: 5px;
-      }
-      i:hover {
-        cursor: pointer;
-      }
-    }
     .dialog {
       input {
         line-height: 20px;
@@ -97,8 +83,12 @@ body {
     }
     .saved {
       .savedMessage {
+        display: inline-flex;
         .fa-exclamation-triangle {
           color: orange;
+        }
+        .left-space {
+          margin-left: 5px;
         }
       }
     }
