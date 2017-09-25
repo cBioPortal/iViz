@@ -168,6 +168,7 @@
                 if (_attrAdded) {
                   $.when(iViz.updateGroupNdx(attrData.group_id, attrData.attr_id)).then(function(isGroupNdxDataUpdated) {
                     attrData.addChartBy = 'user';
+                    attrData.show = true;
                     self_.groups[_groupIdToPush].attributes.push(attrData);
                     if (isGroupNdxDataUpdated) {
                       self_.$broadcast('add-chart-to-group', attrData.group_id);
@@ -187,6 +188,7 @@
                   newgroup_.type = _group.type;
                   newgroup_.id = self_.groupCount;
                   attrData.group_id = newgroup_.id;
+                  attrData.show = true;
                   self_.groupCount += 1;
                   groupAttrs.push(attrData);
                   newgroup_.attributes = groupAttrs;
