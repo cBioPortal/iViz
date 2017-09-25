@@ -281,7 +281,8 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
             // Hide chart which only has no more than one category.
             var numOfKeys = Object.keys(selectedAttrMeta.keys).length;
-            if (numOfKeys <= 1) {
+            if (numOfKeys <= 1
+              && ['CANCER_TYPE', 'CANCER_TYPE_DETAILED'].indexOf(_attrId) === -1) {
               selectedAttrMeta.show = false;
               attrIds = attrIds.filter(function(obj) {
                 return obj !== _attrId;
