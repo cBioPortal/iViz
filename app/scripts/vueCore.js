@@ -30,6 +30,7 @@
             charts: {},
             groupCount: 0,
             updateSpecialCharts: false,
+            showShareButton: true,
             showSaveButton: true,
             showManageButton: true,
             loadUserSpecificCohorts: false,
