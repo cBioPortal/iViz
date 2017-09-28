@@ -739,6 +739,24 @@
       }
       return status;
     };
+    
+    content.defaultQtipConfig = function(content) {
+      var configuration = {
+        style: {
+          classes: 'qtip-light qtip-rounded qtip-shadow'
+        },
+        show: {event: 'mouseover', ready: false},
+        hide: {fixed: true, delay: 200, event: 'mouseleave'},
+        position: {
+          my: 'bottom center',
+          at: 'top center',
+          viewport: $(window)
+        },
+        content: content
+      };
+      
+      return configuration;
+    };
 
     return content;
   })();
