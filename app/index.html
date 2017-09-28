@@ -108,6 +108,7 @@
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <script src="scripts/views/components/errorHandle.js"></script>
   <script src="scripts/views/components/saveVirtualStudy/saveVirtualStudy.js"></script>
+  <script src="scripts/views/components/shareVirtualStudy/shareVirtualStudy.js"></script>
   <!-- endbuild -->
 </head>
 <body>
@@ -124,6 +125,8 @@
         </div>
         <save-virtual-study :show-save-button="showSaveButton" :stats="stats"
                            :update-stats.sync="updateStats"></save-virtual-study>
+        <share-virtual-study :show-share-button="showShareButton" :stats="stats"
+                             :update-stats.sync="updateStats"></share-virtual-study>
         <span id="iviz-header-left-patient-select" class="iviz-header-button"
               @click="openCases" class="number"
               role="button" tabindex="0" style="display: block;"><i class="fa fa-user-circle-o" aria-hidden="true"></i></span>
@@ -202,8 +205,13 @@
     vcSession.URL =
             'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
 
-    // This is used to indicate how to disable two buttons. By default, they are set to false.
-    iViz.vue.manage.getInstance().showSaveButton = true;
+    // This is used to indicate how to disable three buttons. By default, they are set to false.
+    iViz.vue.manage.getInstance().showSaveButton = false;
+
+    //Set this to true if want to share cohorts url(this is for cbioportal)
+    iViz.vue.manage.getInstance().showShareButton = true;
+
+    iViz.vue.manage.getInstance().showManageButton = false;
 
     //Set this to true if want to load user specific cohorts(this is for cbioportal)
     iViz.vue.manage.getInstance().loadUserSpecificCohorts = false;

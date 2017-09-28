@@ -1,42 +1,59 @@
 'use strict';
-(function(Vue, $, vcSession) {
+(function(Vue, $, vcSession, iViz) {
   Vue.component('saveVirtualStudy', {
     template: 
     '<div v-if="showSaveButton" class="save-virtual-study">' +
     '<div class="save-cohort-btn">' +
     '<i class="fa fa-floppy-o" alt="Save Virtual Study"></i></div></div>',
-    props: [
-      'selectedPatientsNum', 'selectedSamplesNum',
-      'stats', 'updateStats', 'showSaveButton'
-    ],
+    props: {
+      selectedPatientsNum: {
+        type: Number,
+        default: 0
+      },
+      selectedSamplesNum: {
+        type: Number,
+        default: 0
+      },
+      stats: {
+        type: Object
+      },
+      updateStats: {
+        type: Boolean,
+        default: false
+      },
+      showSaveButton: {
+        type: Boolean,
+        default: false
+      },
+      createdQtip: {
+        type: Boolean,
+        default: false
+      }
+    },
     data: function() {
       return {
         savedVC: null
       };
-    }, methods: {
+    },
+    watch: {
+      'showSaveButton': function(showSaveButton) {
+        // In case static qtip will be created multiple times.
+        if (showSaveButton && !this.createdQtip) {
+          this.createQtip();
+        }
+      }
+    }, 
+    methods: {
       saveCohort: function() {
         var _self = this;
         _self.updateStats = true;
         _self.$nextTick(function() {
           _self.addNewVC = true;
         });
-      }
-    }, ready: function() {
-      var self_ = this;
-      if (this.showSaveButton) {
-        $('.save-virtual-study').qtip({
-          style: {
-            classes: 'qtip-light qtip-rounded qtip-shadow'
-          },
-          show: {event: 'mouseover', ready: false},
-          hide: {fixed: true, delay: 200, event: 'mouseleave'},
-          position: {
-            my: 'bottom center',
-            at: 'top center',
-            viewport: $(window)
-          },
-          content: 'Save Virtual Study'
-        });
+      },
+      createQtip: function() {
+        var self_ = this;
+        $('.save-virtual-study').qtip(iViz.util.defaultQtipConfig('Save Virtual Study'));
         $('.save-cohort-btn').qtip({
           style: {
             classes: 'qtip-light qtip-rounded qtip-shadow ' +
@@ -82,7 +99,7 @@
                         tooltip.find('.savedMessage').html(
                           '<span>Virtual study <i>' + cohortName +
                           '</i> is saved.</span>' +
-                          '<a class="left-space" href="' + 
+                          '<a class="left-space" href="' +
                           window.cbioURL + 'study?id=' +
                           self_.savedVC.id + '">view</a>');
                       })
@@ -116,6 +133,7 @@
                       .attr('disabled', false);
                   }
                 });
+              this.createdQtip = true;
             },
             show: function() {
               var tooltip = $('.iviz-save-cohort-btn-qtip .qtip-content');
@@ -163,4 +181,4 @@
     }
   });
 })(window.Vue,
-  window.$ || window.jQuery, window.vcSession);
+  window.$ || window.jQuery, window.vcSession, window.iViz);
