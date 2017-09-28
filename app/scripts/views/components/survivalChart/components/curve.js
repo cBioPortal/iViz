@@ -106,8 +106,12 @@
     _curveIndex,
     _lineColor) {
     var _self = this;
-    var _data = data;
-
+    
+    // Filter points with negative value 		
+    var _data = _.filter(data, function(point){
+      return point.time >= 0 && point.survival_rate >= 0;
+    });
+    
     // add an empty/zero point so the curve starts from zero time point
     if (_data !== null && _data.length !== 0) {
       if (_data[0].time !== 0) {

@@ -267,8 +267,14 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             selectedAttrMeta.numOfDatum = 0;
 
             _.each(_clinicalAttributeData, function(_dataObj) {
-              _data[self_.getCaseIndex(type, _dataObj.study_id, _dataObj[idType])][_dataObj.attr_id] = _dataObj.attr_val;
+              var caseIndex = self_.getCaseIndex(type, _dataObj.study_id, _dataObj[idType]);
 
+              // Filter 'undefined' case index		
+              if (caseIndex !== undefined) {
+                _data[caseIndex] = _data[caseIndex] || {};
+                _data[caseIndex][_dataObj.attr_id] = _dataObj.attr_val;
+              }
+              
               if (!selectedAttrMeta.keys
                   .hasOwnProperty(_dataObj.attr_val)) {
                 selectedAttrMeta.keys[_dataObj.attr_val] = 0;
@@ -581,8 +587,6 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         attr.study_id = 'Study ID';
         attr.patient_id = 'Patient ID';
         attr.sample_id = 'Sample ID';
-        attr.mutated_genes = 'With Mutation Data';
-        attr.cna_details = 'With CNA Data';
 
         var arr = [];
         var strA = [];
