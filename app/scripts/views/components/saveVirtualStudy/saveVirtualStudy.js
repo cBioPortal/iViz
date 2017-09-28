@@ -133,6 +133,7 @@
                       .attr('disabled', false);
                   }
                 });
+              this.createdQtip = true;
             },
             show: function() {
               var tooltip = $('.iviz-save-cohort-btn-qtip .qtip-content');
