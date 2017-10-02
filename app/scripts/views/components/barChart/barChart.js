@@ -173,17 +173,21 @@
       } else if (v === opts_.emptyMappingVal || opts_.xDomain.length === 1) {
         return 'NA';
       } else if (v === opts_.xDomain[0]) {
-        formattedValue = opts_.xDomain[1];
+        // In case '<=max' and '>min' occurring
+        formattedValue = opts_.xDomain.length === 2 ? opts_.xDomain[0] : opts_.xDomain[1];
         if (data_.smallDataFlag) {
           return '<=' + e(formattedValue);
         }
         return '<=' + formattedValue;
       } else if ((v === opts_.xDomain[opts_.xDomain.length - 2] && data_.hasNA) ||
         (v === opts_.xDomain[opts_.xDomain.length - 1] && !data_.hasNA)) {
+        // In case '<=max' and '>min' occurring
         if (data_.hasNA) {
-          formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
+          formattedValue = opts_.xDomain.length === 3 ? opts_.xDomain[opts_.xDomain.length - 2] :
+            opts_.xDomain[opts_.xDomain.length - 3];
         } else {
-          formattedValue = opts_.xDomain[opts_.xDomain.length - 2];
+          formattedValue = opts_.xDomain.length === 2 ? opts_.xDomain[opts_.xDomain.length - 1] :
+            opts_.xDomain[opts_.xDomain.length - 2];
         }
         if (data_.smallDataFlag) {
           return '>' + e(formattedValue);
