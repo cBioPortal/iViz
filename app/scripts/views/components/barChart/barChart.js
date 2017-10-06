@@ -152,8 +152,7 @@
       chartInst_.xAxis().tickFormat(function(v) {
         return getTickFormat(v, logScale);
       });
-
-      chartInst_.xAxis().tickValues(opts_.xDomain);
+      
       chartInst_.xUnits(function() {
         return opts_.xDomain.length * 1.3 <= 5 ? 5 : opts_.xDomain.length * 1.3;
       });
