@@ -209,10 +209,8 @@
             if (_.unique(this.data.meta).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
               var maxData = _.max(this.data.meta);
               var minData = _.min(this.data.meta);
-              if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
-                this.data.noGrouping = true;
-                this.data.sortedData = findExtremeResult[3];// use sorted value as ticks directly
-              }
+              this.data.noGrouping = true;
+              this.data.uniqueSortedData = _.unique(findExtremeResult[3]);// use sorted value as ticks directly
             }
           }
 
