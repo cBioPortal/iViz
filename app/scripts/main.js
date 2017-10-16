@@ -122,6 +122,7 @@ var iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         return _def.promise();
       });
       $.when.apply($, requests).then(function() {
+        vm_.isloading = false;
         vm_.selectedsampleUIDs = _.pluck(data_.groups.sample.data, 'sample_uid');
         vm_.selectedpatientUIDs = _.pluck(data_.groups.patient.data, 'patient_uid');
         vm_.groups = groups;
