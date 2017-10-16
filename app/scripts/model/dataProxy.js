@@ -1014,7 +1014,7 @@ window.DataManagerForIviz = (function($, _) {
                       });
                   })
                   .fail(function() {
-                    fetch_promise.reject('Failed to load all sample list from study.');
+                    fetch_promise.reject('Failed to load sample list from study.');
                   });
               }
               return def.promise();
