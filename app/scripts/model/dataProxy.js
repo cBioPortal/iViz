@@ -879,7 +879,7 @@ window.DataManagerForIviz = (function($, _) {
                   }
                   _responseStudyCaseList[cancer_study_id] = studyCaseList;
                   if (_.isUndefined(studyCaseList.allSampleIds)) {
-                    def.reject('Failed to load all sample list from study.');
+                    def.reject('Failed to load sample list from study.');
                   } else {
                     def.resolve(_responseStudyCaseList);
                   }
@@ -1053,7 +1053,7 @@ window.DataManagerForIviz = (function($, _) {
                     self.data.sampleLists[list][studyId] = data;
                     _def.resolve(data);
                   }).fail(function() {
-                    _def.reject('Failed to load ' + list + ' data for ' + studyId);
+                    _def.reject('Failed to load sample list data from study.');
                   });
                 }
                 promises.push(_def.promise());
