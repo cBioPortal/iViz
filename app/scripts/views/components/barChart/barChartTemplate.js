@@ -20,7 +20,7 @@
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} >' +
     '<div v-if="failedToInit" class="error-panel" align="center" style="padding-top: 10%;">' +
-    '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
+    '<error v-if="failedToInit" :message="errorMessage"></error>' +
     '</div></div>' +
     ' <div :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader">' +
@@ -53,11 +53,7 @@
           transitionDuration: iViz.opts.dc.transitionDuration
         },
         failedToInit: false,
-        errorMessage: {
-          dataInvalid: false,
-          noData: false, 
-          failedToLoadData: false
-        },
+        errorMessage: '',
         opts: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
         addingChart: false,
@@ -148,7 +144,7 @@
           this.showSurvivalIcon = false;
         }
       },
-      processBarchartData: function (_data) {
+      processBarchartData: function(_data) {
         var _self = this;
         var _dataIssue = false;
         var smallerOutlier = [];
@@ -180,7 +176,7 @@
         });
 
         if (_dataIssue) {
-          this.errorMessage.dataInvalid = true;
+          this.errorMessage = iViz.util.getDataErrorMessage('dataInvalid');
           this.failedToInit = true;
         } else {
           // for scientific small number
@@ -290,19 +286,19 @@
             if (!_hasMutationCountData) { //empty data
               if (_self.attributes.addChartBy === 'default') {// Hide empty chart initially.
                 _self.attributes.show = false;
-                _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
+                _self.$dispatch('remove-chart', _self.attributes.attr_id, _self.attributes.group_id);//rearrange layout
               } else { // _self.attributes.addChartBy === 'user'
                 _self.$dispatch('data-loaded', _self.attributes.group_id, _self.chartDivId);
               }
               _self.showLoad = false;
-              _self.errorMessage.noData = true;
+              _self.errorMessage = iViz.util.getDataErrorMessage('noData');
               _self.failedToInit = true;
             } else {
               _self.processBarchartData(_mutationCountData);
             }
           }, function() {
             _self.showLoad = false;
-            _self.errorMessage.failedToLoadData = true;
+            _self.errorMessage = iViz.util.getDataErrorMessage('failedToLoadData');
             _self.failedToInit = true;
             _self.$dispatch('data-loaded', _self.attributes.group_id, _self.chartDivId);
           });
