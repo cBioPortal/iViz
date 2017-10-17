@@ -1,7 +1,6 @@
 'use strict';
 var util = (function(_, cbio) {
   return (function() {
-    
     function tableDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
@@ -356,6 +355,7 @@ var util = (function(_, cbio) {
         break;
       }
     }
+
     /**
      * @author Adam Abeshouse
      * @param {number | string} a
@@ -628,7 +628,7 @@ var util = (function(_, cbio) {
       // TODO: DOM id pool. Ideally id shouldn't be repeated
       return domId;
     };
-    
+
     /**
      * Finds the intersection elements between two arrays in a simple fashion.
      * Should have O(n) operations, where n is n = MIN(a.length, b.length)
@@ -801,6 +801,24 @@ var util = (function(_, cbio) {
         }
       }
       return _returnValue;
+    };
+
+    content.getDataErrorMessage = function(type) {
+      var message = 'Failed to load data';
+      switch (type) {
+      case 'dataInvalid':
+        message = 'Data Invalid' + (iViz.opts.emailContact ?
+          ('<span v-if="emailContact">' +
+            ', please contact <span v-html="emailContact"></span></span>') : '');
+        break;
+      case 'noData':
+        message = 'No data available';
+        break;
+      case 'failedToLoadData':
+        message = 'Failed to load data, refresh the page may help';
+        break;
+      }
+      return message;
     };
 
     return content;

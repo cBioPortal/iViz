@@ -39,7 +39,11 @@
             showDropDown: false,
             numOfSurvivalPlots: 0,
             showedSurvivalPlot: false,
-            userMovedChart: false
+            userMovedChart: false,
+            failedToInit: {
+              status: false,
+              message: 'Failed to open the study.' + (iViz.opts.emailContact ? (' Please contact ' + iViz.opts.emailContact + '.') : '')
+            },
           }, watch: {
             charts: function() {
               this.checkForDropDownCharts();
@@ -99,6 +103,10 @@
             },
             'user-moved-chart': function() {
               this.userMovedChart = true;
+            },
+            'fail-during-init': function(message) {
+              this.failedToInit.status = true;
+              this.failedToInit.message = message;
             }
           }, methods: {
             checkForDropDownCharts: function() {
