@@ -87,7 +87,7 @@
         if (!mapTickToCaseIds.hasOwnProperty(val)) {
           mapTickToCaseIds[val] = {
             caseIds: [],
-            tick: getTickFormat(val, logScale)
+            tick: iViz.util.getTickFormat(val, logScale, data_, opts_)
           };
           if (!_.isUndefined(_min) && !_.isUndefined(_max)) {
             mapTickToCaseIds[val].range = _min + '< ~ <=' + _max;
@@ -130,6 +130,7 @@
       }
 
       if (logScale || data_.smallDataFlag) {
+        chartInst_.xAxis().tickValues(opts_.xDomain);
         chartInst_.x(d3.scale.log().nice()
           .domain([opts_.minDomain, opts_.maxDomain]));
       } else if (data_.noGrouping) {
@@ -150,76 +151,13 @@
       chartInst_.yAxis().ticks(6);
       chartInst_.yAxis().tickFormat(d3.format('d'));
       chartInst_.xAxis().tickFormat(function(v) {
-        return getTickFormat(v, logScale);
+        return iViz.util.getTickFormat(v, logScale, data_, opts_);
       });
       
       chartInst_.xUnits(function() {
         return opts_.xDomain.length * 1.3 <= 5 ? 5 : opts_.xDomain.length * 1.3;
       });
     };
-
-    function getTickFormat(v, logScale) {
-      var _returnValue = v;
-      var index = 0;
-      var e = d3.format('.1e');// convert small data to scientific notation format
-      var formattedValue = '';
-      
-      if (data_.noGrouping) {
-        if (v === opts_.emptyMappingVal) {
-          _returnValue = 'NA';
-        } else {
-          _returnValue = opts_.xDomain[opts_.xFakeDomain.indexOf(v)];
-        }
-      } else if (logScale) {
-        if (v === opts_.emptyMappingVal) {
-          _returnValue = 'NA';
-        } else {
-          index = opts_.xDomain.indexOf(v);
-          if (index % 2 !== 0) {
-            _returnValue = '';
-          }
-        }
-      } else if (v === opts_.emptyMappingVal || opts_.xDomain.length === 1) {
-        return 'NA';
-      } else if (v === opts_.xDomain[0]) {
-        formattedValue = opts_.xDomain[1];
-        if (data_.smallDataFlag) {
-          return '<=' + e(formattedValue);
-        }
-        return '<=' + formattedValue;
-      } else if ((v === opts_.xDomain[opts_.xDomain.length - 2] && data_.hasNA) ||
-        (v === opts_.xDomain[opts_.xDomain.length - 1] && !data_.hasNA)) {
-        if (data_.hasNA) {
-          formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
-        } else {
-          formattedValue = opts_.xDomain[opts_.xDomain.length - 2];
-        }
-        if (data_.smallDataFlag) {
-          return '>' + e(formattedValue);
-        }
-        return '>' + formattedValue;
-      } else if (data_.min > 1500 &&
-        opts_.xDomain.length > 7) {
-        // this is the special case for printing out year
-        index = opts_.xDomain.indexOf(v);
-        if (index % 2 === 0) {
-          _returnValue = v;
-        } else {
-          _returnValue = '';
-        }
-      } else {
-        _returnValue = v;
-      }
-
-      if (data_.smallDataFlag) {
-        _returnValue = e(_returnValue);
-        var _tempValue = e(v).toString();
-        if (_tempValue.charAt(0) !== '1') {// hide tick values whose format is not 1.0e-N
-          _returnValue = '';
-        }
-      }
-      return _returnValue;
-    }
 
     function initTsvDownloadData() {
       var data = [];

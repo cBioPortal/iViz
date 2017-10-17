@@ -138,6 +138,11 @@ module.exports = function(grunt) {
       ]
     },
 
+    // Configure a mochaTest task
+    mochaTest: {
+      src: ['test/**/*.spec.js']
+    },
+
     // Mocha testing framework configuration options
     mocha: {
       all: {
@@ -474,7 +479,8 @@ module.exports = function(grunt) {
       grunt.task.run([
         'clean:server',
         'concurrent:test',
-        'postcss'
+        'postcss',
+        'mochaTest'
       ]);
     }
 
