@@ -750,7 +750,14 @@ var util = (function(_, cbio) {
         if (v === opts_.emptyMappingVal) {
           _returnValue = 'NA';
         } else {
-          _returnValue = opts_.xDomain[opts_.xFakeDomain.indexOf(v)];
+          // When noGrouping is true, the number of unique data points is less than 6.
+          // The distance maybe big between points, so we use xFakeDomain to set ticks.
+          // The value of ticks shown on chart is gotten from xDomain.
+          if (data_.smallDataFlag) {
+            _returnValue = e(opts_.xDomain[opts_.xFakeDomain.indexOf(v)]);
+          } else {
+            _returnValue = opts_.xDomain[opts_.xFakeDomain.indexOf(v)];
+          }
         }
       } else if (logScale) {
         if (v === opts_.emptyMappingVal) {
