@@ -203,18 +203,17 @@
             // In this case, the chart sets data value as ticks' value directly. 
             this.data.noGrouping = false;
             if (_.unique(this.data.meta).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
-              var maxData = _.max(this.data.meta);
-              var minData = _.min(this.data.meta);
-              if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
-                this.data.noGrouping = true;
-                this.data.sortedData = findExtremeResult[3];// use sorted value as ticks directly
-              }
+              this.data.noGrouping = true;
+              this.data.uniqueSortedData = _.unique(findExtremeResult[3]);// use sorted value as ticks directly
             }
           }
 
           this.data.attrId = this.attributes.attr_id;
           this.data.groupType = this.attributes.group_type;
-          if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
+          
+          // logScale and noGroup cannot be true at same time
+          // logScale and smallDataFlag cannot be true at same time
+          if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1) && !this.data.noGrouping) {
             this.settings.showLogScale = true;
           }
           this.barChart = new iViz.view.component.BarChart();

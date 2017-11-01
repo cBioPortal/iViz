@@ -1,7 +1,6 @@
 'use strict';
-(function(iViz, _, cbio) {
-  iViz.util = (function() {
-
+var util = (function(_, cbio) {
+  return (function() {
     function tableDownload(fileType, content) {
       switch (fileType) {
         case 'tsv':
@@ -740,6 +739,76 @@
       }
       return status;
     };
+    
+    content.getTickFormat = function(v, logScale, data_, opts_) {
+      var _returnValue = v;
+      var index = 0;
+      var e = d3.format('.1e');// convert small data to scientific notation format
+      var formattedValue = '';
+
+      if (data_.noGrouping) {
+        if (v === opts_.emptyMappingVal) {
+          _returnValue = 'NA';
+        } else {
+          // When noGrouping is true, the number of unique data points is less than 6.
+          // The distance maybe big between points, so we use xFakeDomain to set ticks.
+          // The value of ticks shown on chart is gotten from xDomain.
+          if (data_.smallDataFlag) {
+            _returnValue = e(opts_.xDomain[opts_.xFakeDomain.indexOf(v)]);
+          } else {
+            _returnValue = opts_.xDomain[opts_.xFakeDomain.indexOf(v)];
+          }
+        }
+      } else if (logScale) {
+        if (v === opts_.emptyMappingVal) {
+          _returnValue = 'NA';
+        } else {
+          index = opts_.xDomain.indexOf(v);
+          if (index % 2 !== 0) {
+            _returnValue = '';
+          }
+        }
+      } else if (v === opts_.emptyMappingVal || opts_.xDomain.length === 1) {
+        return 'NA';
+      } else if (v === opts_.xDomain[0]) {
+        formattedValue = opts_.xDomain[1];
+        if (data_.smallDataFlag) {
+          return '<=' + e(formattedValue);
+        }
+        return '<=' + formattedValue;
+      } else if ((v === opts_.xDomain[opts_.xDomain.length - 2] && data_.hasNA) ||
+        (v === opts_.xDomain[opts_.xDomain.length - 1] && !data_.hasNA)) {
+        if (data_.hasNA) {
+          formattedValue = opts_.xDomain[opts_.xDomain.length - 3];
+        } else {
+          formattedValue = opts_.xDomain[opts_.xDomain.length - 2];
+        }
+        if (data_.smallDataFlag) {
+          return '>' + e(formattedValue);
+        }
+        return '>' + formattedValue;
+      } else if (data_.min > 1500 &&
+        opts_.xDomain.length > 7) {
+        // this is the special case for printing out year
+        index = opts_.xDomain.indexOf(v);
+        if (index % 2 === 0) {
+          _returnValue = v;
+        } else {
+          _returnValue = '';
+        }
+      } else {
+        _returnValue = v;
+      }
+
+      if (data_.smallDataFlag && !data_.noGrouping) {
+        _returnValue = e(_returnValue);
+        var _tempValue = e(v).toString();
+        if (_tempValue.charAt(0) !== '1') {// hide tick values whose format is not 1.0e-N
+          _returnValue = '';
+        }
+      }
+      return _returnValue;
+    };
 
     content.getDataErrorMessage = function(type) {
       var message = 'Failed to load data';
@@ -761,5 +830,11 @@
 
     return content;
   })();
-})(window.iViz,
-  window._, window.cbio);
+})(window._, window.cbio);
+
+window.iViz.util = util;
+
+// export cbio.util.getTickFormat for testing
+module.exports = {
+  getTickFormat: util.getTickFormat
+};

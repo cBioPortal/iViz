@@ -2,6 +2,7 @@
   "private": true,
   "devDependencies": {
     "autoprefixer": "^6.4.1",
+    "chai": "^4.1.2",
     "eslint": "^2.13.1",
     "eslint-config-google": "^0.4.0",
     "grunt": "^0.4.5",
@@ -20,6 +21,7 @@
     "grunt-filerev": "^2.2.0",
     "grunt-json-to-sass": "0.0.3",
     "grunt-mocha": "^0.4.12",
+    "grunt-mocha-test": "^0.13.3",
     "grunt-modernizr": "^0.6.0",
     "grunt-newer": "^1.2.0",
     "grunt-postcss": "^0.6.0",
@@ -28,6 +30,8 @@
     "grunt-usemin": "^3.0.0",
     "grunt-wiredep": "^2.0.0",
     "jit-grunt": "^0.9.1",
+    "jsdom": "^11.3.0",
+    "mocha": "^4.0.0",
     "time-grunt": "^1.4.0"
   },
   "engines": {
