@@ -834,6 +834,11 @@ var util = (function(_, cbio) {
 
 window.iViz.util = util;
 
+//
+// Expose the module.
+//
+window.module = window.module || {};
+
 // export cbio.util.getTickFormat for testing
 module.exports = {
   getTickFormat: util.getTickFormat
