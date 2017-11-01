@@ -839,7 +839,7 @@ window.iViz.util = util;
 //
 window.module = window.module || {};
 
-// export cbio.util.getTickFormat for testing
+// export util.getTickFormat for testing
 module.exports = {
   getTickFormat: util.getTickFormat
 };
