@@ -164,10 +164,8 @@
       },
       updateLayout: function() {
         this.updateLayoutMatrix();
-        if (_.isObject(this.grid_)) {
-          this.grid_.items.sort(this.sortByNumber);
-          this.grid_.layout();
-        }
+        if (_.isObject(this.grid_)) {this.grid_.items.sort(this.sortByNumber);
+        this.grid_.layout();}
       },
       getLayoutMatrix: function(layoutMatrix, chart) {
         var self_ = this;

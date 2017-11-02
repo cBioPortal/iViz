@@ -20,7 +20,7 @@
     '<div class="dc-chart dc-bar-chart" align="center" ' +
     'style="float:none !important;" id={{chartId}} >' +
     '<div v-if="failedToInit" class="error-panel" align="center" style="padding-top: 10%;">' +
-    '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
+    '<error v-if="failedToInit" :message="errorMessage"></error>' +
     '</div></div>' +
     ' <div :class="{\'show-loading\': showLoad}" ' +
     'class="chart-loader">' +
@@ -53,11 +53,7 @@
           transitionDuration: iViz.opts.dc.transitionDuration
         },
         failedToInit: false,
-        errorMessage: {
-          dataInvalid: false,
-          noData: false, 
-          failedToLoadData: false
-        },
+        errorMessage: '',
         opts: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
         addingChart: false,
@@ -148,7 +144,7 @@
           this.showSurvivalIcon = false;
         }
       },
-      processBarchartData: function (_data) {
+      processBarchartData: function(_data) {
         var _self = this;
         var _dataIssue = false;
         var smallerOutlier = [];
@@ -180,7 +176,7 @@
         });
 
         if (_dataIssue) {
-          this.errorMessage.dataInvalid = true;
+          this.errorMessage = iViz.util.getDataErrorMessage('dataInvalid');
           this.failedToInit = true;
         } else {
           // for scientific small number
@@ -207,18 +203,17 @@
             // In this case, the chart sets data value as ticks' value directly. 
             this.data.noGrouping = false;
             if (_.unique(this.data.meta).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
-              var maxData = _.max(this.data.meta);
-              var minData = _.min(this.data.meta);
-              if ((maxData - minData) <= findExtremeResult[4]) {// range < iqr
-                this.data.noGrouping = true;
-                this.data.sortedData = findExtremeResult[3];// use sorted value as ticks directly
-              }
+              this.data.noGrouping = true;
+              this.data.uniqueSortedData = _.unique(findExtremeResult[3]);// use sorted value as ticks directly
             }
           }
 
           this.data.attrId = this.attributes.attr_id;
           this.data.groupType = this.attributes.group_type;
-          if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1)) {
+          
+          // logScale and noGroup cannot be true at same time
+          // logScale and smallDataFlag cannot be true at same time
+          if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1) && !this.data.noGrouping) {
             this.settings.showLogScale = true;
           }
           this.barChart = new iViz.view.component.BarChart();
@@ -290,19 +285,19 @@
             if (!_hasMutationCountData) { //empty data
               if (_self.attributes.addChartBy === 'default') {// Hide empty chart initially.
                 _self.attributes.show = false;
-                _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
+                _self.$dispatch('remove-chart', _self.attributes.attr_id, _self.attributes.group_id);//rearrange layout
               } else { // _self.attributes.addChartBy === 'user'
                 _self.$dispatch('data-loaded', _self.attributes.group_id, _self.chartDivId);
               }
               _self.showLoad = false;
-              _self.errorMessage.noData = true;
+              _self.errorMessage = iViz.util.getDataErrorMessage('noData');
               _self.failedToInit = true;
             } else {
               _self.processBarchartData(_mutationCountData);
             }
           }, function() {
             _self.showLoad = false;
-            _self.errorMessage.failedToLoadData = true;
+            _self.errorMessage = iViz.util.getDataErrorMessage('failedToLoadData');
             _self.failedToInit = true;
             _self.$dispatch('data-loaded', _self.attributes.group_id, _self.chartDivId);
           });

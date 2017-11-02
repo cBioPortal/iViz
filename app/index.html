@@ -106,7 +106,7 @@
   <script src="scripts/views/components/dataTable/tableView.js"></script>
   <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
-  <script src="scripts/views/components/errorHandle.js"></script>
+  <script src="scripts/views/components/error.js"></script>
   <script src="scripts/views/components/saveVirtualStudy/saveVirtualStudy.js"></script>
   <script src="scripts/views/components/shareVirtualStudy/shareVirtualStudy.js"></script>
   <!-- endbuild -->
@@ -114,7 +114,7 @@
 <body>
 
 <div class="container-fluid" id="complete-screen">
-  <nav class="navbar navbar-default navbar-fixed-top">
+  <nav class="navbar navbar-default navbar-fixed-top" v-if="!failedToInit.status">
     <div id="main-header" style="display: none" :class="{show:!isloading}">
       <div id="iviz-header-left">
         <div class="iviz-header-left-case">
@@ -181,7 +181,7 @@
       </div>
     </div>
   </nav>
-  <div :class="{'start-loading': showScreenLoad}">
+  <div :class="{'start-loading': showScreenLoad}" v-if="!failedToInit.status">
     <div class="grid" id="main-grid"
          :class="{loading:isloading}">
       <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
@@ -193,6 +193,7 @@
                      :clear-all="clearAll"></main-template>
     </div>
   </div>
+  <error container-id="fail-to-init" v-if="failedToInit.status" :message="failedToInit.message"></error>
 
 </div>
 
@@ -225,17 +226,29 @@
     studyCasesMap['hnsc_tcga'] = {};
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
-    $.when(
-      window.iviz.datamanager.initialSetup(),
-      window.iviz.datamanager.getConfigs()
-    ).then(function(_data, configs) {
-      var opts = {};
-
-      if (_.isObject(configs)) {
-        opts = configs;
-      }
-      iViz.init(_data, opts);
-    });
+    $.when(window.iviz.datamanager.getConfigs())
+      .done(function(configs) {
+        var opts = {};
+        if (_.isObject(configs)) {
+          opts = configs;
+        }
+        $.when(
+          window.iviz.datamanager.initialSetup()
+        ).done(function(_data) {
+          iViz.init(_data, opts);
+        }).fail(function(error) {
+          iViz.vue.manage.getInstance().failedToInit.status = true;
+          if (error) {
+            iViz.vue.manage.getInstance().failedToInit.message = error
+          }
+          iViz.vue.manage.getInstance().isloading = false;
+        });
+      })
+      .fail(function() {
+        iViz.vue.manage.getInstance().failedToInit.status = true;
+        iViz.vue.manage.getInstance().failedToInit.message = 'Failed to load study view configurations.';
+        iViz.vue.manage.getInstance().isloading = false;
+      });
 
     QueryByGeneTextArea.init('#query-by-gene-textarea', function(genes) {
       iViz.vue.manage.getInstance().$broadcast('gene-list-updated', genes);

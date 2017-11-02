@@ -41,7 +41,11 @@
             showDropDown: false,
             numOfSurvivalPlots: 0,
             showedSurvivalPlot: false,
-            userMovedChart: false
+            userMovedChart: false,
+            failedToInit: {
+              status: false,
+              message: 'Failed to open the study.' + (iViz.opts.emailContact ? (' Please contact ' + iViz.opts.emailContact + '.') : '')
+            },
           }, watch: {
             charts: function() {
               this.checkForDropDownCharts();
@@ -104,6 +108,10 @@
             },
             'user-moved-chart': function() {
               this.userMovedChart = true;
+            },
+            'fail-during-init': function(message) {
+              this.failedToInit.status = true;
+              this.failedToInit.message = message;
             }
           }, methods: {
             checkForDropDownCharts: function() {
@@ -173,6 +181,7 @@
                 if (_attrAdded) {
                   $.when(iViz.updateGroupNdx(attrData.group_id, attrData.attr_id)).then(function(isGroupNdxDataUpdated) {
                     attrData.addChartBy = 'user';
+                    attrData.show = true;
                     self_.groups[_groupIdToPush].attributes.push(attrData);
                     if (isGroupNdxDataUpdated) {
                       self_.$broadcast('add-chart-to-group', attrData.group_id);
@@ -192,6 +201,7 @@
                   newgroup_.type = _group.type;
                   newgroup_.id = self_.groupCount;
                   attrData.group_id = newgroup_.id;
+                  attrData.show = true;
                   self_.groupCount += 1;
                   groupAttrs.push(attrData);
                   newgroup_.attributes = groupAttrs;

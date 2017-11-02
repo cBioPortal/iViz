@@ -20,7 +20,7 @@
     'class="chart-loader">' +
     ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
     '<div v-if="failedToInit" class="error-panel" align="center">' +
-    '<error-handle v-if="failedToInit" :error-message="errorMessage"></error-handle>' +
+    '<error-handle v-if="failedToInit" :error="error"></error-handle>' +
     '</div></div>',
     props: [
       'ndx', 'attributes'
@@ -39,7 +39,7 @@
         chartInst: {},
         hasFilters: false,
         showLoad: true,
-        errorMessage: {
+        error: {
           dataInvalid: false,
           noData: false,
           failedToLoadData: false
@@ -165,7 +165,7 @@
               _self.attributes.show = false;
               _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
             } 
-            _self.errorMessage.noData = true;
+            _self.error.noData = true;
             _self.failedToInit = true;
           } else {
             var _opts = {
@@ -192,7 +192,7 @@
           _self.showLoad = false;
         }, function() {
           _self.showLoad = false;
-          _self.errorMessage.failedToLoadData = true;
+          _self.error.failedToLoadData = true;
           _self.failedToInit = true;
         });
       
