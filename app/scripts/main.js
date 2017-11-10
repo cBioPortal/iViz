@@ -687,7 +687,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var self = this;
 
       // extract and reformat selected cases
-      var _selectedCases = [];
+      var _studies = [];
       var _selectedStudyCasesMap = {};
       var _sampleData = data_.groups.sample.data;
 
@@ -695,7 +695,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         var _caseDataObj = _sampleData[sampleUID];
         if (!_selectedStudyCasesMap[_caseDataObj.study_id]) {
           _selectedStudyCasesMap[_caseDataObj.study_id] = {};
-          _selectedStudyCasesMap[_caseDataObj.study_id].studyID = _caseDataObj.study_id;
+          _selectedStudyCasesMap[_caseDataObj.study_id].id = _caseDataObj.study_id;
           _selectedStudyCasesMap[_caseDataObj.study_id].samples = [];
           _selectedStudyCasesMap[_caseDataObj.study_id].patients = [];
         }
@@ -704,9 +704,9 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         _selectedStudyCasesMap[_caseDataObj.study_id].patients.push(data_.groups.patient.data[temp[0]].patient_id);
       });
       $.each(_selectedStudyCasesMap, function(key, val) {
-        _selectedCases.push(val);
+        _studies.push(val);
       });
-      _result.filterspatients = [];
+      _result.filters.patients = [];
       _result.filters.samples = [];
       _.each(vm_.groups, function(group) {
         var filters_ = [];
@@ -733,7 +733,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _result.filters.samples = array;
         }
       });
-      _result.selectedCases = _selectedCases;
+      _result.studies = _studies;
       return _result;
     },
 

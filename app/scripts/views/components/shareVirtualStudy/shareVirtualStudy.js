@@ -112,9 +112,9 @@
                 self_.$nextTick(function() {
                   var saveCohort = false;
 
-                  if (_.isObject(self_.stats.selectedCases)) {
+                  if (_.isObject(self_.stats.studies)) {
                     var selectedCasesMap = {};
-                    _.each(self_.stats.selectedCases, function(study){
+                    _.each(self_.stats.studies, function(study){
                       selectedCasesMap[study.studyID] = study;
                     });
 
@@ -154,18 +154,18 @@
                     if (saveCohort) {
                       var _selectedSamplesNum = 0;
                       var _selectedPatientsNum = 0;
-                      _.each(self_.stats.selectedCases, function (studyCasesMap) {
+                      _.each(self_.stats.studies, function (studyCasesMap) {
                         _selectedSamplesNum += studyCasesMap.samples.length;
-                        _selectedPatientsNum += studyCasesMap.patients.length;
                       });
                       self_.selectedSamplesNum = _selectedSamplesNum;
-                      self_.selectedPatientsNum = _selectedPatientsNum;
+                      self_.selectedPatientsNum = _selectedSamplesNum;
 
+                      console.log(self_.stats)
                       vcSession.events.saveCohort(self_.stats,
                         cohortName, cohortDescription || '')
                         .done(function (response) {
                           var deepCopySelectedCases = JSON.parse(
-                            JSON.stringify(self_.stats.selectedCases));
+                            JSON.stringify(self_.stats.studies));
                           self_.savedVC = response;
                           tooltip.find('.cohort-link').html(
                             '<a class="virtual-study-link" href="' + window.cbioURL +
@@ -175,7 +175,7 @@
                           tooltip.find('.saving').css('display', 'none');
                           tooltip.find('.cohort-link').css('display', 'block');
                           _.each(deepCopySelectedCases, function(study){
-                            previousSelectedCases[study.studyID] = study;
+                            previousSelectedCases[study.id] = study;
                           });
                         })
                         .fail(function () {
