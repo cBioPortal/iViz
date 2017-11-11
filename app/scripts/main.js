@@ -697,11 +697,8 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _selectedStudyCasesMap[_caseDataObj.study_id] = {};
           _selectedStudyCasesMap[_caseDataObj.study_id].id = _caseDataObj.study_id;
           _selectedStudyCasesMap[_caseDataObj.study_id].samples = [];
-          _selectedStudyCasesMap[_caseDataObj.study_id].patients = [];
         }
         _selectedStudyCasesMap[_caseDataObj.study_id].samples.push(_caseDataObj.sample_id);
-        var temp = self.getPatientUIDs(sampleUID);
-        _selectedStudyCasesMap[_caseDataObj.study_id].patients.push(data_.groups.patient.data[temp[0]].patient_id);
       });
       $.each(_selectedStudyCasesMap, function(key, val) {
         _studies.push(val);

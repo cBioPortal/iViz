@@ -77,7 +77,7 @@
       var def = new $.Deferred(), _desp = "";
       $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(_cases, "id"))).done(function(_studyIdNameMap) {
         _.each(_cases, function (_i) {
-          _desp += _studyIdNameMap[_i.id] + ": " + _i.samples.length + " samples / " + _i.patients.length + " patients\n";
+          _desp += _studyIdNameMap[_i.id] + ": " + _i.samples.length + " samples\n";
         });
         def.resolve(_desp);
       });

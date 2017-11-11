@@ -11,14 +11,6 @@
     '<div class="share-cohort-btn">' +
     '<i class="fa fa-share-alt" alt="Share Virtual Study"></i></div></div>',
     props: {
-      selectedPatientsNum: {
-        type: Number,
-        default: 0
-      },
-      selectedSamplesNum: {
-        type: Number,
-        default: 0
-      },
       stats: {
         type: Object
       },
@@ -152,15 +144,6 @@
                     }
 
                     if (saveCohort) {
-                      var _selectedSamplesNum = 0;
-                      var _selectedPatientsNum = 0;
-                      _.each(self_.stats.studies, function (studyCasesMap) {
-                        _selectedSamplesNum += studyCasesMap.samples.length;
-                      });
-                      self_.selectedSamplesNum = _selectedSamplesNum;
-                      self_.selectedPatientsNum = _selectedSamplesNum;
-
-                      console.log(self_.stats)
                       vcSession.events.saveCohort(self_.stats,
                         cohortName, cohortDescription || '')
                         .done(function (response) {
