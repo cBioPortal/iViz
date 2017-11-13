@@ -83,8 +83,8 @@
                   self_.$nextTick(function() {
                     var _selectedSamplesNum = 0;
                     var _selectedPatientsNum = 0;
-                    if (_.isObject(self_.stats.selectedCases)) {
-                      _.each(self_.stats.selectedCases, function(studyCasesMap) {
+                    if (_.isObject(self_.stats.studies)) {
+                      _.each(self_.stats.studies, function(studyCasesMap) {
                         _selectedSamplesNum += studyCasesMap.samples.length;
                         _selectedPatientsNum += studyCasesMap.patients.length;
                       });
@@ -141,7 +141,7 @@
               self_.$nextTick(function() {
                 // If user hasn't specific description only.
                 if (!tooltip.find('.cohort-description').val()) {
-                  $.when(vcSession.utils.generateCohortDescription(self_.stats.selectedCases))
+                  $.when(vcSession.utils.generateCohortDescription(self_.stats.studies))
                     .then(function(_desp) {
                       // If user hasn't specific description only.
                       if (!tooltip.find('.cohort-description').val()) {

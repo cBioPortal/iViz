@@ -107,7 +107,7 @@
                   if (_.isObject(self_.stats.studies)) {
                     var selectedCasesMap = {};
                     _.each(self_.stats.studies, function(study){
-                      selectedCasesMap[study.studyID] = study;
+                      selectedCasesMap[study.id] = study;
                     });
 
                     // When a user clicks copy, it will trigger saving the current virtual cohort and return the url 
@@ -118,8 +118,8 @@
                       saveCohort = true;
                     } else {
                       _.every(selectedCasesMap, function(selectedCase){
-                        if(previousSelectedCases[selectedCase.studyID]){
-                          var previousCase = previousSelectedCases[selectedCase.studyID];
+                        if(previousSelectedCases[selectedCase.id]){
+                          var previousCase = previousSelectedCases[selectedCase.id];
                           if (previousCase.patients.length !== selectedCase.patients.length ||
                             previousCase.samples.length !== selectedCase.samples.length) {
                             saveCohort = true;
