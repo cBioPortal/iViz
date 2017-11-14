@@ -149,10 +149,11 @@
         var _dataIssue = false;
         var smallerOutlier = [];
         var greaterOutlier = [];
+        var dataMetaKeys = {}; // Fast index unique dataMeta instead of using _.unique
 
         this.data.meta = _.map(_.filter(_.pluck(
           _data, this.opts.attrId), function(d) {
-          if (iViz.util.strIsNa(d, true) || (isNaN(d) && !d.includes('>') && !d.includes('<'))) {
+          if (isNaN(d) && !(_.isString(d) && d.includes('>') && d.includes('<'))) {
             _self.data.hasNA = true;
             d = 'NA';
           }
@@ -172,6 +173,7 @@
           } else {
             number = parseFloat(d);
           }
+          dataMetaKeys[number] = true;
           return number;
         });
 
@@ -202,7 +204,7 @@
             // noGrouping is true when number of different values less than or equal to 5. 
             // In this case, the chart sets data value as ticks' value directly. 
             this.data.noGrouping = false;
-            if (_.unique(this.data.meta).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
+            if (Object.keys(dataMetaKeys).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
               this.data.noGrouping = true;
               this.data.uniqueSortedData = _.unique(findExtremeResult[3]);// use sorted value as ticks directly
             }
