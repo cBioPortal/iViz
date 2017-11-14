@@ -6,18 +6,15 @@
   }
   vcSession.utils = (function() {
     var virtualCohort_ = {
-      studyName: '',
+      name: '',
       description: '',
-      userID: 'DEFAULT',
-      created: '',
       filters: '',
-      selectedCases: ''
+      studies: ''
     };
 
-    var selectedCase_ = {
-      studyID: '',
-      samples: [],
-      patients: []
+    var studies_ = {
+      id: '',
+      samples: []
     };
 
     var generateUUID_ = function() {
@@ -49,12 +46,11 @@
       var def = new $.Deferred();
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
       _virtualCohort.filters = filters;
-      _virtualCohort.selectedCases = cases;
-      _virtualCohort.created = new Date().getTime();
+      _virtualCohort.studies = cases;
       if (name) {
-        _virtualCohort.studyName = name;
+        _virtualCohort.name = name;
       } else {
-        _virtualCohort.studyName = "Custom Cohort (" + new Date().toISOString().replace(/T/, ' ') + ")";
+        _virtualCohort.name = "Custom Cohort (" + new Date().toISOString().replace(/T/, ' ') + ")";
       }
       if (description) {
         _virtualCohort.description = description;
@@ -70,18 +66,18 @@
     var buildCaseListObject_ = function(selectedCases, cancerStudyID,
                                         sampleID) {
       var _selectedCases = selectedCases;
-      var _selectedCase = $.extend(true, {}, selectedCase_);
-      _selectedCase.studyID = cancerStudyID;
-      _selectedCase.samples.push(sampleID);
-      _selectedCases.push(_selectedCase);
+      var _studies = $.extend(true, {}, studies_);
+      _studies.id = cancerStudyID;
+      _studies.samples.push(sampleID);
+      _selectedCases.push(_studies);
       return _selectedCases;
     };
 
     var generateCohortDescription_ = function(_cases) {
       var def = new $.Deferred(), _desp = "";
-      $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(_cases, "studyID"))).done(function(_studyIdNameMap) {
+      $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(_cases, "id"))).done(function(_studyIdNameMap) {
         _.each(_cases, function (_i) {
-          _desp += _studyIdNameMap[_i.studyID] + ": " + _i.samples.length + " samples / " + _i.patients.length + " patients\n";
+          _desp += _studyIdNameMap[_i.id] + ": " + _i.samples.length + " samples\n";
         });
         def.resolve(_desp);
       });

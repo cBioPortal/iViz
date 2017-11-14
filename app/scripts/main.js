@@ -651,27 +651,23 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
       if (_self.cohorts_.length === 1) { // to query single study
         if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(_self.cohorts_[0], _self.stat().selectedCases);
+          QueryByGeneUtil.toMainPage(_self.cohorts_[0], _self.stat().studies);
         } else {
           QueryByGeneTextArea.validateGenes(this.decideSubmitSingleCohort, false);
         }
-      } else { // to query multiple studies, always generate a tmp VC and save to session service only. 
-        $.when(vcSession.utils.buildVCObject(_self.stat().filters, _self.stat().selectedCases, "Selected patients / samples", "")).done(function (_vc) {
-          vcSession.model.saveSessionWithoutWritingLocalStorage(_vc, function (_vcId) {
-            if (QueryByGeneTextArea.isEmpty()) {
-              QueryByGeneUtil.toMainPage(_vcId, _self.stat().selectedCases);
-            } else {
-              QueryByGeneUtil.toMultiStudiesQueryPage(_vcId, _self.stat().selectedCases, QueryByGeneTextArea.getGenes());
-            }
-          });
-        });
+      } else { // query multiple studies
+        if (QueryByGeneTextArea.isEmpty()) {
+          QueryByGeneUtil.toMainPage(undefined, _self.stat().studies);
+        } else {
+          QueryByGeneUtil.toMultiStudiesQueryPage(undefined, _self.stat().studies, QueryByGeneTextArea.getGenes());
+        }
       }
     },
     decideSubmitSingleCohort: function(allValid) {
       // if all genes are valid, submit, otherwise show a notification
       if (allValid) {
         var _self = this;
-        QueryByGeneUtil.toQueryPageSingleCohort(window.cohortIdsList[0], iViz.stat().selectedCases,
+        QueryByGeneUtil.toQueryPageSingleCohort(window.cohortIdsList[0], iViz.stat().studies,
           QueryByGeneTextArea.getGenes(), window.mutationProfileId,
           window.cnaProfileId);
       } else {
@@ -687,7 +683,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var self = this;
 
       // extract and reformat selected cases
-      var _selectedCases = [];
+      var _studies = [];
       var _selectedStudyCasesMap = {};
       var _sampleData = data_.groups.sample.data;
 
@@ -695,18 +691,15 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         var _caseDataObj = _sampleData[sampleUID];
         if (!_selectedStudyCasesMap[_caseDataObj.study_id]) {
           _selectedStudyCasesMap[_caseDataObj.study_id] = {};
-          _selectedStudyCasesMap[_caseDataObj.study_id].studyID = _caseDataObj.study_id;
+          _selectedStudyCasesMap[_caseDataObj.study_id].id = _caseDataObj.study_id;
           _selectedStudyCasesMap[_caseDataObj.study_id].samples = [];
-          _selectedStudyCasesMap[_caseDataObj.study_id].patients = [];
         }
         _selectedStudyCasesMap[_caseDataObj.study_id].samples.push(_caseDataObj.sample_id);
-        var temp = self.getPatientUIDs(sampleUID);
-        _selectedStudyCasesMap[_caseDataObj.study_id].patients.push(data_.groups.patient.data[temp[0]].patient_id);
       });
       $.each(_selectedStudyCasesMap, function(key, val) {
-        _selectedCases.push(val);
+        _studies.push(val);
       });
-      _result.filterspatients = [];
+      _result.filters.patients = [];
       _result.filters.samples = [];
       _.each(vm_.groups, function(group) {
         var filters_ = [];
@@ -733,7 +726,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _result.filters.samples = array;
         }
       });
-      _result.selectedCases = _selectedCases;
+      _result.studies = _studies;
       return _result;
     },
 
@@ -750,10 +743,10 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     applyVC: function(_vc) {
       var _selectedSamples = [];
       var _selectedPatients = [];
-      _.each(_.pluck(_vc.selectedCases, 'samples'), function(_arr) {
+      _.each(_.pluck(_vc.studies, 'samples'), function(_arr) {
         _selectedSamples = _selectedSamples.concat(_arr);
       });
-      _.each(_.pluck(_vc.selectedCases, 'patients'), function(_arr) {
+      _.each(_.pluck(_vc.studies, 'patients'), function(_arr) {
         _selectedPatients = _selectedPatients.concat(_arr);
       });
       iViz.init(data_, _selectedSamples, _selectedPatients);

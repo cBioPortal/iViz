@@ -11,14 +11,6 @@
     '<div class="share-cohort-btn">' +
     '<i class="fa fa-share-alt" alt="Share Virtual Study"></i></div></div>',
     props: {
-      selectedPatientsNum: {
-        type: Number,
-        default: 0
-      },
-      selectedSamplesNum: {
-        type: Number,
-        default: 0
-      },
       stats: {
         type: Object
       },
@@ -112,10 +104,10 @@
                 self_.$nextTick(function() {
                   var saveCohort = false;
 
-                  if (_.isObject(self_.stats.selectedCases)) {
+                  if (_.isObject(self_.stats.studies)) {
                     var selectedCasesMap = {};
-                    _.each(self_.stats.selectedCases, function(study){
-                      selectedCasesMap[study.studyID] = study;
+                    _.each(self_.stats.studies, function(study){
+                      selectedCasesMap[study.id] = study;
                     });
 
                     // When a user clicks copy, it will trigger saving the current virtual cohort and return the url 
@@ -126,8 +118,8 @@
                       saveCohort = true;
                     } else {
                       _.every(selectedCasesMap, function(selectedCase){
-                        if(previousSelectedCases[selectedCase.studyID]){
-                          var previousCase = previousSelectedCases[selectedCase.studyID];
+                        if(previousSelectedCases[selectedCase.id]){
+                          var previousCase = previousSelectedCases[selectedCase.id];
                           if (previousCase.patients.length !== selectedCase.patients.length ||
                             previousCase.samples.length !== selectedCase.samples.length) {
                             saveCohort = true;
@@ -152,20 +144,11 @@
                     }
 
                     if (saveCohort) {
-                      var _selectedSamplesNum = 0;
-                      var _selectedPatientsNum = 0;
-                      _.each(self_.stats.selectedCases, function (studyCasesMap) {
-                        _selectedSamplesNum += studyCasesMap.samples.length;
-                        _selectedPatientsNum += studyCasesMap.patients.length;
-                      });
-                      self_.selectedSamplesNum = _selectedSamplesNum;
-                      self_.selectedPatientsNum = _selectedPatientsNum;
-
                       vcSession.events.saveCohort(self_.stats,
                         cohortName, cohortDescription || '')
                         .done(function (response) {
                           var deepCopySelectedCases = JSON.parse(
-                            JSON.stringify(self_.stats.selectedCases));
+                            JSON.stringify(self_.stats.studies));
                           self_.savedVC = response;
                           tooltip.find('.cohort-link').html(
                             '<a class="virtual-study-link" href="' + window.cbioURL +
@@ -175,7 +158,7 @@
                           tooltip.find('.saving').css('display', 'none');
                           tooltip.find('.cohort-link').css('display', 'block');
                           _.each(deepCopySelectedCases, function(study){
-                            previousSelectedCases[study.studyID] = study;
+                            previousSelectedCases[study.id] = study;
                           });
                         })
                         .fail(function () {
