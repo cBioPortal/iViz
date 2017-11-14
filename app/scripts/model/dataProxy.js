@@ -827,6 +827,7 @@ window.DataManagerForIviz = (function($, _) {
                 _profile.push({
                   id: profile.molecularProfileId,
                   study_id: profile.studyId,
+                  datatype: profile.datatype,
                   genetic_alteration_type: profile.molecularAlterationType
                 });
                 profiles[profile.studyId] = _profile;
@@ -898,10 +899,10 @@ window.DataManagerForIviz = (function($, _) {
                   description: attribute.description,
                   display_name: attribute.displayName,
                   is_patient_attribute: attribute.patientAttribute ? "1" : "0",
-                  prority: attribute.priority
+                  priority: attribute.priority
                 });
                 attributes[attribute.studyId] = _attribute;
-              });c
+              });
               var selectedAttributes = _.pick(attributes, self.getCancerStudyIds());
               var clinical_attributes_set = {};
               _.each(selectedAttributes, function(studyAttributes, studyId) {
