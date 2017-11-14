@@ -494,7 +494,7 @@
       var groups = dcDimension.group().top(Infinity);
       var groupTypeId =
         data_.groupType === 'patient' ? 'patient_uid' : 'sample_uid';
-      var selectedCases = _.pluck(dcDimension.top(Infinity), groupTypeId);
+      var selectedCases = _.pluck(dcDimension.top(Infinity), groupTypeId).sort();
       var categories = [];
       var colorCounter = 0;
 
@@ -515,7 +515,7 @@
             key: group.key,
             name: mapTickToCaseIds[group.key].range || mapTickToCaseIds[group.key].tick,
             color: color,
-            caseIds: _.intersection(selectedCases, mapTickToCaseIds[group.key].caseIds)
+            caseIds: iViz.util.intersection(selectedCases, mapTickToCaseIds[group.key].caseIds.sort())
           });
         }
       });
