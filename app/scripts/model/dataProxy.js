@@ -97,22 +97,23 @@ window.DataManagerForIviz = (function($, _) {
               var _cnaCaseUIDs = [];
               var _sequencedCaseUIDs = [];
               var _allCaseUIDs = [];
+              var _allStudyIds = self.getCancerStudyIds();
 
               iViz.priorityManager.setDefaultClinicalAttrPriorities(_configs.priority);
 
-              $.each(_caseLists, function(studyId, caseList) {
+              _.each(_caseLists, function(caseList, studyId) {
                 if (caseList.cnaSampleIds.length > 0) {
-                  $.each(caseList.cnaSampleIds, function(index, sampleId) {
+                  _.each(caseList.cnaSampleIds, function(sampleId, index) {
                     _cnaCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
                   });
                 }
                 if (caseList.sequencedSampleIds.length > 0) {
-                  $.each(caseList.sequencedSampleIds, function(index, sampleId) {
+                  _.each(caseList.sequencedSampleIds, function(sampleId, index) {
                     _sequencedCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
                   });
                 }
                 if (caseList.allSampleIds.length > 0) {
-                  $.each(caseList.allSampleIds, function(index, sampleId) {
+                  _.each(caseList.allSampleIds, function(sampleId, index) {
                     _allCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
                   });
                 }
@@ -192,6 +193,7 @@ window.DataManagerForIviz = (function($, _) {
                 _metaObj.show = _metaObj.priority !== 0;
                 _metaObj.attrList = [_metaObj.attr_id];
                 _metaObj.datatype = content.util.normalizeDataType(_metaObj.datatype);
+                _metaObj.study_ids = _allStudyIds;
                 if (_metaObj.datatype === 'NUMBER') {
                   _metaObj.view_type = 'bar_chart';
                   _metaObj.layout = [-1, 2, 'h'];
@@ -246,6 +248,7 @@ window.DataManagerForIviz = (function($, _) {
                 _metaObj.show = _metaObj.priority !== 0;
                 _metaObj.attrList = [_metaObj.attr_id];
                 _metaObj.datatype = content.util.normalizeDataType(_metaObj.datatype);
+                _metaObj.study_ids = _allStudyIds;
                 if (_metaObj.datatype === 'NUMBER') {
                   _metaObj.view_type = 'bar_chart';
                   _metaObj.layout = [-1, 2, 'h'];
@@ -273,6 +276,8 @@ window.DataManagerForIviz = (function($, _) {
 
               var _samplesToPatientMap = {};
               var _patientToSampleMap = {};
+              var _hasMutationData = self.hasMutationData();
+              var _hasCnaSegmentData = self.hasCnaSegmentData();
 
               _hasSampleAttrData.sample_uid = '';
               _hasSampleAttrData.sample_id = '';
@@ -310,13 +315,13 @@ window.DataManagerForIviz = (function($, _) {
                   _sampleDatum.has_cna_data = 'NO';
                   _sampleDatum.sequenced = 'NO';
 
-                  if (self.hasMutationData()) {
+                  if (_hasMutationData) {
                     if (_sequencedCaseUIdsMap[_sampleUID] !== undefined) {
                       _sampleDatum.sequenced = 'YES';
                     }
                     _sampleDatum.mutated_genes = [];
                   }
-                  if (self.hasCnaSegmentData()) {
+                  if (_hasCnaSegmentData) {
                     if (_cnaCaseUIdsMap[_sampleUID] !== undefined) {
                       _sampleDatum.has_cna_data = 'YES';
                     }
@@ -359,6 +364,7 @@ window.DataManagerForIviz = (function($, _) {
                   allCases: _allCaseUIDs,
                   sequencedCases: _cnaCaseUIDs
                 };
+                _cnaAttrMeta.study_ids = _allStudyIds;
                 _sampleAttributes[_cnaAttrMeta.attr_id] = _cnaAttrMeta;
               }
 
@@ -389,6 +395,7 @@ window.DataManagerForIviz = (function($, _) {
                   allCases: _allCaseUIDs,
                   sequencedCases: _sequencedCaseUIDs
                 };
+                _mutDataAttrMeta.study_ids = _allStudyIds;
                 _sampleAttributes[_mutDataAttrMeta.attr_id] = _mutDataAttrMeta;
               }
 
@@ -409,6 +416,7 @@ window.DataManagerForIviz = (function($, _) {
                     .getDefaultPriority('DFS_SURVIVAL', true);
                 _dfsSurvivalAttrMeta.show = _dfsSurvivalAttrMeta.priority !== 0;
                 _dfsSurvivalAttrMeta.attrList = ['DFS_STATUS', 'DFS_MONTHS'];
+                _dfsSurvivalAttrMeta.study_ids = _allStudyIds;
                 _patientAttributes[_dfsSurvivalAttrMeta.attr_id] = _dfsSurvivalAttrMeta;
               }
 
@@ -429,11 +437,12 @@ window.DataManagerForIviz = (function($, _) {
                     .getDefaultPriority('OS_SURVIVAL', true);
                 _osSurvivalAttrMeta.show = _osSurvivalAttrMeta.priority !== 0;
                 _osSurvivalAttrMeta.attrList = ['OS_STATUS', 'OS_MONTHS'];
+                _osSurvivalAttrMeta.study_ids = _allStudyIds;
                 _patientAttributes[_osSurvivalAttrMeta.attr_id] = _osSurvivalAttrMeta;
               }
 
               // add Cancer Study
-              if (self.getCancerStudyIds().length > 1) {
+              if (_allStudyIds.length > 1) {
                 var _id = 'study_id';
                 _patientAttributes.study_id = {
                   datatype: 'STRING',
@@ -448,7 +457,8 @@ window.DataManagerForIviz = (function($, _) {
                   priority: iViz.priorityManager.getDefaultPriority(_id),
                   show: true,
                   addChartBy: 'default',
-                  attrList: [_id]
+                  attrList: [_id],
+                  study_ids: _allStudyIds
                 };
                 _patientAttributes.study_id.show = _patientAttributes.study_id.priority !== 0;
               }
@@ -469,11 +479,22 @@ window.DataManagerForIviz = (function($, _) {
                   keys: [],
                   numOfDatum: 0,
                   show: true,
-                  addChartBy: 'default'
+                  addChartBy: 'default',
+                  study_ids: _allStudyIds
                 };
                 _sampleAttributes.copy_number_alterations.show = _sampleAttributes.copy_number_alterations.priority !== 0;
               }
 
+              // Pre-calculate whether clinical attribute is preselected
+              _.each(_patientAttributes, function(attr) {
+                attr.isPreselectedByRegex = self.isPreSelectedClinicalAttr(attr.attr_id);
+              });
+
+              // Pre-calculate whether clinical attribute is preselected
+              _.each(_sampleAttributes, function(attr) {
+                attr.isPreselectedByRegex = self.isPreSelectedClinicalAttr(attr.attr_id);
+              });
+              
               _result.groups = {
                 group_mapping: {
                   patient_to_sample: _patientToSampleMap,
@@ -481,14 +502,10 @@ window.DataManagerForIviz = (function($, _) {
                   studyMap: _studyToSampleToPatientMap
                 },
                 patient: {
-                  attr_meta: self
-                    .sortByClinicalPriority(_.values(_patientAttributes)),
                   data: _patientData,
                   has_attr_data: _hasPatientAttrData
                 },
                 sample: {
-                  attr_meta: self
-                    .sortByClinicalPriority(_.values(_sampleAttributes)),
                   data: _sampleData,
                   has_attr_data: _hasSampleAttrData
                 }
@@ -518,6 +535,7 @@ window.DataManagerForIviz = (function($, _) {
               // (Centralized place storing all data for sharing across directives)
               // This needs to be updated after merging into virtual study branch
               _mutCntAttrMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap;
+              _mutCntAttrMeta.study_ids = _allStudyIds;
               _sampleAttributes[_mutCntAttrMeta.attr_id] = _mutCntAttrMeta;
 
               // add mutation count
@@ -540,12 +558,20 @@ window.DataManagerForIviz = (function($, _) {
               _MutationCountMeta.attrList = [_MutationCountMeta.attr_id];
               // This attribute is used for getMutationCountData()
               _MutationCountMeta.sequencedCaseUIdsMap = _sequencedCaseUIdsMap;
+              _MutationCountMeta.study_ids = _allStudyIds;
               _sampleAttributes[_MutationCountMeta.attr_id] = _MutationCountMeta;
 
-              _result.groups.patient.attr_meta =
-                self.sortByClinicalPriority(_.values(_patientAttributes));
-              _result.groups.sample.attr_meta =
-                self.sortByClinicalPriority(_.values(_sampleAttributes));
+              if (_allStudyIds.length > 1) {
+                _result.groups.patient.attr_meta =
+                  self.sortByNumOfStudies(_.values(_patientAttributes));
+                _result.groups.sample.attr_meta =
+                  self.sortByNumOfStudies(_.values(_sampleAttributes));
+              } else {
+                _result.groups.patient.attr_meta =
+                  self.sortByClinicalPriority(_.values(_patientAttributes));
+                _result.groups.sample.attr_meta =
+                  self.sortByClinicalPriority(_.values(_sampleAttributes));
+              }
 
               self.initialSetupResult = _result;
               _def.resolve(_result);
@@ -728,10 +754,10 @@ window.DataManagerForIviz = (function($, _) {
       studyCasesMap: _study_cases_map,
       initialSetup: initialSetup,
       hasMutationData: function() {
-        return _.keys(this.mutationProfileIdsMap).length > 0;
+        return Object.keys(this.mutationProfileIdsMap).length > 0;
       },
       hasCnaSegmentData: function() {
-        return _.keys(this.cnaProfileIdsMap).length > 0;
+        return Object.keys(this.cnaProfileIdsMap).length > 0;
       },
       getCancerStudyIds: function() {
         if (this.cancerStudyIds.length === 0) {
@@ -1397,7 +1423,8 @@ window.DataManagerForIviz = (function($, _) {
        * @return {boolean} Whether input attribute passed the criteria.
        */
       isPreSelectedClinicalAttr: function(attr) {
-        return attr.toLowerCase().match(/(os_survival)|(dfs_survival)|(mut_cnt_vs_cna)|(mutated_genes)|(cna_details)|(^age)|(gender)|(sex)|(os_status)|(os_months)|(dfs_status)|(dfs_months)|(race)|(ethnicity)|(sample_type)|(.*site.*)|(.*grade.*)|(.*stage.*)|(histology)|(tumor_type)|(subtype)|(tumor_site)|(mutation_count)|(copy_number_alterations)/);
+        var result = attr.match(/(os_survival)|(dfs_survival)|(mut_cnt_vs_cna)|(mutated_genes)|(cna_details)|(^age)|(gender)|(sex)|(os_status)|(os_months)|(dfs_status)|(dfs_months)|(race)|(ethnicity)|(sample_type)|(histology)|(tumor_type)|(subtype)|(tumor_site)|(mutation_count)|(copy_number_alterations)|(.*(site|grade|stage).*)/i);
+        return _.isArray(result) && result.length > 0;
       },
 
       /**
@@ -1461,13 +1488,13 @@ window.DataManagerForIviz = (function($, _) {
         var priority = 0;
         var self = this;
 
-        if (self.isPreSelectedClinicalAttr(a.attr_id)) {
-          if (self.isPreSelectedClinicalAttr(b.attr_id)) {
+        if (a.isPreselectedByRegex) {
+          if (b.isPreselectedByRegex) {
             priority = self.compareClinicalAvailability(a, b);
           } else {
             priority = -1;
           }
-        } else if (self.isPreSelectedClinicalAttr(b.attr_id)) {
+        } else if (b.isPreselectedByRegex) {
           priority = 1;
         } else {
           priority = 0;
@@ -1498,6 +1525,24 @@ window.DataManagerForIviz = (function($, _) {
         }
         return array;
       },
+
+      sortByNumOfStudies: function(array) {
+        var self = this;
+        if (_.isArray(array)) {
+          array = array.sort(function(a, b) {
+            var score = b.study_ids.length - a.study_ids.length;
+            if (score === 0) {
+              score = iViz.priorityManager.comparePriorities(a.priority, b.priority, false);
+              if (score === 0) {
+                score = self.compareClinicalAttrs(a, b);
+              }
+            }
+            return score;
+          });
+        }
+        return array;
+      },
+    
       getCancerStudyDisplayName: function(_cancerStudyStableIds) {
         var _def = new $.Deferred();
         var _asyncAjaxCalls = [];
