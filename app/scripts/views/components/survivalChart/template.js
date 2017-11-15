@@ -161,12 +161,20 @@
               var data_ = iViz.getGroupNdx(_groupId);
               var nonNaCases = [];
 
+              //Check whether case contains NA value on filtered attrs
+              var _attrs = {};
+              _.each(group.attrs, function(groupAttr) {
+                _.each(groupAttr.attrList, function(listItem) {
+                  _attrs[listItem] = 1;
+                })
+              });
+              _attrs = Object.keys(_attrs);
+
               _.each(data_, function(data) {
                 var hasNaWithinAttrs = false;
-
-                //Check whether case contains NA value on filtered attrs
-                _.some(_.flatten(_.pluck(group.attrs, 'attrList')), function(attr) {
-                  if (iViz.util.strIsNa(data[attr], false)) {
+                _.some(_attrs, function(attr) {
+                  // All data has been normalized to NA for different NA values
+                  if (data[attr] === 'NA') {
                     hasNaWithinAttrs = true;
                     return true;
                   }

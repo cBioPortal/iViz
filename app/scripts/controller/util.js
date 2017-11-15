@@ -845,6 +845,10 @@ var util = (function(_, cbio) {
       }
       return message;
     };
+    
+    content.getHypotenuse = function(a, b) {
+      return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+    };
 
     return content;
   })();
