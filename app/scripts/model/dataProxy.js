@@ -74,7 +74,7 @@ window.DataManagerForIviz = (function($, _) {
       var _def = new $.Deferred();
       var self = this;
       $.when(self.getSampleLists()).done(function() {
-        $.when(self.getStudyToSampleToPatientdMap(), self.getConfigs()).done(function(_studyToSampleToPatientMap, _configs) {
+        $.when(self.getStudyToSampleToPatientMap(), self.getConfigs()).done(function(_studyToSampleToPatientMap, _configs) {
           $.when(self.getGeneticProfiles(), self.getCaseLists(),
             self.getClinicalAttributesByStudy())
             .done(function(_geneticProfiles, _caseLists,
@@ -950,7 +950,7 @@ window.DataManagerForIviz = (function($, _) {
               fetch_promise.reject(error);
             });
         }),
-      getStudyToSampleToPatientdMap: window.cbio.util.makeCachedPromiseFunction(
+      getStudyToSampleToPatientMap: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           var study_to_sample_to_patient = {};
           var _sample_uid = 0;
@@ -1042,7 +1042,10 @@ window.DataManagerForIviz = (function($, _) {
 
           var _sampleLists = [];
           _.each(self.getCancerStudyIds(), function(studyId) {
-            _sampleLists.push(studyId + '_all');
+            self.data.sampleLists[studyId] = self.data.sampleLists[studyId] || {};
+            if (!_.isArray(self.studyCasesMap[studyId].samples)) {
+              _sampleLists.push(studyId + '_all');
+            }
           });
 
           self.getSampleListsData(_sampleLists)
