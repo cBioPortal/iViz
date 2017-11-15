@@ -126,7 +126,7 @@
     var _dataLength = _data.length;
 
     // Only do the data optimization on more than 5000 data points.
-    if (_dataLength > 5000) {
+    if (_dataLength > 2000) {
       var _dataTime = _.pluck(_data, 'time');
       var _dataSurvivalRate = _.pluck(_data, 'survival_rate');
 
