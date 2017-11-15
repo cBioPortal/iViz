@@ -102,21 +102,15 @@ window.DataManagerForIviz = (function($, _) {
               iViz.priorityManager.setDefaultClinicalAttrPriorities(_configs.priority);
 
               _.each(_caseLists, function(caseList, studyId) {
-                if (caseList.cnaSampleIds.length > 0) {
-                  _.each(caseList.cnaSampleIds, function(sampleId, index) {
-                    _cnaCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
-                  });
-                }
-                if (caseList.sequencedSampleIds.length > 0) {
-                  _.each(caseList.sequencedSampleIds, function(sampleId, index) {
-                    _sequencedCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
-                  });
-                }
-                if (caseList.allSampleIds.length > 0) {
-                  _.each(caseList.allSampleIds, function(sampleId, index) {
-                    _allCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
-                  });
-                }
+                _.each(caseList.cnaSampleIds, function(sampleId) {
+                  _cnaCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
+                });
+                _.each(caseList.sequencedSampleIds, function(sampleId) {
+                  _sequencedCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
+                });
+                _.each(caseList.allSampleIds, function(sampleId) {
+                  _allCaseUIDs.push(_studyToSampleToPatientMap[studyId].sample_to_uid[sampleId]);
+                });
               });
               _cnaCaseUIDs = _cnaCaseUIDs.length > 0 ? _cnaCaseUIDs : _allCaseUIDs;
               _sequencedCaseUIDs = _sequencedCaseUIDs.length > 0 ? _sequencedCaseUIDs : _allCaseUIDs;
