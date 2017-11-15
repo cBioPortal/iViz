@@ -108,10 +108,10 @@
     var _self = this;
     
     // Filter points with negative value 		
-    var _data = _.filter(data, function(point){
+    var _data = _.sortBy(_.filter(data, function(point) {
       return point.time >= 0 && point.survival_rate >= 0;
-    });
-    
+    }), 'time');
+
     // add an empty/zero point so the curve starts from zero time point
     if (_data !== null && _data.length !== 0) {
       if (_data[0].time !== 0) {
@@ -121,6 +121,43 @@
           time: 0
         }].concat(_data);
       }
+    }
+    
+    var _dataLength = _data.length;
+
+    // Only do the data optimization on more than 5000 data points.
+    if (_dataLength > 5000) {
+      var _dataTime = _.pluck(_data, 'time');
+      var _dataSurvivalRate = _.pluck(_data, 'survival_rate');
+
+      var _dataTimeMax = d3.max(_dataTime);
+      var _dataTimeMin = d3.min(_dataTime);
+
+      var _dataSurvivalRateMax = d3.max(_dataSurvivalRate);
+      var _dataSurvivalRateeMin = d3.min(_dataSurvivalRate);
+
+      var timeThreshold = (_dataTimeMax - _dataTimeMin) / 200;
+      var survivalRateThreshold = (_dataSurvivalRateMax - _dataSurvivalRateeMin) / 200;
+      var averageThreshold = iViz.util.getHypotenuse(timeThreshold, survivalRateThreshold);
+      var lastDataPoint = {
+        x: 0,
+        y: 0
+      };
+      _data = _.filter(_data, function(dataItem, index) {
+        if (index == 0) {
+          lastDataPoint.x = dataItem.time;
+          lastDataPoint.y = dataItem.survival_rate;
+          return true;
+        }
+        var dataItemVal = iViz.util.getHypotenuse(dataItem.time - lastDataPoint.x, dataItem.survival_rate - lastDataPoint.y);
+        if (dataItemVal > averageThreshold) {
+          lastDataPoint.x = dataItem.time;
+          lastDataPoint.y = dataItem.survival_rate;
+          return true;
+        } else {
+          return false;
+        }
+      });
     }
 
     if (!_self.elem_.curves.hasOwnProperty(_curveIndex)) {

@@ -8,15 +8,6 @@
  */
 (function(iViz, kmEstimator, _) {
   iViz.data.SurvivalChartProxy = function(_data, _attrId) {
-    var datum_ = {
-      study_id: '',
-      patient_id: '',
-      patient_uid: '',
-      time: '', // num of months
-      status: '',
-      num_at_risk: -1,
-      survival_rate: 0
-    };
     var datumArr_ = [];
 
     // convert raw data
@@ -34,7 +25,15 @@
       if (!isNaN(_time) &&
         _status !== 'NaN' && _status !== 'NA' &&
         typeof _status !== 'undefined' && typeof _time !== 'undefined') {
-        var _datum = jQuery.extend(true, {}, datum_);
+        var _datum = {
+          study_id: '',
+          patient_id: '',
+          patient_uid: '',
+          time: '', // num of months
+          status: '',
+          num_at_risk: -1,
+          survival_rate: 0
+        };
         _datum.patient_uid = _dataObj.patient_uid;
         _datum.patient_id = iViz.getCaseIdUsingUID('patient', _dataObj.patient_uid);
         _datum.study_id = _dataObj.study_id;
