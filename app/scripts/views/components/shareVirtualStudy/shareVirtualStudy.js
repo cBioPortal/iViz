@@ -102,21 +102,14 @@
                 self_.updateStats = true;
 
                 self_.$nextTick(function() {
-                  var saveCohort = false;
-
                   if (_.isObject(self_.stats.studies)) {
                     // When a user clicks copy, it will trigger saving the current virtual cohort and return the url 
                     // to the user. When a user want to see the cohort url, he/she needs to click Share button. 
                     // We always show the url to user but we don't need to same virtual cohort every time 
                     // if it is same with the previous saved cohort.
-
                     var currentSelectedCases = JSON.stringify(self_.stats.studies) + JSON.stringify(self_.stats);
 
                     if (currentSelectedCases !== previousSelectedCases) {
-                      saveCohort = true;
-                    }
-
-                    if (saveCohort) {
                       vcSession.events.saveCohort(self_.stats,
                         cohortName, cohortDescription || '')
                         .done(function (response) {
