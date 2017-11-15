@@ -105,50 +105,21 @@
                   var saveCohort = false;
 
                   if (_.isObject(self_.stats.studies)) {
-                    var selectedCasesMap = {};
-                    _.each(self_.stats.studies, function(study){
-                      selectedCasesMap[study.id] = study;
-                    });
-
                     // When a user clicks copy, it will trigger saving the current virtual cohort and return the url 
                     // to the user. When a user want to see the cohort url, he/she needs to click Share button. 
                     // We always show the url to user but we don't need to same virtual cohort every time 
                     // if it is same with the previous saved cohort.
-                    if (_.isEmpty(previousSelectedCases)) {
+
+                    var currentSelectedCases = JSON.stringify(self_.stats.studies) + JSON.stringify(self_.stats);
+
+                    if (currentSelectedCases !== previousSelectedCases) {
                       saveCohort = true;
-                    } else {
-                      _.every(selectedCasesMap, function(selectedCase){
-                        if(previousSelectedCases[selectedCase.id]){
-                          var previousCase = previousSelectedCases[selectedCase.id];
-                          if (previousCase.patients.length !== selectedCase.patients.length ||
-                            previousCase.samples.length !== selectedCase.samples.length) {
-                            saveCohort = true;
-                          } else if (previousCase.patients.length ===
-                            selectedCase.patients.length) {
-                            var differentPatients = _.difference(previousCase.patients,
-                              selectedCase.patients);
-                            if (differentPatients.length > 0) {
-                              saveCohort = true;
-                            }
-                          } else if (previousCase.samples.length ===
-                            selectedCase.samples.length) {
-                            var differentSamples = _.difference(previousCase.samples,
-                              selectedCase.samples);
-                            if (differentSamples.length > 0) {
-                              saveCohort = true;
-                            }
-                          }
-                        }
-                        return !saveCohort;
-                      });
                     }
 
                     if (saveCohort) {
                       vcSession.events.saveCohort(self_.stats,
                         cohortName, cohortDescription || '')
                         .done(function (response) {
-                          var deepCopySelectedCases = JSON.parse(
-                            JSON.stringify(self_.stats.studies));
                           self_.savedVC = response;
                           tooltip.find('.cohort-link').html(
                             '<a class="virtual-study-link" href="' + window.cbioURL +
@@ -157,9 +128,7 @@
                             window.cbioURL + 'study?id=' + self_.savedVC.id + '</a>');
                           tooltip.find('.saving').css('display', 'none');
                           tooltip.find('.cohort-link').css('display', 'block');
-                          _.each(deepCopySelectedCases, function(study){
-                            previousSelectedCases[study.id] = study;
-                          });
+                          previousSelectedCases = currentSelectedCases;
                         })
                         .fail(function () {
                           tooltip.find('.failedMessage').html(
