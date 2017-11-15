@@ -494,7 +494,7 @@ window.DataManagerForIviz = (function($, _) {
               _.each(_sampleAttributes, function(attr) {
                 attr.isPreselectedByRegex = self.isPreSelectedClinicalAttr(attr.attr_id);
               });
-              
+
               _result.groups = {
                 group_mapping: {
                   patient_to_sample: _patientToSampleMap,
@@ -651,7 +651,7 @@ window.DataManagerForIviz = (function($, _) {
               "identifiers": identifiers
             }),
             dataType: 'json',
-            contentType:"application/json; charset=utf-8",
+            contentType: "application/json; charset=utf-8",
           }).then(function(data) {
             _.each(data, function(item) {
               var uniqueId = item.uniquePatientKey + item.clinicalAttributeId;
@@ -703,7 +703,7 @@ window.DataManagerForIviz = (function($, _) {
               });
             }
           });
-          
+
           var identifiers = [];
 
           _.each(studyCasesMap, function(content, studyId) {
@@ -721,7 +721,7 @@ window.DataManagerForIviz = (function($, _) {
             data: JSON.stringify({
               "attributeIds": attr_ids,
               "identifiers": identifiers
-            }),            dataType: 'json',
+            }), dataType: 'json',
             contentType: "application/json; charset=utf-8",
           }).then(function(data) {
             _.each(data, function(item) {
@@ -877,40 +877,43 @@ window.DataManagerForIviz = (function($, _) {
       getCaseLists: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           var _responseStudyCaseList = {};
-          var requests = self.getCancerStudyIds().map(
-            function(cancer_study_id) {
-              var def = new $.Deferred();
-              var studyCaseList = {
-                sequencedSampleIds: [],
-                cnaSampleIds: [],
-                allSampleIds: []
-              };
-              self.getSampleListsData(['all', 'sequenced', 'cna'], cancer_study_id)
-                .always(function() {
-                  // Always check for all lists, the API call may fail partially
-                  if (_.isArray(self.data.sampleLists.sequenced[cancer_study_id])) {
-                    studyCaseList.sequencedSampleIds = self.data.sampleLists.sequenced[cancer_study_id];
-                  }
-                  if (_.isArray(self.data.sampleLists.cna[cancer_study_id])) {
-                    studyCaseList.cnaSampleIds = self.data.sampleLists.cna[cancer_study_id];
-                  }
-                  if (_.isArray(self.data.sampleLists.all[cancer_study_id])) {
-                    studyCaseList.allSampleIds = self.data.sampleLists.all[cancer_study_id];
-                  }
-                  _responseStudyCaseList[cancer_study_id] = studyCaseList;
-                  if (_.isUndefined(studyCaseList.allSampleIds)) {
-                    def.reject('Failed to load sample list from study.');
-                  } else {
-                    def.resolve(_responseStudyCaseList);
-                  }
-                });
-              return def.promise();
-            });
-          $.when.apply($, requests).then(function() {
-            fetch_promise.resolve(_responseStudyCaseList);
-          }).fail(function(error) {
-            fetch_promise.reject(error);
+          var _sampleLists = [];
+
+          _.each(self.getCancerStudyIds(), function(studyId) {
+            _.each(['all', 'sequenced', 'cna'], function(type) {
+              _sampleLists.push(studyId + '_' + type);
+            })
           });
+
+          self.getSampleListsData(_sampleLists)
+            .done(function(data) {
+              _.each(data, function(list) {
+                self.data.sampleLists[list.studyId] = self.data.sampleLists[list.studyId] || {};
+                self.data.sampleLists[list.studyId][list.sampleListId] = list.sampleIds;
+              });
+
+              _.each(self.getCancerStudyIds(), function(studyId) {
+                _responseStudyCaseList[studyId] = {
+                  sequencedSampleIds: [],
+                  cnaSampleIds: [],
+                  allSampleIds: []
+                };
+                // Always check for all lists, the API call may fail partially
+                if (_.isArray(self.data.sampleLists[studyId][studyId + '_sequenced'])) {
+                  _responseStudyCaseList[studyId].sequencedSampleIds = self.data.sampleLists[studyId][studyId + '_sequenced'];
+                }
+                if (_.isArray(self.data.sampleLists[studyId][studyId + '_cna'])) {
+                  _responseStudyCaseList[studyId].cnaSampleIds = self.data.sampleLists[studyId][studyId + '_cna'];
+                }
+                if (_.isArray(self.data.sampleLists[studyId][studyId + '_all'])) {
+                  _responseStudyCaseList[studyId].allSampleIds = self.data.sampleLists[studyId][studyId + '_all'];
+                }
+              });
+              fetch_promise.resolve(_responseStudyCaseList);
+            })
+            .fail(function(error) {
+              fetch_promise.reject(error);
+            });
         }),
       getClinicalAttributesByStudy: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
@@ -987,7 +990,7 @@ window.DataManagerForIviz = (function($, _) {
               for (var i = 0; i < data.length; i++) {
                 var _dataItem = data[i];
                 var _studyId = _dataItem.studyId;
-                
+
                 patientList[_studyId] = patientList[_studyId] || {};
                 patient_to_sample[_studyId] = patient_to_sample[_studyId] || {};
                 sample_to_patient[_studyId] = sample_to_patient[_studyId] || {};
@@ -997,7 +1000,7 @@ window.DataManagerForIviz = (function($, _) {
                 sample_to_uid[_studyId] = sample_to_uid[_studyId] || {};
                 patient_to_uid[_studyId] = patient_to_uid[_studyId] || {};
                 uid_to_patient[_studyId] = uid_to_patient[_studyId] || {};
-                
+
                 uid_to_sample[_studyId][_sample_uid] = data[i].sampleId;
                 sample_to_uid[_studyId][data[i].sampleId] = _sample_uid.toString();
                 if (patient_to_uid[_studyId][data[i].patientId] === undefined) {
@@ -1022,7 +1025,7 @@ window.DataManagerForIviz = (function($, _) {
                   self.studyCasesMap[studyId].samples.length > 0) {
                   self.studyCasesMap[studyId].patients = Object.keys(patientList[studyId]);
                 }
-                
+
                 var _resultMap = {};
 
                 _resultMap.uid_to_sample = uid_to_sample[studyId];
@@ -1043,31 +1046,23 @@ window.DataManagerForIviz = (function($, _) {
             return def.promise();
           };
 
-          var requests = self.getCancerStudyIds().map(
-            function(cancer_study_id) {
-              var def = new $.Deferred();
-              if (!self.studyCasesMap.hasOwnProperty(cancer_study_id)) {
-                self.studyCasesMap[cancer_study_id] = {};
-              }
-              if (!_.isArray(self.studyCasesMap[cancer_study_id].samples)) {
-                self.getSampleListsData(['all'], cancer_study_id)
-                  .done(function() {
-                    if (_.isArray(self.data.sampleLists.all[cancer_study_id])) {
-                      self.studyCasesMap[cancer_study_id].samples =
-                        self.data.sampleLists.all[cancer_study_id];
-                    }
-                    def.resolve();
-                  })
-                  .fail(function() {
-                    def.reject('Failed to load sample list from study.');
-                  });
-              } else {
-                def.resolve();
-              }
-              return def.promise();
-            });
-          $.when.apply($, requests)
-            .done(function() {
+          var _sampleLists = [];
+          _.each(self.getCancerStudyIds(), function(studyId) {
+            _sampleLists.push(studyId + '_all');
+          });
+
+          self.getSampleListsData(_sampleLists)
+            .done(function(data) {
+              _.each(data, function(list) {
+                self.data.sampleLists[list.studyId] = self.data.sampleLists[list.studyId] || {};
+                self.data.sampleLists[list.studyId][list.sampleListId] = list.sampleIds;
+              });
+
+              _.each(self.getCancerStudyIds(), function(studyId) {
+                if (self.data.sampleLists[studyId].hasOwnProperty(studyId + '_all')) {
+                  self.studyCasesMap[studyId].samples = self.data.sampleLists[studyId][studyId + '_all'];
+                }
+              });
               getSamplesCall()
                 .done(function(data) {
                   fetch_promise.resolve(data);
@@ -1076,50 +1071,31 @@ window.DataManagerForIviz = (function($, _) {
                   fetch_promise.reject(error);
                 });
             })
-            .fail(function(error) {
-              fetch_promise.reject(error);
+            .fail(function() {
+              fetch_promise.reject('Failed to load sample list from study.');
             });
         }),
-      getSampleListsData: function(lists, studyId) {
+      getSampleListsData: function(sampleLists) {
         var def = new $.Deferred();
         var self = this;
-        var promises = [];
-        if (_.isArray(lists)) {
-          _.each(lists, function(list) {
-            var _def = new $.Deferred();
-            if (list && studyId) {
-              if (self.data.sampleLists.lists.hasOwnProperty(studyId)
-                && _.isArray(self.data.sampleLists.lists[studyId])
-                && self.data.sampleLists.lists[studyId].indexOf(studyId + '_' + list) !== -1) {
-                if (!self.data.sampleLists.hasOwnProperty(list)) {
-                  self.data.sampleLists[list] = {};
-                }
-                if (self.data.sampleLists[list].hasOwnProperty(studyId)) {
-                  _def.resolve(self.data.sampleLists[list][studyId]);
-                } else {
-                  $.ajax({
-                    url: window.cbioURL + 'api/sample-lists/' +
-                    studyId + '_' + list + '/sample-ids',
-                    contentType: "application/json",
-                    type: 'GET'
-                  }).done(function(data) {
-                    self.data.sampleLists[list][studyId] = data;
-                    _def.resolve(data);
-                  }).fail(function() {
-                    _def.reject('Failed to load sample list data from study.');
-                  });
-                }
-                promises.push(_def.promise());
-              }
+        var data = [];
+        if (_.isArray(sampleLists)) {
+          _.each(sampleLists, function(list) {
+            if (!self.data.sampleLists.hasOwnProperty(list)) {
+              data.push(list);
             }
           });
-          $.when.apply($, promises)
-            .done(function() {
-              def.resolve();
-            })
-            .fail(function(error) {
-              def.reject(error);
-            });
+          $.ajax({
+            type: 'POST',
+            url: window.cbioURL + 'api/sample-lists/fetch?projection=DETAILED',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+          }).done(function(data) {
+            def.resolve(data);
+          }).fail(function() {
+            def.resolve();
+          });
         } else {
           def.reject();
         }
@@ -1542,7 +1518,7 @@ window.DataManagerForIviz = (function($, _) {
         }
         return array;
       },
-    
+
       getCancerStudyDisplayName: function(_cancerStudyStableIds) {
         var _def = new $.Deferred();
         var _asyncAjaxCalls = [];
@@ -1550,10 +1526,12 @@ window.DataManagerForIviz = (function($, _) {
         _.each(_cancerStudyStableIds, function(_csId) {
           _asyncAjaxCalls.push(
             $.ajax({
-              url: window.cbioURL + 'api/studies/' + _csId ,
+              url: window.cbioURL + 'api/studies/' + _csId,
               contentType: "application/json",
               type: 'GET',
-              success: function(_res) { _responses.push(_res); }
+              success: function(_res) {
+                _responses.push(_res);
+              }
             })
           );
         });
