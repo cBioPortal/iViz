@@ -14,12 +14,11 @@
     ':groupid="attributes.group_id" :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" ' +
     ' :chart-id="chartId" ' +
     ':attributes="attributes"></chart-operations>' +
-    '<div :class="{\'start-loading\': showLoad}" ' +
-    'class="dc-chart dc-scatter-plot" align="center" ' +
-    'style="float:none !important;" id={{chartId}} ></div>' +
-    '<div :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader">' +
-    '<img src="images/ajax-loader.gif" alt="loading"></div></div>',
+    '<div v-show="!showLoad" :class="{\'show-loading-content\': showLoad}"' +
+    'class="dc-chart dc-scatter-plot" align="center" id={{chartId}} ></div>' +
+    '<div v-show="showLoad" class="progress-bar-parent-div" :class="{\'show-loading-bar\': showLoad}">' +
+    '<progress-bar :div-id="loadingBar.divId" :status="loadingBar.status" :opts="loadingBar.opts"></progress-bar></div>' +
+    '</div>',
     props: [
       'ndx', 'attributes'
     ],
@@ -43,6 +42,12 @@
         showingRainbowSurvival: false,
         groups: [],
         invisibleDimension: {},
+        loadingBar :{
+          status: 0,
+          divId: iViz.util.getDefaultDomId('progressBarId', this.attributes.attr_id),
+          opts: {},
+          infinityInterval: null
+        },
         mainDivQtip: ''
       };
     },
@@ -54,6 +59,16 @@
           this.updatePlotGroups(this.hasFilters);
           this.updatePlot();
           this.$dispatch('remove-rainbow-survival');
+        }
+      },
+      showLoad: function(newVal) {
+        if (newVal) {
+          this.initialInfinityLoadingBar();
+        } else {
+          if (this.loadingBar.infinityInterval) {
+            window.clearInterval(this.loadingBar.infinityInterval);
+            this.loadingBar.infinityInterval = null;
+          }
         }
       }
     },
@@ -119,8 +134,8 @@
         this.chartInst.update(
           groups ? groups : this.groups, this.chartId, this.attributes.attr_id);
         this.checkDownloadableStatus();
-        this.showLoad = false;
         this.updateQtipContent();
+        this.showLoad = false;
       },
       updatePlotGroups: function(hasFilters) {
         var _type = this.attributes.group_type;
@@ -320,6 +335,19 @@
         });
         self_.updateQtipContent();
       },
+      initialInfinityLoadingBar: function() {
+        var self = this;
+        self.loadingBar.opts = {
+          duration: 300,
+          step: function(state, bar) {
+            bar.setText('Loading...');
+          }
+        };
+        self.loadingBar.status = 0.5;
+        self.loadingBar.infinityInterval = setInterval(function() {
+          self.loadingBar.status += 0.5;
+        }, 300);
+      },
       checkDownloadableStatus: function() {
         if (this.chartInst.downloadIsEnabled()) {
           this.showDownloadIcon = true;
@@ -330,7 +358,6 @@
     },
     ready: function() {
       var _self = this;
-      _self.showLoad = true;
       var attrId =
         this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
       this.invisibleDimension = this.ndx.dimension(function(d) {

@@ -26,26 +26,24 @@
   display: none;
 }
 
-//Used in index.html
-.loading {
-  //padding:400px;
-  margin: 100px 400px;
-  background-image: url($images + '/ajax-loader.gif');
-  background-repeat: no-repeat;
-  background-size: 100px 100px;
-  display: inline-block;
-  width: 100px;
-  height: 100px;
-  content: "";
-  position: relative;
-}
-
 .start-loading {
   opacity: 0.3;
 }
 
-.show-loading {
+.show-loading-content {
   display: block !important;
+  float: left !important;
+  opacity: 0.4;
+}
+
+.show-loading-bar {
+  background: transparent;
+}
+
+.progress-bar-parent-div {
+  height: calc(100% - 20px);
+  width: 100%;
+  position: absolute;
 }
 
 .chart-loader {

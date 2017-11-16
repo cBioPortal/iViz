@@ -254,6 +254,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       $.when(
         window.iviz.datamanager.getClinicalData(attrIds, isPatientAttributes))
         .then(function(clinicalData) {
+          iViz.vue.manage.getInstance().increaseStudyViewSummaryPagePBStatus();
           var idType = isPatientAttributes ? 'patient_id' : 'sample_id';
           var type = isPatientAttributes ? 'patient' : 'sample';
           var attrsFromServer = {};
@@ -419,19 +420,19 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       tableData_.cna_details.geneMeta = _cnaMeta;
       return tableData_.cna_details;
     },
-    getTableData: function(attrId) {
+    getTableData: function(attrId, progressFunc) {
       var def = new $.Deferred();
       var self = this;
       if (tableData_[attrId] === undefined) {
         if (attrId === 'mutated_genes') {
-          $.when(window.iviz.datamanager.getMutData())
+          $.when(window.iviz.datamanager.getMutData(progressFunc))
             .then(function(_data) {
               def.resolve(self.extractMutationData(_data));
             }, function() {
               def.reject();
             });
         } else if (attrId === 'cna_details') {
-          $.when(window.iviz.datamanager.getCnaData())
+          $.when(window.iviz.datamanager.getCnaData(progressFunc))
             .then(function(_data) {
               def.resolve(self.extractCnaData(_data));
             }, function() {
