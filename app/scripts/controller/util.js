@@ -623,6 +623,9 @@ var util = (function(_, cbio) {
         case 'chartTableId':
           domId = 'table-' + attrId;
           break;
+        case 'progressBarId':
+          domId = attrId + '-pb';
+          break;
         }
       }
       // TODO: DOM id pool. Ideally id shouldn't be repeated

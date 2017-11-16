@@ -44,6 +44,7 @@
   <script src="/bower_components/jstat/dist/jstat.min.js"></script>
   <script src="/bower_components/backbone/backbone.js"></script>
   <script src="/bower_components/remarkable-bootstrap-notify/bootstrap-notify.js"></script>
+  <script src="/bower_components/progressbar.js/dist/progressbar.min.js"></script>
   <!-- endbuild -->
 
   <!-- build:css(.) styles/iviz-vendor.css -->
@@ -109,6 +110,7 @@
   <script src="scripts/views/components/error.js"></script>
   <script src="scripts/views/components/saveVirtualStudy/saveVirtualStudy.js"></script>
   <script src="scripts/views/components/shareVirtualStudy/shareVirtualStudy.js"></script>
+  <script src="scripts/views/components/progressBar/progressBar.js"></script>
   <!-- endbuild -->
 </head>
 <body>
@@ -182,8 +184,7 @@
     </div>
   </nav>
   <div :class="{'start-loading': showScreenLoad}" v-if="!failedToInit.status">
-    <div class="grid" id="main-grid"
-         :class="{loading:isloading}">
+    <div class="grid" id="main-grid" v-show="!isloading">
       <main-template :groups.sync="groups" :redrawgroups.sync="redrawgroups"
                      :selectedpatient-uIDs.sync="selectedpatientUIDs"
                      :selectedsample-uIDs.sync="selectedsampleUIDs"
@@ -192,9 +193,9 @@
                      :showed-survival-plot="showedSurvivalPlot"
                      :clear-all="clearAll"></main-template>
     </div>
+    <progress-bar div-id="study-view-summary-page-pb" :status="studyViewSummaryPagePBStatus" v-show="isloading"></progress-bar>
   </div>
   <error container-id="fail-to-init" v-if="failedToInit.status" :message="failedToInit.message"></error>
-
 </div>
 
 </body>
@@ -204,7 +205,7 @@
     iViz.vue.manage.init();
 
     vcSession.URL =
-            'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
+      'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
 
     // This is used to indicate how to disable three buttons. By default, they are set to false.
     iViz.vue.manage.getInstance().showSaveButton = false;

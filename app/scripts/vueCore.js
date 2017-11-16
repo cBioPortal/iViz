@@ -1,4 +1,3 @@
-
 'use strict';
 (function(Vue, iViz, dc, _) {
   iViz.vue = {};
@@ -42,6 +41,7 @@
             numOfSurvivalPlots: 0,
             showedSurvivalPlot: false,
             userMovedChart: false,
+            studyViewSummaryPagePBStatus: 0,
             failedToInit: {
               status: false,
               message: 'Failed to open the study.' + (iViz.opts.emailContact ? (' Please contact ' + iViz.opts.emailContact + '.') : '')
@@ -91,6 +91,11 @@
                 this.selectedPatientsNum = newVal.length;
               }
             },
+            isloading: function() {
+              if (!this.isloading) {
+                this.studyViewSummaryPagePBStatus = 1;
+              }
+            },
             numOfSurvivalPlots: function(newVal) {
               if (!newVal || newVal <= 0) {
                 this.showedSurvivalPlot = false;
@@ -114,6 +119,15 @@
               this.failedToInit.message = message;
             }
           }, methods: {
+            increaseStudyViewSummaryPagePBStatus: function(text) {
+              if (this.studyViewSummaryPagePBStatus < 0.6) {
+                this.studyViewSummaryPagePBStatus += 0.2;
+              } else if (this.studyViewSummaryPagePBStatus < 1) {
+                this.studyViewSummaryPagePBStatus += (1 - this.studyViewSummaryPagePBStatus) / 4
+              } else {
+                this.studyViewSummaryPagePBStatus = 1;
+              }
+            },
             checkForDropDownCharts: function() {
               var showDropDown = false;
               _.each(this.charts, function(_chart) {

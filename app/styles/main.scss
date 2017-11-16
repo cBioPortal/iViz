@@ -118,5 +118,17 @@ body {
         border-radius: 4px;
       }
     }
-  } 
-}  
+  }
+}
+
+#study-view-summary-page-pb {
+  margin: 40px auto;
+}
+
+.study-view-progress-bar {
+  height: 8px;
+  width: 220px;
+  position: relative;
+  margin: auto;
+  top: calc(50% - 40px);
+}

@@ -16,11 +16,10 @@
     ':show-download-icon="!failedToInit"' +
     ':filters.sync="attributes.filter"> ' +
     '</chart-operations><div class="dc-chart dc-table-plot" ' +
-    ':class="{\'start-loading\': showLoad}" align="center" ' +
-    'style="float:none !important;" id={{chartId}} ></div>' +
-    '<div :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader">' +
-    '<img src="images/ajax-loader.gif" alt="loading"></div>' +
+    'v-show="!showLoad" :class="{\'show-loading-bar\': showLoad}" ' +
+    'align="center" id={{chartId}} ></div>' +
+    '<div v-show="showLoad" class="progress-bar-parent-div" :class="{\'show-loading-bar\': showLoad}">' +
+    '<progress-bar :div-id="loadingBar.divId" :status="loadingBar.status" :opts="loadingBar.opts"></progress-bar></div>' +
     '<div :class="{\'error-init\': failedToInit}" ' +
     'style="display: none;">' +
     '<span class="content">Failed to load data, refresh the page may help</span></div></div>',
@@ -29,7 +28,7 @@
     ],
     data: function() {
       return {
-        chartDivId: 
+        chartDivId:
           iViz.util.getDefaultDomId('chartDivId', this.attributes.attr_id),
         resetBtnId:
           iViz.util.getDefaultDomId('resetBtnId', this.attributes.attr_id),
@@ -42,13 +41,22 @@
         showLoad: true,
         selectedRows: [],
         invisibleDimension: {},
-        isMutatedGeneCna: false,
+        isMutatedGeneCna: ['mutated_genes', 'cna_details']
+          .indexOf(this.attributes.attr_id) !== -1,
         classTableHeight: 'grid-item-h-2',
         madeSelection: false,
         showSurvivalIcon: false,
         genePanelMap: {},
         numOfSurvivalCurveLimit: iViz.opts.numOfSurvivalCurveLimit || 20,
-        dataLoaded: false
+        dataLoaded: false,
+        loadedStudies: 0,
+        totalNumOfStudies: 0,
+        loadingBar :{
+          status: 0,
+          divId: iViz.util.getDefaultDomId('progressBarId', this.attributes.attr_id),
+          opts: {},
+          infinityInterval: null
+        }
       };
     },
     watch: {
@@ -58,6 +66,19 @@
           this.selectedRows = [];
         }
         this.$dispatch('update-filters', true);
+      },
+      'loadedStudies': function() {
+        this.loadingBar.status = this.loadedStudies / (this.totalNumOfStudies || 1);
+      },
+      'showLoad': function(newVal) {
+        if (newVal) {
+          this.initialInfinityLoadingBar();
+        } else {
+          if (this.loadingBar.infinityInterval) {
+            window.clearInterval(this.loadingBar.infinityInterval);
+            this.loadingBar.infinityInterval = null;
+          }
+        }
       },
       'showedSurvivalPlot': function() {
         this.showRainbowSurvival();
@@ -86,8 +107,8 @@
               _.pluck(this.invisibleDimension.top(Infinity), attrId);
             this.chartInst.update(_selectedCases, this.selectedRows);
             this.setDisplayTitle(this.chartInst.getCases().length);
-            this.showLoad = false;
             this.showRainbowSurvival();
+            this.showLoad = false;
           }
         }
       },
@@ -134,7 +155,7 @@
         this.$dispatch('create-rainbow-survival', {
           attrId: this.attributes.attr_id,
           subtitle: ' (' + this.attributes.display_name + ')',
-          groups: groups,  
+          groups: groups,
           groupType: this.attributes.group_type
         });
       }
@@ -174,7 +195,7 @@
             filtersMap[filter] = true;
           }
         });
-        
+
         this.invisibleDimension.filterFunction(function(d) {
           return (filtersMap[d] !== undefined);
         });
@@ -203,9 +224,9 @@
           height: window.iViz.styles.vars.specialTables.height,
           chartId: this.chartId
         };
-        
+
         this.dataLoaded = true;
-        
+
         this.chartInst.init(this.attributes, opts, this.$root.selectedsampleUIDs,
           this.$root.selectedgenes, data, {
             addGeneClick: this.addGeneClick,
@@ -220,8 +241,8 @@
         if (_selectedCases.length > 0) {
           this.chartInst.update(_selectedCases, this.selectedRows);
           this.showRainbowSurvival();
-        } 
-        
+        }
+
         this.setDisplayTitle(this.chartInst.getCases().length);
         if (!this.isMutatedGeneCna &&
           Object.keys(this.attributes.keys).length <= 3) {
@@ -240,17 +261,25 @@
         } else {
           this.showSurvivalIcon = false;
         }
+      },
+      initialInfinityLoadingBar: function() {
+        var self = this;
+        self.loadingBar.opts = {
+          duration: 300,
+          step: function(state, bar) {
+            bar.setText('Loading...');
+          }
+        };
+        self.loadingBar.status = 0.5;
+        self.loadingBar.infinityInterval = setInterval(function() {
+          self.loadingBar.status += 0.5;
+        }, 800);
       }
     },
     ready: function() {
       var _self = this;
-      _self.showLoad = true;
       var callbacks = {};
       var attrId = this.attributes.attr_id;
-      
-      this.isMutatedGeneCna =
-        ['mutated_genes', 'cna_details']
-          .indexOf(_self.attributes.attr_id) !== -1;
 
       if (this.isMutatedGeneCna) {
         attrId = this.attributes.group_type === 'patient' ?
@@ -263,37 +292,54 @@
         }
         return d[attrId];
       });
-      
+
       callbacks.addGeneClick = this.addGeneClick;
       callbacks.submitClick = this.submitClick;
       _self.chartInst = new iViz.view.component.TableView();
       _self.chartInst.setDownloadDataTypes(['tsv']);
       if (_self.isMutatedGeneCna) {
-        $.when(iViz.getTableData(_self.attributes.attr_id))
-          .then(function(_tableData) {
-            $.when(window.iviz.datamanager.getGenePanelMap())
-              .then(function(_genePanelMap) {
-                // create gene panel map
-                this.dataLoaded = true;
-                _self.genePanelMap = _genePanelMap;
-                _self.processTableData(_tableData);
-              }, function() {
-                _self.genePanelMap = {};
-                _self.processTableData(_tableData);
-              });
-          }, function() {
-            _self.setDisplayTitle();
-            if (!_self.isMutatedGeneCna &&
-              Object.keys(_self.attributes.keys).length <= 3) {
-              _self.classTableHeight = 'grid-item-h-1';
-            }
-            _self.failedToInit = true;
-            _self.showLoad = false;
-          });
+        var progressBarText = '';
+        if (_self.attributes.attr_id === 'mutated_genes') {
+          _self.totalNumOfStudies = Object.keys(iviz.datamanager.mutationProfileIdsMap).length;
+          progressBarText = 'mutated genes (';
+        } else {
+          _self.totalNumOfStudies = Object.keys(iviz.datamanager.cnaProfileIdsMap).length;
+          progressBarText = 'copy number alteration genes (';
+        }
+
+        _self.loadingBar.opts = {
+          step: function(state, bar) {
+            bar.setText('Loading ' + progressBarText + Math.round(bar.value() * 100) + '%)');
+          }
+        };
+
+        $.when(iViz.getTableData(_self.attributes.attr_id, function() {
+          _self.loadedStudies++;
+        })).then(function(_tableData) {
+          $.when(window.iviz.datamanager.getGenePanelMap())
+            .then(function(_genePanelMap) {
+              // create gene panel map
+              this.dataLoaded = true;
+              _self.genePanelMap = _genePanelMap;
+              _self.processTableData(_tableData);
+            }, function() {
+              _self.genePanelMap = {};
+              _self.processTableData(_tableData);
+            });
+        }, function() {
+          _self.setDisplayTitle();
+          if (!_self.isMutatedGeneCna &&
+            Object.keys(_self.attributes.keys).length <= 3) {
+            _self.classTableHeight = 'grid-item-h-1';
+          }
+          _self.failedToInit = true;
+          _self.showLoad = false;
+          _self.initialInfinityLoadingBar();
+        });
       } else {
         _self.processTableData();
       }
-      
+
       this.showRainbowSurvival();
       this.$dispatch('data-loaded', this.attributes.group_id, this.chartDivId);
     }
