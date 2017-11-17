@@ -127,17 +127,22 @@
                     if (includeMutationCount) {
                       selectedMap_[geneIndex].num_muts = 1;
                     }
-                    selectedMap_[geneIndex].case_uids = [caseId];
+                    selectedMap_[geneIndex].case_ids = [caseId];
                   } else {
                     if (includeMutationCount) {
                       selectedMap_[geneIndex].num_muts += 1;
                     }
-                    selectedMap_[geneIndex].case_uids.push(caseId);
+                    selectedMap_[geneIndex].case_ids.push(caseId);
                   }
                 });
               }
             }
           });
+          
+          _.each(selectedMap_, function(content) {
+            content.case_uids = iViz.util.unique(content.case_ids);
+          });
+          
           initReactTable(true, selectedMap_, selectedSamples);
         }
       } else {
@@ -298,7 +303,7 @@
           var freq = 0;
           datum.gene = item.gene;
           if (_selectedGenesMap === undefined) {
-            datum.case_uids = iViz.util.unique(item.case_uids);
+            datum.case_uids = item.case_uids;
             datum.cases = datum.case_uids.length;
             datum.uniqueId = index;
             if (typeof genePanelMap[item.gene] !== 'undefined') {
@@ -323,8 +328,7 @@
             if (_selectedGenesMap[item.index] === undefined) {
               return;
             }
-            datum.case_uids =
-              iViz.util.unique(_selectedGenesMap[item.index].case_uids);
+            datum.case_uids = _selectedGenesMap[item.index].case_uids;
             datum.cases = datum.case_uids.length;
             if (typeof genePanelMap[item.gene] !== 'undefined') {
               freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
