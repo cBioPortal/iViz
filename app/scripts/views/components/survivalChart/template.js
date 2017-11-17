@@ -205,7 +205,7 @@
                     }
                   }
                   if (_.isArray(_caseId)) {
-                    nonNaCases = nonNaCases.concat(_caseId);
+                    nonNaCases.push.apply(nonNaCases, _caseId);
                   } else {
                     nonNaCases.push(_caseId);
                   }
@@ -227,7 +227,7 @@
             _allCases = iViz.util.intersection(_nonNaCases, _allCases);
           } else {
             _selectedCases =
-              _.pluck(this.invisibleDimension.top(Infinity), attrId);
+              _.pluck(this.invisibleDimension.top(Infinity), attrId).sort();
           }
         }
         if (_selectedCases.length === 0) {
@@ -245,7 +245,7 @@
             name: 'Selected Patients'
           }, {
             id: 1,
-            caseIds: _.difference(
+            caseIds: iViz.util.difference(
               _allCases, _selectedCases),
             curveHex: '#2986e2',
             name: 'Unselected Patients'
