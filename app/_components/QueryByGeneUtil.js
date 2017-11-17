@@ -33,10 +33,10 @@ window.QueryByGeneUtil = (function() {
         });
       });
       submitForm(window.cbioURL + 'index.do', {
-        'cancer_study_id': studyId? studyId : 'all',
-        'cancer_study_list': selectedCases.map(function(x) {return x.id}),
-        'case_ids': _arr.join('+'),
-        'case_set_id': -1
+        cancer_study_list: selectedCases.map(function(x) {return x.id}),
+        cancer_study_id: 'all',
+        case_set_id: -1,
+        case_ids: _arr.join('+')
       });
     },
     toQueryPageSingleCohort: function(studyId, selectedCases,
@@ -49,8 +49,8 @@ window.QueryByGeneUtil = (function() {
         });
       });
       submitForm(window.cbioURL + 'index.do', {
-        cancer_study_id: studyId,
-        cancer_study_list: null,
+        cancer_study_list: selectedCases.map(function(x) {return x.id}),
+        cancer_study_id: 'all',
         case_ids: _arr.join('+'),
         case_set_id: -1,
         gene_set_choice: 'user-defined-list',
