@@ -50,7 +50,7 @@
       if (name) {
         _virtualCohort.name = name;
       } else {
-        _virtualCohort.name = "Selected " + (cases.length > 1 ? "Studies" : "Study");
+        _virtualCohort.name = cases.length > 1 ? "Combined Studies" : "Selected Study";
       }
       _virtualCohort.description = description || '';
       def.resolve(_virtualCohort);
