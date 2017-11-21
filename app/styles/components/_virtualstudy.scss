@@ -1,0 +1,12 @@
+.save-virtual-study {
+   @extend .iviz-header-button;
+   padding: 0;
+
+   .save-cohort-btn {
+     padding: 5px 10px;
+   }
+ }
+
+.share-virtual-study {
+  @extend .iviz-header-button;
+}

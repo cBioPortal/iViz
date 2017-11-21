@@ -623,6 +623,9 @@ var util = (function(_, cbio) {
         case 'chartTableId':
           domId = 'table-' + attrId;
           break;
+        case 'progressBarId':
+          domId = attrId + '-pb';
+          break;
         }
       }
       // TODO: DOM id pool. Ideally id shouldn't be repeated
@@ -658,15 +661,36 @@ var util = (function(_, cbio) {
       return result;
     };
 
-    content.compare = function(arr1, arr2) {
-      if (arr1.length === arr2.length) {
-        for (var i = 0; i < arr1.length; i++) {
-          if (arr1[i] !== arr2[i]) {
-            return false;
-          }
+    /**
+     * Returns a copy of the array with values from array that are not present in the other array.
+     *
+     * @param {array} a Array, must already be sorted
+     * @param {array} b The other array, must already be sorted
+     * @return {array} The difference values
+     */
+    content.difference = function(a, b) {
+      var result = [];
+      var i = 0;
+      var j = 0;
+      var aL = a.length;
+      var bL = b.length;
+      while (i < aL && j < bL) {
+        if (a[i] < b[j]) {
+          result.push(a[i]);
+          ++i;
+        } else if (a[i] > b[j]) {
+          ++j;
+        } else {
+          ++i;
+          ++j;
         }
       }
-      return false;
+
+      return result;
+    };
+
+    content.compare = function(arr1, arr2) {
+      return JSON.stringify(arr1) === JSON.stringify(arr2);
     };
 
     content.getClinicalAttrTooltipContent = function(attribute) {
@@ -810,6 +834,24 @@ var util = (function(_, cbio) {
       return _returnValue;
     };
 
+    content.defaultQtipConfig = function(content) {
+      var configuration = {
+        style: {
+          classes: 'qtip-light qtip-rounded qtip-shadow'
+        },
+        show: {event: 'mouseover', ready: false},
+        hide: {fixed: true, delay: 200, event: 'mouseleave'},
+        position: {
+          my: 'bottom center',
+          at: 'top center',
+          viewport: $(window)
+        },
+        content: content
+      };
+
+      return configuration;
+    };
+
     content.getDataErrorMessage = function(type) {
       var message = 'Failed to load data';
       switch (type) {
@@ -826,6 +868,10 @@ var util = (function(_, cbio) {
         break;
       }
       return message;
+    };
+    
+    content.getHypotenuse = function(a, b) {
+      return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
     };
 
     return content;

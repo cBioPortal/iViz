@@ -16,6 +16,7 @@ body {
   @import "components/scatterplot";
   @import "components/survivalplot";
   @import "components/table";
+  @import "components/virtualstudy";
 }
 
 @import "vendor/dashiboard";
@@ -62,4 +63,72 @@ body {
       margin: 1px 5px 0 0;
     }
   }
+}
+
+.iviz-save-cohort-btn-qtip {
+  .qtip-content {
+    padding: 9px;
+    .dialog {
+      input {
+        line-height: 20px;
+        padding: 2px 5px;
+        width: 100%;
+        font-size: 14px;
+        margin: 2px 0;
+      }
+      textarea.form-control {
+        padding: 6px 5px;
+      }
+    }
+    .saved, .saving {
+      font-size: 15px;
+      line-height: 16px;
+    }
+    .saved > span {
+      float: left;
+    }
+    .saved > button {
+      float: right;
+    }
+    .saved {
+      .savedMessage {
+        display: inline-flex;
+        .fa-exclamation-triangle {
+          color: orange;
+        }
+        .left-space {
+          margin-left: 5px;
+        }
+      }
+    }
+    .saving {
+      text-align: center;
+    }
+  }
+}
+
+.iviz-share-cohort-btn-qtip {
+  .qtip-content {
+    .dialog {
+      .virtual-study-link {
+        display: inline-flex; 
+        line-height: 16px;
+      }
+      .share-cohort {
+        border-radius: 4px;
+      }
+    }
+  }
+}
+
+#study-view-summary-page-pb {
+  margin: 40px auto;
+}
+
+.study-view-progress-bar {
+  height: 8px;
+  width: 220px;
+  position: relative;
+  margin: auto;
+  top: calc(50% - 40px);
 }

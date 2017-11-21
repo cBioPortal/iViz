@@ -71,7 +71,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         charts[attrData.attr_id] = attrData;
       });
 
-      _.each(iviz.datamanager.sortByClinicalPriority(
+      _.each(iviz.datamanager.sortByNumOfStudies(
         data_.groups.patient.attr_meta.concat(data_.groups.sample.attr_meta))
         , function(attrData) {
           if (chartsCount < iViz.opts.numOfChartsLimit) {
@@ -127,10 +127,6 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         vm_.selectedpatientUIDs = _.pluck(data_.groups.patient.data, 'patient_uid');
         vm_.groups = groups;
         vm_.charts = charts;
-        vm_.$nextTick(function() {
-          _self.fetchCompleteData('patient');
-          _self.fetchCompleteData('sample');
-        });
       });
     }, // ---- close init function ----groups
     createGroupNdx: function(group) {
@@ -258,6 +254,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       $.when(
         window.iviz.datamanager.getClinicalData(attrIds, isPatientAttributes))
         .then(function(clinicalData) {
+          iViz.vue.manage.getInstance().increaseStudyViewSummaryPagePBStatus();
           var idType = isPatientAttributes ? 'patient_id' : 'sample_id';
           var type = isPatientAttributes ? 'patient' : 'sample';
           var attrsFromServer = {};
@@ -269,8 +266,14 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             selectedAttrMeta.numOfDatum = 0;
 
             _.each(_clinicalAttributeData, function(_dataObj) {
-              _data[self_.getCaseIndex(type, _dataObj.study_id, _dataObj[idType])][_dataObj.attr_id] = _dataObj.attr_val;
+              var caseIndex = self_.getCaseIndex(type, _dataObj.study_id, _dataObj[idType]);
 
+              // Filter 'undefined' case index		
+              if (caseIndex !== undefined) {
+                _data[caseIndex] = _data[caseIndex] || {};
+                _data[caseIndex][_dataObj.attr_id] = _dataObj.attr_val;
+              }
+              
               if (!selectedAttrMeta.keys
                   .hasOwnProperty(_dataObj.attr_val)) {
                 selectedAttrMeta.keys[_dataObj.attr_val] = 0;
@@ -339,7 +342,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             _mutGeneMeta[_uniqueId] = {};
             _mutGeneMeta[_uniqueId].gene = _uniqueId;
             _mutGeneMeta[_uniqueId].num_muts = 1;
-            _mutGeneMeta[_uniqueId].case_uids = [_caseUIdIndex];
+            _mutGeneMeta[_uniqueId].case_ids = [_caseUIdIndex];
             _mutGeneMeta[_uniqueId].qval = (window.iviz.datamanager.getCancerStudyIds().length === 1 && _mutGeneDataObj.hasOwnProperty('qval')) ? _mutGeneDataObj.qval : null;
             _mutGeneMeta[_uniqueId].index = _mutGeneMetaIndex;
             if (data_.groups.sample.data[_caseUIdIndex].mutated_genes === undefined) {
@@ -350,7 +353,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
             _mutGeneMetaIndex += 1;
           } else {
             _mutGeneMeta[_uniqueId].num_muts += 1;
-            _mutGeneMeta[_uniqueId].case_uids.push(_caseUIdIndex);
+            _mutGeneMeta[_uniqueId].case_ids.push(_caseUIdIndex);
             if (data_.groups.sample.data[_caseUIdIndex].mutated_genes === undefined) {
               data_.groups.sample.data[_caseUIdIndex].mutated_genes = [_mutGeneMeta[_uniqueId].index];
             } else {
@@ -359,6 +362,11 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           }
         });
       });
+
+      _.each(_mutGeneMeta, function(content) {
+        content.case_uids = iViz.util.unique(content.case_ids);
+      });
+      
       tableData_.mutated_genes = {};
       tableData_.mutated_genes.geneMeta = _mutGeneMeta;
       return tableData_.mutated_genes;
@@ -389,7 +397,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               _cnaMeta[_uniqueId].gene = _geneSymbol;
               _cnaMeta[_uniqueId].cna = _altType;
               _cnaMeta[_uniqueId].cytoband = _cnaDataPerStudy.cytoband[_index];
-              _cnaMeta[_uniqueId].case_uids = [_caseIdIndex];
+              _cnaMeta[_uniqueId].case_ids = [_caseIdIndex];
               if ((window.iviz.datamanager.getCancerStudyIds().length !== 1) || _cnaDataPerStudy.gistic[_index] === null) {
                 _cnaMeta[_uniqueId].qval = null;
               } else {
@@ -403,7 +411,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               }
               _cnaMetaIndex += 1;
             } else {
-              _cnaMeta[_uniqueId].case_uids.push(_caseIdIndex);
+              _cnaMeta[_uniqueId].case_ids.push(_caseIdIndex);
               if (data_.groups.sample.data[_caseIdIndex].cna_details === undefined) {
                 data_.groups.sample.data[_caseIdIndex].cna_details = [_cnaMeta[_uniqueId].index];
               } else {
@@ -413,23 +421,28 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           });
         });
       });
+
+      _.each(_cnaMeta, function(content) {
+        content.case_uids = iViz.util.unique(content.case_ids);
+      });
+      
       tableData_.cna_details = {};
       tableData_.cna_details.geneMeta = _cnaMeta;
       return tableData_.cna_details;
     },
-    getTableData: function(attrId) {
+    getTableData: function(attrId, progressFunc) {
       var def = new $.Deferred();
       var self = this;
       if (tableData_[attrId] === undefined) {
         if (attrId === 'mutated_genes') {
-          $.when(window.iviz.datamanager.getMutData())
+          $.when(window.iviz.datamanager.getMutData(progressFunc))
             .then(function(_data) {
               def.resolve(self.extractMutationData(_data));
             }, function() {
               def.reject();
             });
         } else if (attrId === 'cna_details') {
-          $.when(window.iviz.datamanager.getCnaData())
+          $.when(window.iviz.datamanager.getCnaData(progressFunc))
             .then(function(_data) {
               def.resolve(self.extractCnaData(_data));
             }, function() {
@@ -635,44 +648,38 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       });
     },
     submitForm: function() {
-      var _selectedStudyCasesMap = {};
-      var _sampleData = data_.groups.sample.data;
-      $.each(vm_.selectedsampleUIDs, function(key, sampleUID) {
-        var _caseDataObj = _sampleData[sampleUID];
-        if (!_selectedStudyCasesMap[_caseDataObj.study_id]) {
-          _selectedStudyCasesMap[_caseDataObj.study_id] = [];
-        }
-        _selectedStudyCasesMap[_caseDataObj.study_id].push(_caseDataObj.sample_id);
-      });
+      var _self = this;
+      _self.selectedsamples = _.keys(iViz.getCasesMap('sample'));
+      _self.selectedpatients = _.keys(iViz.getCasesMap('patient'));
+      _self.cohorts_ = window.cohortIdsList; // queried cohorts (vc or regular study)
 
       // Remove all hidden inputs
       $('#iviz-form input:not(:first)').remove();
-      if (Object.keys(_selectedStudyCasesMap).length === 1) {
-        var _study_id = Object.keys(_selectedStudyCasesMap)[0];
-        var _selected_samples = _selectedStudyCasesMap[_study_id];
-        window.studySampleMap = _selectedStudyCasesMap;
+
+      if (_self.cohorts_.length === 1) { // to query single study
         if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(_study_id, _selected_samples);
+          QueryByGeneUtil.toMainPage(_self.cohorts_[0], _self.stat().studies);
         } else {
-          QueryByGeneTextArea.validateGenes(this.decideSubmit, false);
+          QueryByGeneTextArea.validateGenes(this.decideSubmitSingleCohort, false);
         }
-      } else {
-        new Notification().createNotification(
-          'Querying multiple studies features is not yet ready!',
-          {message_type: 'info'});
+      } else { // query multiple studies
+        if (QueryByGeneTextArea.isEmpty()) {
+          QueryByGeneUtil.toMainPage(undefined, _self.stat().studies);
+        } else {
+          QueryByGeneUtil.toMultiStudiesQueryPage(undefined, _self.stat().studies, QueryByGeneTextArea.getGenes());
+        }
       }
     },
-    decideSubmit: function(allValid) {
+    decideSubmitSingleCohort: function(allValid) {
       // if all genes are valid, submit, otherwise show a notification
       if (allValid) {
-        var _study_id = Object.keys(window.studySampleMap)[0];
-        var _selected_samples = window.studySampleMap[_study_id];
-        QueryByGeneUtil.toQueryPage(_study_id, _selected_samples,
+        var _self = this;
+        QueryByGeneUtil.toQueryPageSingleCohort(window.cohortIdsList[0], iViz.stat().studies,
           QueryByGeneTextArea.getGenes(), window.mutationProfileId,
           window.cnaProfileId);
       } else {
         new Notification().createNotification(
-          'There were problems with the selected genes. Please fix.',
+          'Invalid gene symbols.',
           {message_type: 'danger'});
         $('#query-by-gene-textarea').focus();
       }
@@ -683,7 +690,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var self = this;
 
       // extract and reformat selected cases
-      var _selectedCases = [];
+      var _studies = [];
       var _selectedStudyCasesMap = {};
       var _sampleData = data_.groups.sample.data;
 
@@ -691,18 +698,15 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         var _caseDataObj = _sampleData[sampleUID];
         if (!_selectedStudyCasesMap[_caseDataObj.study_id]) {
           _selectedStudyCasesMap[_caseDataObj.study_id] = {};
-          _selectedStudyCasesMap[_caseDataObj.study_id].studyID = _caseDataObj.study_id;
+          _selectedStudyCasesMap[_caseDataObj.study_id].id = _caseDataObj.study_id;
           _selectedStudyCasesMap[_caseDataObj.study_id].samples = [];
-          _selectedStudyCasesMap[_caseDataObj.study_id].patients = [];
         }
         _selectedStudyCasesMap[_caseDataObj.study_id].samples.push(_caseDataObj.sample_id);
-        var temp = self.getPatientUIDs(sampleUID);
-        _selectedStudyCasesMap[_caseDataObj.study_id].patients.push(data_.groups.patient.data[temp[0]].patient_id);
       });
       $.each(_selectedStudyCasesMap, function(key, val) {
-        _selectedCases.push(val);
+        _studies.push(val);
       });
-      _result.filterspatients = [];
+      _result.filters.patients = [];
       _result.filters.samples = [];
       _.each(vm_.groups, function(group) {
         var filters_ = [];
@@ -729,7 +733,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _result.filters.samples = array;
         }
       });
-      _result.selected_cases = _selectedCases;
+      _result.studies = _studies;
       return _result;
     },
 
@@ -746,10 +750,10 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     applyVC: function(_vc) {
       var _selectedSamples = [];
       var _selectedPatients = [];
-      _.each(_.pluck(_vc.selectedCases, 'samples'), function(_arr) {
+      _.each(_.pluck(_vc.studies, 'samples'), function(_arr) {
         _selectedSamples = _selectedSamples.concat(_arr);
       });
-      _.each(_.pluck(_vc.selectedCases, 'patients'), function(_arr) {
+      _.each(_.pluck(_vc.studies, 'patients'), function(_arr) {
         _selectedPatients = _selectedPatients.concat(_arr);
       });
       iViz.init(data_, _selectedSamples, _selectedPatients);

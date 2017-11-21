@@ -13,12 +13,11 @@
     ' :reset-btn-id="resetBtnId" :chart-ctrl="chartInst" ' +
     ':chart-id="chartId"' +
     ' :attributes="attributes" :filters.sync="attributes.filter"></chart-operations>' +
-    ' <div :class="{\'start-loading\': showLoad}" ' +
+    ' <div v-show="!showLoad" ' +
     'class="dc-chart dc-scatter-plot" align="center" ' +
-    'style="float:none !important;" id={{chartId}} ></div>' +
-    ' <div :class="{\'show-loading\': showLoad}" ' +
-    'class="chart-loader">' +
-    ' <img src="images/ajax-loader.gif" alt="loading"></div>' +
+    ':class="{\'show-loading-content\': showLoad}" id={{chartId}} ></div>' +
+    '<div v-show="showLoad" class="progress-bar-parent-div" :class="{\'show-loading-bar\': showLoad}" >' +
+    '<progress-bar :div-id="loadingBar.divId" :status="loadingBar.status" :opts="loadingBar.opts"></progress-bar></div>' +
     '<div v-if="failedToInit" class="error-panel" align="center">' +
     '<error-handle v-if="failedToInit" :error="error"></error-handle>' +
     '</div></div>',
@@ -45,6 +44,12 @@
           failedToLoadData: false
         },
         failedToInit: false,
+        loadingBar :{
+          status: 0,
+          divId: iViz.util.getDefaultDomId('progressBarId', this.attributes.attr_id),
+          opts: {},
+          infinityInterval: null
+        },
         invisibleDimension: {}
       };
     },
@@ -54,6 +59,16 @@
           this.invisibleDimension.filterAll();
         }
         this.$dispatch('update-filters', true);
+      },
+      showLoad: function(newVal) {
+        if (newVal) {
+          this.initialInfinityLoadingBar();
+        } else {
+          if (this.loadingBar.infinityInterval) { 
+            window.clearInterval(this.loadingBar.infinityInterval);
+            this.loadingBar.infinityInterval = null;
+          }
+        }
       }
     },
     events: {
@@ -107,6 +122,19 @@
         this.showOperations = true;
       }, mouseLeave: function() {
         this.showOperations = false;
+      },
+      initialInfinityLoadingBar: function() {
+        var self = this;
+        self.loadingBar.opts = {
+          duration: 300,
+          step: function(state, bar) {
+            bar.setText('Loading...');
+          }
+        };
+        self.loadingBar.status = 0.5;
+        self.loadingBar.infinityInterval = setInterval(function() {
+          self.loadingBar.status += 0.5;
+        }, 800);
       },
       attachPlotlySelectedEvent: function() {
         var _self = this;

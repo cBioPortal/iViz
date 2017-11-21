@@ -35,6 +35,7 @@ function GeneValidator(geneAreaId, geneModel){
                 if(symbolResults.length > 100) {
                     addNotification("<b>You have entered more than 100 genes.</b><br>Please enter fewer genes for better performance", "danger");
                     allValid=false;
+                    $("#iviz-header-left-1").attr("disabled", true);
                 }
 
                 // handle each symbol found
@@ -42,6 +43,7 @@ function GeneValidator(geneAreaId, geneModel){
                     var valid = handleSymbol(symbolResults[j])
                     if(!valid) {
                         allValid = false;
+                        $("#iviz-header-left-1").attr("disabled", true);
                     }
                 }
             })
@@ -51,7 +53,10 @@ function GeneValidator(geneAreaId, geneModel){
             })
             .always(function(){
                 // if not all valid, focus on the gene array for focusin trigger
-                if(!allValid) $(geneAreaId).focus();
+                if(!allValid) {
+                  $(geneAreaId).focus();
+                  $("#iviz-header-left-1").attr("disabled", true);
+                }
                 // in case a submit was pressed, use the callback
                 if($.isFunction(callback)) callback(allValid);
             });
@@ -129,7 +134,7 @@ function GeneValidator(geneAreaId, geneModel){
         $("#"+gene).change(function() {
             nrOfNotifications--;
             // replace the value in the text area
-            self.replaceAreaValue($(this).attr("name"), $(this).attr("value"));
+            self.replaceAreaValue($(this).attr("name"), $(this).val());
 
             // destroy the qtip if it's still there
             $(this).qtip("destroy");

@@ -29,10 +29,11 @@
             charts: {},
             groupCount: 0,
             updateSpecialCharts: false,
-            showSaveButton: true,
-            showManageButton: true,
-            userid: 'DEFAULT',
-            stats: '',
+            showShareButton: false,
+            showSaveButton: false,
+            showManageButton: false,
+            loadUserSpecificCohorts: false,
+            stats: {},
             updateStats: false,
             clearAll: false,
             showScreenLoad: false,
@@ -40,6 +41,7 @@
             numOfSurvivalPlots: 0,
             showedSurvivalPlot: false,
             userMovedChart: false,
+            studyViewSummaryPagePBStatus: 0,
             failedToInit: {
               status: false,
               message: 'Failed to open the study.' + (iViz.opts.emailContact ? (' Please contact ' + iViz.opts.emailContact + '.') : '')
@@ -60,8 +62,11 @@
                 self_.$broadcast('update-special-charts', self_.hasfilters);
               }, 500);
             },
-            updateStats: function() {
-              this.stats = iViz.stat();
+            updateStats: function(newVal) {
+              if (newVal) {
+                this.stats = iViz.stat();
+                this.updateStats = false;
+              }
             },
             redrawgroups: function(newVal) {
               if (newVal.length > 0) {
@@ -84,6 +89,11 @@
             selectedpatientUIDs: function(newVal, oldVal) {
               if (newVal.length !== oldVal.length) {
                 this.selectedPatientsNum = newVal.length;
+              }
+            },
+            isloading: function() {
+              if (!this.isloading) {
+                this.studyViewSummaryPagePBStatus = 1;
               }
             },
             numOfSurvivalPlots: function(newVal) {
@@ -109,6 +119,15 @@
               this.failedToInit.message = message;
             }
           }, methods: {
+            increaseStudyViewSummaryPagePBStatus: function(text) {
+              if (this.studyViewSummaryPagePBStatus < 0.6) {
+                this.studyViewSummaryPagePBStatus += 0.2;
+              } else if (this.studyViewSummaryPagePBStatus < 1) {
+                this.studyViewSummaryPagePBStatus += (1 - this.studyViewSummaryPagePBStatus) / 4
+              } else {
+                this.studyViewSummaryPagePBStatus = 1;
+              }
+            },
             checkForDropDownCharts: function() {
               var showDropDown = false;
               _.each(this.charts, function(_chart) {
@@ -271,7 +290,6 @@
                 new Notification().createNotification(selectedCaseUIDs.length +
                   ' case(s) selected.', {message_type: 'info'});
               }
-
               $('#iviz-header-right-1').qtip('toggle');
               if (selectedCaseUIDs.length > 0) {
                 this.clearAllCharts(false);
@@ -379,35 +397,4 @@
     }
   });
 
-  // This is an example to add sample to a virtual cohort from scatter plot
-  /*  iViz.vue.vmScatter = (function() {
-   var vmInstance_;
-
-   return {
-   init: function() {
-   vmInstance_ = new Vue({
-   el: '#scatter-container',
-   data: {
-   showList: false,
-   virtualCohorts: null,
-   sampleID: null,
-   cancerStudyID: null,
-   addNewVC: false
-   }, ready: function() {
-   this.$watch('showList', function() {
-   if (_.isObject(iViz.session)) {
-   this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
-   }
-   });
-   }
-   });
-   },
-   getInstance: function() {
-   if (typeof vmInstance_ === 'undefined') {
-   this.init();
-   }
-   return vmInstance_;
-   }
-   };
-   })();*/
 })(window.Vue, window.iViz, window.dc, window._);
