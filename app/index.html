@@ -225,6 +225,7 @@
     window.case_set_id = '-1';
     var studyCasesMap = {};
     studyCasesMap['hnsc_tcga'] = {};
+    window.cohortIdsList = ['hnsc_tcga'];
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
     $.when(window.iviz.datamanager.getConfigs())
