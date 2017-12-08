@@ -685,7 +685,7 @@ window.DataManagerForIviz = (function($, _) {
               var _data = {
                 study_id: item.studyId,
                 patient_id: item.patientId,
-                attr_id: item.clinicalAttributeId,
+                attr_id: item.clinicalAttributeId.toUpperCase(),
                 attr_val: item.value
               };
               self.data.clinical.patient[uniqueId] = _data;
@@ -756,7 +756,7 @@ window.DataManagerForIviz = (function($, _) {
               var _data = {
                 study_id: item.studyId,
                 sample_id: item.sampleId,
-                attr_id: item.clinicalAttributeId,
+                attr_id: item.clinicalAttributeId.toUpperCase(),
                 attr_val: item.value
               };
               self.data.clinical.patient[uniqueId] = _data;
