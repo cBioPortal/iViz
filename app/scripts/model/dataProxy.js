@@ -944,6 +944,10 @@ window.DataManagerForIviz = (function($, _) {
               fetch_promise.reject(error);
             });
         }),
+      
+      // Server side uses uppercase clinical attribute ID as convention but the rule is not strictly followed yet.
+      // Manually convert all IDs in front-end to prevent any discrepancy between clinical meta and clinical sample/patient data
+      // In the refactoring effort, this needs to be verified again with backend team.
       getClinicalAttributesByStudy: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           $.get(window.cbioURL + 'api/clinical-attributes?projection=SUMMARY&pageSize=100000&pageNumber=0&direction=ASC')
