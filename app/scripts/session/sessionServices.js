@@ -27,11 +27,12 @@
     };
 
     return {
-      saveSession: function(virtualCohort) {
+      saveSession: function(virtualCohort, addToUserStudies) {
         var def = new $.Deferred();
+        var url = addToUserStudies ? vcSession.URL+"/save" : vcSession.URL;
         $.ajax({
           type: 'POST',
-          url: vcSession.URL,
+          url: url,
           contentType: 'application/json;charset=UTF-8',
           data: JSON.stringify(virtualCohort)
         }).done(function(response) {
