@@ -273,7 +273,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
                 _data[caseIndex] = _data[caseIndex] || {};
                 _data[caseIndex][_dataObj.attr_id] = _dataObj.attr_val;
               }
-              
+
               if (!selectedAttrMeta.keys
                   .hasOwnProperty(_dataObj.attr_val)) {
                 selectedAttrMeta.keys[_dataObj.attr_val] = 0;
@@ -366,7 +366,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       _.each(_mutGeneMeta, function(content) {
         content.case_uids = iViz.util.unique(content.case_ids);
       });
-      
+
       tableData_.mutated_genes = {};
       tableData_.mutated_genes.geneMeta = _mutGeneMeta;
       return tableData_.mutated_genes;
@@ -425,7 +425,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       _.each(_cnaMeta, function(content) {
         content.case_uids = iViz.util.unique(content.case_ids);
       });
-      
+
       tableData_.cna_details = {};
       tableData_.cna_details.geneMeta = _cnaMeta;
       return tableData_.cna_details;
@@ -534,6 +534,9 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       return Object.keys(this.getCasesMap(type));
     },
     getCaseIndex: function(type, study_id, case_id) {
+      if (!data_.groups.group_mapping.studyMap[study_id]) {
+        return undefined;
+      }
       if (type === 'sample') {
         return data_.groups.group_mapping.studyMap[study_id].sample_to_uid[case_id];
       }
