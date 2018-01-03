@@ -32,7 +32,7 @@
     template: '<input type="button" id="custom-case-input-button" ' +
     'class="iviz-header-button" value="Select cases by IDs"/>' +
     '<div class="iviz-hidden" id="iviz-case-select-custom-dialog">' +
-    '<b>Please input IDs (one per line)</b><textarea rows="20" cols="50" ' +
+    '<b>Please input IDs (one per line)</b></br><textarea rows="20" cols="50" ' +
     'id="iviz-case-select-custom-input" v-model="casesIdsList"></textarea>' +
     '<br/><label><input type="radio" v-model="caseSelection" ' +
     'value="sample" checked>By sample ID</label><label><input type="radio" ' +
@@ -49,7 +49,7 @@
     events: {},
     methods: {
       SetCasesSelection: function() {
-        var caseIds = this.casesIdsList.trim().split(/\s+/);
+        var caseIds = this.casesIdsList.trim().split(/\n/);
         this.$dispatch('set-selected-cases', this.caseSelection, _.uniq(caseIds));
       }
     },

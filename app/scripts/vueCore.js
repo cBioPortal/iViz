@@ -269,11 +269,26 @@
               var unmappedCaseIDs = [];
 
               _.each(selectedCases, function(id) {
-                var caseUIDs = iViz.getCaseUID(selectionType, id);
-                if (caseUIDs.length === 0) {
-                  unmappedCaseIDs.push(id);
-                } else {
-                  selectedCaseUIDs = selectedCaseUIDs.concat(caseUIDs);
+                if (id) {
+                  var caseUIDs = [];
+                  if (id.indexOf(':') !== -1) {
+                    var pair = id.split(':').map(function(t) {
+                      return t.trim();
+                    });
+                    if (pair.length == 2) {
+                      var caseId = iViz.getCaseIndex(selectionType, pair[0], pair[1]);
+                      if (caseId) {
+                        caseUIDs.push(caseId);
+                      }
+                    }
+                  } else {
+                    caseUIDs = iViz.getCaseUID(selectionType, id);
+                  }
+                  if (caseUIDs.length === 0) {
+                    unmappedCaseIDs.push(id);
+                  } else {
+                    selectedCaseUIDs = selectedCaseUIDs.concat(caseUIDs);
+                  }
                 }
               });
 
