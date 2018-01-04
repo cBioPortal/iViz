@@ -703,10 +703,14 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _selectedStudyCasesMap[_caseDataObj.study_id] = {};
           _selectedStudyCasesMap[_caseDataObj.study_id].id = _caseDataObj.study_id;
           _selectedStudyCasesMap[_caseDataObj.study_id].samples = [];
+          _selectedStudyCasesMap[_caseDataObj.study_id].patients = {};
         }
         _selectedStudyCasesMap[_caseDataObj.study_id].samples.push(_caseDataObj.sample_id);
+        var _patientId = self.getPatientId(_caseDataObj.study_id, _caseDataObj.sample_id);
+        _selectedStudyCasesMap[_caseDataObj.study_id].patients[_patientId] = 1;
       });
       $.each(_selectedStudyCasesMap, function(key, val) {
+        val.patients = Object.keys(val.patients);
         _studies.push(val);
       });
       _result.filters.patients = [];
