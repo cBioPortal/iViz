@@ -661,13 +661,13 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
       if (_self.cohorts_.length === 1) { // to query single study
         if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(_self.cohorts_[0], _self.stat().studies);
+          QueryByGeneUtil.toMainPage(_self.cohorts_[0], vm_.hasfilters ? _self.stat().studies : undefined);
         } else {
           QueryByGeneTextArea.validateGenes(this.decideSubmitSingleCohort, false);
         }
       } else { // query multiple studies
         if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(undefined, _self.stat().studies);
+          QueryByGeneUtil.toMainPage(_self.cohorts_,  vm_.hasfilters ? _self.stat().studies : undefined);
         } else {
           QueryByGeneUtil.toMultiStudiesQueryPage(undefined, _self.stat().studies, QueryByGeneTextArea.getGenes());
         }

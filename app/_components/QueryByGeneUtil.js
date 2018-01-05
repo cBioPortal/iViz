@@ -19,25 +19,35 @@ window.QueryByGeneUtil = (function() {
 
     // Firefox requires form to be attached to document body.
     $form.appendTo(document.body);
-    
+
     $form.submit();
   }
 
   return {
-    toMainPage: function(studyId, selectedCases) {
+    toMainPage: function(studyIds, selectedCases) {
       var _arr = [];
-      _.each(selectedCases, function(_obj) {
-        var _studyId = _obj.id;
-        _.each(_obj.samples, function(_sampleId) {
-          _arr.push(_studyId + ":" + _sampleId);
+      var formOps = {
+        cancer_study_list: studyIds
+      };
+
+      if (_.isObject(selectedCases)) {
+        _.each(selectedCases, function(_obj) {
+          var _studyId = _obj.id;
+          _.each(_obj.samples, function(_sampleId) {
+            _arr.push(_studyId + ":" + _sampleId);
+          });
         });
-      });
-      submitForm(window.cbioURL + 'index.do', {
-        cancer_study_list: selectedCases.map(function(x) {return x.id}),
-        cancer_study_id: 'all',
-        case_set_id: -1,
-        case_ids: _arr.join('+')
-      });
+
+        formOps = {
+          cancer_study_list: selectedCases.map(function(t) {
+            return t.id
+          }),
+          cancer_study_id: 'all',
+          case_set_id: -1,
+          case_ids: _arr.join('+')
+        };
+      }
+      submitForm(window.cbioURL + 'index.do', formOps);
     },
     toQueryPageSingleCohort: function(studyId, selectedCases,
                                       selectedGenes, mutationProfileId, cnaProfileId) {
@@ -49,7 +59,9 @@ window.QueryByGeneUtil = (function() {
         });
       });
       submitForm(window.cbioURL + 'index.do', {
-        cancer_study_list: selectedCases.map(function(x) {return x.id}),
+        cancer_study_list: selectedCases.map(function(x) {
+          return x.id
+        }),
         cancer_study_id: 'all',
         case_ids: _arr.join('+'),
         case_set_id: -1,
@@ -73,7 +85,9 @@ window.QueryByGeneUtil = (function() {
         });
       });
       submitForm(window.cbioURL + 'index.do', {
-        cancer_study_list: _selectedCases.map(function(x) {return x.id}),
+        cancer_study_list: _selectedCases.map(function(x) {
+          return x.id
+        }),
         cancer_study_id: 'all',
         gene_list: _selectedGenes,
         case_set_id: -1,
