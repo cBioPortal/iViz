@@ -659,6 +659,11 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       // Remove all hidden inputs
       $('#iviz-form input:not(:first)').remove();
 
+      // Had discussion whether we should get rid of _self.cohorts_ and always
+      // use _self.stat().studies which will make the code looks cleaner.
+      // But the major issue for using _self.stat() is the unnecessary calculation
+      // for studies without filters. Especially big combined studies.
+      // We decided to leave the code as it is for now. By Karthik and Hongxin
       if (_self.cohorts_.length === 1) { // to query single study
         if (QueryByGeneTextArea.isEmpty()) {
           QueryByGeneUtil.toMainPage(_self.cohorts_[0], vm_.hasfilters ? _self.stat().studies : undefined);
