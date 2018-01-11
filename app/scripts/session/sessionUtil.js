@@ -12,30 +12,6 @@
       studies: ''
     };
 
-    var generateUUID_ = function() {
-      var _d = new Date().getTime();
-      if (window.performance && typeof window.performance.now === 'function') {
-        _d += window.performance.now();
-      }
-      var _uuid = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-        function(c) {
-          var r = (_d + Math.random() * 16) % 16 | 0;
-          _d = Math.floor(_d / 16);
-          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-        });
-      return _uuid;
-    };
-
-    // Get Virtual cohorts from Local Storage
-    var getVirtualCohorts_ = function() {
-      return JSON.parse(localStorage.getItem('virtual-cohorts')) || [];
-    };
-
-    // Set Virtual cohorts in Local Storage
-    var setVirtualCohorts_ = function(virtualCohorts) {
-      localStorage.setItem('virtual-cohorts', JSON.stringify(virtualCohorts));
-    };
-
     var buildVCObject_ = function(filters, cases, name,
                                   description) {
       var def = new $.Deferred();
@@ -71,9 +47,6 @@
 
     return {
       buildVCObject: buildVCObject_,
-      setVirtualCohorts: setVirtualCohorts_,
-      getVirtualCohorts: getVirtualCohorts_,
-      generateUUID: generateUUID_,
       generateCohortDescription: generateCohortDescription_
     };
   })();

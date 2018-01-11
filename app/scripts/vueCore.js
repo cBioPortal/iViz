@@ -328,11 +328,6 @@
               }
             }
           }, ready: function() {
-            this.$watch('showVCList', function() {
-              if (_.isObject(iViz.session)) {
-                this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
-              }
-            });
             $('#iviz-header-left-patient-select').qtip({
               content: {text: 'View the selected patients.'},
               style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
