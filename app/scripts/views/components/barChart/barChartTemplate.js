@@ -194,7 +194,11 @@
             this.data.max = _.min(greaterOutlier);
           } else {
             var findExtremeResult = cbio.util.findExtremes(this.data.meta);
-            this.data.min = findExtremeResult[0];
+            if (this.attributes.attr_id === 'AGE' && _.min(this.data.meta) < 18 && _.max(this.data.meta) > 18) {
+              this.data.min = 18;
+            } else {
+              this.data.min = findExtremeResult[0];
+            }
             this.data.max = findExtremeResult[1];
 
             // noGrouping is true when number of different values less than or equal to 5. 
