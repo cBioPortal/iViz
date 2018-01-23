@@ -35,7 +35,7 @@
     '<b>Please input IDs (one per line)</b></br>' +
     '<span @click="updateCaseIds()" ' +
     'style="text-decoration: underline;cursor: pointer">' +
-    'Use selected samples/patients</span><br/>' +
+    'Use selected samples/patients</span><br/><br/>' +
     '<textarea rows="20" cols="50" ' +
     'id="iviz-case-select-custom-input" v-model="casesIdsList"></textarea>' +
     '<br/><label><input type="radio" v-model="caseSelection" ' +
@@ -92,6 +92,11 @@
         $.extend(true, {}, headerCaseSelectCustomDialog);
       _customDialogQtip.position.target = $(window);
       _customDialogQtip.content.text = $('#iviz-case-select-custom-dialog');
+      _customDialogQtip.events = {
+        hide: function() {
+          self_.casesIdsList = '';
+        }
+      };
       self_.tooltip = $('#custom-case-input-button').qtip(_customDialogQtip);
     }
   });
