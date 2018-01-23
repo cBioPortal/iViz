@@ -111,7 +111,7 @@
 
                     if (currentSelectedCases !== previousSelectedCases) {
                       vcSession.events.saveCohort(self_.stats,
-                        cohortName, cohortDescription || '')
+                        cohortName, cohortDescription || '', false)
                         .done(function (response) {
                           self_.savedVC = response;
                           tooltip.find('.cohort-link').html(
