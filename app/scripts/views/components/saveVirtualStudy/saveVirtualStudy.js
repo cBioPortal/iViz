@@ -1,7 +1,7 @@
 'use strict';
 (function(Vue, $, vcSession, iViz) {
   Vue.component('saveVirtualStudy', {
-    template: 
+    template:
     '<div v-if="showSaveButton" class="save-virtual-study">' +
     '<div class="save-cohort-btn">' +
     '<i class="fa fa-floppy-o" alt="Save Virtual Study"></i></div></div>',
@@ -38,7 +38,7 @@
           this.createQtip();
         }
       }
-    }, 
+    },
     methods: {
       saveCohort: function() {
         var _self = this;
@@ -95,6 +95,11 @@
                           '<a class="left-space" href="' +
                           window.cbioURL + 'study?id=' +
                           self_.savedVC.id + '">view</a>');
+                        tooltip.find('.savedMessage').find('a').click(function(event) {
+                          event.preventDefault();
+                          window.open(window.cbioURL + 'study?id=' +
+                            self_.savedVC.id);
+                        });
                       })
                       .fail(function() {
                         tooltip.find('.savedMessage').html(
