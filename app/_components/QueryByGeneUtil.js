@@ -76,12 +76,11 @@ window.QueryByGeneUtil = (function() {
         Action: 'Submit'
       });
     },
-    toMultiStudiesQueryPage: function(_vcId, _selectedCases, _selectedGenes) {
+    toMultiStudiesQueryPage: function(_selectedCases, _selectedGenes) {
       var _arr = [];
-      _.each(_selectedCases, function(_obj) {
-        var _studyId = _obj.id;
-        _.each(_obj.samples, function(_sampleId) {
-          _arr.push(_studyId + ":" + _sampleId);
+      _.each(_selectedCases, function(study) {
+        _.each(study.samples, function(_sampleId) {
+          _arr.push(study.id + ":" + _sampleId);
         });
       });
       submitForm(window.cbioURL + 'index.do', {

@@ -690,7 +690,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         if (QueryByGeneTextArea.isEmpty()) {
           QueryByGeneUtil.toMainPage(_self.cohorts_,  vm_.hasfilters ? _self.stat().studies : undefined);
         } else {
-          QueryByGeneUtil.toMultiStudiesQueryPage(undefined, _self.stat().studies, QueryByGeneTextArea.getGenes());
+          QueryByGeneUtil.toMultiStudiesQueryPage(_self.stat().studies, QueryByGeneTextArea.getGenes());
         }
       }
     },
