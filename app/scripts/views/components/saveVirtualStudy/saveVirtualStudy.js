@@ -28,7 +28,8 @@
     },
     data: function() {
       return {
-        savedVC: null
+        savedVC: null,
+        virtualStudyDescription : ''
       };
     },
     watch: {
@@ -114,6 +115,7 @@
                         tooltip.find('.dialog').css('display', 'none');
                         tooltip.find('.cohort-name').val('');
                         tooltip.find('.cohort-description').val('');
+                        self_.virtualStudyDescription = '';
                         tooltip.find('.save-cohort')
                           .attr('disabled', true);
                         api.reposition();
@@ -138,13 +140,12 @@
               self_.updateStats = true;
               self_.$nextTick(function() {
                 // If user hasn't specific description only.
-                if (!tooltip.find('.cohort-description').val()) {
+                if(tooltip.find('.cohort-description').val() === '' || tooltip.find('.cohort-description').val() === self_.virtualStudyDescription){
                   $.when(vcSession.utils.generateCohortDescription(self_.stats.studies))
                     .then(function(_desp) {
-                      // If user hasn't specific description only.
-                      if (!tooltip.find('.cohort-description').val()) {
-                        tooltip.find('.cohort-description').val(_desp);
-                      }
+                      self_.updateStats = false;
+                      self_.virtualStudyDescription = _desp
+                      tooltip.find('.cohort-description').val(_desp);
                     });
                 }
               });
