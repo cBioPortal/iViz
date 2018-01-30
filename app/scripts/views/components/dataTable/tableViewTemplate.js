@@ -325,7 +325,7 @@
         $.when(iViz.getTableData(_self.attributes.attr_id, function() {
           _self.loadedStudies++;
         })).then(function(_tableData) {
-          $.when(window.iviz.datamanager.getGenePanelMap())
+          $.when(window.iviz.datamanager.getGenePanelMap(_tableData.allGenes, _tableData.allSamples))
             .then(function(_genePanelMap) {
               // create gene panel map
               this.dataLoaded = true;

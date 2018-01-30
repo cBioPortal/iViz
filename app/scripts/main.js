@@ -332,11 +332,17 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     },
     extractMutationData: function(_mutationData) {
       var _mutGeneMeta = {};
+      var _allMutSamples = {};
+      var _allMutGenes = _.pluck(_mutationData, 'gene_symbol');
       var _mutGeneMetaIndex = 0;
       var self = this;
       _.each(_mutationData, function(_mutGeneDataObj) {
         var _uniqueId = _mutGeneDataObj.gene_symbol;
+        if (!_allMutSamples.hasOwnProperty(_mutGeneDataObj.study_id)) {
+          _allMutSamples[_mutGeneDataObj.study_id] = {};
+        }
         _.each(_mutGeneDataObj.caseIds, function(_caseId) {
+          _allMutSamples[_mutGeneDataObj.study_id][_caseId] = 1;
           var _caseUIdIndex = self.getCaseIndex('sample', _mutGeneDataObj.study_id, _caseId);
           if (_mutGeneMeta[_uniqueId] === undefined) {
             _mutGeneMeta[_uniqueId] = {};
@@ -369,16 +375,33 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
       tableData_.mutated_genes = {};
       tableData_.mutated_genes.geneMeta = _mutGeneMeta;
+      tableData_.mutated_genes.allGenes = _allMutGenes;
+      tableData_.mutated_genes.allSamples = [];
+
+      _.each(_allMutSamples, function(samples, studyId) {
+        _.each(Object.keys(samples), function(sampleId) {
+          tableData_.mutated_genes.allSamples.push({
+            "molecularProfileId": window.iviz.datamanager.getMutationProfileIdByStudyId(studyId),
+            "sampleId": sampleId
+          })
+        })
+      });
       return tableData_.mutated_genes;
     },
     extractCnaData: function(_cnaData) {
       var _cnaMeta = {};
+      var _allCNASamples = {};
+      var _allCNAGenes = {};
       var _cnaMetaIndex = 0;
       var self = this;
       $.each(_cnaData, function(_studyId, _cnaDataPerStudy) {
+        if (!_allCNASamples.hasOwnProperty(_studyId)) {
+          _allCNASamples[_studyId] = {};
+        }
         $.each(_cnaDataPerStudy.caseIds, function(_index, _caseIdsPerGene) {
           var _geneSymbol = _cnaDataPerStudy.gene[_index];
           var _altType = '';
+          _allCNAGenes[_geneSymbol] = 1;
           switch (_cnaDataPerStudy.alter[_index]) {
           case -2:
             _altType = 'DEL';
@@ -391,6 +414,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           }
           var _uniqueId = _geneSymbol + '-' + _altType;
           _.each(_caseIdsPerGene, function(_caseId) {
+            _allCNASamples[_studyId][_caseId] = 1;
             var _caseIdIndex = self.getCaseIndex('sample', _studyId, _caseId);
             if (_cnaMeta[_uniqueId] === undefined) {
               _cnaMeta[_uniqueId] = {};
@@ -428,6 +452,17 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
       tableData_.cna_details = {};
       tableData_.cna_details.geneMeta = _cnaMeta;
+      tableData_.cna_details.allGenes = Object.keys(_allCNAGenes);
+      tableData_.cna_details.allSamples = [];
+
+      _.each(_allCNASamples, function(samples, studyId) {
+        _.each(Object.keys(samples), function(sampleId) {
+          tableData_.cna_details.allSamples.push({
+            "molecularProfileId":  window.iviz.datamanager.getCNAProfileIdByStudyId(studyId),
+            "sampleId": sampleId
+          })
+        })
+      });
       return tableData_.cna_details;
     },
     getTableData: function(attrId, progressFunc) {
