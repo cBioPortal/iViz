@@ -350,9 +350,12 @@ module.exports = function(grunt) {
     //     }
     //   }
     // },
-    // concat: {
-    //   dist: {}
-    // },
+    concat: {
+      include_ts: {
+        src: ['dist/scripts/iviz.js', 'dist/scripts/ts.js'],
+        dest: 'dist/scripts/iviz.js',
+      }
+    },
 
     // Copies remaining files to places other tasks can use
     copy: {
@@ -411,17 +414,28 @@ module.exports = function(grunt) {
     concurrent: {
       server: [
         'babel:dist',
+        'ts',
         'sass'
       ],
       test: [
+        'ts',
         'babel'
       ],
       dist: [
+        'ts',
         'babel',
         'sass',
         'imagemin',
         'svgmin'
       ]
+    },
+
+    // Convert ts to js
+    ts: {
+      default : {
+        src: ["**/*.ts", "!node_modules/**"],
+        out: "dist/scripts/ts.js"
+      }
     },
 
     // Paser style json file into Sass variabels
@@ -499,6 +513,7 @@ module.exports = function(grunt) {
     'concurrent:dist',
     'postcss',
     'concat:generated',
+    'concat:include_ts',
     'cssmin:generated',
     // 'uglify:generated',
     'copy:dist',
