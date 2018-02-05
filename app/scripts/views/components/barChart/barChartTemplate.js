@@ -194,7 +194,7 @@
             this.data.max = _.min(greaterOutlier);
           } else {
             var findExtremeResult = cbio.util.findExtremes(this.data.meta);
-            if (this.attributes.attr_id === 'AGE' && _.min(this.data.meta) < 18 && _.max(this.data.meta) > 18) {
+            if (this.attributes.attr_id === 'AGE' && _.min(this.data.meta) < 18 && (findExtremeResult[1] - findExtremeResult[0]) / 2 > 18) {
               this.data.min = 18;
             } else {
               this.data.min = findExtremeResult[0];
