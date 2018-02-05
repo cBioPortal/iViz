@@ -46,6 +46,9 @@ function GeneValidator(geneAreaId, geneModel){
                         $("#iviz-header-left-1").attr("disabled", true);
                     }
                 }
+                if (allValid) {
+                  $("#iviz-header-left-1").attr("disabled", false);
+                }
             })
             .fail(function(xhr,  textStatus, errorThrown){
                 addNotification("There was a problem: "+errorThrown, "danger");
