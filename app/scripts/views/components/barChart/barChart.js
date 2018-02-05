@@ -67,7 +67,7 @@
               val = opts_.xDomain[opts_.xDomain.length - 2];
             } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 2] && !data_.hasNA) {
               val = opts_.xDomain[opts_.xDomain.length - 1];
-            } else if (data_.attrId === 'AGE' && (opts_.xDomain.length >= 2 && opts_.xDomain[1] === 18) && d[data_.attrId] <= 20) {
+            } else if (iViz.util.isAgeClinicalAttr(data_.attrId) && (opts_.xDomain.length >= 2 && opts_.xDomain[1] === 18) && d[data_.attrId] <= 20) {
               val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
                 opts_.gutter + opts_.startPoint + opts_.gutter / 2;
             } else {
@@ -773,7 +773,7 @@
           config.xDomain.push(config.emptyMappingVal);
         }
 
-        if (data.attrId === 'AGE') {
+        if (iViz.util.isAgeClinicalAttr(data.attrId)) {
           // Toning the range when the domains cover 18 and the gutter is under 4
           if (config.xDomain.indexOf(18) === -1 && config.gutter <= 4 && config.gutter >= 2 && config.xDomain[0] < 18 && config.xDomain[config.xDomain.length - 1] > 18) {
             var _closestIndex = -1;
