@@ -56,7 +56,11 @@
           divId: iViz.util.getDefaultDomId('progressBarId', this.attributes.attr_id),
           opts: {},
           infinityInterval: null
-        }
+        },
+        // this is used to set dc invisibleDimension filters
+        // In case of MutatedGeneCna plot this would be case uids
+        // and for other talbe charts this would be row uid
+        chartFilters:[]
       };
     },
     watch: {
@@ -64,6 +68,7 @@
         if (newVal.length === 0) {
           this.invisibleDimension.filterAll();
           this.selectedRows = [];
+          this.chartFilters = [];
         }
         this.$dispatch('update-filters', true);
       },
@@ -125,7 +130,7 @@
               this.invisibleDimension.filterAll();
             } else {
               var filtersMap = {};
-              _.each(this.attributes.filter, function(filter) {
+              _.each(this.chartFilters, function(filter) {
                 if (filtersMap[filter] === undefined) {
                   filtersMap[filter] = true;
                 }
@@ -177,22 +182,24 @@
 
         if (this.isMutatedGeneCna) {
           this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
+          this.attributes.filter.push(selectedRowsUids.join(','))
           _.each(_selectedRowData, function(item) {
             var casesIds = item.case_uids.split(',');
             selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);
           });
-          if (this.attributes.filter.length === 0) {
-            this.attributes.filter = selectedSamplesUnion.sort();
+          if(this.chartFilters.length === 0) {
+            this.chartFilters = selectedSamplesUnion.sort();
           } else {
-            this.attributes.filter =
-              iViz.util.intersection(this.attributes.filter, selectedSamplesUnion.sort());
+            this.chartFilters =
+              iViz.util.intersection(this.chartFilters, selectedSamplesUnion.sort());
           }
         } else {
           this.selectedRows = selectedRowsUids;
           this.attributes.filter = this.selectedRows;
+          this.chartFilters = this.selectedRows
         }
         var filtersMap = {};
-        _.each(this.attributes.filter, function(filter) {
+        _.each(this.chartFilters, function(filter) {
           if (filtersMap[filter] === undefined) {
             filtersMap[filter] = true;
           }
