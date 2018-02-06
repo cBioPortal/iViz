@@ -143,13 +143,13 @@
       processBarchartData: function(_data) {
         var _self = this;
         var _dataIssue = false;
-        var smallerOutlier = [];
-        var greaterOutlier = [];
+        var smallerOutlier = {};
+        var greaterOutlier = {};
         var dataMetaKeys = {}; // Fast index unique dataMeta instead of using _.unique
 
         this.data.meta = _.map(_.filter(_.pluck(
           _data, this.opts.attrId), function(d) {
-          if (isNaN(d) && !(_.isString(d) && d.includes('>') && d.includes('<'))) {
+          if (isNaN(d) && !(_.isString(d) && (d.includes('>') || d.includes('<')))) {
             _self.data.hasNA = true;
             d = 'NA';
           }
@@ -160,9 +160,9 @@
           var greaterOutlierPattern = new RegExp('^>|(<=?)$');
           if (isNaN(d)) {
             if (smallerOutlierPattern.test(number)) {
-              smallerOutlier.push(number.replace(/[^0-9.]/g, ''));
+              smallerOutlier[number.replace(/[^0-9.]/g, '')] = 1;
             } else if (greaterOutlierPattern.test(number)) {
-              greaterOutlier.push(number.replace(/[^0-9.]/g, ''));
+              greaterOutlier[number.replace(/[^0-9.]/g, '')] = 1;
             } else {
               _dataIssue = true;
             }
@@ -172,6 +172,9 @@
           dataMetaKeys[number] = true;
           return number;
         });
+
+        smallerOutlier = Object.keys(smallerOutlier);
+        greaterOutlier = Object.keys(greaterOutlier);
 
         if (_dataIssue) {
           this.errorMessage = iViz.util.getDataErrorMessage('dataInvalid');
