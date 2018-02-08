@@ -338,6 +338,9 @@
           '<span class="message"></span></div>' +
           '</div>'
         });
+        $('.virtual-study-btn').click(function() {
+            $('.virtual-study-btn').qtip('show');
+        });
       }
     },
     ready: function() {
