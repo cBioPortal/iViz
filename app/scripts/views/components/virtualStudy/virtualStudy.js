@@ -121,7 +121,7 @@
             classes: 'qtip-light qtip-rounded qtip-shadow ' +
             'iviz-virtual-study-btn-qtip'
           },
-          show: {event: 'click', ready: false},
+          show: false,
           hide: false,
           position: {
             my: 'top center',
@@ -304,6 +304,8 @@
                 return false;
               });
 
+            },
+            visible: function() {
               // Tell the document itself when clicked to hide the tip and then unbind
               // the click event (the .one() method does the auto-unbinding after one time)
               $(document).one("click", function() {
