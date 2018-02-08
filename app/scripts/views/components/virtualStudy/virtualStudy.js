@@ -226,7 +226,6 @@
                             self_.hideLoading(tooltip);
                             self_.showShared(tooltip);
                             previousSelectedCases = currentSelectedCases;
-                            debugger;
                           })
                           .fail(function() {
                             self_.hideLoading(tooltip);
@@ -237,7 +236,6 @@
                               'Failed to share virtual study, ' +
                               'please try again later.</span>')
                             self_.showFailedInfo(tooltip);
-                            debugger;
                           });
                       } else {
                         // Hide saving icon if current study is same as previous.
