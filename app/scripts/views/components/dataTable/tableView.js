@@ -204,6 +204,7 @@
           rowClickFunc: reactRowClickCallback,
           selectedGene: selectedGenes,
           geneClickFunc: reactGeneClickCallback,
+          elementId: chartId_ + '-table',
           selectButtonClickCallback: reactSubmitClickCallback
         });
       }
