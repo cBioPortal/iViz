@@ -65,23 +65,27 @@ body {
   }
 }
 
-.iviz-save-cohort-btn-qtip {
+.iviz-virtual-study-btn-qtip.qtip {
+  max-width: 320px;
+}
+
+.iviz-virtual-study-btn-qtip {
   .qtip-content {
     padding: 9px;
+    font-size: 14px;
     .dialog {
       input {
         line-height: 20px;
         padding: 2px 5px;
         width: 100%;
-        font-size: 14px;
         margin: 2px 0;
       }
-      textarea.form-control {
+      textarea {
+        width: 100%;
         padding: 6px 5px;
       }
     }
     .saved, .saving {
-      font-size: 15px;
       line-height: 16px;
     }
     .saved > span {
@@ -90,9 +94,9 @@ body {
     .saved > button {
       float: right;
     }
-    .saved {
-      .savedMessage {
-        display: inline-flex;
+    .failed {
+      .message {
+        display: flex;
         .fa-exclamation-triangle {
           color: orange;
         }
@@ -103,19 +107,13 @@ body {
     }
     .saving {
       text-align: center;
-    }
-  }
-}
-
-.iviz-share-cohort-btn-qtip {
-  .qtip-content {
-    .dialog {
-      .virtual-study-link {
-        display: inline-flex; 
-        line-height: 16px;
+      .message {
+        margin-left: 5px;
       }
-      .share-cohort {
-        border-radius: 4px;
+    }
+    .shared {
+      .copy-cohort-btn {
+        margin-left: 5px;
       }
     }
   }
