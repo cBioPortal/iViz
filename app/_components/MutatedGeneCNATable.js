@@ -1480,7 +1480,7 @@ window.EnhancedFixedDataTableSpecial = (function() {
         selectedGene: [],
         sortBy: 'cases',
         sortDir: 'DESC',
-        elementId: '',
+        elementId: 'EFDT',
         isResizable: false
       };
     },

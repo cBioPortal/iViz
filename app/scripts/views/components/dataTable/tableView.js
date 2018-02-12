@@ -189,6 +189,7 @@
         autoColumnWidth: false,
         columnMaxWidth: 300,
         columnSorting: false,
+        elementId: chartId_ + '-table',
         sortBy: 'cases',
         selectedRows: selectedRows,
         rowClickFunc: function(data, selected) {
@@ -204,7 +205,6 @@
           rowClickFunc: reactRowClickCallback,
           selectedGene: selectedGenes,
           geneClickFunc: reactGeneClickCallback,
-          elementId: chartId_ + '-table',
           selectButtonClickCallback: reactSubmitClickCallback
         });
       }
