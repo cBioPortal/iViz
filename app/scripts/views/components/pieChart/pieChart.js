@@ -493,6 +493,7 @@
         columnMaxWidth: 300,
         columnSorting: false,
         tableType: 'pieLabel',
+        elementId: targetId + '-table',
         selectedRows: selectedRows,
         rowClickFunc: pieLabelClick
       }, opts);

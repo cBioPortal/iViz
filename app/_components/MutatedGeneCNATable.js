@@ -555,12 +555,13 @@ window.EnhancedFixedDataTableSpecial = (function() {
   var TableMainPart = React.createClass({displayName: "TableMainPart",
     // Creates Qtip
     createQtip: function() {
-      $('.EFDT-table .hasQtip').one('mouseenter', function() {
+      var self = this;
+      $((this.props.elementId ? ('#' + this.props.elementId) : '') + '.EFDT-table .hasQtip').one('mouseenter', function() {
         $(this).qtip({
           content: {text: $(this).attr('data-qtip')},
           hide: {fixed: true, delay: 100},
           show: {ready: true},
-          style: {classes: 'qtip-light qtip-rounded qtip-shadow', tip: true},
+          style: {classes: 'qtip-light qtip-rounded qtip-shadow ' + self.props.elementId, tip: true},
           position: {my: 'center left', at: 'center right', viewport: $(window)}
         });
       });
@@ -578,16 +579,17 @@ window.EnhancedFixedDataTableSpecial = (function() {
 
     // Creates Qtip after page scrolling
     onScrollEnd: function() {
-      $(".qtip").remove();
+      var qtipId = '.qtip';
+      if (this.props.elementId) {
+        qtipId = '.' + this.props.elementId + '-qtip ' + qtipId;
+      }
+      $(qtipId).remove();
       this.createQtip();
     },
 
     // Destroys Qtip before update rendering
     componentWillUpdate: function() {
-      //console.log('number of elments which has "hasQtip" as class name: ', $('.hasQtip').size());
-      //console.log('number of elments which has "hasQtip" as class name under class EFDT: ', $('.EFDT-table .hasQtip').size());
-
-      $('.EFDT-table .hasQtip')
+      $((this.props.elementId ? ('#' + this.props.elementId) : '') + '.EFDT-table .hasQtip')
         .each(function() {
           $(this).qtip('destroy', true);
         });
@@ -1478,6 +1480,7 @@ window.EnhancedFixedDataTableSpecial = (function() {
         selectedGene: [],
         sortBy: 'cases',
         sortDir: 'DESC',
+        elementId: 'EFDT',
         isResizable: false
       };
     },
@@ -1488,7 +1491,7 @@ window.EnhancedFixedDataTableSpecial = (function() {
       var selectedRowIndex = this.getSelectedRowIndex(this.state.selectedRows);
       var confirmedRowsIndex = this.getSelectedRowIndex(this.state.confirmedRows);
       return (
-        React.createElement("div", {className: "EFDT-table"},
+        React.createElement("div", {className: "EFDT-table", id: this.props.elementId},
           React.createElement("div", {className: "EFDT-table-prefix"},
             React.createElement(TablePrefix, {cols: this.state.cols, rows: this.rows,
               onFilterKeywordChange: this.onFilterKeywordChange,
@@ -1538,6 +1541,7 @@ window.EnhancedFixedDataTableSpecial = (function() {
               selectedRowIndex: selectedRowIndex,
               selectedGeneRowIndex: selectedGeneRowIndex,
               isResizable: this.props.isResizable,
+              elementId: this.props.elementId,
               onColumnResizeEndCallback: this.onColumnResizeEndCallback}
             )
           ),
