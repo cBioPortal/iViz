@@ -6,7 +6,7 @@
 
     var chartInst_;// DC chart instance.
     var opts_ = {};// Chart configuration options
-    var data_ = {};// Chart related data. Such as attr_id.
+    var data_ = {};// Chart related data. Such as attrId.
     var colors_;
     var ndx_;
     var dcDimension;
@@ -67,6 +67,9 @@
               val = opts_.xDomain[opts_.xDomain.length - 2];
             } else if (d[data_.attrId] > opts_.xDomain[opts_.xDomain.length - 2] && !data_.hasNA) {
               val = opts_.xDomain[opts_.xDomain.length - 1];
+            } else if (iViz.util.isAgeClinicalAttr(data_.attrId) && (opts_.xDomain.length >= 2 && opts_.xDomain[1] === 18) && d[data_.attrId] <= 20) {
+              val = Math.ceil((d[data_.attrId] - opts_.startPoint) / opts_.gutter) *
+                opts_.gutter + opts_.startPoint + opts_.gutter / 2;
             } else {
               // minus half of separateDistance to make the margin values
               // always map to the left side. Thus for any value x, it is in the
@@ -223,6 +226,7 @@
       opts_ = _.extend({}, opts);
       data_ = data;
       opts_ = _.extend(opts_, iViz.util.barChart.getDcConfig({
+        attrId: opts.attrId,
         min: data_.min,
         max: data_.max,
         meta: data_.meta,
@@ -767,6 +771,47 @@
 
         if (config.emptyMappingVal !== '') {
           config.xDomain.push(config.emptyMappingVal);
+        }
+
+        if (iViz.util.isAgeClinicalAttr(data.attrId)) {
+          // Toning the range when the domains cover 18 and the gutter is under 4
+          if (config.xDomain.indexOf(18) === -1 && config.gutter <= 4 && config.gutter >= 2 && config.xDomain[0] < 18 && config.xDomain[config.xDomain.length - 1] > 18) {
+            var _closestIndex = -1;
+            var _closestDistance = 0;
+            _.each(config.xDomain, function(domain, index) {
+              // _diff should be always a integer in this range
+              var _diff = Math.abs(18 - domain);
+              if (_closestDistance === 0 || _diff < _closestDistance) {
+                _closestDistance = _diff;
+                _closestIndex = index;
+              }
+            });
+            if (_closestIndex > -1) {
+              config.xDomain = _.map(config.xDomain, function(domain) {
+                return domain + _closestDistance;
+              });
+              config.xDomain.unshift(config.xDomain[0] - config.gutter);
+            }
+            if (config.emptyMappingVal !== '') {
+              config.emptyMappingVal = config.xDomain[config.xDomain.length - 1];
+              if (config.xDomain.length >= 2) {
+                config.maxVal = config.xDomain[config.xDomain.length - 2];
+              }
+            } else {
+              config.maxVal = config.xDomain[config.xDomain.length - 1];
+            }
+            config.startPoint = config.xDomain[0];
+          }
+
+          // If the lowest group is 10~20, change the range to 10~18 and 18~30
+          if (config.xDomain[0] === 10 && config.xDomain[1] === 20) {
+            config.xDomain[1] = 18;
+          }
+
+          // if it happens the first sticker is 18, then we keep that group as well.
+          if (config.xDomain[0] === 18) {
+            config.xDomain.unshift(18 - config.gutter);
+          }
         }
       }
       return config;

@@ -874,6 +874,15 @@ var util = (function(_, cbio) {
       return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
     };
 
+    content.isAgeClinicalAttr = function(attrId) {
+      var isRelated = false;
+      if (attrId) {
+        var result = attrId.match(/(^AGE$)|(^AGE_.*)|(.*_AGE_.*)|(.*_AGE&)/);
+        isRelated = _.isArray(result) && result.length > 0;
+      }
+      return isRelated;
+    };
+
     return content;
   })();
 })(window._, window.cbio);
