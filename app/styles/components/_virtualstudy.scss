@@ -1,8 +1,12 @@
 .virtual-study {
-   @extend .iviz-header-button;
-   padding: 0;
+  @extend .iviz-header-button;
+  padding: 0;
 
-   .virtual-study-btn {
-     padding: 5px 10px;
-   }
- }
+  .virtual-study-btn {
+    padding: 5px 10px;
+  }
+}
+
+.share-virtual-study {
+  @extend .iviz-header-button;
+} 

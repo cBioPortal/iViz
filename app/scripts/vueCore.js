@@ -30,6 +30,7 @@
             groupCount: 0,
             updateSpecialCharts: false,
             showVirtualStudyButton: false,
+            showShareButton: false,
             showManageButton: false,
             loadUserSpecificCohorts: false,
             stats: {},

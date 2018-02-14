@@ -119,6 +119,20 @@ body {
   }
 }
 
+.iviz-share-cohort-btn-qtip {
+  .qtip-content {
+    .dialog {
+      .virtual-study-link {
+        display: inline-flex;
+        line-height: 16px;
+      }
+    }
+    .share-cohort {
+      border-radius: 4px;
+    }
+  }
+}
+
 #study-view-summary-page-pb {
   margin: 40px auto;
 }
