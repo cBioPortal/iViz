@@ -206,6 +206,14 @@
                     self_.$nextTick(function() {
                       $('#iviz-add-chart').trigger('chosen:updated');
                       self_.showScreenLoad = false;
+                      $.notify({
+                        // options
+                        message: 'Chart has been added at the bottom of the page.'
+                      },{
+                        // settings
+                        type: 'info',
+                        delay: '1000'
+                      });
                     });
                   });
                 } else {

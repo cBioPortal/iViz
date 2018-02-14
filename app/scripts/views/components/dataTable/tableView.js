@@ -189,6 +189,7 @@
         autoColumnWidth: false,
         columnMaxWidth: 300,
         columnSorting: false,
+        elementId: chartId_ + '-table',
         sortBy: 'cases',
         selectedRows: selectedRows,
         rowClickFunc: function(data, selected) {

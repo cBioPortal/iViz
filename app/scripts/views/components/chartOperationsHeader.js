@@ -4,7 +4,7 @@
 'use strict';
 (function(Vue, iViz, dc, $, _) {
   Vue.component('chartOperations', {
-    template: '<div class="chart-header">' +
+    template: '<div class="chart-header" id="{{chartId}}-chart-header">' +
     '<div class="chart-title" ' +
     ':class="[showOperations?chartTitleActive:chartTitle]" ' +
     'v-if="hasChartTitle">' +
@@ -23,18 +23,18 @@
     'id="{{chartId}}-description-icon"' +
     'aria-hidden="true"></i>' +
     '<i v-if="showTableIcon && chartInitialed" class="fa fa-table icon hover" ' +
-    'aria-hidden="true" @click="changeView()"></i>' +
+    'aria-hidden="true" @click="changeView()" alt="Convert pie chart to table"></i>' +
     '<i v-if="showPieIcon && chartInitialed"" class="fa fa-pie-chart icon hover" ' +
-    'aria-hidden="true" @click="changeView()"></i>' +
-    '<img v-if="showSurvivalIcon && chartInitialed"" src="images/survival_icon.svg" ' +
-    'class="icon hover" @click="getRainbowSurvival" alt="Survival Analysis"/>' +
+    'aria-hidden="true" @click="changeView()" alt="Convert table to pie chart"></i>' +
+    '<div class="dc-survival-icon" style="float: left;"><img v-if="showSurvivalIcon && chartInitialed" src="images/survival_icon.svg" ' +
+    'class="icon hover" @click="getRainbowSurvival" alt="Survival Analysis"/></div>' +
     '<div v-if="showDownloadIcon && chartInitialed"" id="{{chartId}}-download-icon-wrapper" class="download">' +
     '<i class="fa fa-download icon hover" alt="download" ' +
     'id="{{chartId}}-download"></i>' +
     '</div>' +
-    '<i class="fa fa-arrows dc-chart-drag icon" aria-hidden="true"></i>' +
-    '<div style="float:right"><i class="fa fa-times dc-chart-pointer icon" ' +
-    '@click="close()"></i></div>' +
+    '<i class="fa fa-arrows dc-chart-drag icon" aria-hidden="true" alt="Move chart"></i>' +
+    '<div style="float:right"><i class="fa fa-times dc-remove-chart-icon icon" ' +
+    '@click="close()" alt="Delete chart"></i></div>' +
     '</div>' +
     '</div>',
     props: {
@@ -86,6 +86,13 @@
         chartTitleActive: 'chart-title-active chart-title-active-' + 3,
         logChecked: true,
         hasFilters: false,
+        titleIconQtipOpts: {
+          style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
+          show: {event: 'mouseover', delay: 0},
+          hide: {fixed: true, delay: 300, event: 'mouseout'},
+          position: {my: 'bottom left', at: 'top right', viewport: $(window)},
+          content: {}
+        },
         titleTooltip: {
           content: _.isObject(this.attributes) ?
             iViz.util.getClinicalAttrTooltipContent(this.attributes) : ''
@@ -134,9 +141,34 @@
           self_.$dispatch('closeChart');
         });
       },
+      updateChartTypeIconTooltip: function() {
+        $('#' + this.chartId + '-chart-header .fa-table').qtip('destroy', true);
+        $('#' + this.chartId + '-chart-header .fa-pie-chart').qtip('destroy', true);
+
+        if (this.showTableIcon) {
+          this.$nextTick(function() {
+            $('#' + this.chartId + '-chart-header .fa-table').qtip($.extend(true, this.titleIconQtipOpts, {
+              content: {
+                text: 'Convert pie chart to table'
+              }
+            }));
+          });
+        }
+
+        if (this.showPieIcon) {
+          this.$nextTick(function() {
+            $('#' + this.chartId + '-chart-header .fa-pie-chart').qtip($.extend(true, this.titleIconQtipOpts, {
+              content: {
+                text: 'Convert table to pie chart'
+              }
+            }));
+          });
+        }
+      },
       changeView: function() {
         this.showTableIcon = !this.showTableIcon;
         this.showPieIcon = !this.showPieIcon;
+        this.updateChartTypeIconTooltip();
         this.$dispatch('toTableView');
       },
       getRainbowSurvival: function() {
@@ -145,7 +177,7 @@
       hasTitleTooltip: function() {
         return _.isObject(this.attributes) ?
           (['survival'].indexOf(this.attributes.view_type) === -1 &&
-          _.isObject(this.titleTooltip) && this.titleTooltip.content) : false;
+            _.isObject(this.titleTooltip) && this.titleTooltip.content) : false;
       }
     },
     ready: function() {
@@ -172,15 +204,31 @@
         });
       }
 
-      $('#' + this.chartId + '-download-icon-wrapper').qtip({
-        style: {classes: 'qtip-light qtip-rounded qtip-shadow'},
-        show: {event: 'mouseover', delay: 0},
-        hide: {fixed: true, delay: 300, event: 'mouseout'},
-        position: {my: 'bottom left', at: 'top right', viewport: $(window)},
+      $('#' + this.chartId + '-download-icon-wrapper').qtip($.extend(true, this.titleIconQtipOpts, {
         content: {
           text: 'Download'
         }
-      });
+      }));
+
+      $('#' + this.chartId + '-chart-header .dc-chart-drag').qtip($.extend(true, this.titleIconQtipOpts, {
+        content: {
+          text: 'Move chart'
+        }
+      }));
+
+      $('#' + this.chartId + '-chart-header .dc-remove-chart-icon').qtip($.extend(true, this.titleIconQtipOpts, {
+        content: {
+          text: 'Delete chart'
+        }
+      }));
+
+      $('#' + this.chartId + '-chart-header .dc-survival-icon').qtip($.extend(true, this.titleIconQtipOpts, {
+        content: {
+          text: 'Survival Analysis'
+        }
+      }));
+
+      this.updateChartTypeIconTooltip();
 
       $('#' + this.chartId + '-download').qtip({
         id: '#' + this.chartId + '-download-qtip',
