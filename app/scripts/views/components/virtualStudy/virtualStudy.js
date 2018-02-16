@@ -162,7 +162,7 @@
                           '<a class="left-space" href="' +
                           window.cbioURL + 'study?id=' +
                           self_.savedVS.id + '">view</a>');
-                        tooltip.find('.savedMessage').find('a').click(function(event) {
+                        tooltip.find('.saved .message').find('a').click(function(event) {
                           event.preventDefault();
                           window.open(window.cbioURL + 'study?id=' +
                             self_.savedVS.id);
