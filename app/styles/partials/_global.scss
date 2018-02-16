@@ -106,9 +106,13 @@
   color: #555555;
   padding: 5px 10px;
   border: solid 1px;
-  border-radius: 5px;
-  border-color: darkgrey;
+  border-radius: 3px;
+  border-color: #ccc;
   line-height: 18px;
+}
+
+.virtual-study .btn-default {
+  background-color: transparent;
 }
 
 .iviz-header-button:hover {

@@ -108,8 +108,8 @@
   <script src="scripts/views/components/dataTable/tableViewTemplate.js"></script>
   <script src="scripts/views/components/customPlots/CaseDialogBox.js"></script>
   <script src="scripts/views/components/error.js"></script>
-  <script src="scripts/views/components/saveVirtualStudy/saveVirtualStudy.js"></script>
   <script src="scripts/views/components/shareVirtualStudy/shareVirtualStudy.js"></script>
+  <script src="scripts/views/components/virtualStudy/virtualStudy.js"></script>
   <script src="scripts/views/components/progressBar/progressBar.js"></script>
   <!-- endbuild -->
 </head>
@@ -125,8 +125,7 @@
             <span>{{ selectedSamplesNum }} samples / {{ selectedPatientsNum }} patients</span>
           </span>
         </div>
-        <save-virtual-study :show-save-button="showSaveButton" :stats="stats"
-                           :update-stats.sync="updateStats"></save-virtual-study>
+        <virtual-study v-if="showVirtualStudyButton" :stats="stats" :update-stats.sync="updateStats"></virtual-study>
         <share-virtual-study :show-share-button="showShareButton" :stats="stats"
                              :update-stats.sync="updateStats"></share-virtual-study>
         <span id="iviz-header-left-patient-select" class="iviz-header-button"
@@ -205,11 +204,11 @@
     vcSession.URL =
       'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
 
-    // This is used to indicate how to disable three buttons. By default, they are set to false.
-    iViz.vue.manage.getInstance().showSaveButton = false;
+    // Set this to true if want to save/share virtual study, after user is authenticated
+    iViz.vue.manage.getInstance().showVirtualStudyButton = true;
 
-    //Set this to true if want to share cohorts url(this is for cbioportal)
-    iViz.vue.manage.getInstance().showShareButton = true;
+    // Set this to true if want to share virtual study, before user is authenticated
+    iViz.vue.manage.getInstance().showShareButton = false;
 
     iViz.vue.manage.getInstance().showManageButton = false;
 
