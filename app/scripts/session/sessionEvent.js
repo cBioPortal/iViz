@@ -11,7 +11,7 @@ window.vcSession = window.vcSession ? window.vcSession : {};
     return {
       saveCohort: function(stats, name, description, addToUserStudies) {
         var def = new $.Deferred();
-        $.when(vcSession.utils.buildVCObject(stats.filters, stats.studies,
+        $.when(vcSession.utils.buildVCObject(stats,
           name, description)).done(function(_virtualCohort) {
           vcSession.model.saveSession(_virtualCohort, addToUserStudies)
             .done(function(response) {

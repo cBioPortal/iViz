@@ -9,21 +9,23 @@
       name: '',
       description: '',
       filters: '',
-      studies: ''
+      studies: '',
+      origin:''
     };
 
-    var buildVCObject_ = function(filters, cases, name,
+    var buildVCObject_ = function(stats, name,
                                   description) {
       var def = new $.Deferred();
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
-      _virtualCohort.filters = filters;
+      _virtualCohort.filters = stats.filters;
       
-      _virtualCohort.studies = cases.map(function(studyObj) {
+      _virtualCohort.studies = stats.studies.map(function(studyObj) {
         return {
           id: studyObj.id,
           samples: studyObj.samples
         };
       });
+      _virtualCohort.origin = stats.origin;
       if (name) {
         _virtualCohort.name = name;
       } else {
