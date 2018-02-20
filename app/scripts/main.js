@@ -710,6 +710,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     },
     stat: function() {
       var _result = {};
+      _result.origin = window.cohortIdsList;
       _result.filters = {};
       var self = this;
 
