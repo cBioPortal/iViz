@@ -53,8 +53,9 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         selectableIdsSet[id] = true;
       });
 
-      for (var id in window.cohortIdsList) {
-        if(selectableIdsSet[id]){
+      var cohortIds = window.cohortIdsList;
+      for (var i = 0; i < cohortIds.length; i++) {
+        if(selectableIdsSet[cohortIds[i]]){
           includeCases = false;
           break;
         }
