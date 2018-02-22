@@ -36,7 +36,7 @@
       return def.promise();
     };
 
-    var generateCohortDescription_ = function(_cases) {
+    var generateVSDescription_ = function(_cases) {
       var def = new $.Deferred(), _desp = "";
       $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(_cases, "id"))).done(function(_studyIdNameMap) {
         _.each(_cases, function (_i) {
@@ -49,7 +49,10 @@
 
     return {
       buildVCObject: buildVCObject_,
-      generateCohortDescription: generateCohortDescription_
+      generateVSName: function() {
+        return 'Selected Study'
+      },
+      generateVSDescription: generateVSDescription_
     };
   })();
 })(window.vcSession,
