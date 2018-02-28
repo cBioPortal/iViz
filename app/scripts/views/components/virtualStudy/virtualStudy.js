@@ -246,8 +246,8 @@
                             self_.showFailedInfo(tooltip);
                           });
                       } else {
-                        // Hide saving icon if current study is same as previous.
-                        tooltip.find('.saving').css('display', 'none');
+                        self_.hideLoading(tooltip);
+                        self_.showShared(tooltip);
                       }
                     }
                   });
