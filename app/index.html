@@ -215,26 +215,7 @@
     window.cohortIdsList = ['hnsc_tcga'];
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
-    var getSelectableStudyIds = function() {
-      var def = new $.Deferred();
-      $.when(this.getPhysicalStudies(), this.getVirtualStudies()).then(function(physicalStudies, virtualStudies) {
-        var physicalStudyIds = _.pluck(physicalStudies,'studyId');
-        var virtualStudyIds = _.map(virtualStudies,function(virtualStudy){
-          if(virtualStudy['data'] && virtualStudy['data']['studies']){
-            return _.map(virtualStudy['data']['studies'],function(study){
-              return study['id'];
-            })
-          } else {
-            return [];
-          }
-        });
-        virtualStudyIds = _.flatten(virtualStudyIds);
-        def.resolve(virtualStudyIds)
-      }).fail(function(error) {
-        def.reject(error);
-      });
-      return def.promise();
-    }
+
     var getVirtualStudies = function(){
         var _def = new $.Deferred();
         $.get(window.cbioURL+'api-legacy/proxy/session/virtual_study')
@@ -257,6 +238,18 @@
         });
       return def.promise();
     }
+
+    var getSelectableStudyIds = function() {
+      var def = new $.Deferred();
+      $.when(getPhysicalStudies(), getVirtualStudies()).then(function(physicalStudies, virtualStudies) {
+          var physicalStudyIds = _.pluck(physicalStudies,'studyId');
+          var virtualStudyIds = _.pluck(virtualStudies,'id');
+          def.resolve( physicalStudyIds.concat(virtualStudyIds))
+      }).fail(function(error) {
+          def.reject(error);
+      });
+      return def.promise();
+    }
     $.when(window.iviz.datamanager.getConfigs())
       .done(function(configs) {
         var opts = {};
@@ -267,7 +260,7 @@
           window.iviz.datamanager.initialSetup(),
           getSelectableStudyIds()
         ).done(function(_data,selectableIds) {
-          iViz.init(_data, opts);
+          iViz.init(_data, opts, selectableIds);
         }).fail(function(error) {
           iViz.vue.manage.getInstance().failedToInit.status = true;
           if (error) {
