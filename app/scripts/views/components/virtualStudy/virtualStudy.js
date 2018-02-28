@@ -17,6 +17,14 @@
         type: Boolean,
         default: false
       },
+      showSaveButton: {
+        type: Boolean,
+        default: false
+      },
+      showShareButton: {
+        type: Boolean,
+        default: false
+      },
       createdQtip: {
         type: Boolean,
         default: false
@@ -316,10 +324,9 @@
           content: '<div><div class="dialog"><div class="input-group">' +
           '<input type="text" class="form-control cohort-name" ' +
           'placeholder="Virtual study Name"> <span class="input-group-btn">' +
-          '<button class="btn btn-default save-cohort" ' +
-          'type="button" disabled>Save</button>' +
-          '<button class="btn btn-default share-cohort" ' +
-          'type="button" disabled>Share</button></span>' +
+          (self_.showSaveButton ? '<button class="btn btn-default save-cohort" type="button" disabled>Save</button>' : '') +
+          (self_.showShareButton ? '<button class="btn btn-default share-cohort" type="button" disabled>Share</button>' : '') +
+          '</span>' +
           '</div><div>' +
           '<textarea classe="form-control" rows="5" ' +
           'placeholder="Virtual study description (Optional)"></textarea>' +
@@ -341,7 +348,7 @@
           '</div>'
         });
         $('.virtual-study-btn').click(function() {
-            $('.virtual-study-btn').qtip('show');
+          $('.virtual-study-btn').qtip('show');
         });
       }
     },
