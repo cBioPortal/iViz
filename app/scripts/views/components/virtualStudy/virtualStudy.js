@@ -123,7 +123,8 @@
       createQtip: function() {
         var self_ = this;
         var previousSelectedCases = {};
-        $('.virtual-study').qtip(iViz.util.defaultQtipConfig('Save/Share Virtual Study'));
+        $('.virtual-study').qtip(iViz.util.defaultQtipConfig(
+          (self_.showSaveButton ? 'Save/' : '') + 'Share Virtual Study'));
         $('.virtual-study-btn').qtip({
           style: {
             classes: 'qtip-light qtip-rounded qtip-shadow ' +
