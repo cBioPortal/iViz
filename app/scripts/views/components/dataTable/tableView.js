@@ -76,7 +76,7 @@
           group = dimension.group();
           initPieTableData();
         }
-        initReactTable(true, undefined, sequencedSampleIds);
+        initReactTable(true, sequencedSampleIds);
         initialized = true;
       };
 
@@ -95,7 +95,7 @@
         initialized = true;
         selectedSamples = _selectedSampleUIDs;
         if (iViz.util.compare(allSamplesIds, selectedSamples)) {
-          initReactTable(true, undefined, selectedSamples);
+          initReactTable(true, selectedSamples);
         } else {
           _.each(_selectedSampleUIDs, function(caseId) {
             var caseData_ = data_[caseId];
@@ -144,7 +144,7 @@
             content.case_uids = iViz.util.unique(content.case_ids);
           });
           
-          initReactTable(true, selectedMap_, selectedSamples);
+          initReactTable(true, selectedSamples, selectedMap_);
         }
       } else {
         initReactTable(false);
@@ -166,7 +166,7 @@
       return _.values(categories_);
     };
 
-    function initReactTable(_reloadData, _selectedMap, _selectedSampleUids) {
+    function initReactTable(_reloadData, _selectedSampleUids, _selectedMap) {
       if (_reloadData) {
         reactTableData = initReactData(_selectedMap, _selectedSampleUids);
       }
