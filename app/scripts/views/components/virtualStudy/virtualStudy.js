@@ -284,7 +284,7 @@
               self_.$nextTick(function() {
                 // If user hasn't specific name only.
                 if (tooltip.find('.cohort-name').val() === '') {
-                  tooltip.find('.cohort-name').val(vcSession.utils.generateVSName());
+                  tooltip.find('.cohort-name').val(vcSession.utils.VSDefaultName);
                 }
 
                 // If user hasn't specific description only.

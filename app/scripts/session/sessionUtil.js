@@ -49,9 +49,7 @@
 
     return {
       buildVCObject: buildVCObject_,
-      generateVSName: function() {
-        return 'Selected Study'
-      },
+      VSDefaultName: 'Selected Study',
       generateVSDescription: generateVSDescription_
     };
   })();
