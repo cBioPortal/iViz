@@ -55,9 +55,9 @@
       function(_attributes, _opts, _selectedSamples, _selectedGenes,
                _data, _callbacks, _geneData, _dimension, _genePanelMap) {
         initialized = false;
+        _selectedSamples.sort();
         allSamplesIds = _selectedSamples;
         selectedSamples = _selectedSamples;
-        selectedSamples.sort();
         sequencedSampleIds = _attributes.options.sequencedCases === undefined ? allSamplesIds : _attributes.options.sequencedCases;
         sequencedSampleIds.sort();
         selectedGenes = _selectedGenes;
@@ -76,7 +76,8 @@
           group = dimension.group();
           initPieTableData();
         }
-        initReactTable(true);
+        initReactTable(true, undefined, sequencedSampleIds);
+        initialized = true;
       };
 
     content.update = function(_selectedSampleUIDs, _selectedRows) {
@@ -94,7 +95,7 @@
         initialized = true;
         selectedSamples = _selectedSampleUIDs;
         if (iViz.util.compare(allSamplesIds, selectedSamples)) {
-          initReactTable(true);
+          initReactTable(true, undefined, selectedSamples);
         } else {
           _.each(_selectedSampleUIDs, function(caseId) {
             var caseData_ = data_[caseId];
