@@ -197,10 +197,6 @@
   $(document).ready(function() {
     //Include style variables
     iViz.vue.manage.init();
-
-    vcSession.URL =
-      'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
-
     // Set this to true if want to share virtual study, before user is authenticated
     iViz.vue.manage.getInstance().showShareButton = false;
 
@@ -241,17 +237,13 @@
     }
     var getVirtualStudies = function(){
         var _def = new $.Deferred();
-        if (vcSession.URL !== undefined) {
-          $.get(vcSession.URL)
-          .done(function(virtualStudies) {
-            def.resolve(virtualStudies);
-          })
-          .fail(function(error) {
-            def.reject(error);
-          });
-        } else {
-          _def.resolve([])
-        }
+        $.get(window.cbioURL+'api-legacy/proxy/session/virtual_study')
+        .done(function(virtualStudies) {
+          def.resolve(virtualStudies);
+        })
+        .fail(function(error) {
+          def.reject(error);
+        });
       return _def.promise();
     }
     var getPhysicalStudies = function(){
