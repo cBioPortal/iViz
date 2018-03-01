@@ -122,9 +122,9 @@
             <span>{{ selectedSamplesNum }} samples / {{ selectedPatientsNum }} patients</span>
           </span>
         </div>
-        <virtual-study v-if="showVirtualStudyButton" :stats="stats" :update-stats.sync="updateStats"></virtual-study>
-        <share-virtual-study :show-share-button="showShareButton" :stats="stats"
-                             :update-stats.sync="updateStats"></share-virtual-study>
+        <virtual-study v-if="showShareButton || showSaveButton" :show-share-button="showShareButton"
+                       :show-save-button="showSaveButton" :stats="stats"
+                       :update-stats.sync="updateStats"></virtual-study>
         <span id="iviz-header-left-patient-select" class="iviz-header-button"
               @click="openCases" class="number"
               role="button" tabindex="0" style="display: block;"><i class="fa fa-user-circle-o" aria-hidden="true"></i></span>
@@ -201,13 +201,10 @@
     vcSession.URL =
       'http://localhost:8081/session_service/api/sessions/localhost/virtual_cohort/';
 
-    // Set this to true if want to save/share virtual study, after user is authenticated
-    iViz.vue.manage.getInstance().showVirtualStudyButton = true;
-
     // Set this to true if want to share virtual study, before user is authenticated
     iViz.vue.manage.getInstance().showShareButton = false;
 
-    iViz.vue.manage.getInstance().showManageButton = false;
+    iViz.vue.manage.getInstance().showSaveButton = false;
 
     //Set this to true if want to load user specific cohorts(this is for cbioportal)
     iViz.vue.manage.getInstance().loadUserSpecificCohorts = false;
