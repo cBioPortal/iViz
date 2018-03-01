@@ -6,6 +6,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
   var groupFiltersMap_ = {};
   var groupNdxMap_ = {};
   var charts = {};
+  var includeCases= true;
   var configs_ = {
     styles: {
       vars: {
@@ -45,8 +46,20 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
   return {
 
-    init: function(_rawDataJSON, configs) {
+    init: function(_rawDataJSON, configs,_selectableIds) {
       vm_ = iViz.vue.manage.getInstance();
+      var selectableIdsSet = {}
+      _.each(_selectableIds, function(id){
+        selectableIdsSet[id] = true;
+      });
+
+      var cohortIds = window.cohortIdsList;
+      for (var i = 0; i < cohortIds.length; i++) {
+        if(selectableIdsSet[cohortIds[i]]){
+          includeCases = false;
+          break;
+        }
+      }
 
       data_ = _rawDataJSON;
 
@@ -667,46 +680,9 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       });
     },
     submitForm: function() {
-      var _self = this;
-      _self.selectedsamples = _.keys(iViz.getCasesMap('sample'));
-      _self.selectedpatients = _.keys(iViz.getCasesMap('patient'));
-      _self.cohorts_ = window.cohortIdsList; // queried cohorts (vc or regular study)
-
       // Remove all hidden inputs
       $('#iviz-form input:not(:first)').remove();
-
-      // Had discussion whether we should get rid of _self.cohorts_ and always
-      // use _self.stat().studies which will make the code looks cleaner.
-      // But the major issue for using _self.stat() is the unnecessary calculation
-      // for studies without filters. Especially big combined studies.
-      // We decided to leave the code as it is for now. By Karthik and Hongxin
-      if (_self.cohorts_.length === 1) { // to query single study
-        if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(_self.cohorts_[0], vm_.hasfilters ? _self.stat().studies : undefined);
-        } else {
-          QueryByGeneTextArea.validateGenes(this.decideSubmitSingleCohort, false);
-        }
-      } else { // query multiple studies
-        if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(_self.cohorts_,  vm_.hasfilters ? _self.stat().studies : undefined);
-        } else {
-          QueryByGeneUtil.toMultiStudiesQueryPage(_self.stat().studies, QueryByGeneTextArea.getGenes());
-        }
-      }
-    },
-    decideSubmitSingleCohort: function(allValid) {
-      // if all genes are valid, submit, otherwise show a notification
-      if (allValid) {
-        var _self = this;
-        QueryByGeneUtil.toQueryPageSingleCohort(window.cohortIdsList[0], iViz.stat().studies,
-          QueryByGeneTextArea.getGenes(), window.mutationProfileId,
-          window.cnaProfileId);
-      } else {
-        new Notification().createNotification(
-          'Invalid gene symbols.',
-          {message_type: 'danger'});
-        $('#query-by-gene-textarea').focus();
-      }
+      QueryByGeneUtil.query(window.cohortIdsList, this.stat(), QueryByGeneTextArea.getGenes(),includeCases)
     },
     stat: function() {
       var _result = {};
