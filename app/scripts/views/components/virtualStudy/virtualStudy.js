@@ -32,9 +32,7 @@
     },
     data: function() {
       return {
-        savedVS: null,
-        virtualStudyName: 'Selected Study',
-        virtualStudyDescription: ''
+        savedVS: null
       };
     },
     methods: {
@@ -193,7 +191,6 @@
 
                         tooltip.find('.cohort-name').val('');
                         tooltip.find('textarea').val('');
-                        self_.virtualStudyDescription = '';
 
                         self_.disableSaveCohortBtn(tooltip);
                         api.reposition();
@@ -287,15 +284,14 @@
               self_.$nextTick(function() {
                 // If user hasn't specific name only.
                 if (tooltip.find('.cohort-name').val() === '') {
-                  tooltip.find('.cohort-name').val(self_.virtualStudyName);
+                  tooltip.find('.cohort-name').val(vcSession.utils.VSDefaultName);
                 }
 
                 // If user hasn't specific description only.
-                if (!tooltip.find('textarea').val() || tooltip.find('textarea').val() === self_.virtualStudyDescription) {
-                  $.when(vcSession.utils.generateCohortDescription(self_.stats.studies))
+                if (!tooltip.find('textarea').val()) {
+                  $.when(vcSession.utils.generateVSDescription(self_.stats.studies))
                     .then(function(_desp) {
                       self_.updateStats = false;
-                      self_.virtualStudyDescription = _desp
                       tooltip.find('textarea').val(_desp);
                     });
                 }
