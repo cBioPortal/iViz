@@ -483,6 +483,8 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
                 _sampleDatum.cna_fraction = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
                 _sampleDatum.copy_number_alterations = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
               }
+              data_.groups.sample.data[_sampleDatum.sample_uid].cna_fraction = _sampleDatum.cna_fraction;
+              data_.groups.sample.data[_sampleDatum.sample_uid].copy_number_alterations = _sampleDatum.copy_number_alterations;
             }
           });
           def.resolve(data, _hasCNAFractionData, _hasMutationCountData);
@@ -516,6 +518,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
               } else {
                 _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
               }
+              data_.groups.sample.data[_sampleDatum.sample_uid].mutation_count = _sampleDatum.mutation_count;
             }
           });
           def.resolve(data, _hasMutationCountData);
@@ -688,7 +691,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         }
       } else { // query multiple studies
         if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(_self.cohorts_,  vm_.hasfilters ? _self.stat().studies : undefined);
+          QueryByGeneUtil.toMainPage(_self.cohorts_, vm_.hasfilters ? _self.stat().studies : undefined);
         } else {
           QueryByGeneUtil.toMultiStudiesQueryPage(undefined, _self.stat().studies, QueryByGeneTextArea.getGenes());
         }
