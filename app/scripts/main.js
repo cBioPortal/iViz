@@ -609,6 +609,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       window.open(_url);
     },
     downloadCaseData: function() {
+      var _def = new $.Deferred();
       var sampleUIds_ = vm_.selectedsampleUIDs;
       var attr = {};
       var self = this;
@@ -665,9 +666,12 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         };
 
         cbio.download.initDownload(content, downloadOpts);
+        _def.resolve();
       }, function() {
         // TODO: give warning/error message to user if the download is failed
+        _def.resolve();
       });
+      return _def.promise();
     },
     submitForm: function() {
       var _self = this;
