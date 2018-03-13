@@ -377,15 +377,18 @@
       _self.chartInst.setDownloadDataTypes(['pdf', 'svg']);
 
       var data = iViz.getGroupNdx(this.attributes.group_id);
-      var groups = [{
-        id: 0,
-        name: 'All Patients',
-        curveHex: '#2986e2',
-        caseIds: iViz.getCaseUIDs(_type)
-      }];
-      groups = this.calcCurvesData(groups, _type);
-
-      _self.chartInst.init(groups, data, _opts);
+      if (this.$root.hasfilters) {
+        this.updatePlotGroups(true);
+      } else {
+        var groups = [{
+          id: 0,
+          name: 'All Patients',
+          curveHex: '#2986e2',
+          caseIds: iViz.getCaseUIDs(_type)
+        }];
+        this.groups = this.calcCurvesData(groups, _type);
+      }
+      _self.chartInst.init(this.groups, data, _opts);
       _self.checkDownloadableStatus();
       _self.showLoad = false;
       _self.$once('initMainDivQtip', _self.initMainDivQtip);
