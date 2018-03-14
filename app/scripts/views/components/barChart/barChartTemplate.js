@@ -192,30 +192,35 @@
             this.data.smallDataFlag = false;
           }
 
-          if (smallerOutlier.length > 0 && greaterOutlier.length > 0) {// data contain ">, >=,<, <="
-            this.data.min = _.max(smallerOutlier);
-            this.data.max = _.min(greaterOutlier);
+          var findExtremeResult = cbio.util.findExtremes(this.data.meta);
+          if (iViz.util.isAgeClinicalAttr(this.attributes.attr_id) && _.min(this.data.meta) < 18 && (findExtremeResult[1] - findExtremeResult[0]) / 2 > 18) {
+            this.data.min = 18;
           } else {
-            var findExtremeResult = cbio.util.findExtremes(this.data.meta);
-            if (iViz.util.isAgeClinicalAttr(this.attributes.attr_id) && _.min(this.data.meta) < 18 && (findExtremeResult[1] - findExtremeResult[0]) / 2 > 18) {
-              this.data.min = 18;
-            } else {
-              this.data.min = findExtremeResult[0];
-            }
-            this.data.max = findExtremeResult[1];
+            this.data.min = findExtremeResult[0];
+          }
+          this.data.max = findExtremeResult[1];
 
-            // noGrouping is true when number of different values less than or equal to 5. 
-            // In this case, the chart sets data value as ticks' value directly. 
-            this.data.noGrouping = false;
-            if (Object.keys(dataMetaKeys).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
-              this.data.noGrouping = true;
-              this.data.uniqueSortedData = _.unique(findExtremeResult[3]);// use sorted value as ticks directly
-            }
+          // noGrouping is true when number of different values less than or equal to 5. 
+          // In this case, the chart sets data value as ticks' value directly. 
+          this.data.noGrouping = false;
+          if (Object.keys(dataMetaKeys).length <= 5 && this.data.meta.length > 0) {// for data less than 6 points
+            this.data.noGrouping = true;
+            this.data.uniqueSortedData = _.unique(findExtremeResult[3]);// use sorted value as ticks directly
+          }
+
+          if (smallerOutlier.length > 0) {
+            this.data.min = Number(_.max(smallerOutlier));
+            this.data.smallerOutlier = this.data.min;
+          }
+
+          if (greaterOutlier.length > 0) {
+            this.data.max = Number(_.min(greaterOutlier));
+            this.data.greaterOutlier = this.data.max;
           }
 
           this.data.attrId = this.attributes.attr_id;
           this.data.groupType = this.attributes.group_type;
-          
+
           // logScale and noGroup cannot be true at same time
           // logScale and smallDataFlag cannot be true at same time
           if (((this.data.max - this.data.min) > 1000) && (this.data.min > 1) && !this.data.noGrouping) {
