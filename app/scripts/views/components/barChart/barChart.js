@@ -16,8 +16,8 @@
       var tickVal = [];
       var i = 0;
       var barSet = {};
-      
-      dcDimension = ndx_.dimension(function (d) {
+
+      dcDimension = ndx_.dimension(function(d) {
         var val = d[data_.attrId];
         var _min;
         var _max;
@@ -25,17 +25,25 @@
 
         // isNaN(val) treats string in data as 'NA', such as "withheld" and "cannotReleaseHIPAA"
         if (iViz.util.strIsNa(val, true) || isNaN(val)) {
+          var smallerOutlierPattern = new RegExp('^<|(>=?)$');
+          var greaterOutlierPattern = new RegExp('^>|(<=?)$');
+          if (smallerOutlierPattern.test(val)) {
+            val = opts_.xDomain[0];
+          } else if (greaterOutlierPattern.test(val)) {
+            val = data_.hasNA ? opts_.xDomain[opts_.xDomain.length - 2] : opts_.xDomain[opts_.xDomain.length - 1];
+          } else {
             val = opts_.xDomain[opts_.xDomain.length - 1];
+          }
         } else if (logScale) {
-            for (i = 1; i < opts_.xDomain.length; i++) {
-                if (d[data_.attrId] < opts_.xDomain[i] &&
-                    d[data_.attrId] >= opts_.xDomain[i - 1]) {
-                    val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
-                    _min = opts_.xDomain[i - 1];
-                    _max = opts_.xDomain[i];
-                    break;
-                }
+          for (i = 1; i < opts_.xDomain.length; i++) {
+            if (d[data_.attrId] < opts_.xDomain[i] &&
+              d[data_.attrId] >= opts_.xDomain[i - 1]) {
+              val = parseInt(Math.pow(10, i / 2 - 0.25), 10);
+              _min = opts_.xDomain[i - 1];
+              _max = opts_.xDomain[i];
+              break;
             }
+          }
         } else if (data_.noGrouping) {
           val = opts_.xFakeDomain[opts_.xDomain.indexOf(Number(d[data_.attrId]))];
         } else {
@@ -49,7 +57,7 @@
             } else {
               if (data_.hasNA) {
                 endNumIndex = opts_.xDomain.length - 2;
-              } 
+              }
               for (i = 2; i < endNumIndex; i++) {
                 if (d[data_.attrId] <= opts_.xDomain[i] &&
                   d[data_.attrId] >= opts_.xDomain[i - 1]) {
@@ -80,8 +88,8 @@
               _max = val + opts_.gutter / 2;
             }
           }
-        } 
-        
+        }
+
         barSet[val] = 1;
         if (tickVal.indexOf(val) === -1) {
           tickVal.push(Number(val));
@@ -100,10 +108,10 @@
           data_.groupType === 'patient' ? d.patient_uid : d.sample_uid);
         return val;
       });
-    
+
       opts_.xBarValues = Object.keys(barSet);
-      opts_.xBarValues.sort(function (a, b) {
-          return Number(a) < Number(b) ? -1 : 1;
+      opts_.xBarValues.sort(function(a, b) {
+        return Number(a) < Number(b) ? -1 : 1;
       });
 
       tickVal.sort(function(a, b) {
@@ -156,7 +164,7 @@
       chartInst_.xAxis().tickFormat(function(v) {
         return iViz.util.getTickFormat(v, logScale, data_, opts_);
       });
-      
+
       chartInst_.xUnits(function() {
         return opts_.xDomain.length * 1.3 <= 5 ? 5 : opts_.xDomain.length * 1.3;
       });
@@ -261,7 +269,7 @@
 
       tempFilters_[0] = '';
       tempFilters_[1] = '';
-      
+
       if (opts_.xDomain.length === 0) {
         tempFilters_[0] = 'Invalid Selection';
       } else {
@@ -269,7 +277,7 @@
         if (opts_.xDomain.length >= 2) {
           if (data_.noGrouping) {
             if (data_.hasNA) {
-              endNumIndex = opts_.xDomain.length - 2 ;
+              endNumIndex = opts_.xDomain.length - 2;
             }
           } else {
             if (logScaleChecked) {
@@ -329,7 +337,7 @@
             maxNumBarPoint = opts_.xDomain[endNumIndex];
           }
         }
-        
+
         if (data_.noGrouping) {
           minNumBarPoint = opts_.xFakeDomain[0];
           if (data_.hasNA) {
@@ -376,14 +384,14 @@
         // avoid "min< ~ <=min"
         if (!data_.noGrouping && _.isNumber(minNumBarPoint) && _.isNumber(maxNumBarPoint) && minNumBarPoint === maxNumBarPoint) {
           tempFilters_[0] = 'Invalid Selection';
-        } else if ((!data_.noGrouping && _filter[0] < opts_.xDomain[0] && _filter[1] > opts_.xDomain[opts_.xDomain.length - 1]) || 
+        } else if ((!data_.noGrouping && _filter[0] < opts_.xDomain[0] && _filter[1] > opts_.xDomain[opts_.xDomain.length - 1]) ||
           (data_.noGrouping && _filter[0] < opts_.xFakeDomain[0] && _filter[1] > opts_.xFakeDomain[opts_.xFakeDomain.length - 1])) {
           tempFilters_[0] = 'All';
         } else {
           if (data_.noGrouping) {
             if (selectedNumBar.length === opts_.xBarValues.length ||
               (_filter[0] <= opts_.xBarValues[0] && _filter[1] >= opts_.xBarValues[opts_.xBarValues.length - 2] &&
-              data_.hasNA && !hasNA)) {// select all number bars
+                data_.hasNA && !hasNA)) {// select all number bars
               tempFilters_[0] = 'All Numbers';
             } else if (selectedNumBar.length === 0 && hasNA) {// only choose NA bar
               tempFilters_[0] = 'NA';
@@ -416,7 +424,7 @@
               } else if (hasNA && minNumBarPoint !== '' && maxNumBarPoint === '') {
                 tempFilters_[0] = minNumBarPoint + '<';
                 tempFilters_[1] = '<=' + opts_.xDomain[endNumIndex] + ", NA";
-              } else if (hasNA && minNumBarPoint === '' && maxNumBarPoint === ''){//only select "NA" bar
+              } else if (hasNA && minNumBarPoint === '' && maxNumBarPoint === '') {//only select "NA" bar
                 tempFilters_[0] = 'NA';
               } else {
                 tempFilters_[0] = 'Invalid Selection';
@@ -442,7 +450,7 @@
                 if (hasSmallerOutlier) {// Select all bars excluding NA
                   tempFilters_[0] = 'All Numbers';
                 } else {// "> Num"
-                  if(minNumBarPoint === '') {
+                  if (minNumBarPoint === '') {
                     tempFilters_[1] = '> ' + opts_.xDomain[endNumIndex];
                   } else {
                     tempFilters_[1] = '> ' + minNumBarPoint;
@@ -460,7 +468,7 @@
             }
           }
         }
-      }      
+      }
 
       return tempFilters_;
     };
@@ -624,7 +632,7 @@
             config.divider = 2 * Math.pow(10, minExponent);
           }
         }
-        
+
         if (range === 0) {
           config.startPoint = min;
         } else if (max <= 1 && max > 0 && min >= -1 && min < 0) {
@@ -641,8 +649,8 @@
           // config.emptyMappingVal = 1.1;
         } else if (range >= 1) {
           config.gutter = (
-              parseInt(range / (config.numOfGroups * config.divider), 10) + 1
-            ) * config.divider;
+            parseInt(range / (config.numOfGroups * config.divider), 10) + 1
+          ) * config.divider;
           config.maxVal = (parseInt(max / config.gutter, 10) + 1) *
             config.gutter;
           config.startPoint = parseInt(min / config.gutter, 10) *
@@ -723,13 +731,13 @@
                     Number(cbio.util.toPrecision(Number(_tmpValue), 3, 0.1));
                 }
 
-                // If the current tmpValue already bigger than maxmium number, the
+                // If the current tmpValue already bigger than maximum number, the
                 // function should decrease the number of bars and also reset the
-                // Mappped empty value.
+                // Mapped empty value.
                 if (_tmpValue >= max) {
                   // if i = 0 and tmpValue bigger than maximum number, that means
                   // all data fall into NA category.
-                  config.xDomain.push(_tmpValue);
+                  // config.xDomain.push(_tmpValue);
                   break;
                 } else {
                   config.xDomain.push(_tmpValue);

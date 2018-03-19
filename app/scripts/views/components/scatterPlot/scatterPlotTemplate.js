@@ -36,7 +36,6 @@
         showOperations: false,
         selectedSamples: [],
         chartInst: {},
-        hasFilters: false,
         showLoad: true,
         error: {
           dataInvalid: false,
@@ -76,7 +75,6 @@
         this.showLoad = true;
       },
       'update-special-charts': function(hasFilters) {
-        this.hasFilters = hasFilters;
         if (this.dataLoaded) {
           var attrId =
             this.attributes.group_type === 'patient' ? 'patient_uid' : 'sample_uid';
@@ -211,7 +209,7 @@
             _self.dataLoaded = true;
             var _selectedCases =
               _.pluck(_self.invisibleDimension.top(Infinity), attrId);
-            if (_self.hasFilters) {
+            if (_self.$root.hasfilters) {
               _self.chartInst.update(_selectedCases);
             }
             _self.attachPlotlySelectedEvent();

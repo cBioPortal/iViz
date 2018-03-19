@@ -40,7 +40,7 @@
         y: _yArr,
         text: _qtips,
         mode: 'markers',
-        type: 'scatter',
+        type: 'scattergl',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
         sample_uid: _.pluck(data_, 'sample_uid'),
@@ -51,6 +51,7 @@
         }
       };
       var data = [trace];
+      opts_.numOfTraces = 1;
       var _marginX = (d3.max(_xArr) - d3.min(_xArr)) * 0.05;
       var _marginY = (d3.max(_yArr) - d3.min(_yArr)) * 0.05;
       layout_ = {
@@ -80,22 +81,11 @@
           pad: 0
         }
       };
-      Plotly.plot(document.getElementById(chartId_), data, layout_, {
+      Plotly.plot(chartId_, data, layout_, {
         displaylogo: false,
         modeBarButtonsToRemove: ['sendDataToCloud', 'pan2d',
           'zoomIn2d', 'zoomOut2d', 'resetScale2d',
           'hoverClosestCartesian', 'hoverCompareCartesian', 'toImage']
-      });
-
-      // link to sample view
-      var _plotsElem = document.getElementById(chartId_);
-      _plotsElem.on('plotly_click', function(data) {
-        var _pts_study_id =
-          data.points[0].data.study_id[data.points[0].pointNumber];
-        var _pts_sample_uid =
-          data.points[0].data.sample_uid[data.points[0].pointNumber];
-        window.open(
-          cbio.util.getLinkToSampleView(_pts_study_id, iViz.getCaseIdUsingUID('sample', _pts_sample_uid)));
       });
 
       groups_ = [{
@@ -123,7 +113,6 @@
         }
       });
 
-      document.getElementById(chartId_).data = [];
       var _unselectedDataQtips = [];
       var _selectedDataQtips = [];
 
@@ -147,12 +136,19 @@
           data: _unselectedData
         })
       }
-      document.getElementById(chartId_).data[0] = {
+
+      var _traces = [];
+      for (var i = 0; i < opts_.numOfTraces; i++) {
+        _traces.push(i);
+      }
+      Plotly.deleteTraces(chartId_, _traces);
+      var data = [];
+      data.push({
         x: _.pluck(_unselectedData, 'cna_fraction'),
         y: _.pluck(_unselectedData, 'mutation_count'),
         text: _unselectedDataQtips,
         mode: 'markers',
-        type: 'scatter',
+        type: 'scattergl',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
         sample_uid: _.pluck(data_, 'sample_uid'),
@@ -161,13 +157,13 @@
           color: '#2986e2',
           line: {color: 'white'}
         }
-      };
-      document.getElementById(chartId_).data[1] = {
+      });
+      data.push({
         x: _.pluck(_selectedData, 'cna_fraction'),
         y: _.pluck(_selectedData, 'mutation_count'),
         text: _selectedDataQtips,
         mode: 'markers',
-        type: 'scatter',
+        type: 'scattergl',
         hoverinfo: 'text',
         study_id: _.pluck(data_, 'study_id'),
         sample_uid: _.pluck(data_, 'sample_uid'),
@@ -176,10 +172,9 @@
           color: 'red',
           line: {color: 'white'}
         }
-      };
-
-      Plotly.newPlot(document.getElementById(chartId_), document.getElementById(chartId_).data, layout_);
-
+      });
+      opts_.numOfTraces = 2;
+      Plotly.addTraces(chartId_, data);
     };
 
     content.updateDataForDownload = function(fileType) {

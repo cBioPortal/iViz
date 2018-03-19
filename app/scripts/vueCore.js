@@ -27,6 +27,7 @@
               patientUids: []
             },
             charts: {},
+            downloadingSelected: false,
             groupCount: 0,
             updateSpecialCharts: false,
             showShareButton: false,
@@ -142,7 +143,12 @@
               iViz.openCases();
             },
             downloadCaseData: function() {
-              iViz.downloadCaseData();
+              var _self = this;
+              _self.downloadingSelected = true;
+              iViz.downloadCaseData()
+                .always(function() {
+                  _self.downloadingSelected = false;
+                });
             },
             submitForm: function() {
               iViz.submitForm();
