@@ -222,16 +222,16 @@
         var _def = new $.Deferred();
         $.get(window.cbioURL+'api-legacy/proxy/session/virtual_study')
         .done(function(virtualStudies) {
-          def.resolve(virtualStudies);
+          _def.resolve(virtualStudies);
         })
         .fail(function(error) {
-          def.reject(error);
+          _def.resolve([]);
         });
       return _def.promise();
     }
     var getPhysicalStudies = function(){
       var def = new $.Deferred();
-      $.get(window.cbioURL + 'cbioportal/api/studies')
+      $.get(window.cbioURL + 'api/studies')
         .done(function(response) {
           def.resolve(response);
         })
