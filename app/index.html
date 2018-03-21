@@ -130,7 +130,9 @@
               role="button" tabindex="0" style="display: block;"><i class="fa fa-user-circle-o" aria-hidden="true"></i></span>
         <span id="iviz-header-left-case-download" class="iviz-header-button" @click="downloadCaseData()"
               role="button"
-              tabindex="0"><i class="fa fa-download" alt="download"></i></span>
+              tabindex="0" :disabled="downloadingSelected">
+          <i v-if="!downloadingSelected" class="fa fa-download" alt="download"></i>
+          <i v-if="downloadingSelected" class="fa fa-spinner fa-spin"></i></span>
 
         <span id="query-by-gene-span">
           <textarea id="query-by-gene-textarea" class="expand expandFocusOut" rows="1" cols="10"></textarea>
