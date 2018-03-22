@@ -111,7 +111,7 @@
       },
       createQtip: function() {
         var self_ = this;
-        var previousSelectedCases = {};
+        var previousSelection = {};
         $('.virtual-study').qtip(iViz.util.defaultQtipConfig(
           (self_.showSaveButton ? 'Save/' : '') + 'Share Virtual Study'));
         $('.virtual-study-btn').qtip({
@@ -217,9 +217,9 @@
                       // to the user. When a user want to see the cohort url, he/she needs to click Share button. 
                       // We always show the url to user but we don't need to same virtual cohort every time 
                       // if it is same with the previous saved cohort.
-                      var currentSelectedCases = JSON.stringify(self_.stats.studies) + JSON.stringify(self_.stats);
+                      var currentSelection = cohortName + cohortDescription + JSON.stringify(self_.stats.studies) + JSON.stringify(self_.stats);
 
-                      if (currentSelectedCases !== previousSelectedCases) {
+                      if (currentSelection !== previousSelection) {
                         vcSession.events.saveCohort(self_.stats,
                           cohortName, cohortDescription || '', false)
                           .done(function(response) {
@@ -232,7 +232,7 @@
 
                             self_.hideLoading(tooltip);
                             self_.showShared(tooltip);
-                            previousSelectedCases = currentSelectedCases;
+                            previousSelection = currentSelection;
                           })
                           .fail(function() {
                             self_.hideLoading(tooltip);
