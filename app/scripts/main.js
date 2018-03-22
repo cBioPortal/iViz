@@ -686,12 +686,12 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       });
       return _def.promise();
     },
-    submitForm: function() {
+    submitForm: function(cohortIdsList) {
       // Remove all hidden inputs
       $('#iviz-form input:not(:first)').remove();
 
       
-          QueryByGeneUtil. query (window.cohortIdsList, this.stat(),
+          QueryByGeneUtil. query (cohortIdsList ? cohortIdsList: window.cohortIdsList, this.stat(),
           QueryByGeneTextArea.getGenes(), includeCases)
     },
     stat: function() {

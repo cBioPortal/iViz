@@ -29,7 +29,7 @@
       if (name) {
         _virtualCohort.name = name;
       } else {
-        _virtualCohort.name = cases.length > 1 ? "Combined Study" : "Selected Study";
+        _virtualCohort.name = getVSDefaultName();
       }
       _virtualCohort.description = description || '';
       def.resolve(_virtualCohort);
@@ -37,19 +37,32 @@
     };
 
     var generateVSDescription_ = function(_cases) {
-      var def = new $.Deferred(), _desp = "";
-      $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(_cases, "id"))).done(function(_studyIdNameMap) {
-        _.each(_cases, function (_i) {
-          _desp += _studyIdNameMap[_i.id] + ": " + _i.samples.length + " samples\n";
+      var _desp = '';
+      if (_cases.length >= 1) {
+        var _numOfSamples = 0;
+        _desp = 'from ' + _cases.length +
+          (_cases.length > 1 ? ' studies' : ' study') + ' (' + getCurrentDate() + ')';
+        _.each(_cases, function(_study) {
+          _numOfSamples += _study.samples.length;
         });
-        def.resolve(_desp);
-      });
-      return def.promise();
-    }
+        _desp = _numOfSamples + (_numOfSamples > 1 ? ' samples ' : ' sample ') + _desp;
+      }
+      return _desp;
+    };
+
+    var getCurrentDate = function() {
+      var _date = new Date();
+      var strArr = [_date.getFullYear(), _date.getMonth(), _date.getDate()];
+      return strArr.join('-');
+    };
+    
+    var getVSDefaultName = function() {
+      return 'Selected samples (' + getCurrentDate() + ')';
+    };
 
     return {
       buildVCObject: buildVCObject_,
-      VSDefaultName: 'Selected Study',
+      VSDefaultName: getVSDefaultName(),
       generateVSDescription: generateVSDescription_
     };
   })();
