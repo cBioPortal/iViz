@@ -279,12 +279,10 @@
               var tooltip = $('.iviz-virtual-study-btn-qtip .qtip-content');
               self_.updateStats = true;
               self_.$nextTick(function() {
-                // If user hasn't specific name only.
-                tooltip.find('.cohort-name')
-                  .attr('placeholder', vcSession.utils.VSDefaultName);
-
-                // If user hasn't specific description only.
                 self_.updateStats = false;
+                tooltip.find('.cohort-name').val('');
+                tooltip.find('.cohort-name')
+                  .attr('placeholder', vcSession.utils.VSDefaultName(self_.stats.studies));
                 tooltip.find('textarea').val(vcSession.utils.generateVSDescription(self_.stats.studies));
               });
               self_.showDialog(tooltip);

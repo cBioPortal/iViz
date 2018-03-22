@@ -36,15 +36,20 @@
       return def.promise();
     };
 
+    var getNumOfSelectedSamplesFromStudyMap = function(studyMap) {
+      var _numOfSamples = 0;
+      _.each(studyMap, function(_study) {
+        _numOfSamples += _study.samples.length;
+      });
+      return _numOfSamples;
+    };
+    
     var generateVSDescription_ = function(_cases) {
       var _desp = '';
       if (_cases.length >= 1) {
-        var _numOfSamples = 0;
+        var _numOfSamples = getNumOfSelectedSamplesFromStudyMap(_cases);
         _desp = 'from ' + _cases.length +
           (_cases.length > 1 ? ' studies' : ' study') + ' (' + getCurrentDate() + ')';
-        _.each(_cases, function(_study) {
-          _numOfSamples += _study.samples.length;
-        });
         _desp = _numOfSamples + (_numOfSamples > 1 ? ' samples ' : ' sample ') + _desp;
       }
       return _desp;
@@ -55,14 +60,16 @@
       var strArr = [_date.getFullYear(), _date.getMonth(), _date.getDate()];
       return strArr.join('-');
     };
-    
-    var getVSDefaultName = function() {
-      return 'Selected samples (' + getCurrentDate() + ')';
+
+    var getVSDefaultName = function(studyMap) {
+      var _numOfSamples = getNumOfSelectedSamplesFromStudyMap(studyMap);
+      return 'Selected ' + (_numOfSamples > 1 ? 'samples' : 'sample')
+        + ' (' + getCurrentDate() + ')';
     };
 
     return {
       buildVCObject: buildVCObject_,
-      VSDefaultName: getVSDefaultName(),
+      VSDefaultName: getVSDefaultName,
       generateVSDescription: generateVSDescription_
     };
   })();
