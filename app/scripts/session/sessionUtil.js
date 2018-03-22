@@ -48,9 +48,9 @@
       var _desp = '';
       if (_cases.length >= 1) {
         var _numOfSamples = getNumOfSelectedSamplesFromStudyMap(_cases);
-        _desp = 'from ' + _cases.length +
+        _desp = _numOfSamples + (_numOfSamples > 1 ? ' samples ' : ' sample ') 
+          + 'from ' + _cases.length +
           (_cases.length > 1 ? ' studies' : ' study') + ' (' + getCurrentDate() + ')';
-        _desp = _numOfSamples + (_numOfSamples > 1 ? ' samples ' : ' sample ') + _desp;
       }
       return _desp;
     };
