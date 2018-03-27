@@ -75,7 +75,7 @@
         this.$dispatch('update-filters', true);
       },
       'loadedStudies': function() {
-        this.loadingBar.status = this.loadedStudies / (this.totalNumOfStudies || 1);
+        this.loadingBar.status = (this.loadedStudies / (this.totalNumOfStudies || 1)) * 0.8;
       },
       'showLoad': function(newVal) {
         if (newVal) {
