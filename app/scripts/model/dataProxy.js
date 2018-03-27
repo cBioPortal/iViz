@@ -1373,25 +1373,6 @@ window.DataManagerForIviz = (function($, _) {
         return isPatientAttributes ? this.getPatientClinicalData(attribute_ids) :
           this.getSampleClinicalData(attribute_ids);
       },
-      getGenesByHugoSymbols: function(hugoSymbols) {
-        var _def = new $.Deferred();
-        if (_.isArray(hugoSymbols) && hugoSymbols.length > 0) {
-          $.ajax({
-            type: 'POST',
-            url: window.cbioURL + 'api/genes/fetch?geneIdType=HUGO_GENE_SYMBOL&projection=SUMMARY',
-            data: JSON.stringify(hugoSymbols),
-            dataType: 'json',
-            contentType: "application/json; charset=utf-8",
-          }).then(function(genes) {
-            _def.resolve(genes);
-          }).fail(function() {
-            _def.reject('Failed to genes data.');
-          });
-        } else {
-          _def.resolve([]);
-        }
-        return _def.promise();
-      },
       getGenePanelMap: function(hugoSymbols, map) {
         var _def = new $.Deferred();
         var panelSamplesMap = {};
