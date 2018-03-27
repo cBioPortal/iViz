@@ -17,7 +17,8 @@
     'class="dc-chart dc-scatter-plot" align="center" ' +
     ':class="{\'show-loading-content\': showLoad}" id={{chartId}} ></div>' +
     '<div v-show="showLoad" class="progress-bar-parent-div" :class="{\'show-loading-bar\': showLoad}" >' +
-    '<progress-bar :div-id="loadingBar.divId" :status="loadingBar.status" :opts="loadingBar.opts"></progress-bar></div>' +
+    '<progress-bar :div-id="loadingBar.divId" :type="loadingBar.type" :disable="loadingBar.disable" ' +
+    ' :status="loadingBar.status" :opts="loadingBar.opts"></progress-bar></div>' +
     '<div v-if="failedToInit" class="error-panel" align="center">' +
     '<error-handle v-if="failedToInit" :error="error"></error-handle>' +
     '</div></div>',
@@ -45,9 +46,10 @@
         failedToInit: false,
         loadingBar :{
           status: 0,
+          type: 'percentage',
           divId: iViz.util.getDefaultDomId('progressBarId', this.attributes.attr_id),
           opts: {},
-          infinityInterval: null
+          disable: false
         },
         invisibleDimension: {}
       };
@@ -63,10 +65,7 @@
         if (newVal) {
           this.initialInfinityLoadingBar();
         } else {
-          if (this.loadingBar.infinityInterval) { 
-            window.clearInterval(this.loadingBar.infinityInterval);
-            this.loadingBar.infinityInterval = null;
-          }
+          this.loadingBar.disable = true;
         }
       }
     },
@@ -122,17 +121,7 @@
         this.showOperations = false;
       },
       initialInfinityLoadingBar: function() {
-        var self = this;
-        self.loadingBar.opts = {
-          duration: 300,
-          step: function(state, bar) {
-            bar.setText('Loading...');
-          }
-        };
-        self.loadingBar.status = 0.5;
-        self.loadingBar.infinityInterval = setInterval(function() {
-          self.loadingBar.status += 0.5;
-        }, 800);
+        this.loadingBar.type = 'infinite';
       },
       attachPlotlySelectedEvent: function() {
         var _self = this;
