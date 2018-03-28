@@ -95,7 +95,7 @@
         if (this.type === 'percentage' && newVal >= 0.9) {
           this.cancelInterval('percentage');
         }
-        if (newVal > oldVal) {
+        if (newVal > this.bar.value()) {
           this.bar.animate(newVal);
         }
       },
