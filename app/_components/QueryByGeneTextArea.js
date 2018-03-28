@@ -142,7 +142,9 @@ var QueryByGeneTextArea  = (function() {
     // initialise events
     function initEvents(){
         // when user types in the textarea, update the model
-        $(areaId).bind('input propertychange', updateModel);
+        $(areaId).bind('input propertychange', function() {
+          setTimeout(updateModel, 1000);
+        });
 
         // when the model is changed, update the textarea
         geneModel.on("change", updateTextArea);
