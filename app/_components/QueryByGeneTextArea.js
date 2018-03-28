@@ -12,9 +12,14 @@ var GenelistModel = Backbone.Model.extend({
         delim = delim || " ";
         return this.getCleanGeneArray().join(delim);
     },
-
-    getCleanGeneArray: function(){
-        return $.unique(this.removeEmptyElements(this.get("geneString").toUpperCase().split(/[^a-zA-Z0-9-]/))).reverse();
+  
+    getCleanGeneArray: function() {
+      var _arr = this.removeEmptyElements(this.get("geneString")
+        .toUpperCase().split(/[^a-zA-Z0-9-]/));
+      _arr = _arr.filter(function(item, pos) {
+        return _arr.indexOf(item) === pos;
+      });
+      return _arr;
     },
 
     removeEmptyElements: function (array){
