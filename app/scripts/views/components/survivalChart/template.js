@@ -17,7 +17,8 @@
     '<div v-show="!showLoad" :class="{\'show-loading-content\': showLoad}"' +
     'class="dc-chart dc-scatter-plot" align="center" id={{chartId}} ></div>' +
     '<div v-show="showLoad" class="progress-bar-parent-div" :class="{\'show-loading-bar\': showLoad}">' +
-    '<progress-bar :div-id="loadingBar.divId" :status="loadingBar.status" :opts="loadingBar.opts"></progress-bar></div>' +
+    '<progress-bar :div-id="loadingBar.divId" :status="loadingBar.status" :opts="loadingBar.opts" ' +
+    ':type="loadingBar.type" :disable="loadingBar.disable" ></progress-bar></div>' +
     '</div>',
     props: [
       'ndx', 'attributes'
@@ -42,11 +43,12 @@
         showingRainbowSurvival: false,
         groups: [],
         invisibleDimension: {},
-        loadingBar :{
+        loadingBar: {
           status: 0,
+          type: 'percentage',
           divId: iViz.util.getDefaultDomId('progressBarId', this.attributes.attr_id),
           opts: {},
-          infinityInterval: null
+          disable: false
         },
         mainDivQtip: ''
       };
@@ -65,10 +67,7 @@
         if (newVal) {
           this.initialInfinityLoadingBar();
         } else {
-          if (this.loadingBar.infinityInterval) {
-            window.clearInterval(this.loadingBar.infinityInterval);
-            this.loadingBar.infinityInterval = null;
-          }
+          this.loadingBar.disable = true;
         }
       }
     },
@@ -160,7 +159,7 @@
               };
             }
             filteredClinicalAttrs[group.id].attrs = [];
-            
+
             // Loop through attrList instead of only using attr_id
             // Combination chart has its own attr_id, but the clinical data
             // it's using are listed under attrList
@@ -336,17 +335,7 @@
         self_.updateQtipContent();
       },
       initialInfinityLoadingBar: function() {
-        var self = this;
-        self.loadingBar.opts = {
-          duration: 300,
-          step: function(state, bar) {
-            bar.setText('Loading...');
-          }
-        };
-        self.loadingBar.status = 0.5;
-        self.loadingBar.infinityInterval = setInterval(function() {
-          self.loadingBar.status += 0.5;
-        }, 300);
+        this.loadingBar.type = 'infinite';
       },
       checkDownloadableStatus: function() {
         if (this.chartInst.downloadIsEnabled()) {
