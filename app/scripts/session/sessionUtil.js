@@ -57,7 +57,7 @@
 
     var getCurrentDate = function() {
       var _date = new Date();
-      var strArr = [_date.getFullYear(), _date.getMonth(), _date.getDate()];
+      var strArr = [_date.getFullYear(), _date.getMonth() + 1, _date.getDate()];
       return strArr.join('-');
     };
 
