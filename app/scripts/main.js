@@ -458,7 +458,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       _.each(_allCNASamples, function(samples, studyId) {
         _.each(Object.keys(samples), function(sampleId) {
           tableData_.cna_details.allSamples.push({
-            "molecularProfileId":  window.iviz.datamanager.getCNAProfileIdByStudyId(studyId),
+            "molecularProfileId": window.iviz.datamanager.getCNAProfileIdByStudyId(studyId),
             "sampleId": sampleId
           })
         })
@@ -621,27 +621,44 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
       if (Object.keys(_selectedCasesMap).length === 1) {
         _url = window.cbioURL +
-               'case.do#/patient?studyId=' +
-                _study_id +
-                '&caseId=' +
-                _selectedCaseIds[0] +
-                '&navCaseIds=' +
-                _selectedCaseIds.join(',');
+          'case.do#/patient?studyId=' +
+          _study_id +
+          '&caseId=' +
+          _selectedCaseIds[0] +
+          '&navCaseIds=' +
+          _selectedCaseIds.join(',');
       } else {
-        var studyPatientString = _.map(_selectedCasesMap, function (patientIds, studyId) {
-          return _.map(patientIds, function(patientId,index){
-            return studyId+":"+patientId;
+        var studyPatientString = _.map(_selectedCasesMap, function(patientIds, studyId) {
+          return _.map(patientIds, function(patientId, index) {
+            return studyId + ":" + patientId;
           });
         }).join(',');
         _url = window.cbioURL +
-               'case.do#/patient?studyId=' +
-               _study_id +
-               '&caseId=' +
-               _selectedCaseIds[0] +
-               '&navCaseIds=' +
-               studyPatientString;
+          'case.do#/patient?studyId=' +
+          _study_id +
+          '&caseId=' +
+          _selectedCaseIds[0] +
+          '&navCaseIds=' +
+          studyPatientString;
       }
-      window.open(_url);
+
+      // The IE URL limitation is 2083
+      // https://blogs.msdn.microsoft.com/ieinternals/2014/08/13/url-length-limits/
+      // But for safe, we decrease the limit to 1800
+      if (_url.length > 1800) {
+        var browser = cbio.util.browser;
+        if (browser.msie) {
+          new Notification().createNotification(
+            'Due to limitation of Internet Explore, ' +
+            'you cannot browse current selected samples. Please select ' +
+            'less samples, or use Chrome, Firefox or Sarafi instead.',
+            {message_type: 'danger'});
+        } else {
+          window.open(_url);
+        }
+      } else {
+        window.open(_url);
+      }
     },
     downloadCaseData: function() {
       var _def = new $.Deferred();
