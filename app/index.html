@@ -208,13 +208,14 @@
     iViz.vue.manage.getInstance().loadUserSpecificCohorts = false;
 
     window.cbioURL = 'http://www.cbioportal.org/';
+    window.appVersion = new Date().getTime();
     window.cbioResourceURL = 'resources/';
-    window.mutationProfileId = 'hnsc_tcga_mutations';
-    window.cnaProfileId = 'hnsc_tcga_gistic';
+    window.mutationProfileId = 'cellline_ccle_broad_mutations';
+    window.cnaProfileId = 'cellline_ccle_broad_gistic';
     window.case_set_id = '-1';
     var studyCasesMap = {};
-    studyCasesMap['hnsc_tcga'] = {};
-    window.cohortIdsList = ['hnsc_tcga'];
+    studyCasesMap['cellline_ccle_broad'] = {};
+    window.cohortIdsList = ['cellline_ccle_broad'];
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
 

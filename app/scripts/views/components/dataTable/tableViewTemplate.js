@@ -19,7 +19,8 @@
     'v-show="!showLoad" :class="{\'show-loading-bar\': showLoad}" ' +
     'align="center" id={{chartId}} ></div>' +
     '<div v-show="showLoad" class="progress-bar-parent-div" :class="{\'show-loading-bar\': showLoad}">' +
-    '<progress-bar :div-id="loadingBar.divId" :status="loadingBar.status" :opts="loadingBar.opts"></progress-bar></div>' +
+    '<progress-bar :div-id="loadingBar.divId" :type="loadingBar.type" :disable="loadingBar.disable" ' +
+    ':status="loadingBar.status" :opts="loadingBar.opts"></progress-bar></div>' +
     '<div :class="{\'error-init\': failedToInit}" ' +
     'style="display: none;">' +
     '<span class="content">Failed to load data, refresh the page may help</span></div></div>',
@@ -53,9 +54,10 @@
         totalNumOfStudies: 0,
         loadingBar :{
           status: 0,
+          type: 'percentage',
           divId: iViz.util.getDefaultDomId('progressBarId', this.attributes.attr_id),
           opts: {},
-          infinityInterval: null
+          disable: false
         },
         // this is used to set dc invisibleDimension filters
         // In case of MutatedGeneCna plot this would be case uids
@@ -73,16 +75,13 @@
         this.$dispatch('update-filters', true);
       },
       'loadedStudies': function() {
-        this.loadingBar.status = this.loadedStudies / (this.totalNumOfStudies || 1);
+        this.loadingBar.status = (this.loadedStudies / (this.totalNumOfStudies || 1)) * 0.8;
       },
       'showLoad': function(newVal) {
         if (newVal) {
           this.initialInfinityLoadingBar();
         } else {
-          if (this.loadingBar.infinityInterval) {
-            window.clearInterval(this.loadingBar.infinityInterval);
-            this.loadingBar.infinityInterval = null;
-          }
+          this.loadingBar.disable = true;
         }
       },
       'showedSurvivalPlot': function() {
@@ -272,17 +271,7 @@
         }
       },
       initialInfinityLoadingBar: function() {
-        var self = this;
-        self.loadingBar.opts = {
-          duration: 300,
-          step: function(state, bar) {
-            bar.setText('Loading...');
-          }
-        };
-        self.loadingBar.status = 0.5;
-        self.loadingBar.infinityInterval = setInterval(function() {
-          self.loadingBar.status += 0.5;
-        }, 800);
+        this.loadingBar.type = 'infinite';
       }
     },
     ready: function() {
@@ -325,15 +314,21 @@
         $.when(iViz.getTableData(_self.attributes.attr_id, function() {
           _self.loadedStudies++;
         })).then(function(_tableData) {
-          $.when(window.iviz.datamanager.getGenePanelMap())
+          $.when(window.iviz.datamanager.getGenePanelMap(_tableData.allGenes, _tableData.allSamples))
             .then(function(_genePanelMap) {
               // create gene panel map
-              this.dataLoaded = true;
-              _self.genePanelMap = _genePanelMap;
-              _self.processTableData(_tableData);
+              _self.loadingBar.status = 1;
+              setTimeout(function() {
+                this.dataLoaded = true;
+                _self.genePanelMap = _genePanelMap;
+                _self.processTableData(_tableData);
+              }, 0);
             }, function() {
-              _self.genePanelMap = {};
-              _self.processTableData(_tableData);
+              _self.loadingBar.status = 1;
+              setTimeout(function() {
+                _self.genePanelMap = {};
+                _self.processTableData(_tableData);
+              }, 0);
             });
         }, function() {
           _self.setDisplayTitle();

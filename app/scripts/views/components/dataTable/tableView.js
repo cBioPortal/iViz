@@ -287,14 +287,7 @@
     }
 
     function mutatedGenesData(_selectedGenesMap, _selectedSampleUids) {
-      var _selectedSampleIds;
-      if (_.isArray(_selectedSampleUids)) {
-        _selectedSampleIds = [];
-        _.each(_selectedSampleUids, function(uid) {
-          _selectedSampleIds.push(iViz.getCaseIdUsingUID('sample', uid));
-        });
-      }
-      genePanelMap = window.iviz.datamanager.updateGenePanelMap(genePanelMap, _selectedSampleIds);
+      genePanelMap = window.iviz.datamanager.updateGenePanelMap(genePanelMap, _selectedSampleUids);
 
       selectedGeneData.length = 0;
       var numOfCases_ = content.getCases().length;
@@ -309,7 +302,7 @@
             datum.cases = datum.case_uids.length;
             datum.uniqueId = index;
             if (typeof genePanelMap[item.gene] !== 'undefined') {
-              freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
+              freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene].sampleNum);
             } else {
               freq = iViz.util.calcFreq(datum.cases, numOfCases_);
             }
@@ -333,7 +326,7 @@
             datum.case_uids = _selectedGenesMap[item.index].case_uids;
             datum.cases = datum.case_uids.length;
             if (typeof genePanelMap[item.gene] !== 'undefined') {
-              freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene]["sample_num"]);
+              freq = iViz.util.calcFreq(datum.cases, genePanelMap[item.gene].sampleNum);
             } else {
               freq = iViz.util.calcFreq(datum.cases, numOfCases_);
             }
