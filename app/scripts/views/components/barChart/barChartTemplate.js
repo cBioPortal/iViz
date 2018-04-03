@@ -149,7 +149,7 @@
 
         this.data.meta = _.map(_.filter(_.pluck(
           _data, this.opts.attrId), function(d) {
-          if (isNaN(d) && !(_.isString(d) && (d.includes('>') || d.includes('<')))) {
+          if (isNaN(d) && !(_.isString(d) && (d.indexOf('>') !== -1 || d.indexOf('<') !== -1))) {
             _self.data.hasNA = true;
             d = 'NA';
           }

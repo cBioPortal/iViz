@@ -12,9 +12,14 @@ var GenelistModel = Backbone.Model.extend({
         delim = delim || " ";
         return this.getCleanGeneArray().join(delim);
     },
-
-    getCleanGeneArray: function(){
-        return $.unique(this.removeEmptyElements(this.get("geneString").toUpperCase().split(/[^a-zA-Z0-9-]/))).reverse();
+  
+    getCleanGeneArray: function() {
+      var _arr = this.removeEmptyElements(this.get("geneString")
+        .toUpperCase().split(/[^a-zA-Z0-9-]/));
+      _arr = _arr.filter(function(item, pos) {
+        return _arr.indexOf(item) === pos;
+      });
+      return _arr;
     },
 
     removeEmptyElements: function (array){
@@ -137,7 +142,9 @@ var QueryByGeneTextArea  = (function() {
     // initialise events
     function initEvents(){
         // when user types in the textarea, update the model
-        $(areaId).bind('input propertychange', updateModel);
+        $(areaId).bind('input propertychange', function() {
+          setTimeout(updateModel, 1000);
+        });
 
         // when the model is changed, update the textarea
         geneModel.on("change", updateTextArea);
