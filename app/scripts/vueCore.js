@@ -317,7 +317,6 @@
                 new Notification().createNotification(selectedCaseUIDs.length +
                   ' case(s) selected.', {message_type: 'info'});
               }
-              $('#iviz-header-right-1').qtip('toggle');
               if (selectedCaseUIDs.length > 0) {
                 this.clearAllCharts(false);
                 var self_ = this;
