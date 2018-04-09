@@ -205,7 +205,8 @@
                 self_.showLoading(tooltip);
                 self_.updateSavingMessage(tooltip, 'Generating the virtual study link');
 
-                var cohortName = tooltip.find('.cohort-name').val();
+                var cohortName = tooltip.find('.cohort-name').val() ?
+                  tooltip.find('.cohort-name').val() : tooltip.find('.cohort-name').attr('placeholder');
                 var cohortDescription =
                   tooltip.find('textarea').val();
                 if (_.isObject(vcSession)) {
