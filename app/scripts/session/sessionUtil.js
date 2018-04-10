@@ -10,7 +10,7 @@
       description: '',
       filters: '',
       studies: '',
-      origin:''
+      origin: ''
     };
 
     var buildVCObject_ = function(stats, name,
@@ -18,7 +18,7 @@
       var def = new $.Deferred();
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
       _virtualCohort.filters = stats.filters;
-      
+
       _virtualCohort.studies = stats.studies.map(function(studyObj) {
         return {
           id: studyObj.id,
@@ -37,20 +37,51 @@
     };
 
     var getNumOfSelectedSamplesFromStudyMap = function(studyMap) {
-      var _numOfSamples = 0;
+      var _numOfSamples = {
+        sampleCounts__: 0,
+        studies: {}
+      };
       _.each(studyMap, function(_study) {
-        _numOfSamples += _study.samples.length;
+        _numOfSamples.studies[_study.id] = _study.samples.length;
+        _numOfSamples.sampleCounts__ += _study.samples.length;
       });
       return _numOfSamples;
     };
-    
-    var generateVSDescription_ = function(_cases) {
+
+    var generateVSDescription_ = function(_studyDisplayName, _filters, _cases) {
       var _desp = '';
-      if (_cases.length >= 1) {
+      if (_cases.length > 0) {
         var _numOfSamples = getNumOfSelectedSamplesFromStudyMap(_cases);
-        _desp = _numOfSamples + (_numOfSamples > 1 ? ' samples ' : ' sample ') 
+        var _count = _numOfSamples.sampleCounts__;
+        _desp = _count + (_count > 1 ? ' samples ' : ' sample ')
           + 'from ' + _cases.length +
-          (_cases.length > 1 ? ' studies' : ' study') + ' (' + getCurrentDate() + ')';
+          (_cases.length > 1 ? ' studies' : ' study') + ':';
+
+        _.each(_numOfSamples.studies, function(_count, _studyId) {
+          _desp += '\n- ' + _studyDisplayName[_studyId] + ' ('
+            + _count + ' sample' + (_count > 1 ? 's' : '') + ')';
+        });
+
+        if (_filters.length > 0) {
+          _desp += '\n\nFilter' + (_filters.length > 1 ? 's' : '') + ':';
+          _filters.sort(function(a, b) {
+            return a.attrName.localeCompare(b.attrName);
+          });
+          _.each(_filters, function(_filter) {
+            _desp += '\n- ' + _filter.attrName + ': ';
+            if (_filter.viewType === 'bar_chart') {
+              _desp += iViz.util.getDisplayBarChartBreadCrumb(_filter.filter);
+            } else if (_filter.viewType === 'table') {
+              _desp += _filter.filter.join('; ');
+            } else if (_filter.viewType === 'scatter_plot') {
+              _desp = _desp.slice(0, -2);
+            } else {
+              _desp += _filter.filter;
+            }
+          });
+        }
+
+        _desp += '\n\nCreated on  ' + getCurrentDate();
       }
       return _desp;
     };

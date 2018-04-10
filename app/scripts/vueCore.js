@@ -242,6 +242,9 @@
                 }
               });
             },
+            getChartsByAttrIds: function(attrIds) {
+              return _.pick(this.charts, attrIds);
+            },
             removeChart: function(attrId) {
               var self = this;
               var attrData = self.charts[attrId];

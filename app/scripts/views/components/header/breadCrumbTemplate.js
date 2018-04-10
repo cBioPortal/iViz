@@ -2,7 +2,7 @@
  * Created by Karthik Kalletla on 4/18/16.
  */
 'use strict';
-(function(Vue) {
+(function(Vue, iViz) {
   Vue.component('breadCrumb', {
     template: '<span class="breadcrumb_container" ' +
     'v-if="attributes.filter.length > 0">' +
@@ -10,9 +10,7 @@
     'v-if="(filtersToSkipShowing.indexOf(attributes.attr_id) === -1) && ' +
     '(specialTables.indexOf(attributes.attr_id) === -1)" class="breadcrumb_items">' +
     '<span v-if="attributes.view_type===\'bar_chart\'">' +
-    '<span v-if="filters[0]!==\'\' && filters[1]!==\'\'" class="breadcrumb_item">{{filters[0]}} ~ {{filters[1]}}</span>' +
-    '<span v-if="filters[0]!==\'\' && filters[1]===\'\'" class="breadcrumb_item">{{filters[0]}}</span>' +
-    '<span v-if="filters[0]===\'\' && filters[1]!==\'\'" class="breadcrumb_item">{{filters[1]}}</span>' +
+    '<span class="breadcrumb_item">{{getBarChartFilterString(filters)}}</span>' +
     '<i class="fa fa-times breadcrumb_remove" @click="removeFilter()"></i>' +
     '</span>' +
     '<template v-else>' +
@@ -32,6 +30,9 @@
       };
     },
     methods: {
+      getBarChartFilterString: function(filters) {
+        return iViz.util.getDisplayBarChartBreadCrumb(filters);
+      },
       removeFilter: function(val) {
         if (this.attributes.view_type === 'bar_chart') {
           this.filters = [];
@@ -54,4 +55,4 @@
       }
     }
   });
-})(window.Vue);
+})(window.Vue, window.iViz);
