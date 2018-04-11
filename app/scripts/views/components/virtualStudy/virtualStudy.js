@@ -112,6 +112,7 @@
           })
           .always(function() {
             var filters = {};
+            var vm = iViz.vue.manage.getInstance();
             _.each(self.stats.filters, function(_filters, _type) {
               _.each(_filters, function(filter, attrId) {
                 filters[attrId] = {
@@ -119,12 +120,18 @@
                 };
               });
             });
-            var attrs = iViz.vue.manage.getInstance().getChartsByAttrIds(Object.keys(filters));
+            var attrs = vm.getChartsByAttrIds(Object.keys(filters));
             _.each(attrs, function(attr) {
               filters[attr.attr_id].attrId = attr.attr_id;
               filters[attr.attr_id].attrName = attr.display_name;
               filters[attr.attr_id].viewType = attr.view_type;
             });
+
+            if (filters.hasOwnProperty(vm.customfilter.id)) {
+              filters[vm.customfilter.id].attrId = vm.customfilter.id;
+              filters[vm.customfilter.id].attrName = vm.customfilter.display_name;
+              filters[vm.customfilter.id].viewType = 'custom';
+            }
 
             def.resolve(vcSession.utils.generateVSDescription(selectedStudiesDisplayName, _.values(filters), self.stats.studies));
           });

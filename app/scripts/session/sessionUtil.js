@@ -71,12 +71,13 @@
             _desp += '\n- ' + _filter.attrName + ': ';
             if (_filter.viewType === 'bar_chart') {
               _desp += iViz.util.getDisplayBarChartBreadCrumb(_filter.filter);
-            } else if (_filter.viewType === 'table') {
-              _desp += _filter.filter.join('; ');
-            } else if (_filter.viewType === 'scatter_plot') {
-              _desp = _desp.slice(0, -2);
+            } else if (_filter.viewType === 'scatter_plot' || _filter.viewType === 'custom') {
+              _desp += _filter.filter.length + ' sample'
+                + (_filter.filter.length > 1 ? 's' : '');
             } else {
-              _desp += _filter.filter;
+              _.each(_filter.filter, function(subSelection) {
+                _desp += '\n  - ' + subSelection;
+              });
             }
           });
         }

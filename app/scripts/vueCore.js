@@ -21,7 +21,8 @@
             isloading: true,
             redrawgroups: [],
             customfilter: {
-              display_name: 'Custom',
+              id: 'selectById',
+              display_name: 'Select by IDs',
               type: '',
               sampleUids: [],
               patientUids: []
