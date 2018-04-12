@@ -71,18 +71,25 @@
             _desp += '\n- ' + _filter.attrName + ': ';
             if (_filter.viewType === 'bar_chart') {
               _desp += iViz.util.getDisplayBarChartBreadCrumb(_filter.filter);
+            } else if (_filter.viewType === 'table'
+              && ['mutated_genes', 'cna_details'].indexOf(_filter.attrId) !== -1) {
+              _.each(_filter.filter, function(subSelection) {
+                _desp += '\n  - ' + subSelection;
+              });
             } else if (_filter.viewType === 'scatter_plot' || _filter.viewType === 'custom') {
               _desp += _filter.filter.length + ' sample'
                 + (_filter.filter.length > 1 ? 's' : '');
             } else {
-              _.each(_filter.filter, function(subSelection) {
-                _desp += '\n  - ' + subSelection;
-              });
+              _desp += _filter.filter.join(', ');
             }
           });
         }
 
         _desp += '\n\nCreated on  ' + getCurrentDate();
+
+        if (window.userEmailAddress) {
+          _desp += ' by ' + window.userEmailAddress;
+        }
       }
       return _desp;
     };
