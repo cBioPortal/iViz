@@ -21,7 +21,8 @@
             isloading: true,
             redrawgroups: [],
             customfilter: {
-              display_name: 'Custom',
+              id: 'selectById',
+              display_name: 'Select by IDs',
               type: '',
               sampleUids: [],
               patientUids: []
@@ -242,6 +243,9 @@
                 }
               });
             },
+            getChartsByAttrIds: function(attrIds) {
+              return _.pick(this.charts, attrIds);
+            },
             removeChart: function(attrId) {
               var self = this;
               var attrData = self.charts[attrId];
@@ -326,10 +330,10 @@
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;
                       if (radioVal === 'sample') {
-                        self_.customfilter.sampleUids = selectedCaseUIDs;
+                        self_.customfilter.sampleUids = selectedCaseUIDs.sort();
                         self_.customfilter.patientUids = [];
                       } else {
-                        self_.customfilter.patientUids = selectedCaseUIDs;
+                        self_.customfilter.patientUids = selectedCaseUIDs.sort();
                         self_.customfilter.sampleUids = [];
                       }
                       self_.$broadcast('update-custom-filters');

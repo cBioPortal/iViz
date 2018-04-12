@@ -297,7 +297,7 @@ var util = (function(_, cbio) {
 
       // This is for PDF download. fill transparent will be treated as black.
       _svg.find('rect').each(function(index, item) {
-        if($(item).css('fill') === 'transparent') {
+        if ($(item).css('fill') === 'transparent') {
           $(item).css('fill', 'white');
         }
       });
@@ -763,7 +763,7 @@ var util = (function(_, cbio) {
       }
       return status;
     };
-    
+
     content.getTickFormat = function(v, logScale, data_, opts_) {
       var _returnValue = v;
       var index = 0;
@@ -869,7 +869,7 @@ var util = (function(_, cbio) {
       }
       return message;
     };
-    
+
     content.getHypotenuse = function(a, b) {
       return Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
     };
@@ -881,6 +881,22 @@ var util = (function(_, cbio) {
         isRelated = _.isArray(result) && result.length > 0;
       }
       return isRelated;
+    };
+
+    /**
+     *
+     * @param filters Array Filters should contain two elements
+     */
+    content.getDisplayBarChartBreadCrumb = function(filters) {
+      var str = '';
+      if (filters[0] && filters[1]) {
+        str = filters[0] + ' ~ ' + filters[1];
+      } else if (filters[0]) {
+        str = filters[0];
+      } else if (filters[1]) {
+        str = filters[1];
+      }
+      return str;
     };
 
     return content;

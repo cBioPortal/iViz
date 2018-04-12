@@ -617,6 +617,16 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     getSampleIds: function(studyId, patientId) {
       return data_.groups.group_mapping.studyMap[studyId].patient_to_sample[patientId];
     },
+    getStudyCacseIdsUsingUIDs: function(type, uids) {
+      var ids = [];
+      _.each(uids, function(uid) {
+        ids.push({
+          studyId: data_.groups[type].data[uid].study_id,
+          caseId: data_.groups[type].data[uid].sample_id
+        });
+      });
+      return ids;
+    },
     openCases: function() {
       var _selectedCasesMap = {};
       var _patientData = data_.groups.patient.data;
@@ -776,6 +786,12 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _.each(group.attributes, function(attributes) {
             if (attributes.filter.length > 0) {
               filters_[attributes.attr_id] = attributes.filter;
+              if (attributes.attr_id === 'MUT_CNT_VS_CNA') {
+                filters_[attributes.attr_id] =
+                  _.map(self.getStudyCacseIdsUsingUIDs('sample', filters_[attributes.attr_id]), function(item) {
+                    return item.studyId + ':' + item.caseId;
+                  });
+              }
             }
           });
           temp = $.extend(true, _result.filters.samples, filters_);
@@ -783,6 +799,16 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _result.filters.samples = array;
         }
       });
+
+      if (vm_.customfilter.sampleUids.length > 0
+        || vm_.customfilter.patientUids.length > 0) {
+        var type = vm_.customfilter.type === 'sample' ? 'samples' : 'patients';
+        var uidsType = type === 'samples' ? 'sampleUids' : 'patientUids';
+        _result.filters[type][vm_.customfilter.id] =
+          _.map(self.getStudyCacseIdsUsingUIDs(vm_.customfilter.type, vm_.customfilter[uidsType]), function(item) {
+            return item.studyId + ':' + item.caseId;
+          });
+      }
       _result.studies = _studies;
       return _result;
     },

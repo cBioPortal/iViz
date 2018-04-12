@@ -102,6 +102,41 @@
       enableShareCohortBtn: function(tooltip) {
         this.disableBtn(tooltip.find('.share-cohort'), false);
       },
+      getDefaultVSDescription: function() {
+        var def = new $.Deferred();
+        var selectedStudiesDisplayName = [];
+        var self = this;
+        window.iviz.datamanager.getCancerStudyDisplayName(this.stats.origin)
+          .then(function(names) {
+            selectedStudiesDisplayName = names
+          })
+          .always(function() {
+            var filters = {};
+            var vm = iViz.vue.manage.getInstance();
+            _.each(self.stats.filters, function(_filters, _type) {
+              _.each(_filters, function(filter, attrId) {
+                filters[attrId] = {
+                  filter: filter
+                };
+              });
+            });
+            var attrs = vm.getChartsByAttrIds(Object.keys(filters));
+            _.each(attrs, function(attr) {
+              filters[attr.attr_id].attrId = attr.attr_id;
+              filters[attr.attr_id].attrName = attr.display_name;
+              filters[attr.attr_id].viewType = attr.view_type;
+            });
+
+            if (filters.hasOwnProperty(vm.customfilter.id)) {
+              filters[vm.customfilter.id].attrId = vm.customfilter.id;
+              filters[vm.customfilter.id].attrName = vm.customfilter.display_name;
+              filters[vm.customfilter.id].viewType = 'custom';
+            }
+
+            def.resolve(vcSession.utils.generateVSDescription(selectedStudiesDisplayName, _.values(filters), self.stats.studies));
+          });
+        return def.promise();
+      },
       saveCohort: function() {
         var _self = this;
         _self.updateStats = true;
@@ -205,7 +240,8 @@
                 self_.showLoading(tooltip);
                 self_.updateSavingMessage(tooltip, 'Generating the virtual study link');
 
-                var cohortName = tooltip.find('.cohort-name').val();
+                var cohortName = tooltip.find('.cohort-name').val() ?
+                  tooltip.find('.cohort-name').val() : tooltip.find('.cohort-name').attr('placeholder');
                 var cohortDescription =
                   tooltip.find('textarea').val();
                 if (_.isObject(vcSession)) {
@@ -277,26 +313,31 @@
             },
             show: function() {
               var tooltip = $('.iviz-virtual-study-btn-qtip .qtip-content');
+              var showThis = this;
               self_.updateStats = true;
               self_.$nextTick(function() {
                 self_.updateStats = false;
                 tooltip.find('.cohort-name').val('');
                 tooltip.find('.cohort-name')
                   .attr('placeholder', vcSession.utils.VSDefaultName(self_.stats.studies));
-                tooltip.find('textarea').val(vcSession.utils.generateVSDescription(self_.stats.studies));
-              });
-              self_.showDialog(tooltip);
-              self_.hideLoading(tooltip);
-              self_.hideShared(tooltip);
-              self_.hideSaved(tooltip);
-              self_.hideFailedInfo(tooltip);
-              self_.hideAfterClipboard(tooltip);
+                self_.hideDialog(tooltip);
+                self_.showLoading(tooltip);
+                self_.getDefaultVSDescription()
+                  .always(function(description) {
+                    tooltip.find('textarea').val(description);
+                    self_.showDialog(tooltip);
+                    self_.hideLoading(tooltip);
+                    self_.hideShared(tooltip);
+                    self_.hideSaved(tooltip);
+                    self_.hideFailedInfo(tooltip);
+                    self_.hideAfterClipboard(tooltip);
 
-              // Tell the tip itself to not bubble up clicks on it
-              $($(this).qtip('api').elements.tooltip).click(function() {
-                return false;
+                    // Tell the tip itself to not bubble up clicks on it
+                    $($(showThis).qtip('api').elements.tooltip).click(function() {
+                      return false;
+                    });
+                  });
               });
-
             },
             visible: function() {
               // Tell the document itself when clicked to hide the tip and then unbind
@@ -313,7 +354,7 @@
           (self_.showShareButton ? '<button class="btn btn-default share-cohort" type="button">Share</button>' : '') +
           '</span>' +
           '</div><div>' +
-          '<textarea classe="form-control" rows="5" ' +
+          '<textarea classe="form-control" rows="10" ' +
           'placeholder="Virtual study description (Optional)"></textarea>' +
           '</div></div>' +
           '<div class="saving" style="display: none;">' +
