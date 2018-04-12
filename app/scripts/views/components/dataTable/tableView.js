@@ -64,7 +64,10 @@
         chartId_ = _opts.chartId;
         opts = _opts;
         genePanelMap = _genePanelMap;
-        data_ = _data;
+        data_ = _data.reduce(function(acc, next) {
+          acc[next[_attributes.group_type+'_uid']] = next;
+          return acc;
+        }, {})
         geneData_ = _geneData;
         type_ = _attributes.type;
         displayName = _attributes.display_name || 'Table';
