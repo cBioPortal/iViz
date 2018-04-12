@@ -4,7 +4,7 @@
     template:
     '<div class="virtual-study">' +
     '<div class="virtual-study-btn">' +
-    'Virtual Study</div></div>',
+    '<i class="fa fa-bookmark" aria-hidden="true"></i></div></div>',
     props: {
       selectedSamplesNum: {
         type: Number,
