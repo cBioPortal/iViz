@@ -102,7 +102,7 @@
 
     var getVSDefaultName = function(studyMap) {
       var _numOfSamples = getNumOfSelectedSamplesFromStudyMap(studyMap);
-      return 'Selected ' + (_numOfSamples > 1 ? 'samples' : 'sample')
+      return 'Selected ' + (_numOfSamples.sampleCounts__ > 1 ? 'samples' : 'sample')
         + ' (' + getCurrentDate() + ')';
     };
 
