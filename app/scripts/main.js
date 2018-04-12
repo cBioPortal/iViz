@@ -177,7 +177,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       return def.promise();
     },
     getGroupNdx: function(groupId) {
-      return groupNdxMap_[groupId].data;
+      return _.values(groupNdxMap_[groupId].data);
     },
     setGroupFilteredCases: function(groupId_, type_, filters_) {
       groupFiltersMap_[groupId_] = {};
@@ -216,7 +216,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var _def = new $.Deferred();
       $.when(_def).done(function() {
         var _data = isPatientAttributes ? data_.groups.patient.data : data_.groups.sample.data;
-        var toReturn = [];
+        var toReturn = {};
         _.each(_data, function(_caseData, _index) {
           toReturn[_index] = _.pick(_caseData, updatedAttrIds);
         });
@@ -601,9 +601,9 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     },
     getCaseIdUsingUID: function(type, case_uid) {
       if (type === 'sample') {
-        return data_.groups.sample.data[parseInt(case_uid, 10)].sample_id;
+        return data_.groups.sample.data[case_uid].sample_id;
       }
-      return data_.groups.patient.data[parseInt(case_uid, 10)].patient_id;
+      return data_.groups.patient.data[case_uid].patient_id;
     },
     getPatientUIDs: function(sampleUID) {
       return this.getCasesMap('sample')[sampleUID];

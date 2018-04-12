@@ -92,10 +92,10 @@ window.DataManagerForIviz = (function($, _) {
                            _clinicalAttributes) {
               vueInstance.increaseStudyViewSummaryPagePBStatus();
               var _result = {};
-              var _patientData = [];
+              var _patientData = {};
               var _sampleAttributes = {};
               var _patientAttributes = {};
-              var _sampleData = [];
+              var _sampleData = {};
               var _hasDFS = false;
               var _hasOS = false;
               var _hasPatientAttrData = {};
@@ -1002,8 +1002,6 @@ window.DataManagerForIviz = (function($, _) {
       getStudyToSampleToPatientMap: window.cbio.util.makeCachedPromiseFunction(
         function(self, fetch_promise) {
           var study_to_sample_to_patient = {};
-          var _sample_uid = 0;
-          var _patient_uid = 0
           var getSamplesCall = function() {
             var def = new $.Deferred();
             var data = [];
@@ -1046,21 +1044,19 @@ window.DataManagerForIviz = (function($, _) {
                 patient_to_uid[_studyId] = patient_to_uid[_studyId] || {};
                 uid_to_patient[_studyId] = uid_to_patient[_studyId] || {};
 
-                uid_to_sample[_studyId][_sample_uid] = data[i].sampleId;
-                sample_to_uid[_studyId][data[i].sampleId] = _sample_uid.toString();
+                uid_to_sample[_studyId][data[i].uniqueSampleKey] = data[i].sampleId;
+                sample_to_uid[_studyId][data[i].sampleId] = data[i].uniqueSampleKey;
                 if (patient_to_uid[_studyId][data[i].patientId] === undefined) {
-                  uid_to_patient[_studyId][_patient_uid] = data[i].patientId;
-                  patient_to_uid[_studyId][data[i].patientId] = _patient_uid.toString();
-                  _patient_uid++;
+                  uid_to_patient[_studyId][data[i].uniquePatientKey] = data[i].patientId;
+                  patient_to_uid[_studyId][data[i].patientId] = data[i].uniquePatientKey;
                 }
                 if (!patient_to_sample.hasOwnProperty(data[i].patientId)) {
                   patient_to_sample[_studyId][data[i].patientId] = {};
                 }
                 patient_to_sample[_studyId][data[i].patientId][data[i].sampleId] = 1;
                 sample_to_patient[_studyId][data[i].sampleId] = data[i].patientId;
-                sample_uid_to_patient_uid[_studyId][_sample_uid] = patient_to_uid[_studyId][data[i].patientId];
+                sample_uid_to_patient_uid[_studyId][data[i].uniqueSampleKey] = patient_to_uid[_studyId][data[i].patientId];
                 patientList[_studyId][data[i].patientId] = 1;
-                _sample_uid++;
               }
 
               _.each(self.getCancerStudyIds(), function(studyId) {
