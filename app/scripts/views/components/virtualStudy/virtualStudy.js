@@ -209,7 +209,7 @@
                         });
                         tooltip.find('.saved .message .query-vs').click(function(event) {
                           event.preventDefault();
-                          iViz.submitForm([self_.savedVS.id]);
+                          window.open(window.cbioURL + 'index.do?cancer_study_id'+self_.savedVS.id)
                         });
                       })
                       .fail(function() {
