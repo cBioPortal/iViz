@@ -217,40 +217,18 @@
     window.iviz = {};
     window.iviz.datamanager = new DataManagerForIviz.init(window.cbioURL, studyCasesMap);
 
-    var getVirtualStudies = function(){
-        var _def = new $.Deferred();
-        $.get(window.cbioURL+'api-legacy/proxy/session/virtual_study')
-        .done(function(virtualStudies) {
-          _def.resolve(virtualStudies);
-        })
-        .fail(function(error) {
-          _def.resolve([]);
-        });
-      return _def.promise();
-    }
-    var getPhysicalStudies = function(){
-      var def = new $.Deferred();
-      $.get(window.cbioURL + 'api/studies')
-        .done(function(response) {
-          def.resolve(response);
-        })
-        .fail(function(error) {
-          def.reject(error);
-        });
-      return def.promise();
-    }
-
     var getSelectableStudyIds = function() {
       var def = new $.Deferred();
-      $.when(getPhysicalStudies(), getVirtualStudies()).then(function(physicalStudies, virtualStudies) {
-          var physicalStudyIds = _.pluck(physicalStudies,'studyId');
-          var virtualStudyIds = _.pluck(virtualStudies,'id');
-          def.resolve( physicalStudyIds.concat(virtualStudyIds))
+      $.when(window.iviz.datamanager.getAllPhysicalStudies(),
+        window.iviz.datamanager.getAllVirtualStudies()).then(function(physicalStudies, virtualStudies) {
+        var physicalStudyIds = _.pluck(physicalStudies, 'studyId');
+        var virtualStudyIds = _.pluck(virtualStudies, 'id');
+        def.resolve(physicalStudyIds.concat(virtualStudyIds))
       }).fail(function(error) {
-          def.reject(error);
+        def.reject(error);
       });
       return def.promise();
-    }
+    };
     $.when(window.iviz.datamanager.getConfigs())
       .done(function(configs) {
         var opts = {};
