@@ -87,7 +87,7 @@
 
         _desp += '\n\nCreated on  ' + getCurrentDate();
 
-        if (window.userEmailAddress) {
+        if (window.userEmailAddress && window.userEmailAddress !== 'anonymousUser') {
           _desp += ' by ' + window.userEmailAddress;
         }
       }
