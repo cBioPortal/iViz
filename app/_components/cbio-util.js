@@ -825,7 +825,7 @@ cbio.util = (function() {
         return '<a href="' + window.cbioURL + 'study?id=' + study.id + '" title="' +
           study.description.replace(/(<([^>]+)>)/ig, '') + '" target="_blank">' +
           study.name + '</a>';
-      }).join("<br />e");
+      }).join("<br />");
       addFoldableDescription(descriptionSelector, collapseStudyName)
     }
   }
@@ -839,7 +839,7 @@ cbio.util = (function() {
         '<h4 class="panel-title"><span role="button" data-toggle="collapse" ' +
         'data-target="#' + study.id + '-collapse-content">' +
         '<i class="fa fa-chevron-right" aria-hidden="true"></i>' +
-        study.name + '</span><i class="fa fa-external-link" aria-hidden="true"></i></h4></div>' +
+        study.name + '</span><a target="_blank" href="' + window.cbioURL + 'study?id=' + study.id + '"><i class="fa fa-external-link" aria-hidden="true"></i></a></h4></div>' +
         '<div id="' + study.id + '-collapse-content" ' +
         'class="panel-collapse collapse">' +
         '<div class="panel-body">' + study.description.replace(/\r?\n/g, '<br/>') + '</div></div></div>');
