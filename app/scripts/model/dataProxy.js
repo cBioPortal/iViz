@@ -1628,7 +1628,7 @@ window.DataManagerForIviz = (function($, _) {
         return _def.promise();
       },
 
-      getAllPhysicalStudies: function(){
+      getAllPhysicalStudies: function() {
         var _def = new $.Deferred();
         var _self = this;
         $.get(window.cbioURL + 'api/studies')
@@ -1643,6 +1643,10 @@ window.DataManagerForIviz = (function($, _) {
             _def.reject(error);
           });
         return _def.promise();
+      },
+
+      getStudyById: function(id) {
+        return this.data.studies[id];
       },
 
       getCancerStudyDisplayName: function(_cancerStudyStableIds) {

@@ -1,5 +1,5 @@
 'use strict';
-(function(Vue, $, vcSession, iViz) {
+(function(Vue, $, vcSession, iViz, _) {
   Vue.component('virtualStudy', {
     template:
     '<div class="virtual-study">' +
@@ -87,6 +87,10 @@
         tooltip.find('.saving .message')
           .html(message)
       },
+      updateOriginStudiesDescription: function(tooltip, message) {
+        tooltip.find('.origin-studies-frame')
+          .html(message);
+      },
       disableBtn: function(el, action) {
         el.attr('disabled', action);
       },
@@ -102,9 +106,38 @@
       enableShareCohortBtn: function(tooltip) {
         this.disableBtn(tooltip.find('.share-cohort'), false);
       },
-      getDefaultVSDescription: function() {
-        var def = new $.Deferred();
-        var selectedStudiesDisplayName = window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(this.stats.studies, 'id'));
+      getFilteredOriginStudies: function() {
+        var selectedStudiesDisplayName = window.iviz.datamanager.getCancerStudyDisplayName(this.stats.origin);
+        var filteredOriginStudies = {
+          studies: [],
+          count: 0
+        };
+        var selectedStudies = {};
+        _.each(this.stats.studies, function(study) {
+          selectedStudies[study.id] = study.samples;
+          filteredOriginStudies.count += study.samples.length;
+        });
+        filteredOriginStudies.studies = this.stats.origin.map(function(studyId) {
+          var _studyData = iviz.datamanager.getStudyById(studyId);
+          var _count = 0;
+          if (_studyData.studyType === 'vs') {
+            _.each(_studyData.data.studies, function(_study) {
+              _count += _.intersection(_study.samples, selectedStudies[_study.id]).length;
+            });
+          } else {
+            _count = selectedStudies.hasOwnProperty(studyId) ? selectedStudies[studyId].length : 0;
+          }
+          return {
+            id: studyId,
+            name: selectedStudiesDisplayName[studyId],
+            count: _count
+          };
+        }).filter(function(t) {
+          return t.count > 0;
+        });
+        return filteredOriginStudies;
+      },
+      getDefaultVSDescription: function(filteredOriginStudies) {
         var self = this;
         var filters = {};
         var vm = iViz.vue.manage.getInstance();
@@ -127,9 +160,7 @@
           filters[vm.customfilter.id].attrName = vm.customfilter.display_name;
           filters[vm.customfilter.id].viewType = 'custom';
         }
-
-        def.resolve(vcSession.utils.generateVSDescription(selectedStudiesDisplayName, _.values(filters), self.stats.studies));
-        return def.promise();
+        return vcSession.utils.generateVSDescription(filteredOriginStudies, _.values(filters));
       },
       saveCohort: function() {
         var _self = this;
@@ -203,7 +234,7 @@
                         });
                         tooltip.find('.saved .message .query-vs').click(function(event) {
                           event.preventDefault();
-                          window.open(window.cbioURL + 'index.do?cancer_study_id='+self_.savedVS.id)
+                          window.open(window.cbioURL + 'index.do?cancer_study_id=' + self_.savedVS.id)
                         });
                       })
                       .fail(function() {
@@ -308,6 +339,7 @@
             show: function() {
               var tooltip = $('.iviz-virtual-study-btn-qtip .qtip-content');
               var showThis = this;
+              self_.updateSavingMessage(tooltip, 'Loading');
               self_.updateStats = true;
               self_.$nextTick(function() {
                 self_.updateStats = false;
@@ -316,21 +348,32 @@
                   .attr('placeholder', vcSession.utils.VSDefaultName(self_.stats.studies));
                 self_.hideDialog(tooltip);
                 self_.showLoading(tooltip);
-                self_.getDefaultVSDescription()
-                  .always(function(description) {
-                    tooltip.find('textarea').val(description);
-                    self_.showDialog(tooltip);
-                    self_.hideLoading(tooltip);
-                    self_.hideShared(tooltip);
-                    self_.hideSaved(tooltip);
-                    self_.hideFailedInfo(tooltip);
-                    self_.hideAfterClipboard(tooltip);
+                var filteredOriginStudies = this.getFilteredOriginStudies();
+                var defaultVSDescription = self_.getDefaultVSDescription(filteredOriginStudies);
+                tooltip.find('textarea').val(defaultVSDescription);
 
-                    // Tell the tip itself to not bubble up clicks on it
-                    $($(showThis).qtip('api').elements.tooltip).click(function() {
-                      return false;
-                    });
+                if (filteredOriginStudies.studies.length > 0) {
+                  filteredOriginStudies.studies.map(function(study) {
+                    var studyMetaData = iviz.datamanager.getStudyById(study.id);
+                    study.description = studyMetaData.studyType === 'vs' ? studyMetaData.data.description : studyMetaData.description;
+                    return study;
                   });
+                  self_.updateOriginStudiesDescription(tooltip, cbio.util.getOriginStudiesDescriptionHtml(filteredOriginStudies.studies));
+                  $('.origin-studies-frame [data-toggle="collapse"]').click(function(a, b) {
+                    $($(this).attr('data-target')).collapse('toggle');
+                  });
+                }
+                self_.showDialog(tooltip);
+                self_.hideLoading(tooltip);
+                self_.hideShared(tooltip);
+                self_.hideSaved(tooltip);
+                self_.hideFailedInfo(tooltip);
+                self_.hideAfterClipboard(tooltip);
+
+                // Tell the tip itself to not bubble up clicks on it
+                $($(showThis).qtip('api').elements.tooltip).click(function() {
+                  return false;
+                });
               });
             },
             visible: function() {
@@ -350,6 +393,7 @@
           '</div><div>' +
           '<textarea classe="form-control" rows="10" ' +
           'placeholder="Virtual study description (Optional)"></textarea>' +
+          '<div class="origin-studies-frame"></div>' +
           '</div></div>' +
           '<div class="saving" style="display: none;">' +
           '<i class="fa fa-spinner fa-spin"></i>' +
@@ -377,4 +421,4 @@
     }
   });
 })(window.Vue,
-  window.$ || window.jQuery, window.vcSession, window.iViz);
+  window.$ || window.jQuery, window.vcSession, window.iViz, window._);
