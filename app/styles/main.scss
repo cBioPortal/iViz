@@ -84,6 +84,7 @@ body {
         width: 100%;
         padding: 6px 5px;
         line-height: 15px;
+        border-color: $iviz-header-left-border-color;
       }
     }
     .saved, .saving {
@@ -144,4 +145,32 @@ body {
   position: relative;
   margin: auto;
   top: calc(50% - 40px);
+}
+
+.origin-studies {
+  margin-top: 10px;
+  .header {
+    font-weight: bold;
+    font-size: 13px;
+  }
+  .panel-group {
+    margin-top: 5px;
+    margin-bottom: 0;
+    .panel.panel-default {
+      border-radius: 0;
+      .panel-heading {
+        padding: 10px 5px;
+        background-color: white;
+        h4 {
+          font-size: 14px;
+          font-weight: 400;
+          color: #000;
+          i {
+            margin: 0 5px;
+            color: #000;
+          }
+        }
+      }
+    }
+  }
 }

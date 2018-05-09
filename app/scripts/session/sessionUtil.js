@@ -48,18 +48,16 @@
       return _numOfSamples;
     };
 
-    var generateVSDescription_ = function(_studyDisplayName, _filters, _cases) {
+    var generateVSDescription_ = function(_studies, _filters) {
       var _desp = '';
-      if (_cases.length > 0) {
-        var _numOfSamples = getNumOfSelectedSamplesFromStudyMap(_cases);
-        var _count = _numOfSamples.sampleCounts__;
-        _desp = _count + (_count > 1 ? ' samples ' : ' sample ')
-          + 'from ' + _cases.length +
-          (_cases.length > 1 ? ' studies' : ' study') + ':';
+      if (_studies.studies.length > 0) {
+        _desp = _studies.count + (_studies.count > 1 ? ' samples ' : ' sample ')
+          + 'from ' + _studies.studies.length +
+          (_studies.studies.length > 1 ? ' studies' : ' study') + ':';
 
-        _.each(_numOfSamples.studies, function(_count, _studyId) {
-          _desp += '\n- ' + _studyDisplayName[_studyId] + ' ('
-            + _count + ' sample' + (_count > 1 ? 's' : '') + ')';
+        _.each(_studies.studies, function(_study) {
+          _desp += '\n- ' + _study.name + ' ('
+            + _study.count + ' sample' + (_study.count > 1 ? 's' : '') + ')';
         });
 
         if (_filters.length > 0) {
