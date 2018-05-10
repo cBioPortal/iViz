@@ -156,6 +156,8 @@ body {
   .panel-group {
     margin-top: 5px;
     margin-bottom: 0;
+    max-height: 200px;
+    overflow-y: auto;
     .panel.panel-default {
       border-radius: 0;
       .panel-heading {
