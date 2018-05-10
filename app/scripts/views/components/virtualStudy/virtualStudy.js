@@ -362,6 +362,9 @@
                   $('.origin-studies-frame [data-toggle="collapse"]').click(function(a, b) {
                     $($(this).attr('data-target')).collapse('toggle');
                   });
+                  $('.origin-studies-frame .panel-title a').click(function() {
+                    window.open($(this).attr('href'));
+                  });
                 }
                 self_.showDialog(tooltip);
                 self_.hideLoading(tooltip);

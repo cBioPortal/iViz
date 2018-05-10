@@ -159,17 +159,35 @@ body {
     .panel.panel-default {
       border-radius: 0;
       .panel-heading {
-        padding: 10px 5px;
+        padding: 8px 10px;
         background-color: white;
+        .panel-title {
+          span:before {
+            content: "\f056";
+            font-family: "FontAwesome";
+            margin: 0 5px 0 0;
+            color: #000;
+            padding: 0;
+          }
+          span.collapsed:before {
+            content: "\f055";
+            font-family: "FontAwesome";
+          }
+        }
         h4 {
-          font-size: 14px;
+          font-size: 12px;
           font-weight: 400;
           color: #000;
-          i {
-            margin: 0 5px;
+          font-family: sans-serif;
+          letter-spacing: normal;
+          i.fa-external-link {
+            margin-left: 5px;
             color: #000;
           }
         }
+      }
+      .panel-body {
+        padding: 10px;
       }
     }
   }
