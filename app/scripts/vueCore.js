@@ -21,7 +21,8 @@
             isloading: true,
             redrawgroups: [],
             customfilter: {
-              display_name: 'Custom',
+              id: 'selectById',
+              display_name: 'Select by IDs',
               type: '',
               sampleUids: [],
               patientUids: []
@@ -30,9 +31,8 @@
             downloadingSelected: false,
             groupCount: 0,
             updateSpecialCharts: false,
-            showShareButton: false,
             showSaveButton: false,
-            showManageButton: false,
+            showShareButton: false,
             loadUserSpecificCohorts: false,
             stats: {},
             updateStats: false,
@@ -243,6 +243,9 @@
                 }
               });
             },
+            getChartsByAttrIds: function(attrIds) {
+              return _.pick(this.charts, attrIds);
+            },
             removeChart: function(attrId) {
               var self = this;
               var attrData = self.charts[attrId];
@@ -318,7 +321,6 @@
                 new Notification().createNotification(selectedCaseUIDs.length +
                   ' case(s) selected.', {message_type: 'info'});
               }
-              $('#iviz-header-right-1').qtip('toggle');
               if (selectedCaseUIDs.length > 0) {
                 this.clearAllCharts(false);
                 var self_ = this;
@@ -328,10 +330,10 @@
                       self_.hasfilters = true;
                       self_.customfilter.type = group.type;
                       if (radioVal === 'sample') {
-                        self_.customfilter.sampleUids = selectedCaseUIDs;
+                        self_.customfilter.sampleUids = selectedCaseUIDs.sort();
                         self_.customfilter.patientUids = [];
                       } else {
-                        self_.customfilter.patientUids = selectedCaseUIDs;
+                        self_.customfilter.patientUids = selectedCaseUIDs.sort();
                         self_.customfilter.sampleUids = [];
                       }
                       self_.$broadcast('update-custom-filters');
@@ -342,11 +344,6 @@
               }
             }
           }, ready: function() {
-            this.$watch('showVCList', function() {
-              if (_.isObject(iViz.session)) {
-                this.virtualCohorts = iViz.session.utils.getVirtualCohorts();
-              }
-            });
             $('#iviz-header-left-patient-select').qtip({
               content: {text: 'View the selected patients.'},
               style: {classes: 'qtip-light qtip-rounded qtip-shadow'},

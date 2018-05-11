@@ -9,72 +9,105 @@
       name: '',
       description: '',
       filters: '',
-      studies: ''
+      studies: '',
+      origin: ''
     };
 
-    var generateUUID_ = function() {
-      var _d = new Date().getTime();
-      if (window.performance && typeof window.performance.now === 'function') {
-        _d += window.performance.now();
-      }
-      var _uuid = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-        function(c) {
-          var r = (_d + Math.random() * 16) % 16 | 0;
-          _d = Math.floor(_d / 16);
-          return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-        });
-      return _uuid;
-    };
-
-    // Get Virtual cohorts from Local Storage
-    var getVirtualCohorts_ = function() {
-      return JSON.parse(localStorage.getItem('virtual-cohorts')) || [];
-    };
-
-    // Set Virtual cohorts in Local Storage
-    var setVirtualCohorts_ = function(virtualCohorts) {
-      localStorage.setItem('virtual-cohorts', JSON.stringify(virtualCohorts));
-    };
-
-    var buildVCObject_ = function(filters, cases, name,
+    var buildVCObject_ = function(stats, name,
                                   description) {
       var def = new $.Deferred();
       var _virtualCohort = $.extend(true, {}, virtualCohort_);
-      _virtualCohort.filters = filters;
-      
-      _virtualCohort.studies = cases.map(function(studyObj) {
+      _virtualCohort.filters = stats.filters;
+
+      _virtualCohort.studies = stats.studies.map(function(studyObj) {
         return {
           id: studyObj.id,
           samples: studyObj.samples
         };
       });
+      _virtualCohort.origin = stats.origin;
       if (name) {
         _virtualCohort.name = name;
       } else {
-        _virtualCohort.name = cases.length > 1 ? "Combined Study" : "Selected Study";
+        _virtualCohort.name = getVSDefaultName();
       }
       _virtualCohort.description = description || '';
       def.resolve(_virtualCohort);
       return def.promise();
     };
 
-    var generateCohortDescription_ = function(_cases) {
-      var def = new $.Deferred(), _desp = "";
-      $.when(window.iviz.datamanager.getCancerStudyDisplayName(_.pluck(_cases, "id"))).done(function(_studyIdNameMap) {
-        _.each(_cases, function (_i) {
-          _desp += _studyIdNameMap[_i.id] + ": " + _i.samples.length + " samples\n";
-        });
-        def.resolve(_desp);
+    var getNumOfSelectedSamplesFromStudyMap = function(studyMap) {
+      var _numOfSamples = {
+        sampleCounts__: 0,
+        studies: {}
+      };
+      _.each(studyMap, function(_study) {
+        _numOfSamples.studies[_study.id] = _study.samples.length;
+        _numOfSamples.sampleCounts__ += _study.samples.length;
       });
-      return def.promise();
-    }
+      return _numOfSamples;
+    };
+
+    var generateVSDescription_ = function(_studies, _filters) {
+      var _desp = '';
+      if (_studies.studies.length > 0) {
+        _desp = _studies.count + (_studies.count > 1 ? ' samples ' : ' sample ')
+          + 'from ' + _studies.studies.length +
+          (_studies.studies.length > 1 ? ' studies' : ' study') + ':';
+
+        _.each(_studies.studies, function(_study) {
+          _desp += '\n- ' + _study.name + ' ('
+            + _study.count + ' sample' + (_study.count > 1 ? 's' : '') + ')';
+        });
+
+        if (_filters.length > 0) {
+          _desp += '\n\nFilter' + (_filters.length > 1 ? 's' : '') + ':';
+          _filters.sort(function(a, b) {
+            return a.attrName.localeCompare(b.attrName);
+          });
+          _.each(_filters, function(_filter) {
+            _desp += '\n- ' + _filter.attrName + ': ';
+            if (_filter.viewType === 'bar_chart') {
+              _desp += iViz.util.getDisplayBarChartBreadCrumb(_filter.filter);
+            } else if (_filter.viewType === 'table'
+              && ['mutated_genes', 'cna_details'].indexOf(_filter.attrId) !== -1) {
+              _.each(_filter.filter, function(subSelection) {
+                _desp += '\n  - ' + subSelection;
+              });
+            } else if (_filter.viewType === 'scatter_plot' || _filter.viewType === 'custom') {
+              _desp += _filter.filter.length + ' sample'
+                + (_filter.filter.length > 1 ? 's' : '');
+            } else {
+              _desp += _filter.filter.join(', ');
+            }
+          });
+        }
+
+        _desp += '\n\nCreated on  ' + getCurrentDate();
+
+        if (window.userEmailAddress && window.userEmailAddress !== 'anonymousUser') {
+          _desp += ' by ' + window.userEmailAddress;
+        }
+      }
+      return _desp;
+    };
+
+    var getCurrentDate = function() {
+      var _date = new Date();
+      var strArr = [_date.getFullYear(), _date.getMonth() + 1, _date.getDate()];
+      return strArr.join('-');
+    };
+
+    var getVSDefaultName = function(studyMap) {
+      var _numOfSamples = getNumOfSelectedSamplesFromStudyMap(studyMap);
+      return 'Selected ' + (_numOfSamples.sampleCounts__ > 1 ? 'samples' : 'sample')
+        + ' (' + getCurrentDate() + ')';
+    };
 
     return {
       buildVCObject: buildVCObject_,
-      setVirtualCohorts: setVirtualCohorts_,
-      getVirtualCohorts: getVirtualCohorts_,
-      generateUUID: generateUUID_,
-      generateCohortDescription: generateCohortDescription_
+      VSDefaultName: getVSDefaultName,
+      generateVSDescription: generateVSDescription_
     };
   })();
 })(window.vcSession,

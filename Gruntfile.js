@@ -495,6 +495,7 @@ module.exports = function(grunt) {
     'wiredep',
     'useminPrepare',
     'json_to_sass:vars',
+    'sass',
     'dynamicVars:dev',
     'concurrent:dist',
     'postcss',

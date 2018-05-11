@@ -65,23 +65,29 @@ body {
   }
 }
 
-.iviz-save-cohort-btn-qtip {
+.iviz-virtual-study-btn-qtip.qtip {
+  max-width: 350px;
+}
+
+.iviz-virtual-study-btn-qtip {
   .qtip-content {
     padding: 9px;
+    font-size: 14px;
     .dialog {
       input {
         line-height: 20px;
         padding: 2px 5px;
         width: 100%;
-        font-size: 14px;
         margin: 2px 0;
       }
-      textarea.form-control {
+      textarea {
+        width: 100%;
         padding: 6px 5px;
+        line-height: 15px;
+        border-color: $iviz-header-left-border-color;
       }
     }
     .saved, .saving {
-      font-size: 15px;
       line-height: 16px;
     }
     .saved > span {
@@ -90,9 +96,9 @@ body {
     .saved > button {
       float: right;
     }
-    .saved {
-      .savedMessage {
-        display: inline-flex;
+    .failed {
+      .message {
+        display: flex;
         .fa-exclamation-triangle {
           color: orange;
         }
@@ -103,6 +109,14 @@ body {
     }
     .saving {
       text-align: center;
+      .message {
+        margin-left: 5px;
+      }
+    }
+    .shared {
+      .copy-cohort-btn {
+        margin-left: 5px;
+      }
     }
   }
 }
@@ -111,12 +125,12 @@ body {
   .qtip-content {
     .dialog {
       .virtual-study-link {
-        display: inline-flex; 
+        display: inline-flex;
         line-height: 16px;
       }
-      .share-cohort {
-        border-radius: 4px;
-      }
+    }
+    .share-cohort {
+      border-radius: 4px;
     }
   }
 }
@@ -131,4 +145,52 @@ body {
   position: relative;
   margin: auto;
   top: calc(50% - 40px);
+}
+
+.origin-studies {
+  margin-top: 10px;
+  .header {
+    font-weight: bold;
+    font-size: 13px;
+  }
+  .panel-group {
+    margin-top: 5px;
+    margin-bottom: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    .panel.panel-default {
+      border-radius: 0;
+      .panel-heading {
+        padding: 8px 10px;
+        background-color: white;
+        .panel-title {
+          span:before {
+            content: "\f056";
+            font-family: "FontAwesome";
+            margin: 0 5px 0 0;
+            color: #000;
+            padding: 0;
+          }
+          span.collapsed:before {
+            content: "\f055";
+            font-family: "FontAwesome";
+          }
+        }
+        h4 {
+          font-size: 12px;
+          font-weight: 400;
+          color: #000;
+          font-family: sans-serif;
+          letter-spacing: normal;
+          i.fa-external-link {
+            margin-left: 5px;
+            color: #000;
+          }
+        }
+      }
+      .panel-body {
+        padding: 10px;
+      }
+    }
+  }
 }

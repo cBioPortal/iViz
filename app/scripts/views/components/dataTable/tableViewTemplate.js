@@ -181,7 +181,7 @@
 
         if (this.isMutatedGeneCna) {
           this.selectedRows = _.union(this.selectedRows, selectedRowsUids);
-          this.attributes.filter.push(selectedRowsUids.join(','))
+          this.attributes.filter.push(selectedRowsUids.join(', '))
           _.each(_selectedRowData, function(item) {
             var casesIds = item.case_uids.split(',');
             selectedSamplesUnion = selectedSamplesUnion.concat(casesIds);

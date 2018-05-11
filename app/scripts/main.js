@@ -6,6 +6,7 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
   var groupFiltersMap_ = {};
   var groupNdxMap_ = {};
   var charts = {};
+  var includeCases= true;
   var configs_ = {
     styles: {
       vars: {
@@ -82,8 +83,20 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
 
   return {
 
-    init: function(_rawDataJSON, configs) {
+    init: function(_rawDataJSON, configs,_selectableIds) {
       vm_ = iViz.vue.manage.getInstance();
+      var selectableIdsSet = {}
+      _.each(_selectableIds, function(id){
+        selectableIdsSet[id] = true;
+      });
+
+      var cohortIds = window.cohortIdsList;
+      for (var i = 0; i < cohortIds.length; i++) {
+        if(selectableIdsSet[cohortIds[i]]){
+          includeCases = false;
+          break;
+        }
+      }
 
       data_ = _rawDataJSON;
 
@@ -164,6 +177,20 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
         vm_.selectedpatientUIDs = _.pluck(data_.groups.patient.data, 'patient_uid');
         vm_.groups = groups;
         vm_.charts = charts;
+
+        //Show unknown samples error message, whenthe initial(pie and bar) charts are loaded
+        if (window.iviz.datamanager.unknownSamples.length > 0) {
+          var str = ''
+          window.iviz.datamanager.unknownSamples.forEach(function(obj){
+            obj.samples.forEach(function(sample){
+              str = str+'<br/>'+obj.studyId+':'+sample
+            })
+          })
+          new Notification().createNotification('Following sample(s) might have been deleted/updated with the recent data updates<br/>'+str, {
+            message_type: 'danger',
+            delay:10000
+          });
+        }
       });
     }, // ---- close init function ----groups
     createGroupNdx: function(group) {
@@ -641,6 +668,16 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
     getSampleIds: function(studyId, patientId) {
       return data_.groups.group_mapping.studyMap[studyId].patient_to_sample[patientId];
     },
+    getStudyCacseIdsUsingUIDs: function(type, uids) {
+      var ids = [];
+      _.each(uids, function(uid) {
+        ids.push({
+          studyId: data_.groups[type].data[uid].study_id,
+          caseId: data_.groups[type].data[uid].sample_id
+        });
+      });
+      return ids;
+    },
     openCases: function() {
       var _selectedCasesMap = {};
       var _patientData = data_.groups.patient.data;
@@ -753,50 +790,17 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       });
       return _def.promise();
     },
-    submitForm: function() {
-      var _self = this;
-      _self.selectedsamples = _.keys(iViz.getCasesMap('sample'));
-      _self.selectedpatients = _.keys(iViz.getCasesMap('patient'));
-      _self.cohorts_ = window.cohortIdsList; // queried cohorts (vc or regular study)
-
+    submitForm: function(cohortIdsList) {
       // Remove all hidden inputs
       $('#iviz-form input:not(:first)').remove();
 
-      // Had discussion whether we should get rid of _self.cohorts_ and always
-      // use _self.stat().studies which will make the code looks cleaner.
-      // But the major issue for using _self.stat() is the unnecessary calculation
-      // for studies without filters. Especially big combined studies.
-      // We decided to leave the code as it is for now. By Karthik and Hongxin
-      if (_self.cohorts_.length === 1) { // to query single study
-        if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(_self.cohorts_[0], vm_.hasfilters ? _self.stat().studies : undefined);
-        } else {
-          QueryByGeneTextArea.validateGenes(this.decideSubmitSingleCohort, false);
-        }
-      } else { // query multiple studies
-        if (QueryByGeneTextArea.isEmpty()) {
-          QueryByGeneUtil.toMainPage(_self.cohorts_, vm_.hasfilters ? _self.stat().studies : undefined);
-        } else {
-          QueryByGeneUtil.toMultiStudiesQueryPage(undefined, _self.stat().studies, QueryByGeneTextArea.getGenes());
-        }
-      }
-    },
-    decideSubmitSingleCohort: function(allValid) {
-      // if all genes are valid, submit, otherwise show a notification
-      if (allValid) {
-        var _self = this;
-        QueryByGeneUtil.toQueryPageSingleCohort(window.cohortIdsList[0], iViz.stat().studies,
-          QueryByGeneTextArea.getGenes(), window.mutationProfileId,
-          window.cnaProfileId);
-      } else {
-        new Notification().createNotification(
-          'Invalid gene symbols.',
-          {message_type: 'danger'});
-        $('#query-by-gene-textarea').focus();
-      }
+      
+          QueryByGeneUtil. query (cohortIdsList ? cohortIdsList: window.cohortIdsList, this.stat(),
+          QueryByGeneTextArea.getGenes(), includeCases)
     },
     stat: function() {
       var _result = {};
+      _result.origin = window.cohortIdsList;
       _result.filters = {};
       var self = this;
 
@@ -841,6 +845,12 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _.each(group.attributes, function(attributes) {
             if (attributes.filter.length > 0) {
               filters_[attributes.attr_id] = attributes.filter;
+              if (attributes.attr_id === 'MUT_CNT_VS_CNA') {
+                filters_[attributes.attr_id] =
+                  _.map(self.getStudyCacseIdsUsingUIDs('sample', filters_[attributes.attr_id]), function(item) {
+                    return item.studyId + ':' + item.caseId;
+                  });
+              }
             }
           });
           temp = $.extend(true, _result.filters.samples, filters_);
@@ -848,6 +858,16 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
           _result.filters.samples = array;
         }
       });
+
+      if (vm_.customfilter.sampleUids.length > 0
+        || vm_.customfilter.patientUids.length > 0) {
+        var type = vm_.customfilter.type === 'sample' ? 'samples' : 'patients';
+        var uidsType = type === 'samples' ? 'sampleUids' : 'patientUids';
+        _result.filters[type][vm_.customfilter.id] =
+          _.map(self.getStudyCacseIdsUsingUIDs(vm_.customfilter.type, vm_.customfilter[uidsType]), function(item) {
+            return item.studyId + ':' + item.caseId;
+          });
+      }
       _result.studies = _studies;
       return _result;
     },

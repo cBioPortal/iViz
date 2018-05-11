@@ -91,45 +91,40 @@
   display: none;
 }
 
-.show {
-  display: block;
-}
-
 .iviz-header-button {
   float: left;
-  margin: 0 5px;
   font-family: Verdana, Arial, sans-serif;
-  font-size: 16px;
-  border: 1px solid darkgray;
+  font-size: 18px;
+  border: 1px solid $iviz-header-left-border-color;
   background: none;
   font-weight: normal;
   color: #555555;
   padding: 5px 10px;
-  border: solid 1px;
-  border-radius: 5px;
-  border-color: darkgrey;
+  border-radius: 3px;
   line-height: 18px;
 }
 
+.virtual-study .btn-default {
+  background-color: transparent;
+}
+study-view
 .iviz-header-button:hover {
   cursor: pointer;
 }
 
 #iviz-header-left {
   display: inline-block;
-}
-
-@media screen and (min-width: 1260px) {
-  #iviz-header-right {
-    float: right;
-    margin: $iviz-header-right-margin;
+  .iviz-header-item {
+    height: 30px;
+    float: left;
+    margin-left: $iviz-header-left-item-margin-left;
   }
 }
 
 #iviz_add_chart_chosen {
   width: $add-chart-chosen-width !important;
   background-image: none !important;
-  margin-top: -4px;
+  margin-left: $iviz-header-left-item-margin-left;
 }
 
 #iviz_add_chart_chosen > a {
@@ -145,17 +140,12 @@ div.geneAddedNotification {
   font-size: 0.8em;
 }
 
-#iviz-header-left-1 {
-  font-size: 1.1em;
-}
-
 .iviz-header-left-case {
   font-family: Verdana, Arial, sans-serif;
   font-size: 1.1em;
   vertical-align: middle;
   float: left;
   line-height: 30px;
-  margin: $iviz-header-left-case-margin;
   span {
     float: left;
   }
