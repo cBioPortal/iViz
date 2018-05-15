@@ -188,7 +188,7 @@
                 var hasNaWithinAttrs = false;
                 _.some(_attrs, function(attr) {
                   // All data has been normalized to NA for different NA values
-                  if (data[attr] === 'NA') {
+                  if (data[attr] === undefined || data[attr] === 'NA') {
                     hasNaWithinAttrs = true;
                     return true;
                   }
