@@ -324,11 +324,8 @@
                 _self.processTableData(_tableData);
               }, 0);
             }, function() {
-              _self.loadingBar.status = 1;
-              setTimeout(function() {
-                _self.genePanelMap = {};
-                _self.processTableData(_tableData);
-              }, 0);
+              _self.failedToInit = true;
+              _self.showLoad = false;
             });
         }, function() {
           _self.setDisplayTitle();
