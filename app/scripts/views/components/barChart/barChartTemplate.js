@@ -285,32 +285,9 @@
         height: this.settings.height
       });
 
-      // Mutation_count chart will cost much time to get data, so we treat it individually to avoid performance issue.  
-      // In the future, we may change it.
-      if (_self.attributes.attr_id === 'mutation_count') {
-        $.when(iViz.getMutationCountData(_self))
-          .then(function(_mutationCountData, _hasMutationCountData) {
-            if (!_hasMutationCountData) { //empty data
-              if (_self.attributes.addChartBy === 'default') {// Hide empty chart initially.
-                _self.attributes.show = false;
-                _self.$dispatch('remove-chart', _self.attributes.attr_id, _self.attributes.group_id);//rearrange layout
-              } else { // _self.attributes.addChartBy === 'user'
-                _self.$dispatch('data-loaded', _self.attributes.group_id, _self.chartDivId);
-              }
-              _self.errorMessage = iViz.util.getDataErrorMessage('noData');
-              _self.failedToInit = true;
-            } else {
-              _self.processBarchartData(_mutationCountData);
-            }
-          }, function() {
-            _self.errorMessage = iViz.util.getDataErrorMessage('failedToLoadData');
-            _self.failedToInit = true;
-            _self.$dispatch('data-loaded', _self.attributes.group_id, _self.chartDivId);
-          });
-      } else {
-        _data = iViz.getGroupNdx(this.opts.groupid);
-        _self.processBarchartData(_data);
-      }
+      
+      _data = iViz.getGroupNdx(this.opts.groupid);
+      _self.processBarchartData(_data);
     }
   });
 })(
