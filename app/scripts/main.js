@@ -548,69 +548,11 @@ window.iViz = (function(_, $, cbio, QueryByGeneUtil, QueryByGeneTextArea) {
       var self = this;
       var data = {};
 
-      $.when(window.iviz.datamanager.getCnaFractionData(),
-        self.getMutationCountData(_self))
-        .then(function(_cnaFractionData, _mutationCountResult) {
-          var _hasCNAFractionData = _.keys(_cnaFractionData).length > 0;
-          var _hasMutationCountData = false;
-          var groupId = _self.attributes.group_id;
-
-          if (_mutationCountResult[1]) {
-            _hasMutationCountData = _mutationCountResult[1];
-          }
-          data = self.getGroupNdx(groupId);
-
-          _.each(data, function(_sampleDatum) {
-            // cna fraction
-            if (_hasCNAFractionData) {
-              if (_cnaFractionData[_sampleDatum.study_id] === undefined ||
-                _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                _sampleDatum.cna_fraction = 'NA';
-                _sampleDatum.copy_number_alterations = 'NA';
-              } else {
-                _sampleDatum.cna_fraction = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
-                _sampleDatum.copy_number_alterations = _cnaFractionData[_sampleDatum.study_id][_sampleDatum.sample_id];
-              }
-              data_.groups.sample.data[_sampleDatum.sample_uid].cna_fraction = _sampleDatum.cna_fraction;
-              data_.groups.sample.data[_sampleDatum.sample_uid].copy_number_alterations = _sampleDatum.copy_number_alterations;
-            }
-          });
-          def.resolve(data, _hasCNAFractionData, _hasMutationCountData);
-        }, function() {
-          def.reject();
-        });
-      return def.promise();
-    },
-    getMutationCountData: function(_self) {
-      var def = new $.Deferred();
-      var self = this;
-      var data = {};
-
-      $.when(window.iviz.datamanager.getMutationCount())
-        .then(function(_mutationCountData) {
-          var _hasMutationCountData = _.keys(_mutationCountData).length > 0;
+      $.when(window.iviz.datamanager.getSampleClinicalData(['MUTATION_COUNT', 'FRACTION_GENOME_ALTERED']))
+        .then(function(_clinicalData) {
           var groupId = _self.attributes.group_id;
           data = self.getGroupNdx(groupId);
-
-          _.each(data, function(_sampleDatum) {
-            // mutation count
-            if (_hasMutationCountData) {
-              if (_mutationCountData[_sampleDatum.study_id] === undefined ||
-                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === undefined ||
-                _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id] === null) {
-                if (_self.attributes.sequencedCaseUIdsMap[_sampleDatum.sample_uid] === undefined) {
-                  _sampleDatum.mutation_count = 'NA';
-                } else {
-                  _sampleDatum.mutation_count = 0;
-                }
-              } else {
-                _sampleDatum.mutation_count = _mutationCountData[_sampleDatum.study_id][_sampleDatum.sample_id];
-              }
-              data_.groups.sample.data[_sampleDatum.sample_uid].mutation_count = _sampleDatum.mutation_count;
-            }
-          });
-          def.resolve(data, _hasMutationCountData);
+          def.resolve(data);
         }, function() {
           def.reject();
         });

@@ -14,12 +14,12 @@
     var getQtipString = function(_data) {
       var toReturn = ['Cancer Study:', _data.study_id, '<br>Sample Id: ',
         iViz.getCaseIdUsingUID('sample', _data.sample_uid), '<br>CNA fraction: '];
-      if (isNaN(_data.cna_fraction)) {
-        toReturn.push(_data.cna_fraction);
+      if (isNaN(_data.FRACTION_GENOME_ALTERED)) {
+        toReturn.push(_data.FRACTION_GENOME_ALTERED);
       } else {
-        toReturn.push(cbio.util.toPrecision(_data.cna_fraction, 2, 0.001));
+        toReturn.push(cbio.util.toPrecision(Number(_data.FRACTION_GENOME_ALTERED), 2, 0.001));
       }
-      toReturn.push('<br>Mutation count: ' + _data.mutation_count);
+      toReturn.push('<br>Mutation count: ' + _data.MUTATION_COUNT);
       return toReturn.join('');
     };
 
@@ -27,10 +27,10 @@
       opts_ = $.extend(true, {}, opts);
       chartId_ = opts_.chartId;
       data_ = _.filter(_data, function(datum) {
-        return !isNaN(datum.cna_fraction) && !isNaN(datum.mutation_count);
+        return !isNaN(datum.FRACTION_GENOME_ALTERED) && !isNaN(datum.MUTATION_COUNT);
       });
-      var _xArr = _.pluck(data_, 'cna_fraction');
-      var _yArr = _.pluck(data_, 'mutation_count');
+      var _xArr = _.pluck(data_, 'FRACTION_GENOME_ALTERED');
+      var _yArr = _.pluck(data_, 'MUTATION_COUNT');
       var _qtips = [];
       _.each(data_, function(_dataObj) {
         _qtips.push(getQtipString(_dataObj));
@@ -144,8 +144,8 @@
       Plotly.deleteTraces(chartId_, _traces);
       var data = [];
       data.push({
-        x: _.pluck(_unselectedData, 'cna_fraction'),
-        y: _.pluck(_unselectedData, 'mutation_count'),
+        x: _.pluck(_unselectedData, 'FRACTION_GENOME_ALTERED'),
+        y: _.pluck(_unselectedData, 'MUTATION_COUNT'),
         text: _unselectedDataQtips,
         mode: 'markers',
         type: 'scattergl',
@@ -159,8 +159,8 @@
         }
       });
       data.push({
-        x: _.pluck(_selectedData, 'cna_fraction'),
-        y: _.pluck(_selectedData, 'mutation_count'),
+        x: _.pluck(_selectedData, 'FRACTION_GENOME_ALTERED'),
+        y: _.pluck(_selectedData, 'MUTATION_COUNT'),
         text: _selectedDataQtips,
         mode: 'markers',
         type: 'scattergl',
@@ -195,8 +195,8 @@
           var _sampleId = iViz.getCaseIdUsingUID('sample', item.sample_uid);
           var _patientId = iViz.getPatientId(item.study_id, _sampleId);
           var _txt = (_patientId ? _patientId : 'NA') +
-            '\t' + _sampleId + '\t' + item.mutation_count + '\t' +
-            item.cna_fraction + '\t' + group.name;
+            '\t' + _sampleId + '\t' + item.MUTATION_COUNT + '\t' +
+            item.FRACTION_GENOME_ALTERED + '\t' + group.name;
           _data.push(_txt);
         });
       });

@@ -135,7 +135,7 @@
               // count as key, dataObj as value (performance concern)
               var _CnaFracMutCntMap = {};
               _.each(data, function(_dataObj) {
-                var _key = _dataObj.cna_fraction + '||' + _dataObj.mutation_count;
+                var _key = _dataObj.FRACTION_GENOME_ALTERED + '||' + _dataObj.MUTATION_COUNT;
                 _CnaFracMutCntMap[_key] = _dataObj;
               });
               _.each(_eventData.points, function(_pointObj) {
@@ -174,35 +174,26 @@
       });
       
       $.when(iViz.getScatterData(_self))
-        .then(function(_scatterData, _hasCnaFractionData, _hasMutationCountData) {
-          if (!_hasCnaFractionData || !_hasMutationCountData) {
-            if (_self.attributes.addChartBy === 'default') {
-              _self.attributes.show = false;
-              _self.$dispatch('remove-chart', _self.attributes.attr_id,  _self.attributes.group_id);//rearrange layout
-            } 
-            _self.error.noData = true;
-            _self.failedToInit = true;
-          } else {
-            var _opts = {
-              chartId: _self.chartId,
-              chartDivId: _self.chartDivId,
-              title: _self.attributes.display_name,
-              width: window.iViz.styles.vars.scatter.width,
-              height: window.iViz.styles.vars.scatter.height
-            };
-            
-            _self.chartInst = new iViz.view.component.ScatterPlot();
-            _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
-            _self.chartInst.init(_scatterData, _opts);
+        .then(function(_scatterData) {
+          var _opts = {
+            chartId: _self.chartId,
+            chartDivId: _self.chartDivId,
+            title: _self.attributes.display_name,
+            width: window.iViz.styles.vars.scatter.width,
+            height: window.iViz.styles.vars.scatter.height
+          };
+          
+          _self.chartInst = new iViz.view.component.ScatterPlot();
+          _self.chartInst.setDownloadDataTypes(['pdf', 'svg', 'tsv']);
+          _self.chartInst.init(_scatterData, _opts);
 
-            _self.dataLoaded = true;
-            var _selectedCases =
-              _.pluck(_self.invisibleDimension.top(Infinity), attrId);
-            if (_self.$root.hasfilters) {
-              _self.chartInst.update(_selectedCases);
-            }
-            _self.attachPlotlySelectedEvent();
+          _self.dataLoaded = true;
+          var _selectedCases =
+            _.pluck(_self.invisibleDimension.top(Infinity), attrId);
+          if (_self.$root.hasfilters) {
+            _self.chartInst.update(_selectedCases);
           }
+          _self.attachPlotlySelectedEvent();
          
           _self.showLoad = false;
         }, function() {
