@@ -1,4 +1,4 @@
-# iViz
+# iViz (Deprecated)
 <a href="https://codeclimate.com/github/cBioPortal/iViz"><img src="https://codeclimate.com/github/cBioPortal/iViz/badges/gpa.svg" /></a>
 [![API Doc](https://doclets.io/cBioPortal/iViz/master.svg)](https://doclets.io/cBioPortal/iViz/master)
 
